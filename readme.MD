@@ -3,7 +3,7 @@ Module which support waw project on basic level, elements and scripts which is n
 
 ## Mongo Service
 ## Modal Service
-## FM Service (File Manager)
+## File Service
 ## Socket Service
 ## Image Service
 ## Hash Service
