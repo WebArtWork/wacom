@@ -2,6 +2,6 @@
  * Public API Surface of wacom
  */
 
-export * from './lib/wacom.service';
-export * from './lib/wacom.component';
-export * from './lib/wacom.module';
+export * from './lib/mongo.service';
+export * from './lib/http.service';
+export * from './lib/sd.service';
