@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 	providedIn: 'root'
 })
 export class MongoService {
-	create(part, obj, cb) {
+	create(part, obj=null, cb=null) {
 		if (typeof obj == 'function') {
 			cb = obj;
 			obj = {};
