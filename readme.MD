@@ -26,7 +26,7 @@ $ npm i --save wacom
 
 
 ## Mongo Service
-Mongo Service is an suportive service for combining angular 6 client with waw CRUD back-end. Example of importing mongo service:
+Mongo Service is an suportive service for combining angular 6 client with waw CRUD back-end. Which means that you have to use [waw Framework](https://www.npmjs.com/package/waw) or you have to made your back-end routes in a way of waw crud. Example of importing mongo service:
 ```javascript
 import { MongoService } from 'wacom';
 constructor(private mongo: MongoService){};
@@ -139,6 +139,15 @@ checking value if it's object then we keep it and in other case, we replace it w
 mongo.get('colName', {
 	replace: {
 		data:mongo.beObj
+	}
+});
+```
+### beDate `function`
+making value new Date(valueContent). Example where each doc will have date as date:
+```javascript
+mongo.get('colName', {
+	replace: {
+		date:mongo.beDate
 	}
 });
 ```
