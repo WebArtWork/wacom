@@ -17,7 +17,7 @@ export class MongoService {
 	/*
 	*	waw crud connect functions
 	*/
-		public create(part, doc=null, cb=null) {
+		public create(part, doc=undefined, cb=undefined) {
 			if (typeof doc == 'function') {
 				cb = doc;
 				doc = {};
@@ -31,7 +31,7 @@ export class MongoService {
 				}
 			});
 		};
-		public get(part, opts=null, cb=null) {
+		public get(part, opts=undefined, cb=undefined) {
 			if (typeof opts == 'function') {
 				cb = opts;
 				opts = {};
@@ -58,7 +58,7 @@ export class MongoService {
 			});
 			return this.data['arr' + part];
 		};
-		public updateAll(part, doc, opts=null, cb=null) {
+		public updateAll(part, doc, opts=undefined, cb=undefined) {
 			if (typeof opts == 'function'){
 				cb = opts;
 				opts = {};
@@ -80,7 +80,7 @@ export class MongoService {
 				}
 			});
 		};
-		public updateUnique(part, doc, opts=null, cb=null){
+		public updateUnique(part, doc, opts=undefined, cb=undefined){
 			if(typeof opts == 'function'){
 				cb = opts;
 				opts='';
@@ -102,12 +102,14 @@ export class MongoService {
 				}
 			});
 		};
-		public delete(part, doc, opts=null, cb=null) {
+		public delete(part, doc, opts=undefined, cb=undefined) {
 			if (typeof opts == 'function') {
 				cb = opts;
 				opts = {};
 			}
-			if(typeof opts != 'object') opts = {};
+			if(typeof opts !== 'object') opts = {};
+			console.log(opts);
+			console.log(typeof(opts));
 			if(opts.fields){
 				if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
 				let _doc = {};
