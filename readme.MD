@@ -48,7 +48,11 @@ mongo.get('colName',{
 		name: function(val, cb, doc){
 			cb(val+'_modified')
 		}
-	}
+	},
+	populate: [{
+		field: 'author',
+		part: 'user'
+	}]
 }, () => {
 	console.log('documents is loaded and field name is modified on each doc.');
 })

@@ -108,8 +108,6 @@ export class MongoService {
 				opts = {};
 			}
 			if(typeof opts !== 'object') opts = {};
-			console.log(opts);
-			console.log(typeof(opts));
 			if(opts.fields){
 				if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
 				let _doc = {};
@@ -169,6 +167,12 @@ export class MongoService {
 		};
 		public populate(doc, field, part){
 			if(!doc||!field||!part) return;
+			if(Array.isArray(doc)){
+				for(let i = 0; i < doc.length; i++){
+					this.populate(doc[i], field, part);
+				}
+				return;
+			}
 			if(this.data['loaded'+part]){
 				if(Array.isArray(field)){
 					for(let i = 0; i < field.length; i++){
@@ -184,7 +188,7 @@ export class MongoService {
 				if(Array.isArray(doc[field])){
 					for(let i = doc[field].length-1; i >= 0; i--){
 						if(this.data['obj'+part][doc[field][i]]){
-							doc[field][i] = this.data['obj'+part][doc[field][i]]
+							doc[field][i] = this.data['obj'+part][doc[field][i]];
 						}else{
 							doc[field].splice(i, 1);
 						}
