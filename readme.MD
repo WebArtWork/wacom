@@ -205,6 +205,15 @@ Example where we closing modal inside modal html cope:
 ```
 ## Popup Service
 ## Spinner Service
+service for adding and closing spinners. Example where we creating spinner:
+```javascript
+let id = spin.open();
+```
+id which accepted as parameter of function spin.close(), returning from spin.open().
+Example where we closing spinner:
+```javascript
+spin.close(id);
+```
 ## File Service
 ## Socket Service
 ## Image Service
