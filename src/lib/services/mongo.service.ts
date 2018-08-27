@@ -203,6 +203,19 @@ export class MongoService {
 				}, 100);
 			}
 		}
+		public on(parts, cb) {
+   		    if (typeof parts == 'string') {
+   		        parts = parts.split(" ");
+   		    }
+   		    for (var i = 0; i < parts.length; i++) {
+   		        if (!this.data['loaded'+parts[i]]) {
+   		            setTimeout( () => {
+   		                this.on(parts, cb);
+   		            }, 100);
+   		        } 
+   		    }
+   		    cb();
+   		}
 	/*
 	*	mongo replace support functions
 	*/
