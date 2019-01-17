@@ -1,11 +1,29 @@
 {
 	"name": "wacom",
-	"version": "0.1.2",
+	"version": "0.1.13",
 	"license": "MIT",
 	"repository": "WebArtWork/wacom",
-	"keywords": ["waw", "angular", "ngx", "crud", "mongo", "general", "modal", "popup", "spinner", "file", "socket", "image", "hash"],
+	"keywords": [
+		"waw",
+		"angular",
+		"ngx",
+		"crud",
+		"mongo",
+		"general",
+		"modal",
+		"popup",
+		"spinner",
+		"file",
+		"socket",
+		"image",
+		"hash"
+	],
 	"peerDependencies": {
 		"@angular/common": "^6.0.0-rc.0 || ^6.0.0",
 		"@angular/core": "^6.0.0-rc.0 || ^6.0.0"
+	},
+	"dependencies": {
+		"ng-click-outside": "^4.0.0",
+		"rxjs": "^6.3.3"
 	}
 }

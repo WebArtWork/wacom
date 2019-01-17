@@ -49,14 +49,75 @@ mongo.get('colName',{
 			cb(val+'_modified')
 		}
 	},
+	name: 'me',
+	next: {
+		name: 'friends',
+		next: {
+			name: 'near',
+			next: {
+				name: 'city',
+				next: {
+					name: 'country'
+				}
+			}
+		}
+	},
 	populate: [{
 		field: 'author',
 		part: 'user'
-	}]
-}, () => {
-	console.log('documents is loaded and field name is modified on each doc.');
+	}],
+	groups: 'city name' || ['city', 'name'] || {
+		first_name: {
+			field: function(doc, cb){
+				if(doc.name.split(' ').length>1) cb(doc.name.split(' ')[1]);
+				retun doc.name.split(' ')[0];
+			},
+			allow: function(doc){
+				return !!doc.name;
+			},
+			ignore: function(){
+				return false;
+			},
+			sort: function(){
+
+			}
+		}
+	},
+	query: {
+		male: function(doc){
+			return doc.gender;
+		},
+		female: {
+			allow: function(doc){
+				return !doc.gender;
+			},
+			ignore: function(){
+				return typeof doc.gender != 'boolean';
+			},
+			sort: function(a, b){
+				if(a.order > b.order) return -1;
+				return 1;
+			}
+		}
+	}
+}, (arr, obj, name, resp) => {
+/*
+*	arr will be array with total docs from that part
+*	obj will be object with total docs from that part binded by _id
+*	groups will be saved into obj in the way: obj.name['Denys'] or obj.city['Kiev']
+*	name is the name of current pull from server
+*	resp is the array of responsinse with documents queried
+*/
 })
 ```
+#### replace `options`
+work as filler of each doc for cases when we can calculate things to use in website. Good example can be currencies which change each moment, we have product in one currency and we want to show it in different currrencies. Other good example can be date fields, which is saved as string and we need them in `new Date()` format.
+#### populate `options`
+works in the same way as populate of mongodb but in the client side. This works great when you need documents inside other documents and put on them sorting or other things.
+#### groups `options`
+makings arrays which show different documents inside specific placeholders. As example we can have list of users in specific town or country, so we don't have to create pipes for that.
+#### next `options`
+works as level of pulling different documents from the server. This is mostly made for performance, so user can have the info he needs directly.
 ### updateAll `function`
 connecting with waw CRUD updateAll. As parameters accepting name of mongo collection, document object, optionally options and optionally callback function which will return the document. Example:
 ```javascript
@@ -135,6 +196,68 @@ Example:
 mongo.on('user post', () => {
 	console.log('user and post part has been loaded');
 });
+```
+## Sort
+Set of functions, which are accepted by th function ```array.sort()``` as a parameter. Each of these functions is for sorting documents(objects).
+### sortAscId `function`
+accepting array of objects and return it sorted in ascending order by _id
+Example:
+```javascript
+array.sort(mongo.sortAscId());
+```
+### sortDescId `function`
+accepting array of objects and return it sorted in descending order by _id
+Example:
+```javascript
+mongo.sortDescId();
+```
+### sortAscString `function`
+accepting array of object and return it sorted in ascending order by alphabet
+Example:
+```javascript
+mongo.sortAscString();
+```
+### sortDescString `function`
+accepting array of object and return it sorted in descending order by alphabet
+Example:
+```javascript
+mongo.sortDescString();
+```
+### sortAscDate `function`
+accepting array of object and return it sorted in ascending order by date
+Example:
+```javascript
+mongo.sortAscDate();
+```
+### sortDescDate `function`
+accepting array of object and return it sorted in descending order by date
+Example:
+```javascript
+mongo.sortDescDate();
+```
+### sortAscNumber `function`
+accepting array of object and return it sorted in ascending order by number
+Example:
+```javascript
+mongo.sortAscNumber();
+```
+### sortDescNumber `function`
+accepting array of object and return it sorted in descending order by number
+Example:
+```javascript
+mongo.sortDescNumber();
+```
+### sortAscBoolean `function`
+accepting array of object and return it sorted: first - true, second - false
+Example:
+```javascript
+mongo.sortAscBoolean();
+```
+### sortDescBoolean `function`
+accepting array of object and return it sorted: first - false, second - true
+Example:
+```javascript
+mongo.sortDescBoolean();
 ```
 ### beArr `function`
 checking value if it's array then we keep it and in other case, we replace it with new array. Example where each doc will have data as array:

@@ -20,7 +20,7 @@ export class SpinnerService {
       private injector: Injector
   ) { }
   private data = {};
-  open(component: any, obj:any = {}) {
+  open(component: any = null, obj:any = {}) {
     if(!component) component = SpinnerComponent;
     if(!obj.id) obj.id = new Date().getTime();
 

@@ -1,26 +1,32 @@
 import { NgModule } from '@angular/core';
 import { ModalComponent } from './components/modal/modal.component';
-import { InputComponent } from './components/input/input.component';
 import { SpinnerComponent } from './components/spinner/spinner.component';
+import { PopupComponent } from './components/popup/popup.component';
+import { PopComponent } from './components/pop/pop.component';
 import { CommonModule } from '@angular/common'; 
+import { ClickOutsideModule } from 'ng-click-outside';
 @NgModule({
   imports: [ 
-  	CommonModule 
+  	CommonModule,
+    ClickOutsideModule
   ],
   declarations: [
-  	ModalComponent, 
-  	InputComponent,
-    SpinnerComponent
+  	ModalComponent,
+    SpinnerComponent,
+    PopupComponent,
+    PopComponent
   ],
   exports: [
   	ModalComponent,
-  	InputComponent,
-    SpinnerComponent
+    SpinnerComponent,
+    PopupComponent,
+    PopComponent
   ],
   entryComponents:[
     ModalComponent,
-    InputComponent,
-    SpinnerComponent
+    SpinnerComponent,
+    PopupComponent,
+    PopComponent
   ]
 })
 export class WacomModule { }

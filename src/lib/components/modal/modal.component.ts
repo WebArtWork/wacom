@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalService } from '../../services/modal.service';
+import { Observable, Subject } from 'rxjs';
+
 @Component({
-  selector: 'modal',
-  templateUrl: './modal.component.html',
-  styleUrls: ['./modal.component.scss']
+	selector: 'modal',
+	templateUrl: './modal.component.html',
+	styleUrls: ['./modal.component.scss']
 })
 export class ModalComponent implements OnInit {
 	private id;
@@ -11,16 +12,15 @@ export class ModalComponent implements OnInit {
 	public cover;
 	public header;
 	public content;
+	constructor(){}
+	ngOnInit(){}
+	private modalClose: Subject<any> = new Subject();
 	close(){
-		this.mod.close(this.id);
+		this.modalClose.next();
+		this.modalClose.complete();
 	}
-
-  constructor(private mod: ModalService) { }
-  
-  ngOnInit() {
-  	let obj=this.mod.pull();
-  	for(let key in obj){
-  		this[key]=obj[key];
-  	}
-  }
+	onModalClose(): Observable<any> {
+		return this.modalClose.asObservable();
+	}
 }
+ 
