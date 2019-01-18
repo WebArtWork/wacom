@@ -297,6 +297,9 @@ export class MongoService {
    		    }
    		    cb();
    		};
+   		public track(index, doc){
+   			return doc && doc._id && doc._id || index;
+   		}
    	/*
 	*	mongo sort filters
 	*/
