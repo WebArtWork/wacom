@@ -4,7 +4,6 @@ import { Injectable } from '@angular/core';
 	providedIn: 'root'
 })
 export class ImageService {
-	
 	// resizeUpTo(info, callback){
 	// 	if(!info) return console.log('No image');
 	// 	info.width = info.width || 1920;
@@ -37,6 +36,5 @@ export class ImageService {
 	// 	};
 	// 	reader.readAsDataURL(info);
 	// }
-
 	constructor() {}
 }

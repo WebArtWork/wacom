@@ -32,7 +32,7 @@ export class MongoService {
 				}
 			});
 		};
-		public get(part, opts=undefined, cb=undefined) {
+		public get(part, opts=undefined, cb=undefined, init=undefined) {
 			if (typeof opts == 'function') {
 				cb = opts;
 				opts = {};
@@ -114,6 +114,9 @@ export class MongoService {
 				this.data['loaded'+part]=true;
 				if(opts.next){
 					this.next(part, opts.next, cb);
+				}
+				if(typeof init == 'function'){
+					init(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);
 				}
 			});
 			return this.data['arr' + part];
@@ -285,133 +288,130 @@ export class MongoService {
 			}
 		};
 		public on(parts, cb) {
-   		    if (typeof parts == 'string') {
-   		        parts = parts.split(" ");
-   		    }
-   		    for (var i = 0; i < parts.length; i++) {
-   		        if (!this.data['loaded'+parts[i]]) {
-   		            return setTimeout( () => {
-   		                this.on(parts, cb);
-   		            }, 100);
-   		        } 
-   		    }
-   		    cb();
-   		};
-   		public track(index, doc){
-   			return doc && doc._id && doc._id || index;
-   		}
-   	/*
+			if (typeof parts == 'string') {
+				parts = parts.split(" ");
+			}
+			for (var i = 0; i < parts.length; i++) {
+				if (!this.data['loaded'+parts[i]]) {
+					return setTimeout( () => {
+						this.on(parts, cb);
+					}, 100);
+				} 
+			}
+			cb();
+		};
+		public track(index, doc){ return doc && doc._id && doc._id || index; }
+	/*
 	*	mongo sort filters
 	*/
-   		public sortAscId(){
-   			return function(a,b){
-   				if(a._id>b._id) return 1;
-   				else return -1;
-   			}
-   		};
-   		public sortDescId(){
-   			return function(a,b){
-   				if(a._id<b._id) return 1;
-   				else return -1;
-   			}
-   		};
-   		public sortAscString(opts){
-   			if(typeof opts == 'string'){
-   				opts = {
-   					field: opts
-   				}
-   			}
-   			return function(a,b){
-   				if(a[opts.field].toLowerCase()>b[opts.field].toLowerCase()) return 1;
-   				else if(a[opts.field].toLowerCase()<b[opts.field].toLowerCase() || !opts.next) return -1;
-   				else return opts.next(a,b);
-   			}
-   		}
-   		public sortDescString(opts){
-   			if(typeof opts == 'string'){
-   				opts = {
-   					field: opts
-   				}
-   			}
-   			return function(a,b){
-   				if(a[opts.field].toLowerCase()<b[opts.field].toLowerCase()) return 1;
-   				else if(a[opts.field].toLowerCase()>b[opts.field].toLowerCase() || !opts.next) return -1;
-   				else return opts.next(a,b);
-   			}
-   		}
-   		public sortAscDate(opts){
-   			if(typeof opts == 'string'){
-   				opts = {
-   					field: opts
-   				}
-   			}
-   			return function(a,b){
-   				if(a[opts.field].getTime()>b[opts.field].getTime()) return 1;
-   				else if(a[opts.field].getTime()<b[opts.field].getTime() || !opts.next) return -1;
-   				else return opts.next(a,b);
-   			}
-   		}
-   		public sortDescDate(opts){
-   			if(typeof opts == 'string'){
-   				opts = {
-   					field: opts
-   				}
-   			}
-   			return function(a,b){
-   				if(a[opts.field].getTime()<b[opts.field].getTime()) return 1;
-   				else if(a[opts.field].getTime()>b[opts.field].getTime() || !opts.next) return -1;
-   				else return opts.next(a,b);
-   			}
-   		}
-   		public sortAscNumber(opts){
-   			if(typeof opts == 'string'){
-   				opts = {
-   					field: opts
-   				}
-   			}
-   			return function(a,b){
-   				if(a[opts.field]>b[opts.field]) return 1;
-   				else if(a[opts.field]<b[opts.field] || !opts.next) return -1;
-   				else return opts.next(a,b);
-   			}
-   		}
-   		public sortDescNumber(opts){
-   			if(typeof opts == 'string'){
-   				opts = {
-   					field: opts
-   				}
-   			}
-   			return function(a,b){
-   				if(a[opts.field]<b[opts.field]) return 1;
-   				else if(a[opts.field]>b[opts.field] || !opts.next) return -1;
-   				else return opts.next(a,b);
-   			}
-   		}
-   		public sortAscBoolean(opts){
-   			if(typeof opts == 'string'){
-   				opts = {
-   					field: opts
-   				}
-   			}
-   			return function(a,b){
-   				if(!a[opts.field]&&b[opts.field]) return 1;
-   				else if(a[opts.field]&&!b[opts.field] || !opts.next) return -1;
-   				else return opts.next(a,b);
-   			}
-   		}
-   		public sortDescBoolean(opts){
-   			if(typeof opts == 'string'){
-   				opts = {
-   					field: opts
-   				}
-   			}
-   			return function(a,b){
-   				if(a[opts.field]&&!b[opts.field]) return 1;
-   				else if(!a[opts.field]&&b[opts.field] || !opts.next) return -1;
-   				else return opts.next(a,b);
-   			}
-   		}
-
+		public sortAscId(){
+			return function(a,b){
+				if(a._id>b._id) return 1;
+				else return -1;
+			}
+		};
+		public sortDescId(){
+			return function(a,b){
+				if(a._id<b._id) return 1;
+				else return -1;
+			}
+		};
+		public sortAscString(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field].toLowerCase()>b[opts.field].toLowerCase()) return 1;
+				else if(a[opts.field].toLowerCase()<b[opts.field].toLowerCase() || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortDescString(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field].toLowerCase()<b[opts.field].toLowerCase()) return 1;
+				else if(a[opts.field].toLowerCase()>b[opts.field].toLowerCase() || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortAscDate(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field].getTime()>b[opts.field].getTime()) return 1;
+				else if(a[opts.field].getTime()<b[opts.field].getTime() || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortDescDate(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field].getTime()<b[opts.field].getTime()) return 1;
+				else if(a[opts.field].getTime()>b[opts.field].getTime() || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortAscNumber(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field]>b[opts.field]) return 1;
+				else if(a[opts.field]<b[opts.field] || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortDescNumber(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field]<b[opts.field]) return 1;
+				else if(a[opts.field]>b[opts.field] || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortAscBoolean(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(!a[opts.field]&&b[opts.field]) return 1;
+				else if(a[opts.field]&&!b[opts.field] || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortDescBoolean(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field]&&!b[opts.field]) return 1;
+				else if(!a[opts.field]&&b[opts.field] || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
 	/*
 	*	mongo replace filters
 	*/
