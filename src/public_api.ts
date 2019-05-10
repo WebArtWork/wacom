@@ -15,6 +15,7 @@ export * from './lib/services/file.service';
 export * from './lib/services/hash.service';
 export * from './lib/services/modal.service';
 export * from './lib/wacom.module';
+export * from './lib/pipes/pipes.module';
 export * from './lib/components/modal/modal.component';
 export * from './lib/components/popup/popup.component';
 export * from './lib/components/pop/pop.component';
