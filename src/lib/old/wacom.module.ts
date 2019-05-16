@@ -5,7 +5,7 @@ import { PopupComponent } from './components/popup/popup.component';
 import { PopComponent } from './components/pop/pop.component';
 import { CommonModule } from '@angular/common'; 
 import { ClickOutsideModule } from 'ng-click-outside';
-import { SearchPipe } from './pipes/search.pipe';
+
 @NgModule({
   imports: [ 
   	CommonModule,
@@ -15,7 +15,6 @@ import { SearchPipe } from './pipes/search.pipe';
   	ModalComponent,
     SpinnerComponent,
     PopupComponent,
-    SearchPipe,
     PopComponent
   ],
   exports: [

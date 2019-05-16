@@ -422,21 +422,33 @@ export class MongoService {
 			}
 			cb(val);
 		};
-		public beDate(val, cb) {
-			cb( new Date(val) );
-		};
+		public beDate(val, cb) { cb( new Date(val) ); };
 		public beString(val, cb){
 			if(typeof val != 'string'){
 				val = '';
 			}
 			cb(val);
 		};
+		public beDoc = (val, cb)=>{
+			if(typeof val != 'object' || Array.isArray(val)) val = {};
+			if(!val._id){
+				this._id(_id=>{
+					val._id = _id;
+					cb(val);
+				});
+			}else cb(val);
+		};
 		public forceArr(val, cb){ cb([]); };
 		public forceObj(val, cb){ cb({}); };
 		public forceString(val, cb){ cb(''); };
-		public getCreated(val, cb, doc){
-			cb(new Date(parseInt(doc._id.substring(0,8), 16)*1000));
+		public forceDoc = (val, cb) => {
+			this._id(_id=>{
+				cb({
+					_id: _id
+				});
+			});
 		};
+		public getCreated(val, cb, doc){ cb(new Date(parseInt(doc._id.substring(0,8), 16)*1000)); };
 	/*
 	*	mongo local support functions
 	*/

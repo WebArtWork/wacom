@@ -6,11 +6,14 @@ import {
 	Injectable,
 	Injector
 } from '@angular/core';
-import { ModalComponent } from '../components/modal/modal.component';
+
+// import { ModalComponent } from '../components/modal/modal.component';
+
 @Injectable({
 	providedIn: 'root'
 })
 export class ModalService {
+	/*
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
 		private appRef: ApplicationRef,
@@ -59,4 +62,5 @@ export class ModalService {
 	close(id){
 		this.data[id].appRef.detachView(this.data[id].componentRefer.hostView);
 	}
+	*/
 }
