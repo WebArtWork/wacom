@@ -118,7 +118,7 @@ export class MongoService {
 			});
 			return this.data['arr' + part];
 		};
-		public updateAll(part, doc, opts=undefined, cb=undefined) {
+		public update(part, doc, opts=undefined, cb=undefined) {
 			if (typeof opts == 'function'){
 				cb = opts;
 				opts = {};
@@ -132,7 +132,7 @@ export class MongoService {
 				}
 				doc = _doc;
 			}
-			this.http.post('/api/' + part + '/update/all' + (opts.name||''), doc).subscribe(resp => {
+			this.http.post('/api/' + part + '/update' + (opts.name||''), doc).subscribe(resp => {
 				if (resp && typeof cb == 'function') {
 					cb(resp);
 				} else if (typeof cb == 'function') {
@@ -140,28 +140,50 @@ export class MongoService {
 				}
 			});
 		};
-		public updateUnique(part, doc, opts=undefined, cb=undefined){
-			if(typeof opts == 'function'){
-				cb = opts;
-				opts='';
-			}
-			if(typeof opts != 'object') opts = {};
-			if(opts.fields){
-				if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
-				let _doc = {};
-				for(let i = 0; i < opts.fields.length; i++){
-					_doc[opts.fields[i]] = doc[opts.fields[i]];
+			public updateAll(part, doc, opts=undefined, cb=undefined) {
+				if (typeof opts == 'function'){
+					cb = opts;
+					opts = {};
 				}
-				doc = _doc;
-			}
-			this.http.post('/api/'+part+'/unique/field'+opts, doc).subscribe(resp => {
+				if(typeof opts != 'object') opts = {};
+				if(opts.fields){
+					if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
+					let _doc = {};
+					for(let i = 0; i < opts.fields.length; i++){
+						_doc[opts.fields[i]] = doc[opts.fields[i]];
+					}
+					doc = _doc;
+				}
+				this.http.post('/api/' + part + '/update/all' + (opts.name||''), doc).subscribe(resp => {
 					if (resp && typeof cb == 'function') {
-					cb(resp);
-				} else if (typeof cb == 'function') {
-					cb(false);
+						cb(resp);
+					} else if (typeof cb == 'function') {
+						cb(false);
+					}
+				});
+			};
+			public updateUnique(part, doc, opts=undefined, cb=undefined){
+				if(typeof opts == 'function'){
+					cb = opts;
+					opts='';
 				}
-			});
-		};
+				if(typeof opts != 'object') opts = {};
+				if(opts.fields){
+					if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
+					let _doc = {};
+					for(let i = 0; i < opts.fields.length; i++){
+						_doc[opts.fields[i]] = doc[opts.fields[i]];
+					}
+					doc = _doc;
+				}
+				this.http.post('/api/'+part+'/unique/field'+opts, doc).subscribe(resp => {
+						if (resp && typeof cb == 'function') {
+						cb(resp);
+					} else if (typeof cb == 'function') {
+						cb(false);
+					}
+				});
+			};
 		public delete(part, doc, opts=undefined, cb=undefined) {
 			if (typeof opts == 'function') {
 				cb = opts;
@@ -417,7 +439,7 @@ export class MongoService {
 			else cb(val);
 		};
 		public beObj(val, cb){
-			if(typeof val != 'object' || Array.isArray(val)){
+			if(typeof val != 'object' || Array.isArray(val) || !val){
 				val = {};
 			}
 			cb(val);
@@ -430,13 +452,14 @@ export class MongoService {
 			cb(val);
 		};
 		public beDoc = (val, cb)=>{
-			if(typeof val != 'object' || Array.isArray(val)) val = {};
-			if(!val._id){
-				this._id(_id=>{
-					val._id = _id;
-					cb(val);
-				});
-			}else cb(val);
+			this.beObj(val, val=>{
+				if(!val._id){
+					this._id(_id=>{
+						val._id = _id;
+						cb(val);
+					});
+				}else cb(val);
+			});
 		};
 		public forceArr(val, cb){ cb([]); };
 		public forceObj(val, cb){ cb({}); };
