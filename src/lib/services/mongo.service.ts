@@ -32,6 +32,95 @@ export class MongoService {
 				}
 			});
 		};
+		private init(part, opts, cb){
+			if(this.data['loaded'+part]){
+				if(typeof cb == 'function'){
+					cb(this.data['arr' + part], this.data['obj' + part]);
+				}
+				return this.data['arr' + part];
+			}
+			this.data['arr' + part] = [];
+			this.data['obj' + part] = {};
+			this.data['opts' + part] = opts = opts||{};
+			if(opts.query){
+				for(let key in opts.query){
+					if(typeof opts.query[key] == 'function'){
+						opts.query[key] = {
+							allow: opts.query[key]
+						}
+					}
+					this.data['obj' + part][key] = [];
+				}
+			}
+			if(opts.groups){
+				if(typeof opts.groups == 'string'){
+					opts.groups = opts.groups.split(' ');
+				}
+				if(Array.isArray(opts.groups)){
+					let arr = opts.groups;
+					opts.groups = {};
+					for(let i = 0; i < arr.length; i++){
+						if(typeof arr[i] == 'string'){
+							opts.groups[arr[i]] = true;
+						}else {
+							for(let key in arr[i]){
+								opts.groups[key] = arr[i][key];
+							}
+						}
+					}
+				}
+				for(let key in opts.groups){
+					if(typeof opts.groups[key] == 'boolean'){
+						if(opts.groups[key]){
+							opts.groups[key] = {
+								field: function(doc){
+									return doc[key];
+								}
+							}
+						}else{
+							delete opts.groups[key];
+							continue;
+						}
+					}
+					if(typeof opts.groups[key] != 'object'){
+						delete opts.groups[key];
+						continue;
+					}
+					if(typeof opts.groups[key].field != 'function'){
+						delete opts.groups[key];
+						continue;
+					}
+					if(Array.isArray(this.data['obj' + part][key])){
+						console.warn('You can have same field groups with query. Field '+key+' is not used in groups.');
+						delete opts.groups[key];
+						continue;
+					}
+					this.data['obj' + part][key] = {};
+				}
+			}
+		}
+		public fetch(part, opts=undefined, cb=undefined) {
+			if (typeof opts == 'function') {
+				cb = opts;
+				opts = {};
+			}
+			this.init(part, opts, cb);
+			this.http.get < any > ('/api/' + part + '/get'+(opts.name||'')+(opts.param||'')).subscribe(resp => {
+				if (resp) {
+					for (let i = 0; i < resp.length; i++) {
+						this.push(part,resp[i]);
+					}
+					if (typeof cb == 'function') cb(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);
+				} else if (typeof cb == 'function') {
+					cb(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);
+				}
+				this.data['loaded'+part]=true;
+				if(opts.next){
+					this.next(part, opts.next, cb);
+				}
+			});
+			return this.data['arr' + part];
+		};
 		public get(part, opts=undefined, cb=undefined) {
 			if (typeof opts == 'function') {
 				cb = opts;
