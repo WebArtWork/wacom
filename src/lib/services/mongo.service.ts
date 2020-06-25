@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { SocketService } from './socket.service';
-
+import { throwError } from 'rxjs'; 
+import { catchError } from 'rxjs/operators'; 
 @Injectable({
 	providedIn: 'root'
 })
@@ -86,13 +87,13 @@ export class MongoService {
 				}
 			}
 		};
-		public create(part, doc=undefined, cb=undefined, errCb=undefined) {
+		public create(part, doc=undefined, cb=undefined, errCb:any=(err:HttpErrorResponse)=>{}) {
 			if (typeof doc == 'function') {
-				errCb = cb;
+				if(cb) errCb = cb;
 				cb = doc;
 				doc = {};
 			}
-			this.http.post < any > ('/api/' + part + '/create', doc || {}).subscribe(resp => {
+			this.http.post < any > ('/api/' + part + '/create', doc || {}).pipe(catchError(this.handleError(errCb))).subscribe(resp => {
 				if (resp) {
 					this.socket.emit('create', {
 						_id: resp._id,
@@ -103,34 +104,35 @@ export class MongoService {
 				}else if (typeof cb == 'function') {
 					cb(false);
 				}
-			}, errCb||()=>{});
+			});
 		};
-		public fetch(part, opts=undefined, cb=undefined, errCb=undefined) {
+		public fetch(part, opts=undefined, cb=undefined, errCb:any=(err:HttpErrorResponse)=>{}) {
 			if (typeof opts == 'function') {
-				errCb = cb;
+				if(cb) errCb = cb;
 				cb = opts;
 				opts = {};
 			}
 			this.config(part, opts);
 			let url = '/api/' + part + '/fetch'+(opts.name||'');
-			this.http.post < any > (opts.url || url, (opts.query||{})).subscribe(resp => {
+			this.http.post < any > (opts.url || url, (opts.query||{})).pipe(catchError(this.handleError(errCb))).subscribe(resp => {
 				this.push(part, resp);
 				if (resp && typeof cb == 'function') {
 					cb(resp);
 				} else if (typeof cb == 'function') {
 					cb(false);
 				}
-			}, errCb||()=>{});
+			});
 		};
-		public get(part, opts=undefined, cb=undefined, errCb=undefined) {
+		public get(part, opts=undefined, cb=undefined, errCb:any=(err:HttpErrorResponse)=>{}) {
 			if (typeof opts == 'function') {
-				errCb = cb;
+				if(cb) errCb = cb;
 				cb = opts;
 				opts = {};
 			}
 			this.config(part, opts);			
 			let url = '/api/' + part + '/get'+(opts.name||'')+(opts.param||'');
-			this.http.get<any>(opts.url || url).subscribe(resp => {
+			console.log(errCb, part);
+			this.http.get<any>(opts.url || url).pipe(catchError(this.handleError(errCb))).subscribe(resp => {
 				if (Array.isArray(resp)) {
 					for (let i = 0; i < resp.length; i++) {
 						this.push(part,resp[i]);
@@ -140,7 +142,7 @@ export class MongoService {
 					cb(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);
 				}
 				this.data['loaded'+part]=true;
-			}, errCb||()=>{});
+			}, errCb);
 			return this.data['arr' + part];
 		};
 		public set(part, opts=undefined, resp=undefined) {
@@ -176,16 +178,16 @@ export class MongoService {
 			}
 			return doc;
 		};
-		public update(part, doc, opts=undefined, cb=undefined, errCb=undefined) {
+		public update(part, doc, opts=undefined, cb=undefined, errCb:any=(err:HttpErrorResponse)=>{}) {
 			if (typeof opts == 'function'){
-				errCb = cb;
+				if(cb) errCb = cb;
 				cb = opts;
 				opts = {};
 			}
 			if(typeof opts != 'object') opts = {};
 			doc = this.prepare_update(doc, opts);
 			let url = '/api/' + part + '/update' + (opts.name||'');
-			this.http.post(opts.url || url, doc).subscribe(resp => {
+			this.http.post(opts.url || url, doc).pipe(catchError(this.handleError(errCb))).subscribe(resp => {
 				if(resp){
 					this.socket.emit('update', {
 						_id: doc._id,
@@ -198,18 +200,18 @@ export class MongoService {
 				} else if (typeof cb == 'function') {
 					cb(false);
 				}
-			}, errCb||()=>{});
+			});
 		};
-		public unique(part, doc, opts=undefined, cb=undefined, errCb=undefined) {
+		public unique(part, doc, opts=undefined, cb=undefined, errCb:any=(err:HttpErrorResponse)=>{}) {
 			if (typeof opts == 'function'){
-				errCb = cb;
+				if(cb) errCb = cb;
 				cb = opts;
 				opts = {};
 			}
 			if(typeof opts != 'object') opts = {};
 			doc = this.prepare_update(doc, opts);
 			let url = '/api/' + part + '/unique' + (opts.name||'');
-			this.http.post(opts.url || url, doc).subscribe(resp => {
+			this.http.post(opts.url || url, doc).pipe(catchError(this.handleError(errCb))).subscribe(resp => {
 				if(resp){
 					this.socket.emit('update', {
 						_id: doc._id,
@@ -222,11 +224,11 @@ export class MongoService {
 				} else if (typeof cb == 'function') {
 					cb(false);
 				}
-			}, errCb||()=>{});
+			});
 		};
-		public delete(part, doc, opts=undefined, cb=undefined, errCb=undefined) {
+		public delete(part, doc, opts=undefined, cb=undefined, errCb:any=(err:HttpErrorResponse)=>{}) {
 			if (typeof opts == 'function') {
-				errCb = cb;
+				if(cb) errCb = cb;
 				cb = opts;
 				opts = {};
 			}
@@ -244,7 +246,7 @@ export class MongoService {
 				}
 			}
 			let url = '/api/' + part + '/delete' + (opts.name||'');
-			this.http.post(opts.url || url, doc).subscribe(resp => {
+			this.http.post(opts.url || url, doc).pipe(catchError(this.handleError(errCb))).subscribe(resp => {
 				if (resp) {
 					this.socket.emit('delete', {
 						_id: doc._id,
@@ -257,7 +259,7 @@ export class MongoService {
 				} else if (typeof cb == 'function') {
 					cb(false);
 				}
-			}, errCb||()=>{});
+			});
 		};
 		public _id(cb){
 			if(typeof cb == 'function'){
@@ -494,6 +496,12 @@ export class MongoService {
 	/*
 	*	mongo local support functions
 	*/
+		private handleError(cb = err=>{}) {
+			return function(error: HttpErrorResponse){
+				cb(error);
+				return throwError("We can't connect to the server");
+			}
+		};
 		private replace(doc, value, rpl){
 			if(value.indexOf('.')>-1){
 				value = value.split('.');
