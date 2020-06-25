@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { SocketService } from './socket.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -18,95 +19,119 @@ export class MongoService {
 	/*
 	*	waw crud connect functions
 	*/
-		public create(part, doc=undefined, cb=undefined) {
+		public config(part, opts){
+			if(this.data['opts' + part]) return;
+			this.data['arr' + part] = [];
+			this.data['obj' + part] = {};
+			this.data['opts' + part] = opts = opts||{};
+			if(opts.query){
+				for(let key in opts.query){
+					if(typeof opts.query[key] == 'function'){
+						opts.query[key] = {
+							allow: opts.query[key]
+						}
+					}
+					this.data['obj' + part][key] = [];
+				}
+			}
+			if(opts.groups){
+				if(typeof opts.groups == 'string'){
+					opts.groups = opts.groups.split(' ');
+				}
+				if(Array.isArray(opts.groups)){
+					let arr = opts.groups;
+					opts.groups = {};
+					for(let i = 0; i < arr.length; i++){
+						if(typeof arr[i] == 'string'){
+							opts.groups[arr[i]] = true;
+						}else {
+							for(let key in arr[i]){
+								if(typeof arr[i][key] == 'function'){
+									arr[i][key] = {
+										field: arr[i][key]
+									}
+								}
+								opts.groups[key] = arr[i][key];
+							}
+						}
+					}
+				}
+				for(let key in opts.groups){
+					if(typeof opts.groups[key] == 'boolean'){
+						if(opts.groups[key]){
+							opts.groups[key] = {
+								field: function(doc){
+									return doc[key];
+								}
+							}
+						}else{
+							delete opts.groups[key];
+							continue;
+						}
+					}
+					if(typeof opts.groups[key] != 'object'){
+						delete opts.groups[key];
+						continue;
+					}
+					if(typeof opts.groups[key].field != 'function'){
+						delete opts.groups[key];
+						continue;
+					}
+					if(Array.isArray(this.data['obj' + part][key])){
+						console.warn('You can have same field groups with query. Field '+key+' is not used in groups.');
+						delete opts.groups[key];
+						continue;
+					}
+					this.data['obj' + part][key] = {};
+				}
+			}
+		};
+		public create(part, doc=undefined, cb=undefined, errCb=undefined) {
 			if (typeof doc == 'function') {
+				errCb = cb;
 				cb = doc;
 				doc = {};
 			}
 			this.http.post < any > ('/api/' + part + '/create', doc || {}).subscribe(resp => {
 				if (resp) {
+					this.socket.emit('create', {
+						_id: resp._id,
+						part: part
+					});
 					this.push(part, resp);
 					if (typeof cb == 'function') cb(resp);
 				}else if (typeof cb == 'function') {
 					cb(false);
 				}
-			});
+			}, errCb||()=>{});
 		};
-		private init(part, opts, cb){
-			if(this.data['loaded'+part]){
-				if(typeof cb == 'function'){
-					cb(this.data['arr' + part], this.data['obj' + part]);
-				}
-				return this.data['arr' + part];
-			}
-			this.data['arr' + part] = [];
-			this.data['obj' + part] = {};
-			this.data['opts' + part] = opts = opts||{};
-			if(opts.query){
-				for(let key in opts.query){
-					if(typeof opts.query[key] == 'function'){
-						opts.query[key] = {
-							allow: opts.query[key]
-						}
-					}
-					this.data['obj' + part][key] = [];
-				}
-			}
-			if(opts.groups){
-				if(typeof opts.groups == 'string'){
-					opts.groups = opts.groups.split(' ');
-				}
-				if(Array.isArray(opts.groups)){
-					let arr = opts.groups;
-					opts.groups = {};
-					for(let i = 0; i < arr.length; i++){
-						if(typeof arr[i] == 'string'){
-							opts.groups[arr[i]] = true;
-						}else {
-							for(let key in arr[i]){
-								opts.groups[key] = arr[i][key];
-							}
-						}
-					}
-				}
-				for(let key in opts.groups){
-					if(typeof opts.groups[key] == 'boolean'){
-						if(opts.groups[key]){
-							opts.groups[key] = {
-								field: function(doc){
-									return doc[key];
-								}
-							}
-						}else{
-							delete opts.groups[key];
-							continue;
-						}
-					}
-					if(typeof opts.groups[key] != 'object'){
-						delete opts.groups[key];
-						continue;
-					}
-					if(typeof opts.groups[key].field != 'function'){
-						delete opts.groups[key];
-						continue;
-					}
-					if(Array.isArray(this.data['obj' + part][key])){
-						console.warn('You can have same field groups with query. Field '+key+' is not used in groups.');
-						delete opts.groups[key];
-						continue;
-					}
-					this.data['obj' + part][key] = {};
-				}
-			}
-		}
-		public fetch(part, opts=undefined, cb=undefined) {
+		public fetch(part, opts=undefined, cb=undefined, errCb=undefined) {
 			if (typeof opts == 'function') {
+				errCb = cb;
 				cb = opts;
 				opts = {};
 			}
-			this.init(part, opts, cb);
-			this.http.get < any > ('/api/' + part + '/get'+(opts.name||'')+(opts.param||'')).subscribe(resp => {
-				if (resp) {
+			this.config(part, opts);
+			let url = '/api/' + part + '/fetch'+(opts.name||'');
+			this.http.post < any > (opts.url || url, (opts.query||{})).subscribe(resp => {
+				this.push(part, resp);
+				if (resp && typeof cb == 'function') {
+					cb(resp);
+				} else if (typeof cb == 'function') {
+					cb(false);
+				}
+			}, errCb||()=>{});
+		};
+		public get(part, opts=undefined, cb=undefined, errCb=undefined) {
+			if (typeof opts == 'function') {
+				errCb = cb;
+				cb = opts;
+				opts = {};
+			}
+			this.config(part, opts);			
+			let url = '/api/' + part + '/get'+(opts.name||'')+(opts.param||'');
+			this.http.get<any>(opts.url || url).subscribe(resp => {
+				if (Array.isArray(resp)) {
 					for (let i = 0; i < resp.length; i++) {
 						this.push(part,resp[i]);
 					}
@@ -115,104 +140,26 @@ export class MongoService {
 					cb(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);
 				}
 				this.data['loaded'+part]=true;
-				if(opts.next){
-					this.next(part, opts.next, cb);
-				}
-			});
+			}, errCb||()=>{});
 			return this.data['arr' + part];
 		};
-		public get(part, opts=undefined, cb=undefined) {
-			if (typeof opts == 'function') {
-				cb = opts;
-				opts = {};
+		public set(part, opts=undefined, resp=undefined) {
+			if (Array.isArray(opts)) {
+				resp = opts;
+				opts = undefined;
 			}
-			if(this.data['loaded'+part]){
-				if(typeof cb == 'function'){
-					cb(this.data['arr' + part], this.data['obj' + part]);
-				}
-				return this.data['arr' + part];
-			}
-			this.data['arr' + part] = [];
-			this.data['obj' + part] = {};
-			this.data['opts' + part] = opts = opts||{};
-			if(opts.query){
-				for(let key in opts.query){
-					if(typeof opts.query[key] == 'function'){
-						opts.query[key] = {
-							allow: opts.query[key]
-						}
-					}
-					this.data['obj' + part][key] = [];
+			if(opts) this.config(part, opts);
+			if (Array.isArray(resp)) {
+				for (let i = 0; i < resp.length; i++) {
+					this.push(part, resp[i]);
 				}
 			}
-			if(opts.groups){
-				if(typeof opts.groups == 'string'){
-					opts.groups = opts.groups.split(' ');
-				}
-				if(Array.isArray(opts.groups)){
-					let arr = opts.groups;
-					opts.groups = {};
-					for(let i = 0; i < arr.length; i++){
-						if(typeof arr[i] == 'string'){
-							opts.groups[arr[i]] = true;
-						}else {
-							for(let key in arr[i]){
-								opts.groups[key] = arr[i][key];
-							}
-						}
-					}
-				}
-				for(let key in opts.groups){
-					if(typeof opts.groups[key] == 'boolean'){
-						if(opts.groups[key]){
-							opts.groups[key] = {
-								field: function(doc){
-									return doc[key];
-								}
-							}
-						}else{
-							delete opts.groups[key];
-							continue;
-						}
-					}
-					if(typeof opts.groups[key] != 'object'){
-						delete opts.groups[key];
-						continue;
-					}
-					if(typeof opts.groups[key].field != 'function'){
-						delete opts.groups[key];
-						continue;
-					}
-					if(Array.isArray(this.data['obj' + part][key])){
-						console.warn('You can have same field groups with query. Field '+key+' is not used in groups.');
-						delete opts.groups[key];
-						continue;
-					}
-					this.data['obj' + part][key] = {};
-				}
+			return {
+				arr: this.data['arr' + part],
+				obj: this.data['obj' + part]
 			}
-			this.http.get < any > ('/api/' + part + '/get'+(opts.name||'')+(opts.param||'')).subscribe(resp => {
-				if (resp) {
-					for (let i = 0; i < resp.length; i++) {
-						this.push(part,resp[i]);
-					}
-					if (typeof cb == 'function') cb(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);
-				} else if (typeof cb == 'function') {
-					cb(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);
-				}
-				this.data['loaded'+part]=true;
-				if(opts.next){
-					this.next(part, opts.next, cb);
-				}
-			});
-			return this.data['arr' + part];
 		};
-		public update(part, doc, opts=undefined, cb=undefined) {
-			if (typeof opts == 'function'){
-				cb = opts;
-				opts = {};
-			}
-			if(typeof opts != 'object') opts = {};
+		private prepare_update(doc, opts){
 			if(opts.fields){
 				if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
 				let _doc = {};
@@ -221,60 +168,65 @@ export class MongoService {
 				}
 				doc = _doc;
 			}
-			this.http.post('/api/' + part + '/update' + (opts.name||''), doc).subscribe(resp => {
+			if(typeof opts.replace == 'object' && Object.values(opts.replace).length){
+				doc = JSON.parse(JSON.stringify(doc));
+				for(let key in opts.replace){
+					this.replace(doc, key, opts.replace[key]);
+				}
+			}
+			return doc;
+		};
+		public update(part, doc, opts=undefined, cb=undefined, errCb=undefined) {
+			if (typeof opts == 'function'){
+				errCb = cb;
+				cb = opts;
+				opts = {};
+			}
+			if(typeof opts != 'object') opts = {};
+			doc = this.prepare_update(doc, opts);
+			let url = '/api/' + part + '/update' + (opts.name||'');
+			this.http.post(opts.url || url, doc).subscribe(resp => {
+				if(resp){
+					this.socket.emit('update', {
+						_id: doc._id,
+						part: part
+					});
+					this.renew(part, doc);
+				}
 				if (resp && typeof cb == 'function') {
 					cb(resp);
 				} else if (typeof cb == 'function') {
 					cb(false);
 				}
-			});
+			}, errCb||()=>{});
 		};
-			public updateAll(part, doc, opts=undefined, cb=undefined) {
-				if (typeof opts == 'function'){
-					cb = opts;
-					opts = {};
+		public unique(part, doc, opts=undefined, cb=undefined, errCb=undefined) {
+			if (typeof opts == 'function'){
+				errCb = cb;
+				cb = opts;
+				opts = {};
+			}
+			if(typeof opts != 'object') opts = {};
+			doc = this.prepare_update(doc, opts);
+			let url = '/api/' + part + '/unique' + (opts.name||'');
+			this.http.post(opts.url || url, doc).subscribe(resp => {
+				if(resp){
+					this.socket.emit('update', {
+						_id: doc._id,
+						part: part
+					});
+					this.renew(part, doc);
 				}
-				if(typeof opts != 'object') opts = {};
-				if(opts.fields){
-					if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
-					let _doc = {};
-					for(let i = 0; i < opts.fields.length; i++){
-						_doc[opts.fields[i]] = doc[opts.fields[i]];
-					}
-					doc = _doc;
+				if (resp && typeof cb == 'function') {
+					cb(resp);
+				} else if (typeof cb == 'function') {
+					cb(false);
 				}
-				this.http.post('/api/' + part + '/update/all' + (opts.name||''), doc).subscribe(resp => {
-					if (resp && typeof cb == 'function') {
-						cb(resp);
-					} else if (typeof cb == 'function') {
-						cb(false);
-					}
-				});
-			};
-			public updateUnique(part, doc, opts=undefined, cb=undefined){
-				if(typeof opts == 'function'){
-					cb = opts;
-					opts='';
-				}
-				if(typeof opts != 'object') opts = {};
-				if(opts.fields){
-					if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
-					let _doc = {};
-					for(let i = 0; i < opts.fields.length; i++){
-						_doc[opts.fields[i]] = doc[opts.fields[i]];
-					}
-					doc = _doc;
-				}
-				this.http.post('/api/'+part+'/unique/field'+opts, doc).subscribe(resp => {
-						if (resp && typeof cb == 'function') {
-						cb(resp);
-					} else if (typeof cb == 'function') {
-						cb(false);
-					}
-				});
-			};
-		public delete(part, doc, opts=undefined, cb=undefined) {
+			}, errCb||()=>{});
+		};
+		public delete(part, doc, opts=undefined, cb=undefined, errCb=undefined) {
 			if (typeof opts == 'function') {
+				errCb = cb;
 				cb = opts;
 				opts = {};
 			}
@@ -291,43 +243,21 @@ export class MongoService {
 					_id:doc._id
 				}
 			}
-			this.http.post('/api/' + part + '/delete' + (opts.name||''), doc).subscribe(resp => {
-				if (resp && Array.isArray(this.data['arr' + part])) {
-					for (let i = 0; i < this.data['arr' + part].length; i++) {
-						if (this.data['arr' + part][i]._id == doc._id) {
-							this.data['arr' + part].splice(i, 1);
-							break;
-						}
-					}
-					delete this.data['obj' + part][doc._id];
-					if(this.data['opts'+part].groups){
-						for(let key in this.data['opts'+part].groups){
-							for(let field in this.data['obj' + part][key]){
-								for (let i = this.data['obj' + part][key][field].length-1; i >= 0 ; i--) {
-									if (this.data['obj' + part][key][field][i]._id == doc._id) {
-										this.data['obj' + part][key][field].splice(i, 1);
-									}
-								}
-							}
-						}
-					}
-					if(this.data['opts'+part].query){
-						for(let key in this.data['opts'+part].query){
-							for (let i = this.data['obj' + part][key].length-1; i >= 0 ; i--) {
-								if (this.data['obj' + part][key][i]._id == doc._id) {
-									this.data['obj' + part][key].splice(i, 1);
-									break;
-								}
-							}
-						}
-					}
+			let url = '/api/' + part + '/delete' + (opts.name||'');
+			this.http.post(opts.url || url, doc).subscribe(resp => {
+				if (resp) {
+					this.socket.emit('delete', {
+						_id: doc._id,
+						part: part
+					});
+					this.remove(part, doc);
 				}
 				if (resp && typeof cb == 'function') {
 					cb(resp);
 				} else if (typeof cb == 'function') {
 					cb(false);
 				}
-			});
+			}, errCb||()=>{});
 		};
 		public _id(cb){
 			if(typeof cb == 'function'){
@@ -580,7 +510,7 @@ export class MongoService {
 			}
 		};
 		public push(part, doc){
-			if(this.data['obj' + part][doc._id]) return;
+			if(this.data['obj' + part][doc._id]) return this.renew(part, doc);
 			if(this.data['opts'+part].replace){
 				for(let key in this.data['opts'+part].replace){
 					this.replace(doc, key, this.data['opts'+part].replace[key]);
@@ -641,23 +571,135 @@ export class MongoService {
 				}
 			}
 		};
-		private next(part, opts, cb){
-			this.http.get < any > ('/api/' + part + '/get'+(opts.name||'')+(opts.param||'')).subscribe(resp => {
-				if (resp) {
-					for (let i = 0; i < resp.length; i++) {
-						this.push(part, resp[i]);
+		public remove(part, doc){
+			if(!Array.isArray(this.data['arr' + part])) return;
+			for (let i = 0; i < this.data['arr' + part].length; i++) {
+				if (this.data['arr' + part][i]._id == doc._id) {
+					this.data['arr' + part].splice(i, 1);
+					break;
+				}
+			}
+			delete this.data['obj' + part][doc._id];
+			if(this.data['opts'+part].groups){
+				for(let key in this.data['opts'+part].groups){
+					for(let field in this.data['obj' + part][key]){
+						for (let i = this.data['obj' + part][key][field].length-1; i >= 0 ; i--) {
+							if (this.data['obj' + part][key][field][i]._id == doc._id) {
+								this.data['obj' + part][key][field].splice(i, 1);
+							}
+						}
 					}
-					if (typeof cb == 'function') cb(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);
-				} else if (typeof cb == 'function') {
-					cb(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);
 				}
-				if(opts.next){
-					this.next(part, opts.next, cb);
+			}
+			if(this.data['opts'+part].query){
+				for(let key in this.data['opts'+part].query){
+					for (let i = this.data['obj' + part][key].length-1; i >= 0 ; i--) {
+						if (this.data['obj' + part][key][i]._id == doc._id) {
+							this.data['obj' + part][key].splice(i, 1);
+							break;
+						}
+					}
 				}
-			});
+			}
+		};
+		public renew(part, doc){
+			if(!this.data['obj' + part][doc._id]) return this.push(part, doc);
+			for (let each in this.data['obj' + part][doc._id]){
+				this.data['obj' + part][doc._id][each] = doc[each];
+			}
+			for (let each in doc){
+				this.data['obj' + part][doc._id][each] = doc[each];
+			}
+			if(this.data['opts'+part].groups){
+				for(let key in this.data['opts'+part].groups){
+					let to_have = true;
+					let g = this.data['opts'+part].groups[key];
+					if(typeof g.ignore == 'function' && g.ignore(doc)) to_have = false;
+					if(typeof g.allow == 'function' && !g.allow(doc)) to_have = false;
+					if(!this.data['obj' + part][key]){
+						this.data['obj' + part][key] = {};
+					}
+					let fields = {};
+					let set = field => {
+						fields[field] = true;
+						if(!field) return;
+						if(!Array.isArray(this.data['obj' + part][key][field])){
+							this.data['obj' + part][key][field] = [];
+						}
+						if(to_have){
+							for (let i = this.data['obj' + part][key][field].length-1; i >= 0; i--){
+							    if(this.data['obj' + part][key][field][i]._id == doc._id) return;
+							}
+							this.data['obj' + part][key][field].push(doc);
+						} else {
+							for (let i = this.data['obj' + part][key][field].length-1; i >= 0; i--){
+							    if(this.data['obj' + part][key][field][i]._id == doc._id){
+							    	this.data['obj' + part][key][field].splice(i, 1);
+							    }
+							}
+						}
+						if(typeof g.sort == 'function'){
+							this.data['obj' + part][key][field].sort(g.sort);
+						}
+					}
+					set(g.field(doc, set.bind(this)));
+					for (let field in this.data['obj' + part][key]){
+						if(fields[field]) continue;
+						for (let i = this.data['obj' + part][key][field].length-1; i >= 0; i--){
+							if(this.data['obj' + part][key][field][i]._id == doc._id){
+								this.data['obj' + part][key][field].splice(i, 1);
+							}
+						}
+					}
+				}
+			}
+			if(this.data['opts'+part].query){
+				for(let key in this.data['opts'+part].query){
+					let to_have = true;
+					let query = this.data['opts'+part].query[key];
+					if(typeof query.ignore == 'function' && query.ignore(doc)) to_have = false;
+					if(typeof query.allow == 'function' && !query.allow(doc)) to_have = false;
+					if(!this.data['obj' + part][key]){
+						this.data['obj' + part][key] = [];
+					}
+					if(to_have){
+						for (let i = this.data['obj' + part][key].length-1; i >= 0; i--){
+						    if(this.data['obj' + part][key][i]._id == doc._id) return;
+						}
+						this.data['obj' + part][key].push(doc);
+					} else {
+						for (let i = this.data['obj' + part][key].length-1; i >= 0; i--){
+						    if(this.data['obj' + part][key][i]._id == doc._id){
+						    	this.data['obj' + part][key].splice(i, 1);
+						    }
+						}
+					}
+					if(typeof query.sort == 'function'){
+						this.data['obj' + part][key].sort(query.sort);
+					}
+				}
+			}
 		};
 	/*
 	*	Endof Mongo Service
 	*/
-	constructor(private http: HttpClient) {}
+	constructor(private http: HttpClient, private socket: SocketService){
+		socket.on('create', created=>{
+			this.fetch(created.part, {
+				query: {
+					_id: created._id
+				}
+			});
+		});
+		socket.on('update', updated=>{
+			this.fetch(updated.part, {
+				query: {
+					_id: updated._id
+				}
+			});
+		});
+		socket.on('delete', deleted=>{
+			this.remove(deleted.part, deleted);
+		});
+	}
 }

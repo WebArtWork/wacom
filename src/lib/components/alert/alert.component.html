@@ -1,0 +1,10 @@
+<div class="waw-alert-container" [class.height]="height">
+	<div [class.waw-alert-color-blue]="type=='info'" [class.waw-alert-color-red]="type=='error'" [class.waw-alert-color-green]="type=='success'" [class.waw-alert-color-orange]="type=='warning'" class="waw-alert bounceInUp waw-alert-theme-light  waw-alert-animateInside waw-alert-opened">
+		<div class="waw-alert-body">
+			<div class="waw-alert-texts">
+				<span class="waw-alert-title slideIn">Success.</span> 
+				<span class="waw-alert-message slideIn">{{text.slice(0, 50)}}</span>
+			</div>
+		</div>
+	</div>
+</div>

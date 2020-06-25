@@ -1,29 +1,16 @@
-# wacom waw Angular6 common
+# wacom waw Angular (ngx) common
 Module which support waw project on basic level, elements and scripts which is needed on all projects. 
 
 [Mongo service](https://www.npmjs.com/package/wacom#mongo-service) provide connection between waw crud and everything that will be needed for mongo documents management.
 
-[SD service](https://www.npmjs.com/package/wacom#sd-service) provide collection of functions for general use.
-
-[Modal service](https://www.npmjs.com/package/wacom#modal-service) handling everything that has to be added into modal or alert.
-
-[Popup service](https://www.npmjs.com/package/wacom#popup-service) handling everything that has to be managed as popup on something else.
-
-[Spinner service](https://www.npmjs.com/package/wacom#spinner-service) take care of all loading pieces.
-
-[File service](https://www.npmjs.com/package/wacom#file-service) managing file process, from load any type from user to sent it to server.
-
-[Socket service](https://www.npmjs.com/package/wacom#socket-service) handling the sockets management with server and other clients.
-
-[Image service](https://www.npmjs.com/package/wacom#image-service) take care of everything around pictures on the client side.
-
 [Hash service](https://www.npmjs.com/package/wacom#hash-service) with use of href hash, provide memo sharable points for modals or popups.
+
+[Render service](https://www.npmjs.com/package/wacom#render-service) provide a structure for rendering components on specific emits.
 
 Installation:
 ```bash
 $ npm i --save wacom
 ```
-
 
 ## Mongo Service
 Mongo Service is an suportive service for combining angular 6 client with waw CRUD back-end. Which means that you have to use [waw Framework](https://www.npmjs.com/package/waw) or you have to made your back-end routes in a way of waw crud. Example of importing mongo service:
@@ -304,42 +291,7 @@ mongo.get('colName', {
 	}
 });
 ```
-## SD Service
-## Modal Service
-The basic service for adding and closing modals. Example where we opening modal inside controller or service:
-```javascript
-import { ModalService } from 'wacom';
-import { Component } from './component';
-constructor(private modal: ModalService) {
-	modal.open({
-		component:Component,
-		full:true,
-	});
-}
-
-```
-Example how to use the object we are passing:
-```html
-<div>{{name}}</div>
-```
-Example where we closing modal inside modal html cope:
-```html
-<button ng-click="close();">Cancel</button>
-```
-## Popup Service
-## Spinner Service
-service for adding and closing spinners. Example where we creating spinner:
-```javascript
-let id = spin.open();
-```
-id which accepted as parameter of function spin.close(), returning from spin.open().
-Example where we closing spinner:
-```javascript
-spin.close(id);
-```
-## File Service
-## Socket Service
-## Image Service
 ## Hash Service
+## Render Service
 ## License
   [MIT](LICENSE)
