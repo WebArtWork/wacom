@@ -23,7 +23,6 @@ export class DomService {
 			this.appRef.attachView(componentRef.hostView);
 			const domElem = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
 			let element = document.getElementById(id);
-			console.log(element);
 			if(element){
 				element.appendChild(domElem);
 			}
@@ -32,7 +31,12 @@ export class DomService {
 	/**
 	* Appends a component to body currently
 	*/
+		private providedIn:any = {};
 		appendComponent(component: any, options: any = {}, element = document.body) {
+			if(options.providedIn){
+				if(this.providedIn[options.providedIn]) return;
+				this.providedIn[options.providedIn] = true;
+			}
 			const componentRef = this.componentFactoryResolver.resolveComponentFactory(component).create(this.injector);
 			this.projectComponentInputs(componentRef, options);
 			this.appRef.attachView(componentRef.hostView);

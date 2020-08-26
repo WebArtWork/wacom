@@ -93,6 +93,8 @@ export class MongoService {
 				cb = doc;
 				doc = {};
 			}
+			if(doc.___created) return;
+			doc.___created = true;
 			this.http.post < any > ('/api/' + part + '/create', doc || {}).pipe(catchError(this.handleError(errCb))).subscribe(resp => {
 				if (resp) {
 					this.socket.emit('create', {
@@ -115,7 +117,7 @@ export class MongoService {
 			this.config(part, opts);
 			let url = '/api/' + part + '/fetch'+(opts.name||'');
 			this.http.post < any > (opts.url || url, (opts.query||{})).pipe(catchError(this.handleError(errCb))).subscribe(resp => {
-				this.push(part, resp);
+				if(resp) this.push(part, resp);
 				if (resp && typeof cb == 'function') {
 					cb(resp);
 				} else if (typeof cb == 'function') {
@@ -131,7 +133,6 @@ export class MongoService {
 			}
 			this.config(part, opts);			
 			let url = '/api/' + part + '/get'+(opts.name||'')+(opts.param||'');
-			console.log(errCb, part);
 			this.http.get<any>(opts.url || url).pipe(catchError(this.handleError(errCb))).subscribe(resp => {
 				if (Array.isArray(resp)) {
 					for (let i = 0; i < resp.length; i++) {

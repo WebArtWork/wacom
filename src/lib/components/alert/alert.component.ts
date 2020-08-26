@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild} from '@angular/core';
 
 @Component({
     selector: 'alert',
@@ -6,20 +6,30 @@ import { Component } from '@angular/core';
     styleUrls: ['./alert.component.scss']
 })
 
-
 export class AlertComponent {
-    show: any;
-    height = true;
+    @ViewChild('alert', { static: false })  alert: any;
     public text: string = "Hello, World!";
-    public type: string = "success";
+    public type: string = "info";
     public progress: boolean = true;
     public position: string = 'bottomRight'; // [bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter or center]
-    public timeout: number = 3000;
+    public timeout: number = 5000;
     public close: any = true;
-    public buttons: any = [];/*[{text,or,html, callback}]*/
+    public buttons: any = []; /*[{text, callback}]*/
+	
     constructor() {
-        setTimeout(() => {
-            this.show = true;
-        }, 300);
+        if(this.timeout){
+            setTimeout(() => {
+                this.remove();
+            }, this.timeout);
+        }
+    }
+    public delete_animation=false;
+    remove(){
+        this.delete_animation=true;
+        setTimeout(()=>{
+            this.alert.nativeElement.remove();
+            this.delete_animation=false;
+        },350);
+		
     }
 }

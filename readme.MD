@@ -3,10 +3,6 @@ Module which support waw project on basic level, elements and scripts which is n
 
 [Mongo service](https://www.npmjs.com/package/wacom#mongo-service) provide connection between waw crud and everything that will be needed for mongo documents management.
 
-[Hash service](https://www.npmjs.com/package/wacom#hash-service) with use of href hash, provide memo sharable points for modals or popups.
-
-[Render service](https://www.npmjs.com/package/wacom#render-service) provide a structure for rendering components on specific emits.
-
 Installation:
 ```bash
 $ npm i --save wacom
@@ -291,7 +287,5 @@ mongo.get('colName', {
 	}
 });
 ```
-## Hash Service
-## Render Service
 ## License
   [MIT](LICENSE)

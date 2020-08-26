@@ -15,13 +15,20 @@ export class SearchPipe implements PipeTransform {
 		// f stands for fields
 		// l stands for limit
 		// i stands for ignore filter
-		if(i || !s) return given||[];
+		// start stands for start the limit
+		if(!s){
+			return given;
+		}
 		if(typeof f == 'number'){
 			l = f;
 			f = null;
 		}
+		if(i || !s){
+			if(l && Array.isArray(given)) return given.slice(0, l);
+			else return given||[];
+		}
 		let _arr = [], _check = {};
-		if(typeof s == 'object'){
+		if(!Array.isArray(s)&&typeof s == 'object'){
 			let _s = [];
 			for(let key in s){
 				if(s[key]) _s.push(key);
@@ -30,7 +37,7 @@ export class SearchPipe implements PipeTransform {
 		}
 		if(typeof s == 'string'){
 			s = [s];
-		}		
+		}
 		if(!f) f = ['name'];
 		if(typeof f == 'string') f = f.split(' ');
 		let sub_test = function(obj, _f, initObj, check){
@@ -49,9 +56,9 @@ export class SearchPipe implements PipeTransform {
 			}
 			for (let j = 0; j < s.length; j++) {
 				let b = false;
-				if(typeof obj[_f] == 'string' && typeof s[j] == 'string' &&
-					(obj[_f].toLowerCase().indexOf(s[j].toLowerCase())>-1 ||
-					 s[j].toLowerCase().indexOf(obj[_f].toLowerCase())>-1)){
+				if((typeof obj[_f] == 'string' || typeof obj[_f] == 'number') && typeof s[j] == 'string' &&
+					(obj[_f].toString().toLowerCase().indexOf(s[j].toLowerCase())>-1 ||
+					 s[j].toLowerCase().indexOf(obj[_f].toString().toLowerCase())>-1)){
 					if(!_check[check]) _arr.push(initObj);
 					_check[check] = true;
 					b = true;
@@ -77,5 +84,4 @@ export class SearchPipe implements PipeTransform {
 		if(l) return _arr.splice(0, l);
 		return _arr;
 	}
-
 }

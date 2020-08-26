@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AlertComponent } from '../components/alert/alert.component';
 import { WrapperComponent } from '../components/alert/wrapper/wrapper.component';
 import { DomService } from './dom.service';
+
 interface AlertOptions {
 	text:string;
 	type?: string;
