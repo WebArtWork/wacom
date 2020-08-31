@@ -12,7 +12,7 @@ export class AlertComponent {
     public type: string = "info";
     public progress: boolean = true;
     public position: string = 'bottomRight'; // [bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter or center]
-    public timeout: number = 5000;
+    public timeout: number = 50000;
     public close: any = true;
     public buttons: any = []; /*[{text, callback}]*/
 	

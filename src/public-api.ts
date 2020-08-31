@@ -1,6 +1,16 @@
 /*
-* Services
+*	Interfaces
 */
+	export * from './lib/interfaces/config';
+	export * from './lib/interfaces/alert.interface';
+/*
+*	Guard
+*/
+	export * from './lib/guard/meta.guard';
+/*
+*	Services
+*/
+	export * from './lib/services/meta.service';
 	export * from './lib/services/store.service';
 	export * from './lib/services/http.service';
 	export * from './lib/services/mongo.service';
@@ -14,9 +24,9 @@
 	export * from './lib/services/ui.service';
 	export * from './lib/services/core.service';
 /*
-* Initial
+*	Initial
 */
 	export * from './lib/wacom.module';
 /*
-* End of Support
+*	End of Support
 */

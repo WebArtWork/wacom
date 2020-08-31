@@ -46,6 +46,9 @@ export class HashService {
 		this.hash[field] = value;
 		this.save();
 	}
+	get(field){
+		return this.hash[field];
+	}
 	clear(field){
 		delete this.hash[field];
 		this.save();

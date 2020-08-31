@@ -144,6 +144,19 @@ export class CoreService {
 			this.cb[signal][id] = null;
 		}
 	}
+	/* once Signal when something is ready */
+	private done_next:any = {};
+	public done(signal) {
+		this.done_next[signal] = true;
+	};
+	public next(signal, cb) {
+		if(this.done_next[signal]) cb();
+		else {
+			return setTimeout(()=>{
+				this.next(signal, cb);
+			}, 100);
+		}
+	};
 	/*
 	public for(arr, cb, i=0, field=[], counter=[], lead:any){
 		if(i < arr.length){

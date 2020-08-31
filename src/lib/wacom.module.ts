@@ -1,5 +1,6 @@
 /* modules */
 import { NgModule, ModuleWithProviders } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 /* filters */
@@ -21,15 +22,20 @@ import { ColorComponent } from './components/picker/color/color.component';
 import { HtmlComponent } from './components/picker/html/html.component';
 import { FilesComponent } from './components/files/files.component';
 import { ClickOutsideDirective } from './directives/click-outside.directive';
+import { CheckboxComponent } from './components/picker/checkbox/checkbox.component';
+import { RadioComponent } from './components/picker/radio/radio.component';
+import { SelectComponent } from './components/picker/select/select.component';
+import { MetaGuard } from './guard/meta.guard';
+import { MetaService } from './services/meta.service';
 @NgModule({
-	declarations: [OtaPipe, SafePipe, SearchPipe, EachPipe, AlertComponent, WrapperComponent, PickerComponent, TextComponent, NumberComponent, DateComponent, TimeComponent, ColorComponent, HtmlComponent, FilesComponent, ClickOutsideDirective],
+	declarations: [OtaPipe, SafePipe, SearchPipe, EachPipe, AlertComponent, WrapperComponent, PickerComponent, TextComponent, NumberComponent, DateComponent, TimeComponent, ColorComponent, HtmlComponent, FilesComponent, ClickOutsideDirective, CheckboxComponent, RadioComponent, SelectComponent],
 	exports: [OtaPipe, SafePipe, SearchPipe, EachPipe, AlertComponent, PickerComponent, ClickOutsideDirective],
 	entryComponents: [AlertComponent, WrapperComponent, FilesComponent],
 	providers: [{
 		provide: CONFIG_TOKEN,
 		useValue: DEFAULT_CONFIG
-	}],
-	imports: [CommonModule, FormsModule]
+	}, MetaGuard, MetaService],
+	imports: [CommonModule, FormsModule, HttpClientModule]
 })
 export class WacomModule {
 	static forRoot(config: Config = DEFAULT_CONFIG): ModuleWithProviders {

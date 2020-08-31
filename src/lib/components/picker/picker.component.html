@@ -4,3 +4,6 @@
 <waw-color *ngIf="type == 'color'" [id]="id" [name]="name" [placeholder]="placeholder" [(inputModel)]="ngModel" (inputModelChange)="ngModelChange.emit(ngModel)"></waw-color>
 <waw-html *ngIf="type == 'html'" [id]="id" [name]="name" [placeholder]="placeholder" [(inputModel)]="ngModel" (inputModelChange)="ngModelChange.emit(ngModel)"></waw-html>
 <waw-time *ngIf="type == 'time'" [id]="id" [name]="name" [placeholder]="placeholder" [min]="min" [max]="max" [step]="step" [(inputModel)]="ngModel" (inputModelChange)="ngModelChange.emit(ngModel)"></waw-time>
+<waw-check *ngIf="type == 'check'" [(inputModel)]="ngModel" (inputModelChange)="ngModelChange.emit(ngModel)" [list]="list" [config]="config"></waw-check>
+<waw-radio *ngIf="type == 'radio'" [(inputModel)]="ngModel" (inputModelChange)="ngModelChange.emit(ngModel)" [list]="list" [config]="config"></waw-radio>
+<waw-select *ngIf="type == 'select'" [(inputModel)]="ngModel" (inputModelChange)="ngModelChange.emit(ngModel)" [list]="list" [config]="config" [disabled]="disabled" [multiple]="multiple" [size]="size" [label]="placeholder"></waw-select>

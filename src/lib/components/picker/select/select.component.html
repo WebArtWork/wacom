@@ -1,0 +1,25 @@
+<div (clickOutside)="options = false">
+	<div *ngIf="!multiple">
+		<span>{{inputModel||label}}</span>
+		<button *ngIf="inputModel" (click)="inputModel = null">Remove</button>
+		<button (click)="options = !options">Open</button>
+	</div>
+	<div *ngIf="multiple">
+		<ng-container *ngIf="inputModel?.length">
+			<div *ngFor="let obj of inputModel; index as i">
+				<span>{{obj}}</span>
+				<button (click)="inputModel.splice(i, 1); inputModelChange.emit(inputModel)">Remove</button>
+			</div>
+			<button (click)="inputModel = []; inputModelChange.emit(inputModel)">Remove All</button>
+		</ng-container>
+		<ng-container *ngIf="!inputModel?.length">
+			<span>{{label}}</span>
+		</ng-container>
+		<button (click)="options = !options">Open</button>
+	</div>
+	<ng-container *ngIf="options">
+		<div *ngFor="let row of list" [id]="row.id">
+			<span (click)="selected(row)">{{row?.label}}</span>
+		</div>
+	</ng-container>
+</div>
