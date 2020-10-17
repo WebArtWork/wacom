@@ -1,4 +1,4 @@
-import { Component, ViewChild} from '@angular/core';
+import { Component, ElementRef, ViewChild} from '@angular/core';
 
 @Component({
     selector: 'alert',
@@ -7,16 +7,17 @@ import { Component, ViewChild} from '@angular/core';
 })
 
 export class AlertComponent {
-    @ViewChild('alert', { static: false })  alert: any;
+    public component: any;
     public text: string = "Hello, World!";
+    public class: string = "";
     public type: string = "info";
     public progress: boolean = true;
     public position: string = 'bottomRight'; // [bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter or center]
-    public timeout: number = 50000;
+    public timeout: number = 5000;
     public close: any = true;
     public buttons: any = []; /*[{text, callback}]*/
 	
-    constructor() {
+    constructor(private elementRef: ElementRef) {
         if(this.timeout){
             setTimeout(() => {
                 this.remove();
@@ -27,7 +28,7 @@ export class AlertComponent {
     remove(){
         this.delete_animation=true;
         setTimeout(()=>{
-            this.alert.nativeElement.remove();
+            this.elementRef.nativeElement.remove();
             this.delete_animation=false;
         },350);
 		

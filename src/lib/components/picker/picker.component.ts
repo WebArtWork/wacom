@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
 
 @Component({
-	inputs: ['type', 'id', 'name', 'placeholder', 'min', 'max', 'step', 'field', 'config', 'list', 'disabled', 'multiple', 'size', 'label'],
+	inputs: ['type', 'id', 'name', 'placeholder', 'min', 'max', 'step', 'field', 'config', 'list', 'disabled', 'multiple', 'size', 'label', 'search'],
 	selector: 'picker',
 	templateUrl: './picker.component.html',
 	styleUrls: ['./picker.component.scss']
@@ -22,6 +22,7 @@ export class PickerComponent  {
 	public size;
 	public list = [];
 	public label = 'Select';
+	public search = false;
 	@Input() ngModel;
   	@Output() ngModelChange = new EventEmitter();
 	constructor() {

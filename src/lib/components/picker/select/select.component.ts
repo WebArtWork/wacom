@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, Input, OnInit } from '@angular/core';
 
 @Component({
-	inputs: ['id', 'name', 'list', 'config', 'disabled', 'multiple', 'size', 'label'],
+	inputs: ['id', 'name', 'list', 'config', 'disabled', 'multiple', 'size', 'label', 'search'],
 	selector: 'waw-select',
 	templateUrl: './select.component.html',
 	styleUrls: ['./select.component.scss']
@@ -19,6 +19,8 @@ export class SelectComponent implements OnInit {
 	public config:any = {};
 	public options = false;
 	public label;
+	public search = false;
+	public text_search = '';
 	constructor() {
 	}
 	ngOnInit() {

@@ -1,12 +1,40 @@
 # wacom waw Angular (ngx) common
-Module which support waw project on basic level, elements and scripts which is needed on all projects. 
+Module which has common services and components which can be used on all projects.
 
-[Mongo service](https://www.npmjs.com/package/wacom#mongo-service) provide connection between waw crud and everything that will be needed for mongo documents management.
+## Getting Started
 
-Installation:
+### License
+  [MIT](LICENSE)
+
+### Instalation
 ```bash
 $ npm i --save wacom
 ```
+
+### Services
+| Name | Description |
+| ------- |:-----:|
+| [**`Core`**](https://www.npmjs.com/package/wacom#core-service) | Common supportive function which can be used in any service |
+| [**`Store`**](https://www.npmjs.com/package/wacom#store-service) | Service will is responsible for keeping information on the device |
+| [**`Hash`**](https://www.npmjs.com/package/wacom#hash-service) | Hash management for easily use, storage which stay in url |
+| [**`Dom`**](https://www.npmjs.com/package/wacom#dom-service) | Html DOM management, user friendly service |
+| [**`Render`**](https://www.npmjs.com/package/wacom#render-service) | Make not automated render management well structured |
+| [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service) | Website meta tags management within router |
+| [**`Alert`**](https://www.npmjs.com/package/wacom#alert-service) | Alerts management |
+| [**`Modal`**](https://www.npmjs.com/package/wacom#modal-service) | Modals management |
+| [**`Loader`**](https://www.npmjs.com/package/wacom#loader-service) | Loaders management |
+| [**`Time`**](https://www.npmjs.com/package/wacom#time-service) | Supportive time service |
+| [**`UI`**](https://www.npmjs.com/package/wacom#ui-service) | Supportive UI/UX service |
+| [**`Http`**](https://www.npmjs.com/package/wacom#http-service) | Http layer for HttpClient |
+| [**`File`**](https://www.npmjs.com/package/wacom#file-service) | File management, connect with waw back-end |
+| [**`Mongo`**](https://www.npmjs.com/package/wacom#mongo-service) | Mongo management, connect with waw back-end |
+| [**`Social`**](https://www.npmjs.com/package/wacom#social-service) | Social management, connect with waw back-end |
+| [**`Socket`**](https://www.npmjs.com/package/wacom#socket-service) | Socket management, connect with waw back-end |
+
+### Components
+| Name | Description |
+| ------- |:-----:|
+| [**`Picker`**](https://www.npmjs.com/package/wacom#picker-component) | Huge common component which is used to take information from user |
 
 ## Mongo Service
 Mongo Service is an suportive service for combining angular 6 client with waw CRUD back-end. Which means that you have to use [waw Framework](https://www.npmjs.com/package/waw) or you have to made your back-end routes in a way of waw crud. Example of importing mongo service:
@@ -287,5 +315,3 @@ mongo.get('colName', {
 	}
 });
 ```
-## License
-  [MIT](LICENSE)

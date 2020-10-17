@@ -26,7 +26,7 @@ export class DomService {
 			if(element){
 				element.appendChild(domElem);
 			}
-			return componentRef;
+			return domElem;
 		}
 	/**
 	* Appends a component to body currently
@@ -42,7 +42,7 @@ export class DomService {
 			this.appRef.attachView(componentRef.hostView);
 			const domElem = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
 			element.appendChild(domElem);
-			return componentRef;
+			return domElem;
 		}
 	/**
 	* Projects the inputs onto the component

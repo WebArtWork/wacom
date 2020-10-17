@@ -1,4 +1,4 @@
-<div (clickOutside)="options = false">
+<div class="waw-select" [class._active]="options" (clickOutside)="options = false">
 	<div *ngIf="!multiple">
 		<span>{{inputModel||label}}</span>
 		<button *ngIf="inputModel" (click)="inputModel = null">Remove</button>
@@ -17,9 +17,13 @@
 		</ng-container>
 		<button (click)="options = !options">Open</button>
 	</div>
-	<ng-container *ngIf="options">
-		<div *ngFor="let row of list" [id]="row.id">
+	<div class="waw-select_pop" *ngIf="options">
+		<div *ngIf="config&&config.search">
+			<input type="text" name="search" [placeholder]="config.search.placeholder||'Type to search'" [(ngModel)]="text_search">
+		</div>
+		<div *ngFor="let row of list | search: text_search: (config.search.field||''): config.search.limit||10" [id]="row.id">
 			<span (click)="selected(row)">{{row?.label}}</span>
 		</div>
-	</ng-container>
+		<div *ngIf="!(list | search: text_search: (config.search.field||''): config.search.limit||10).length">{{config.search.zero_results||''}}</div>
+	</div>
 </div>

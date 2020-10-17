@@ -1,6 +1,7 @@
 import { Router, NavigationEnd } from '@angular/router';
 import { Injectable } from '@angular/core';
 declare var window:any;
+declare var cordova:any;
 
 @Injectable({
 	providedIn: 'root'
@@ -13,6 +14,18 @@ export class CoreService {
 		});
 	}
 	public device:any;
+	public version:any;
+	set_version(version='1.0.0'){
+		this.version = version;
+		document.addEventListener('deviceready', () => {
+			this.done('mobile');
+			if(cordova && cordova.getAppVersion){
+				cordova.getAppVersion.getVersionNumber((version)=>{
+					this.version = version;
+				});
+			}
+		});
+	}
 	constructor(private router: Router) {
 		var userAgent = navigator.userAgent || navigator.vendor || window.opera;
 		if (/windows phone/i.test(userAgent)) {
@@ -22,21 +35,7 @@ export class CoreService {
 		}else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
 			this.device = "ios";
 		}else this.device = "web";
-	}
-	public url( cb:any=()=>{}, replace:any=null ){
-		this.router.events.subscribe((e: any) => {
-			if (e instanceof NavigationEnd) {
-				let path = window.location.pathname;
-				if(typeof replace == 'string'){
-					path = path.replace(replace, '');
-				}else if(Array.isArray(replace)){
-					for (let i = 0; i < replace.length; i++){
-						path = path.replace(replace[i], '');
-					}
-				}
-				cb(path);
-			}
-		});
+		this.set_version();
 	}
 	public host:any = window.location.host.toLowerCase();
 	public parallel(arr, callback){
@@ -149,6 +148,7 @@ export class CoreService {
 	public done(signal) {
 		this.done_next[signal] = true;
 	};
+	public ready(signal){ return this.done_next[signal]; };
 	public next(signal, cb) {
 		if(this.done_next[signal]) cb();
 		else {

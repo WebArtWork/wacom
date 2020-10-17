@@ -1,16 +1,16 @@
-<div class="waw-alert-container height" [class._close]="delete_animation" #alert>
+<div [ngClass]="class" class="waw-alert-container height" [class._close]="delete_animation" #alert>
 	<div [class.waw-alert-color-blue]="type=='info'" [class.waw-alert-color-red]="type=='error'" [class.waw-alert-color-green]="type=='success'" [class.waw-alert-color-orange]="type=='warning'" [class.waw-alert-color-yellow]="type=='question'" class="waw-alert bounceInUp waw-alert-theme-light  waw-alert-animateInside waw-alert-opened">
 		<div class="waw-alert__progress" *ngIf="progress"><span [ngStyle]="{'animation-duration': timeout/1000+'s'}"></span></div>
 		<div class="waw-alert-body">
-			<div class="waw-alert-texts">
+			<div *ngIf="!component" class="waw-alert-texts">
 				<div class="waw-alert-title slideIn" style="text-transform: capitalize;">{{type}}.</div> 
 				<div class="waw-alert-message slideIn">{{text.slice(0, 50)}}</div>
-				<div class="waw-alert__close" *ngIf="close" (click)="remove()"></div>
 				
 			</div>
-			<div *ngIf="type=='question'">
+			<div *ngIf="!component&&type=='question'">
 				<button class="alert-btn" *ngFor="let b of buttons" (click)="b.callback(); remove()">{{b.text}}</button>
 			</div>
 		</div>
+		<div class="waw-alert__close" *ngIf="close" (click)="remove()"></div>
 	</div>
 </div>

@@ -5,19 +5,12 @@ import { Injectable } from '@angular/core';
 })
 export class UiService {
 	public var:any = {};
-	private variables:any = localStorage.getItem('css_variables') && JSON.parse(localStorage.getItem('css_variables')) || {};
-	private save(){
-		localStorage.setItem('css_variables', JSON.stringify(this.variables));
-	}
-	private setProperty(key, value){
-		document.documentElement.style.setProperty(key, value);
-	}
 	constructor(){
 		for (let key in this.variables){
 			this.setProperty(key, this.variables[key]);
 		}
 	}
-	/* Forms Management*/
+	/* Forms Management */
 		private _forms:any = {};
 		public form(id){
 			if(typeof id != 'string') return {};
@@ -66,6 +59,13 @@ export class UiService {
 			return false;
 		}
 	/* Css Management*/
+		private variables:any = localStorage.getItem('css_variables') && JSON.parse(localStorage.getItem('css_variables')) || {};
+		private save(){
+			localStorage.setItem('css_variables', JSON.stringify(this.variables));
+		}
+		private setProperty(key, value){
+			document.documentElement.style.setProperty(key, value);
+		}
 		public set(variables, opts:any={}){
 			if(typeof opts == 'string'){
 				if(opts == 'local') opts = {local: true};
@@ -99,7 +99,7 @@ export class UiService {
 			}
 			this.save();
 		}
-		public arr(arrLen=10, type='number'){
+		public arr(arrLen=10, type:any='number'){
 			let arr = [];
 			for (let i = 0; i < arrLen; i++){
 				if(type == 'number'){
@@ -108,6 +108,8 @@ export class UiService {
 					arr.push(this.text());
 				}else if(type == 'date'){
 					arr.push(new Date(new Date().getTime()+(i*86400000)));
+				}else{
+					arr.push(type);
 				}
 			}
 			return arr;

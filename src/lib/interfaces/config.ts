@@ -9,6 +9,41 @@ export interface Config {
 			titleSuffix?: string;
 		} & { [key: string]: string | undefined; };		
 	};
+	database?: {
+		_id?: string;
+		collections?: [{
+			_id?: string;
+			name: string;
+			opts?: {
+				replace?:any;
+			};
+			all?: [];
+			by_id?: object;
+			query?: object;
+			groups?: object;
+		}];
+	};
+	alert?: {
+		alerts?:object;
+		text?:string;
+		type?: string;
+		class?: string;
+		unique?: string;
+		progress?: boolean;
+		position?: string;
+		timeout?: number;
+		close?: any;
+		buttons?: any;
+	};
+	modal?: {
+		size?: any;
+		timeout?: any;
+		class?:string;
+		modals?:object;
+		position?: string;
+		closable?: boolean;
+		unique?: string;
+	};
 	socket?: any;
 	url?: string;
 }

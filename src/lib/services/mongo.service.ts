@@ -99,7 +99,8 @@ export class MongoService {
 					err: opts
 				};
 			}
-			if(doc.___created) return;
+			if(typeof doc != 'object') doc={};
+			if(doc.___created && !opts.allow_multiple) return;
 			doc.___created = true;
 			this.http.post(opts.url || '/api/' + part + '/create', doc || {}, resp => {
 				if (resp) {
@@ -171,7 +172,8 @@ export class MongoService {
 				obj: this.data['obj' + part]
 			}
 		};
-		private prepare_update(doc, opts){
+		private prepare_update(part, doc, opts){
+			this.renew(part, doc);
 			if(opts.fields){
 				if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
 				let _doc = {};
@@ -181,9 +183,14 @@ export class MongoService {
 				doc = _doc;
 			}
 			if(typeof opts.replace == 'object' && Object.values(opts.replace).length){
-				doc = JSON.parse(JSON.stringify(doc));
 				for(let key in opts.replace){
 					this.replace(doc, key, opts.replace[key]);
+				}
+			}
+			if(typeof opts.rewrite == 'object' && Object.values(opts.rewrite).length){
+				doc = JSON.parse(JSON.stringify(doc));
+				for(let key in opts.rewrite){
+					this.replace(doc, key, opts.rewrite[key]);
 				}
 			}
 			return doc;
@@ -194,7 +201,7 @@ export class MongoService {
 				opts = {};
 			}
 			if(typeof opts != 'object') opts = {};
-			doc = this.prepare_update(doc, opts);
+			doc = this.prepare_update(part, doc, opts);
 			let url = '/api/' + part + '/update' + (opts.name||'');
 			this.http.post(opts.url || url, doc, resp => {
 				if(resp){
@@ -202,7 +209,6 @@ export class MongoService {
 						_id: doc._id,
 						part: part
 					});
-					this.renew(part, doc);
 				}
 				if (resp && typeof cb == 'function') {
 					cb(resp);
@@ -217,7 +223,7 @@ export class MongoService {
 				opts = {};
 			}
 			if(typeof opts != 'object') opts = {};
-			doc = this.prepare_update(doc, opts);
+			doc = this.prepare_update(part, doc, opts);
 			let url = '/api/' + part + '/unique' + (opts.name||'');
 			this.http.post(opts.url || url, doc, resp => {
 				if(resp){
@@ -225,7 +231,11 @@ export class MongoService {
 						_id: doc._id,
 						part: part
 					});
-					this.renew(part, doc);
+					let current_doc = this.data['obj' + part][doc._id];
+					for (let each in doc){
+					    current_doc[each] = doc[each];
+					}
+					this.renew(part, current_doc);
 				}
 				if (resp && typeof cb == 'function') {
 					cb(resp);
@@ -518,6 +528,89 @@ export class MongoService {
 				}, doc);
 			}
 		};
+		public renew(part, doc){
+			if(!this.data['obj' + part][doc._id]) return this.push(part, doc);
+			if(this.data['opts'+part].replace){
+				for(let key in this.data['opts'+part].replace){
+					this.replace(doc, key, this.data['opts'+part].replace[key]);
+				}
+			}
+			for (let each in this.data['obj' + part][doc._id]){
+				this.data['obj' + part][doc._id][each] = doc[each];
+			}
+			for (let each in doc){
+				this.data['obj' + part][doc._id][each] = doc[each];
+			}
+			if(this.data['opts'+part].groups){
+				for(let key in this.data['opts'+part].groups){
+					let to_have = true;
+					let g = this.data['opts'+part].groups[key];
+					if(typeof g.ignore == 'function' && g.ignore(doc)) to_have = false;
+					if(typeof g.allow == 'function' && !g.allow(doc)) to_have = false;
+					if(!this.data['obj' + part][key]){
+						this.data['obj' + part][key] = {};
+					}
+					let fields = {};
+					let set = field => {
+						fields[field] = true;
+						if(!field) return;
+						if(!Array.isArray(this.data['obj' + part][key][field])){
+							this.data['obj' + part][key][field] = [];
+						}
+						if(to_have){
+							for (let i = this.data['obj' + part][key][field].length-1; i >= 0; i--){
+							    if(this.data['obj' + part][key][field][i]._id == doc._id) return;
+							}
+							this.data['obj' + part][key][field].push(doc);
+						} else {
+							for (let i = this.data['obj' + part][key][field].length-1; i >= 0; i--){
+							    if(this.data['obj' + part][key][field][i]._id == doc._id){
+							    	this.data['obj' + part][key][field].splice(i, 1);
+							    }
+							}
+						}
+						if(typeof g.sort == 'function'){
+							this.data['obj' + part][key][field].sort(g.sort);
+						}
+					}
+					set(g.field(doc, set.bind(this)));
+					for (let field in this.data['obj' + part][key]){
+						if(fields[field]) continue;
+						for (let i = this.data['obj' + part][key][field].length-1; i >= 0; i--){
+							if(this.data['obj' + part][key][field][i]._id == doc._id){
+								this.data['obj' + part][key][field].splice(i, 1);
+							}
+						}
+					}
+				}
+			}
+			if(this.data['opts'+part].query){
+				for(let key in this.data['opts'+part].query){
+					let to_have = true;
+					let query = this.data['opts'+part].query[key];
+					if(typeof query.ignore == 'function' && query.ignore(doc)) to_have = false;
+					if(typeof query.allow == 'function' && !query.allow(doc)) to_have = false;
+					if(!this.data['obj' + part][key]){
+						this.data['obj' + part][key] = [];
+					}
+					if(to_have){
+						for (let i = this.data['obj' + part][key].length-1; i >= 0; i--){
+						    if(this.data['obj' + part][key][i]._id == doc._id) return;
+						}
+						this.data['obj' + part][key].push(doc);
+					} else {
+						for (let i = this.data['obj' + part][key].length-1; i >= 0; i--){
+						    if(this.data['obj' + part][key][i]._id == doc._id){
+						    	this.data['obj' + part][key].splice(i, 1);
+						    }
+						}
+					}
+					if(typeof query.sort == 'function'){
+						this.data['obj' + part][key].sort(query.sort);
+					}
+				}
+			}
+		};
 		public push(part, doc){
 			if(this.data['obj' + part][doc._id]) return this.renew(part, doc);
 			if(this.data['opts'+part].replace){
@@ -612,84 +705,6 @@ export class MongoService {
 							this.data['obj' + part][key].splice(i, 1);
 							break;
 						}
-					}
-				}
-			}
-		};
-		public renew(part, doc){
-			if(!this.data['obj' + part][doc._id]) return this.push(part, doc);
-			for (let each in this.data['obj' + part][doc._id]){
-				this.data['obj' + part][doc._id][each] = doc[each];
-			}
-			for (let each in doc){
-				this.data['obj' + part][doc._id][each] = doc[each];
-			}
-			if(this.data['opts'+part].groups){
-				for(let key in this.data['opts'+part].groups){
-					let to_have = true;
-					let g = this.data['opts'+part].groups[key];
-					if(typeof g.ignore == 'function' && g.ignore(doc)) to_have = false;
-					if(typeof g.allow == 'function' && !g.allow(doc)) to_have = false;
-					if(!this.data['obj' + part][key]){
-						this.data['obj' + part][key] = {};
-					}
-					let fields = {};
-					let set = field => {
-						fields[field] = true;
-						if(!field) return;
-						if(!Array.isArray(this.data['obj' + part][key][field])){
-							this.data['obj' + part][key][field] = [];
-						}
-						if(to_have){
-							for (let i = this.data['obj' + part][key][field].length-1; i >= 0; i--){
-							    if(this.data['obj' + part][key][field][i]._id == doc._id) return;
-							}
-							this.data['obj' + part][key][field].push(doc);
-						} else {
-							for (let i = this.data['obj' + part][key][field].length-1; i >= 0; i--){
-							    if(this.data['obj' + part][key][field][i]._id == doc._id){
-							    	this.data['obj' + part][key][field].splice(i, 1);
-							    }
-							}
-						}
-						if(typeof g.sort == 'function'){
-							this.data['obj' + part][key][field].sort(g.sort);
-						}
-					}
-					set(g.field(doc, set.bind(this)));
-					for (let field in this.data['obj' + part][key]){
-						if(fields[field]) continue;
-						for (let i = this.data['obj' + part][key][field].length-1; i >= 0; i--){
-							if(this.data['obj' + part][key][field][i]._id == doc._id){
-								this.data['obj' + part][key][field].splice(i, 1);
-							}
-						}
-					}
-				}
-			}
-			if(this.data['opts'+part].query){
-				for(let key in this.data['opts'+part].query){
-					let to_have = true;
-					let query = this.data['opts'+part].query[key];
-					if(typeof query.ignore == 'function' && query.ignore(doc)) to_have = false;
-					if(typeof query.allow == 'function' && !query.allow(doc)) to_have = false;
-					if(!this.data['obj' + part][key]){
-						this.data['obj' + part][key] = [];
-					}
-					if(to_have){
-						for (let i = this.data['obj' + part][key].length-1; i >= 0; i--){
-						    if(this.data['obj' + part][key][i]._id == doc._id) return;
-						}
-						this.data['obj' + part][key].push(doc);
-					} else {
-						for (let i = this.data['obj' + part][key].length-1; i >= 0; i--){
-						    if(this.data['obj' + part][key][i]._id == doc._id){
-						    	this.data['obj' + part][key].splice(i, 1);
-						    }
-						}
-					}
-					if(typeof query.sort == 'function'){
-						this.data['obj' + part][key].sort(query.sort);
 					}
 				}
 			}
