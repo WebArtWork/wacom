@@ -38,7 +38,7 @@ export class AlertService {
 		if(!opts) opts = {};
 		for (let each in this.config.alert){
 			if(each=="class") opts[each] = opts[each]+" "+this.config.alert[each];
-			else if(!opts[each]) opts[each] = this.config.alert[each];
+			else if(typeof opts[each] == "undefined") opts[each] = this.config.alert[each];
 		}
 		if(this.shortcuts[opts.position]) opts.position = this.shortcuts[opts.position];
 		if(opts.unique){

@@ -18,7 +18,7 @@ export class UiService {
 			// add more cool things or submiting, etc
 			return this._forms[id];
 		}
-		public valid(value, kind='email', extra:any){
+		public valid(value, kind='email', extra:any=''){
 			if(kind=='email'){
 				return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value||'');
 			}else if(kind=='text'){

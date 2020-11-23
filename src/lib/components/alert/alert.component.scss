@@ -154,6 +154,7 @@
     height: 15px;
     opacity: 0.3;
     position: relative;
+	order: 2;
 
     &:hover {
         opacity: 1;
@@ -286,6 +287,9 @@
     min-height: 36px;
     margin: 0 0 0 15px;
     text-align: left;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 

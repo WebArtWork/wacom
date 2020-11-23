@@ -15,7 +15,7 @@ export class CoreService {
 	}
 	public device:any;
 	public version:any;
-	set_version(version='1.0.0'){
+	public set_version(version='1.0.0'){
 		this.version = version;
 		document.addEventListener('deviceready', () => {
 			this.done('mobile');

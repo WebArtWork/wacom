@@ -19,14 +19,17 @@ export class MetaGuard implements CanActivate {
 			return;
 		}
 		this.metaService.setTitle(meta.title, meta.titleSuffix);
-		Object.keys(meta).forEach(key => {
-			if (key === 'title' || key === 'titleSuffix') {
+		this.metaService.setLink(meta.link);
+		Object.keys(meta).forEach(prop => {
+			if (prop === 'title' || prop === 'titleSuffix'|| prop === 'link') {
 				return;
 			}
-			this.metaService.setTag(key, meta[key]);
+			Object.keys(meta[prop]).forEach(key => {
+				this.metaService.setTag(key, meta[prop][key], prop);
+			});
 		});
 		Object.keys(this.config.meta.defaults).forEach(key => {
-			if (key in meta || key === 'title' || key === 'titleSuffix') {
+			if (key in meta || key === 'title' || key === 'titleSuffix' || key === 'link') {
 				return;
 			}
 			this.metaService.setTag(key, this.config.meta.defaults[key]);

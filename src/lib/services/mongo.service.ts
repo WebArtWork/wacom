@@ -173,7 +173,6 @@ export class MongoService {
 			}
 		};
 		private prepare_update(part, doc, opts){
-			this.renew(part, doc);
 			if(opts.fields){
 				if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
 				let _doc = {};
@@ -181,12 +180,7 @@ export class MongoService {
 					_doc[opts.fields[i]] = doc[opts.fields[i]];
 				}
 				doc = _doc;
-			}
-			if(typeof opts.replace == 'object' && Object.values(opts.replace).length){
-				for(let key in opts.replace){
-					this.replace(doc, key, opts.replace[key]);
-				}
-			}
+			}else this.renew(part, doc);
 			if(typeof opts.rewrite == 'object' && Object.values(opts.rewrite).length){
 				doc = JSON.parse(JSON.stringify(doc));
 				for(let key in opts.rewrite){

@@ -9,10 +9,11 @@ export interface Alert {
 	unique?: string;
 	progress?: boolean;
 	position?: string;
-	timeout?: number;
+	timeout?: any;
 	closable?: boolean;
 	close?: any;
 	buttons?: any;
+	[x: string]: any;
 }
 export const DEFAULT_Alert: Alert = {
 	alerts: {},

@@ -16,6 +16,9 @@ export interface Config {
 			name: string;
 			opts?: {
 				replace?:any;
+				sort?: any;
+				query?: any;
+				groups?: any;
 			};
 			all?: [];
 			by_id?: object;
@@ -45,7 +48,10 @@ export interface Config {
 		unique?: string;
 	};
 	socket?: any;
-	url?: string;
+	http?: {
+		replace?: any;
+		url?: string;
+	}
 }
 export const CONFIG_TOKEN = new InjectionToken<Config>('config');
 export const DEFAULT_CONFIG: Config = {
@@ -55,5 +61,7 @@ export const DEFAULT_CONFIG: Config = {
 		defaults: {}
 	},
 	socket: false,
-	url: ''
+	http: {
+		url: ''
+	}
 }

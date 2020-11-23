@@ -1,16 +1,16 @@
 <div class="waw-select" [class._active]="options" (clickOutside)="options = false">
 	<div *ngIf="!multiple">
 		<span>{{inputModel||label}}</span>
-		<button *ngIf="inputModel" (click)="inputModel = null">Remove</button>
+		<button *ngIf="inputModel&&clearable" (click)="inputModel = null">Remove</button>
 		<button (click)="options = !options">Open</button>
 	</div>
 	<div *ngIf="multiple">
 		<ng-container *ngIf="inputModel?.length">
 			<div *ngFor="let obj of inputModel; index as i">
-				<span>{{obj}}</span>
-				<button (click)="inputModel.splice(i, 1); inputModelChange.emit(inputModel)">Remove</button>
+				<span>{{bindLabel&&obj[bindLabel]||obj}}</span>
+				<button (click)="inputModel.splice(i, 1); count = count - 1;inputModelChange.emit(inputModel)">Remove</button>
 			</div>
-			<button (click)="inputModel = []; inputModelChange.emit(inputModel)">Remove All</button>
+			<button *ngIf="clearable" (click)="inputModel = []; count = 0;inputModelChange.emit(inputModel)">Remove All</button>
 		</ng-container>
 		<ng-container *ngIf="!inputModel?.length">
 			<span>{{label}}</span>
@@ -18,12 +18,18 @@
 		<button (click)="options = !options">Open</button>
 	</div>
 	<div class="waw-select_pop" *ngIf="options">
-		<div *ngIf="config&&config.search">
-			<input type="text" name="search" [placeholder]="config.search.placeholder||'Type to search'" [(ngModel)]="text_search">
+		<div *ngIf="search">
+			<input type="text" name="search" [placeholder]="searchPlaceholder" [(ngModel)]="text_search">
 		</div>
-		<div *ngFor="let row of list | search: text_search: (config.search.field||''): config.search.limit||10" [id]="row.id">
-			<span (click)="selected(row)">{{row?.label}}</span>
-		</div>
-		<div *ngIf="!(list | search: text_search: (config.search.field||''): config.search.limit||10).length">{{config.search.zero_results||''}}</div>
+		<ng-template #defaultOptionsTemplate>
+			<div *ngFor="let row of list | search: text_search: searchField: searchLimit" [id]="row.id">
+				<span (click)="selected(row)">{{row?.label}}</span>
+			</div>
+			<div *ngIf="!(list | search: text_search: searchField: searchLimit).length">{{noResults}}</div>
+		</ng-template>
+		<ng-container
+            [ngTemplateOutlet]="tmplOptions || defaultOptionsTemplate"
+            [ngTemplateOutletContext]="{search: text_search}">
+        </ng-container>
 	</div>
 </div>

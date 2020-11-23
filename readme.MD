@@ -4,7 +4,7 @@ Module which has common services and components which can be used on all project
 ## Getting Started
 
 ### License
-  [MIT](LICENSE)
+[MIT](LICENSE)
 
 ### Instalation
 ```bash
@@ -36,6 +36,20 @@ $ npm i --save wacom
 | ------- |:-----:|
 | [**`Picker`**](https://www.npmjs.com/package/wacom#picker-component) | Huge common component which is used to take information from user |
 
+## Core Service
+### device
+### version
+### set_version
+### host
+### parallel
+### serial
+### each
+### afterWhile
+### emit
+### on
+### done
+### ready
+### next
 ## Mongo Service
 Mongo Service is an suportive service for combining angular 6 client with waw CRUD back-end. Which means that you have to use [waw Framework](https://www.npmjs.com/package/waw) or you have to made your back-end routes in a way of waw crud. Example of importing mongo service:
 ```javascript
@@ -314,4 +328,91 @@ mongo.get('colName', {
 		data:mongo.forceObj
 	}
 });
+```
+## Alert Service
+Alert Service is an suportive service for alerts manamanagement. Example of importing alert service:
+```javascript
+import { AlertService } from 'wacom';
+constructor(private alert: AlertService){};
+```
+### show `function`
+Opens the alert and return htmlElement of this alert. Example:
+```javascript
+let my_alert = alert.show({
+	text: 'Hello, world!',
+	type: 'info',
+	timeout: 5000,
+	class: 'myClass',
+	position: 'bottomRight',
+	buttons: [{
+		text: 'YES',
+		callback: ()=>{
+			console.log("YES!");
+		}
+	},{
+		text: 'NO',
+		callback: ()=>{
+			console.log("NO!");
+		}
+	}]
+});
+my_alert.remove();
+```
+### options
+|  Name            | Type     | Description     |
+| ---------------  |--------- | --------------- |
+| `text`           | string   | Text of alert. |
+| `type`           | string   | Type of alert(etc `info`, `success`, `warning`, `error`, `question`). |
+| `class`          | string   | Custom class for your alert. |
+| `unique`         | string   | Identificator for your alerts. |
+| `progress`       | boolean  | Enable timeout progress bar. |
+| `position`       | string   | Position of the alert(`topLeft`, `topCenter`, `topRight`, `right`, `bottomRight`, `bottomCenter`, `bottomLeft`, `left`, `center`). |
+| `timeout`        | number   | Amount in milliseconds to close the alert, 0 to disable. |
+| `closable`       | boolean  | Show "x" close button. |
+| `buttons`        | number   | Array of buttons for your alerts. |
+| `component`      | string or @Component | Component which will be appended into the alert. |
+| `close`          | function | Capture when the alert is closing. |
+### destroy `function`
+Close all alerts. Example:
+```javascript
+alert.destroy();
+```
+## Modal Service
+Modal Service is an suportive service for modals manamanagement. Example of importing modal service:
+```javascript
+import { ModalService } from 'wacom';
+constructor(private modal: ModalService){};
+```
+### show `function`
+Opens the modal and return htmlElement of this modal. Example:
+```javascript
+let my_modal = modal.show({
+	component: MyCustomComponent,
+	size: 'mid',
+	timeout: 5000,
+	class: 'myClass',
+	position: 'center',
+	closable: true
+});
+my_modal.remove();
+```
+### options
+|  Name              | Type     | Description     |
+| ---------------    |--------- | --------------- |
+| `id`               | string   |  |
+| `component`        | string or @Component   | Component which will be appended into the modal. |
+| `size`             | string   | Size of the modal. |
+| `timeout`          | number  | Amount in milliseconds to close the modal, 0 to disable. |
+| `class`            | string   | Custom class for your modal. |
+| `position`         | string   | Position of the modal(`topLeft`, `topCenter`, `topRight`, `right`, `bottomRight`, `bottomCenter`, `bottomLeft`, `left`, `center`). |
+| `closable`         | boolean  | Show "x" close button. |
+| `unique`           | string | Identificator for your modals. |
+| `close`            | function | custom function for close modal. |
+| `onOpen`           | function | Capture when the modal is opening. |
+| `onClose`          | function | Capture when the modal is closing. |
+| `onClickOutside`   | function | Capture when the alert is closing by click outside. |
+### destroy `function`
+Close all modals. Example:
+```javascript
+modal.destroy();
 ```

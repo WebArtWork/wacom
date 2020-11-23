@@ -22,20 +22,29 @@ export class MetaService {
 		this.titleService.setTitle(titleContent);
 		return this;
 	}
-	public setTag(tag: string, value: string): MetaService {
+	public setLink(obj:any): MetaService {
+		for (let key in obj){
+		    let link: HTMLLinkElement = document.createElement('link');
+			link.setAttribute('rel', key);
+			document.head.appendChild(link);
+			link.setAttribute('href', obj[key]);
+		}
+		return this;
+	}
+	public setTag(tag: string, value:string, prop?: string): MetaService {
 		if (tag === 'title' || tag === 'titleSuffix') {
 			throw new Error(`Attempt to set ${tag} through 'setTag': 'title' and 'titleSuffix' are reserved tag names.
 				Please use 'MetaService.setTitle' instead`);
 		}
 		let content = isDefined(value) ? value : (this.config.meta.defaults[tag] || '');
-		this._updateMetaTag(tag, content);
+		this._updateMetaTag(tag, content, prop);
 		if (tag === 'description') {
-			this._updateMetaTag('og:description', content);
+			this._updateMetaTag('og:description', content, prop);
 		}
 		return this;
 	}
-	private _updateMetaTag(tag: string, value: string) {
-		let prop = 'name';
+	private _updateMetaTag(tag: string, value: string, prop?: string) {
+		if(!prop) prop='name';
 		if (tag.startsWith(`og:`)) {
 			prop = 'property';
 		}

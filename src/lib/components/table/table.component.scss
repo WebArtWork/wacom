@@ -1,0 +1,166 @@
+.table-wrapp {
+     background: #fff;
+     box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.15);
+     border-radius: 10px;
+     padding: 20px;
+     width: calc(100vw - 100px);
+}
+ .table-wrapp table {
+     border-collapse: collapse;
+     margin: 0;
+     padding: 0;
+     width: 100%;
+     table-layout: fixed;
+}
+ @media screen and (max-width: 600px) {
+     .table-wrapp table {
+         border: 0;
+    }
+     .table-wrapp table caption {
+         font-size: 1.3em;
+    }
+     .table-wrapp table thead {
+         border: none;
+         clip: rect(0 0 0 0);
+         height: 1px;
+         margin: -1px;
+         overflow: hidden;
+         padding: 0;
+         position: absolute;
+         width: 1px;
+    }
+     .table-wrapp table tr {
+         display: block;
+         margin-bottom: 0.625em;
+         border-bottom: 3px solid #ddd;
+    }
+     .table-wrapp table td {
+         display: block;
+         border-right: none;
+    }
+     .table-wrapp table td::before {
+        /* * aria-label has no advantage, it won't be read inside a table content: attr(aria-label);
+         */
+         content: attr(data-label);
+         float: left;
+         font-weight: bold;
+         text-transform: uppercase;
+    }
+     .table-wrapp table td:last-child {
+         border-bottom: 0;
+    }
+}
+ .table-wrapp  th {
+     position: relative;
+     padding: 15px 10px;
+     text-align: center;
+     border-right: 2px solid #bdbdbd;
+     border-bottom: 0.5px solid #334d6e;
+     font-weight: 500;
+     font-size: 16px;
+     line-height: 24px;
+     letter-spacing: 0.01em;
+     text-transform: uppercase;
+     color: #334d6e;
+     overflow: hidden;
+     text-overflow: ellipsis;
+}
+ .table-wrapp th .icon-arrow {
+     opacity: 0;
+     transition: 0.3s all ease-in-out;
+}
+ .table-wrapp th:hover .icon-arrow {
+     opacity: 1;
+     transition: 0.3s all ease-in-out;
+}
+ .table-wrapp td {
+     cursor: pointer;
+     padding: 15px 10px;
+     text-align: center;
+     vertical-align: middle;
+     border-right: 2px solid #bdbdbd;
+     border-bottom: 2px dashed #e0e0e0;
+     font-size: 14px;
+     line-height: 24px;
+     letter-spacing: 0.01em;
+     color: #334d6e;
+     word-break: break-word;
+}
+ .table-wrapp tr:last-child td {
+     border-bottom: none;
+     border-bottom: none;
+}
+ .table-wrapp tr td:last-child, .table-wrapp tr th:last-child {
+     border-right: none;
+     border-right: none;
+}
+ .icon-arrow {
+     transform: rotate(90deg);
+     font-size: 16px;
+     position: absolute;
+     top: 3px;
+     cursor: pointer;
+}
+ .table-header__sort {
+     position: relative;
+     cursor: pointer;
+}
+ .table-header__sort._active .icon-arrow {
+     transform: rotate(-90deg);
+}
+
+.re {
+     position: relative;
+     padding: 15px 10px;
+     text-align: center;
+     border-right: 2px solid #bdbdbd;
+     border-bottom: 0.5px solid #334d6e;
+     font-weight: 500;
+     font-size: 16px;
+     line-height: 24px;
+     letter-spacing: 0.01em;
+     text-transform: uppercase;
+     color: #334d6e;
+     overflow: hidden;
+     text-overflow: ellipsis;
+}
+div.container {
+  margin: 34px auto;
+  width: 260px;
+  background-color: transparent;
+}
+div.dropdown {
+  position: relative;
+}
+div.dropdown > div.caption {
+  background-color: #f2f2f2;
+  padding: 11px 24px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+div.dropdown > div.list {
+  position: absolute;
+  background-color: #f2f2f2;
+  width: 100%;
+  border-radius: 0 0 3px 3px;
+  display: none;
+}
+div.dropdown > div.list > div.item > div{
+  padding: 11px 24px;
+  cursor: pointer;
+}
+div.dropdown > div.list > div.item.selected {
+  font-weight: bold;
+}
+div.dropdown > div.caption:hover,
+div.dropdown > div.list > div.item:hover {
+  background-color: rgb(83, 161, 214);
+  color: #fff;
+}
+div.dropdown.open > div.caption {
+  border-radius: 3px 3px 0 0;
+  border-bottom: solid 1px #999;
+}
+div.dropdown.open > div.list {
+  display: block;
+}

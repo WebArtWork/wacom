@@ -13,16 +13,18 @@ export class AlertComponent {
     public type: string = "info";
     public progress: boolean = true;
     public position: string = 'bottomRight'; // [bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter or center]
-    public timeout: number = 5000;
+    public timeout: any = 5000;
     public close: any = true;
     public buttons: any = []; /*[{text, callback}]*/
-	
+
     constructor(private elementRef: ElementRef) {
-        if(this.timeout){
-            setTimeout(() => {
-                this.remove();
-            }, this.timeout);
-        }
+        setTimeout(()=>{
+            if(this.timeout){
+                setTimeout(() => {
+                    this.remove();
+                }, this.timeout);
+            }
+        });
     }
     public delete_animation=false;
     remove(){
@@ -31,6 +33,6 @@ export class AlertComponent {
             this.elementRef.nativeElement.remove();
             this.delete_animation=false;
         },350);
-		
+
     }
 }

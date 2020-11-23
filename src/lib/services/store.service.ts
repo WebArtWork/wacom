@@ -107,24 +107,40 @@ export class StoreService {
 	/* Document Management */
 		private data:any = {};
 		private _id:string = '_id';
-		private set_docs(type){
+		private store_docs(name){
 			let docs = [];
-			for (let each in this.data[type].by_id){
+			for (let each in this.data[name].by_id){
 			    docs.push(each);
 			}
-			this.set(type+'_docs', JSON.stringify(docs));
+			this.set(name+'_docs', JSON.stringify(docs));
 		}
-		private add_doc(type, doc){
+		private add_doc(name, doc){
+			let _id = this.data[name]._id || this._id;
 			for (let each in doc){
-			    this.data[type].by_id[doc[this._id]][each] = doc[each];
+			    this.data[name].by_id[doc[_id]][each] = doc[each];
 			}
 			let add = true;
-			this.data[type].all.forEach(selected=>{
-				if(selected[this._id] == doc[this._id]) add = false;
+			this.data[name].all.forEach(selected=>{
+				if(selected[_id] == doc[_id]) add = false;
 			});
-			if(add) this.data[type].all.push(this.data[type].by_id[doc[this._id]]);
+			if(add){
+				this.data[name].all.push(this.data[name].by_id[doc[_id]]);
+				// if(this.data[name].opts.sort == 'string' &&
+				// 	typeof this[this.data[name].opts.sort] == 'function'){
+				// 	this.data[name].all.sort(this[this.data[name].opts.sort](_id));
+				// }else 
+				if(typeof this.data[name].opts.sort == 'function'){
+					this.data[name].all.sort(this.data[name].opts.sort);
+				}
+			}
+		}
+		private initialize_doc(type, doc_id){
+			this.get_doc(type, doc_id, doc=>{
+				this.add_doc(type, doc);
+			});
 		}
 		private initialize(collection){
+			if(!collection.opts) collection.opts={};
 			if(!collection.all) collection.all=[];
 			if(!collection.by_id) collection.by_id={};
 			this.data[collection.name] = collection;
@@ -132,23 +148,25 @@ export class StoreService {
 				if(!docs) return;
 				docs = JSON.parse(docs);
 				for (let i = 0; i < docs.length; i++){
-					this.add_doc(collection.name, this.get_doc(collection.name, docs[i]));
+					this.initialize_doc(collection.name, docs[i]);
 				}
 			});
 		}
-		get_docs(type:string, doc:object){
-			return this.data[type].all;
-		}
-		get_doc(type:string, _id:string){
+		get_docs(type:string){ return this.data[type].all; }
+		get_doc(type:string, _id:string, cb:any=doc=>{}){
 			if(!this.data[type].by_id[_id]){
 				this.data[type].by_id[_id] = {};
-				this.data[type].by_id[_id][this._id] = _id;
+				this.data[type].by_id[_id][this.data[type]._id || this._id] = _id;
 				this.get(type+'_'+_id, doc=>{
 					if(!doc) return;
+					doc = JSON.parse(doc);
 					for (let each in doc){
 						this.data[type].by_id[_id][each] = doc[each]
 					}
+					cb(this.data[type].by_id[_id]);
 				});
+			}else{
+				cb(this.data[type].by_id[_id]);
 			}
 			return this.data[type].by_id[_id];
 		}
@@ -157,9 +175,16 @@ export class StoreService {
 				doc[each] = value;
 			});
 		}
+		set_docs(type:string, docs:any){
+			if(!Array.isArray(docs)) return;
+			for (let i = 0; i < docs.length; i++){
+				this.set_doc(type, docs[i]);
+			}
+		}
 		set_doc(type:string, doc:object){
-			if(!this.data[type].by_id[doc[this._id]]){
-				this.data[type].by_id[doc[this._id]] = {};
+			let _id = this.data[type]._id || this._id;
+			if(!this.data[type].by_id[doc[_id]]){
+				this.data[type].by_id[doc[_id]] = {};
 			}
 			if(typeof this.data[type].opts.replace == 'function'){
 				doc = this.data[type].opts.replace(doc);
@@ -170,13 +195,124 @@ export class StoreService {
 					}
 				}
 			}
-			this.set(type+'_'+doc[this._id], doc);
+			this.set(type+'_'+doc[_id], JSON.stringify(doc));
 			this.add_doc(type, doc);
-			this.set_docs(type);
-			return this.data[type].by_id[doc[this._id]];
+			this.store_docs(type);
+			return this.data[type].by_id[doc[_id]];
 		}
-		remove_doc(_id){
-
+		remove_doc(type:string, _id:string){
+			this.remove(type+'_'+_id);
+			delete this.data[type].by_id[_id];
+			this.store_docs(type);
+		}
+	/* sorts Management */
+		public sortAscId(id='_id'){
+			return function(a,b){
+				if(a[id]>b[id]) return 1;
+				else return -1;
+			}
+		};
+		public sortDescId(id='_id'){
+			return function(a,b){
+				if(a[id]<b[id]) return 1;
+				else return -1;
+			}
+		};
+		public sortAscString(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field].toLowerCase()>b[opts.field].toLowerCase()) return 1;
+				else if(a[opts.field].toLowerCase()<b[opts.field].toLowerCase() || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortDescString(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field].toLowerCase()<b[opts.field].toLowerCase()) return 1;
+				else if(a[opts.field].toLowerCase()>b[opts.field].toLowerCase() || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortAscDate(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field].getTime()>b[opts.field].getTime()) return 1;
+				else if(a[opts.field].getTime()<b[opts.field].getTime() || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortDescDate(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field].getTime()<b[opts.field].getTime()) return 1;
+				else if(a[opts.field].getTime()>b[opts.field].getTime() || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortAscNumber(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field]>b[opts.field]) return 1;
+				else if(a[opts.field]<b[opts.field] || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortDescNumber(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field]<b[opts.field]) return 1;
+				else if(a[opts.field]>b[opts.field] || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortAscBoolean(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(!a[opts.field]&&b[opts.field]) return 1;
+				else if(a[opts.field]&&!b[opts.field] || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
+		}
+		public sortDescBoolean(opts){
+			if(typeof opts == 'string'){
+				opts = {
+					field: opts
+				}
+			}
+			return function(a,b){
+				if(a[opts.field]&&!b[opts.field]) return 1;
+				else if(!a[opts.field]&&b[opts.field] || !opts.next) return -1;
+				else return opts.next(a,b);
+			}
 		}
 	/* End of Store Service */
 }

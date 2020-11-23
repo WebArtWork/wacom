@@ -14,6 +14,7 @@ import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from './interfaces/config';
 /* components */
 import { ModalComponent } from './components/modal/modal.component';
 import { AlertComponent } from './components/alert/alert.component';
+import { TableComponent } from './components/table/table.component';
 import { LoaderComponent } from './components/loader/loader.component';
 import { WrapperComponent } from './components/alert/wrapper/wrapper.component';
 import { PickerComponent } from './components/picker/picker.component';
@@ -25,6 +26,8 @@ import { ColorComponent } from './components/picker/color/color.component';
 import { HtmlComponent } from './components/picker/html/html.component';
 import { FilesComponent } from './components/files/files.component';
 import { ClickOutsideDirective } from './directives/click-outside.directive';
+import { PickerSelectOptionsDirective } from './directives/picker.directive';
+import { TableHeadersDirective, TableRowsDirective} from './directives/table.directive';
 import { CheckboxComponent } from './components/picker/checkbox/checkbox.component';
 import { RadioComponent } from './components/picker/radio/radio.component';
 import { SelectComponent } from './components/picker/select/select.component';
@@ -41,6 +44,7 @@ import { WframeComponent } from './components/wframe/wframe.component';
 		LoaderComponent,
 		WrapperComponent,
 		PickerComponent,
+		TableComponent,
 		TextComponent,
 		NumberComponent,
 		DateComponent,
@@ -49,6 +53,9 @@ import { WframeComponent } from './components/wframe/wframe.component';
 		HtmlComponent,
 		FilesComponent,
 		ClickOutsideDirective,
+		PickerSelectOptionsDirective,
+		TableHeadersDirective,
+		TableRowsDirective,
 		CheckboxComponent,
 		RadioComponent,
 		SelectComponent,
@@ -65,7 +72,11 @@ import { WframeComponent } from './components/wframe/wframe.component';
 		AlertComponent,
 		LoaderComponent,
 		PickerComponent,
-		ClickOutsideDirective
+		TableComponent,
+		ClickOutsideDirective,
+		PickerSelectOptionsDirective,
+		TableHeadersDirective,
+		TableRowsDirective
 	],
 	entryComponents: [
 		AlertComponent,
@@ -74,10 +85,11 @@ import { WframeComponent } from './components/wframe/wframe.component';
 		WrapperComponent,
 		FilesComponent
 	],
-	providers: [{
-		provide: CONFIG_TOKEN,
-		useValue: DEFAULT_CONFIG
-	}, MetaGuard, MetaService],
+	providers: [
+		{ provide: CONFIG_TOKEN, useValue: DEFAULT_CONFIG },  
+		MetaGuard, 
+		MetaService
+	],
 	imports: [CommonModule, FormsModule, HttpClientModule]
 })
 export class WacomModule {
