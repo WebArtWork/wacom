@@ -1,12 +1,12 @@
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { Injectable, Inject, Optional } from '@angular/core';
-declare var window:any;
+import { CoreService } from './core.service';
 @Injectable({
 	providedIn: 'root'
 })
 export class StoreService {
 	private db:any = null;
-	constructor(@Inject(CONFIG_TOKEN) @Optional() private config: Config) {
+	constructor(public core: CoreService, @Inject(CONFIG_TOKEN) @Optional() private config: Config) {
 		if(!this.config) this.config = DEFAULT_CONFIG;
 		/* Database Management*/
 			if(!this.config.database) this.config.database={};
@@ -17,9 +17,9 @@ export class StoreService {
 				}
 			}
 		/* SQL Management*/
-			document.addEventListener('deviceready', () => {
-				if(window.sqlitePlugin){
-					this.db = window.sqlitePlugin.openDatabase({
+			this.core.document.addEventListener('deviceready', () => {
+				if(this.core.window.sqlitePlugin){
+					this.db = this.core.window.sqlitePlugin.openDatabase({
 						location: 'default',
 						name: 'data'
 					});
@@ -37,7 +37,7 @@ export class StoreService {
 	}
 	/* Storage Management */
 		set(hold, value, cb:any=()=>{}, errCb:any=()=>{}){
-			if(window.sqlitePlugin){
+			if(this.core.window.sqlitePlugin){
 				if(!this.db){
 					return setTimeout(()=>{
 						this.set(hold, value, cb);
@@ -56,13 +56,13 @@ export class StoreService {
 					}
 				});
 			}else{
-				try { localStorage.setItem('waw_temp_storage_'+hold, value); }
+				try { this.core.localStorage.setItem('waw_temp_storage_'+hold, value); }
 				catch(e){ errCb(); }
 				cb();
 			}
 		}
 		get(hold, cb:any=()=>{}, errcb:any=()=>{}){
-			if(window.sqlitePlugin){
+			if(this.core.window.sqlitePlugin){
 				if(!this.db){
 					return setTimeout(()=>{
 						this.get(hold, cb);
@@ -76,24 +76,24 @@ export class StoreService {
 					}
 				}, errcb);	
 			}else{
-				cb(localStorage.getItem('waw_temp_storage_'+hold)||'');
+				cb(this.core.localStorage.getItem('waw_temp_storage_'+hold)||'');
 			}
 		}
 		remove(hold, cb:any=()=>{}, errcb:any=()=>{}){
-			if(window.sqlitePlugin){
+			if(this.core.window.sqlitePlugin){
 				if(!this.db)
 					return setTimeout(()=>{
 						this.remove(hold);
 					}, 100);
 				this.db.executeSql('DELETE FROM Data where hold=?', [hold], cb, errcb);	
 			}else{
-				localStorage.removeItem('waw_temp_storage_'+hold);
+				this.core.localStorage.removeItem('waw_temp_storage_'+hold);
 				cb();
 			}
 		}
 		clear(cb:any=()=>{}, errcb:any=()=>{}){
-			localStorage.clear();
-			if(window.sqlitePlugin){
+			this.core.localStorage.clear();
+			if(this.core.window.sqlitePlugin){
 				if(!this.db){
 					return setTimeout(()=>{
 						this.clear();

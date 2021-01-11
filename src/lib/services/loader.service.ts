@@ -30,8 +30,15 @@ export class LoaderService {
 		if(typeof opts.component == 'string' && this.config.alert.alerts[opts.component]){
 			opts.component = this.config.alert.alerts[opts.component];
 		}*/
-		if(opts.component) return this.dom.appendComponent(LoaderComponent, {}, opts.component);
-		else return this.dom.appendComponent(LoaderComponent, {});
+		let component;
+		if(opts.component){
+			component = this.dom.appendComponent(LoaderComponent, {}, opts.component);
+			return component.nativeElement;
+		}
+		else{
+			component = this.dom.appendComponent(LoaderComponent, {});
+			return component.nativeElement;
+		}
 	}
 	destroy(){
 

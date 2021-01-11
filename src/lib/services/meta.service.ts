@@ -2,11 +2,12 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { Router, ActivatedRoute, Route } from '@angular/router';
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
+import { CoreService } from './core.service';
 const isDefined = (val: any) => typeof val !== 'undefined';
 
 @Injectable()
 export class MetaService {
-	public constructor(private router: Router, private meta: Meta,
+	public constructor(private router: Router, private meta: Meta, private core: CoreService,
 		private titleService: Title, private activatedRoute: ActivatedRoute,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config) {
 		if(!this.config) this.config = DEFAULT_CONFIG;
@@ -24,9 +25,9 @@ export class MetaService {
 	}
 	public setLink(obj:any): MetaService {
 		for (let key in obj){
-		    let link: HTMLLinkElement = document.createElement('link');
+		    let link: HTMLLinkElement = this.core.document.createElement('link');
 			link.setAttribute('rel', key);
-			document.head.appendChild(link);
+			this.core.document.head.appendChild(link);
 			link.setAttribute('href', obj[key]);
 		}
 		return this;

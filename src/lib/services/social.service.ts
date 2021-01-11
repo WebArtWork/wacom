@@ -17,7 +17,7 @@ export class SocialService {
 
 			});
 		}else{
-			window.location.replace('/api/user/facebook');
+			this.core.window.location.replace('/api/user/facebook');
 		}
 	}
 }

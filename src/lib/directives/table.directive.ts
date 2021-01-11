@@ -1,15 +1,25 @@
-import { Directive, TemplateRef } from '@angular/core';
+import { Directive, TemplateRef, Input, OnInit } from '@angular/core';
 
 @Directive({
-  selector: '[tableHeaders]'
+  selector: 'ng-template[cell]'
 })
-export class TableHeadersDirective {   
-	constructor(public template: TemplateRef<any>) {}
+export class CellDirective implements OnInit{  
+	@Input('cell') cell; 
+	constructor(public template: TemplateRef<any>) {
+
+	}
+	ngOnInit() {
+	}
 }
 
 @Directive({
-  selector: '[tableRows]'
+  selector: 'ng-template[sort]'
 })
-export class TableRowsDirective {   
-	constructor(public template: TemplateRef<any>) {}
+export class SortDirective implements OnInit{
+	@Input('cell') cell; 
+	constructor(public template: TemplateRef<any>) {
+
+	}
+	ngOnInit() {
+	}
 }

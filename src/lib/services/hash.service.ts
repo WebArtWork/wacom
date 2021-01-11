@@ -1,6 +1,6 @@
 // find . -name "*.spec.ts" -type f -delete
 import { Injectable } from '@angular/core';
-
+import { CoreService } from './core.service';
 @Injectable({
 	providedIn: 'root'
 })
@@ -11,12 +11,12 @@ export class HashService {
 	}];
 	public hash = {};
 	private done: boolean = false;
-	constructor() {
-		if(!window.location.hash){
+	constructor(public core: CoreService) {
+		if(!this.core.window.location.hash){
 			this.done = true;
 			return;
 		}
-		let hash:any = window.location.hash.replace('#!#', '').replace('#', '').split('&');
+		let hash:any = this.core.window.location.hash.replace('#!#', '').replace('#', '').split('&');
 		for(let i = 0; i < hash.length; i++){
 			let holder = hash[i].split('=')[0];
 			let value = hash[i].split('=')[1];
@@ -40,7 +40,7 @@ export class HashService {
 			if(hash) hash += '&';
 			hash += each + '=' + this.hash[each];
 		}
-		window.location.hash = hash;
+		this.core.window.location.hash = hash;
 	}
 	set(field, value){
 		this.hash[field] = value;

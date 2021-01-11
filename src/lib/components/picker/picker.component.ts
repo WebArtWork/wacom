@@ -12,7 +12,7 @@ export class PickerComponent  {
   	@ContentChild(PickerSelectOptionsDirective, { read: TemplateRef, static: false}) optionsTemplate: TemplateRef<any>;
 	@Input('type') type = 'text';
 	@Input('id') id;
-	@Input('name') name;
+	@Input('nameT') name;
 	@Input('placeholder') placeholder;
 	@Input('min') min;
 	@Input('max') max;

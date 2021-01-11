@@ -2,38 +2,44 @@
 	<table class="table" cellpadding="0" cellspacing="0">
 		<thead>
 			<tr>
-				<ng-template #defaultHeaders>
-					<th scope="col" *ngFor="let header of headers">
-						<div class="table-header__sort" [class._active]="sort" (click)="sort=!sort">
-							<span>{{header}}</span>
-							<span class="material-icons icon-arrow">keyboard_backspace</span>
-						</div>
-					</th>
-				</ng-template>
-				<ng-container [ngTemplateOutlet]="tableHeaders || defaultHeaders"></ng-container>
+				<th scope="col" *ngFor="let column of columns">
+					<div class="table-header__sort" [class._active]="column.sort == 'desc'" (click)="sort(column)">
+						<span>{{column.title}}</span>
+						<span *ngIf="sortable[column.field]" class="material-icons icon-arrow">keyboard_backspace</span>
+					</div>
+				</th>
 			</tr>
+			<input type="text" name="search" [(ngModel)]="searching_text" (ngModelChange)="onSearch.emit(searching_text)">
 		</thead>
 		<tbody>
-			<ng-template #defaultRows>
-				<tr *ngFor="let row of rows">
-					<ng-container *ngFor="let head of headers">
-						<td *ngIf="row[head|lowercase]" [attr.data-label]="head">{{row[head|lowercase]}}</td>
-					</ng-container>
-				</tr>
-			</ng-template>
-			<ng-container [ngTemplateOutlet]="tableRows || defaultRows">
-			</ng-container>
+			<tr *ngFor="let row of config.perPage && config.rows.slice((config.page-1)*config.perPage, config.page*config.perPage) || config.rows">
+				<ng-container *ngFor="let column of columns">
+					<ng-template #defaultRows>
+						<td *ngIf="row[column.field]" [attr.data-label]="column.title">{{row[column.field]}}</td>
+					</ng-template>
+					<ng-container [ngTemplateOutlet]="custom_cell[column.field]" [ngTemplateOutletContext]="{$implicit: row}">
+					</ng-container> 
+				</ng-container>
+
+			</tr>
 		</tbody>
 		<tfoot>
-			<div class="container">
-				<div class="dropdown" (clickOutside)="perPage = false" [class.open]="perPage">
-					<div class="caption" (click)="perPage = !perPage">{{page_num||'Select'}}</div>
-					<div class="list">
-						<div class="item" *ngFor="let row of perPages">
-							<div [class.selected]="selected_opt[row]" (click)="selected_opt={}; selected_opt[row]=true; page_num = row; perPage = false;">{{row}}</div>
+			<div *ngIf="config.perPage">
+				<div class="container">
+					<div class="dropdown" (clickOutside)="select_page_size = false" [class.open]="select_page_size">
+						<div class="caption" (click)="select_page_size = !select_page_size">{{config.perPage}}</div>
+						<div class="list">
+							<div class="item" *ngFor="let row of config.pageSizeOptions">
+								<div [class.selected]="row==config.perPage" (click)="changePerPage(row)">{{row}}</div>
+							</div>
 						</div>
 					</div>
 				</div>
+				<div><span>{{((config.page-1)*config.perPage)+1}} - {{config.page*config.perPage > config.rows.length&&config.rows.length||config.page*config.perPage}}</span> of <span>{{config.rows.length}}</span></div>
+				<button (click)="config.page = 1">First Button</button>
+				<button (click)="previous()">Previous</button>
+				<button (click)="next()">Next</button>
+				<button (click)="lastPage()">Last Button</button>
 			</div>
 		</tfoot>
 	</table>

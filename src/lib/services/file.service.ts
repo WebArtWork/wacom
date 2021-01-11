@@ -2,6 +2,7 @@ import { FilesComponent } from '../components/files/files.component';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { HttpService } from './http.service';
 import { DomService } from './dom.service';
+import { CoreService } from './core.service';
 import { Injectable } from '@angular/core';
 import { throwError } from 'rxjs'; 
 import { catchError } from 'rxjs/operators'; 
@@ -12,7 +13,7 @@ import { catchError } from 'rxjs/operators';
 export class FileService {
 	private added:any = {};
 	private files:any = [];
-	constructor(private dom: DomService, private http: HttpService) {
+	constructor(private dom: DomService, private core: CoreService, private http: HttpService) {
 		this.dom.appendComponent(FilesComponent, {
 			fs: this
 		});
@@ -173,8 +174,8 @@ export class FileService {
 				if(!info.resize){
 					return this.update(loadEvent.target.result, info, file);
 				}
-				let canvasElement = document.createElement('canvas');
-				let imageElement = document.createElement('img');
+				let canvasElement = this.core.document.createElement('canvas');
+				let imageElement = this.core.document.createElement('img');
 				imageElement.onload = ()=>{
 					let infoRatio = info.resize.width / info.resize.height;
 					let imgRatio = imageElement.width / imageElement.height;

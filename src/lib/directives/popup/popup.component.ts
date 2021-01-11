@@ -1,4 +1,5 @@
 import {Component, ElementRef, HostListener, HostBinding, Input, OnInit, EventEmitter, Renderer2} from '@angular/core';
+import { CoreService } from '../../services/core.service';
 
 @Component({
     selector: 'popup',
@@ -77,7 +78,7 @@ export class PopupComponent {
         return this.options['theme'] === 'light';
     }
 
-    constructor(private elementRef: ElementRef, private renderer: Renderer2) {}
+    constructor(private elementRef: ElementRef, private renderer: Renderer2, public core: CoreService) {}
 
     ngOnInit() {
         this.setCustomClass();
@@ -123,7 +124,7 @@ export class PopupComponent {
         let elementWidth = isSvg ? this.element.getBoundingClientRect().width : this.element.offsetWidth;
         const popupHeight = popup.clientHeight;
         const popupWidth = popup.clientWidth;
-        const scrollY = window.pageYOffset;
+        const scrollY = this.core.window.pageYOffset;
 
         if (isCustomPosition) {
             elementHeight = 0;
@@ -163,8 +164,8 @@ export class PopupComponent {
             const bottomEdge = topStyle + popupHeight;
             const leftEdge = leftStyle;
             const rightEdge = leftStyle + popupWidth;
-            const bodyHeight = window.innerHeight + scrollY;
-            const bodyWidth = document.body.clientWidth;
+            const bodyHeight = this.core.window.innerHeight + scrollY;
+            const bodyWidth = this.core.document.body.clientWidth;
 
             if (topEdge < 0 || bottomEdge > bodyHeight || leftEdge < 0 || rightEdge > bodyWidth) {
                 return false;

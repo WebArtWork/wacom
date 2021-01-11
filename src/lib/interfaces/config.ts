@@ -30,6 +30,7 @@ export interface Config {
 		alerts?:object;
 		text?:string;
 		type?: string;
+		icon?: string;
 		class?: string;
 		unique?: string;
 		progress?: boolean;

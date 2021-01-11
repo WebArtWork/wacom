@@ -3,13 +3,14 @@ import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { AlertComponent } from '../components/alert/alert.component';
 import { WrapperComponent } from '../components/alert/wrapper/wrapper.component';
 import { DomService } from './dom.service';
+import { CoreService } from './core.service';
 import { Alert, DEFAULT_Alert } from '../interfaces/alert.interface';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class AlertService {
-	constructor(private dom: DomService,
+	constructor(private dom: DomService, private core: CoreService,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config) {
 		if(!this.config) this.config = DEFAULT_CONFIG;
 		if(!this.config.alert){
@@ -46,23 +47,48 @@ export class AlertService {
 			this.uniques[opts.unique] = opts;
 		}
 		if(!opts.position) opts.position='bottomRight';
+		let content;
+		opts.close = ()=>{
+			if(content) content.componentRef.destroy();
+			component.nativeElement.remove();
+			if(typeof opts.onClose == 'function') opts.onClose();
+		};
 		let component = this.dom.appendById(AlertComponent, opts, opts.position);
 		if(typeof opts.component == 'string' && this.config.alert.alerts[opts.component]){
 			opts.component = this.config.alert.alerts[opts.component];
 		}
 		if(typeof opts.component == 'function'){
-			let content = component.children[0].children[0].children[0];
-			this.dom.appendComponent(opts.component, opts, content as HTMLElement);
+			content = this.dom.appendComponent(opts.component, opts, component.nativeElement.children[0].children[0].children[0] as HTMLElement);
 		}
-		return component;
+		return component.nativeElement;
+	}
+	info(opts: Alert){
+		opts['type']='info';
+		this.show(opts)
+	}
+	success(opts: Alert){
+		opts['type']='success';
+		this.show(opts)
+	}
+	warning(opts: Alert){
+		opts['type']='warning';
+		this.show(opts)
+	}
+	error(opts: Alert){
+		opts['type']='error';
+		this.show(opts)
+	}
+	question(opts: Alert){
+		opts['type']='question';
+		this.show(opts)
 	}
 	destroy(){
-		document.getElementById("bottomRight").innerHTML = ""; 
-		document.getElementById("bottomLeft").innerHTML = ""; 
-		document.getElementById("bottomCenter").innerHTML = ""; 
-		document.getElementById("topRight").innerHTML = ""; 
-		document.getElementById("topLeft").innerHTML = ""; 
-		document.getElementById("topCenter").innerHTML = ""; 
-		document.getElementById("center").innerHTML = ""; 
+		this.core.document.getElementById("bottomRight").innerHTML = ""; 
+		this.core.document.getElementById("bottomLeft").innerHTML = ""; 
+		this.core.document.getElementById("bottomCenter").innerHTML = ""; 
+		this.core.document.getElementById("topRight").innerHTML = ""; 
+		this.core.document.getElementById("topLeft").innerHTML = ""; 
+		this.core.document.getElementById("topCenter").innerHTML = ""; 
+		this.core.document.getElementById("center").innerHTML = ""; 
 	}
 }

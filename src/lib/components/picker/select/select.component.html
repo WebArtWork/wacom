@@ -23,7 +23,7 @@
 		</div>
 		<ng-template #defaultOptionsTemplate>
 			<div *ngFor="let row of list | search: text_search: searchField: searchLimit" [id]="row.id">
-				<span (click)="selected(row)">{{row?.label}}</span>
+				<span (click)="selected(row)">{{row?.label||row}}</span>
 			</div>
 			<div *ngIf="!(list | search: text_search: searchField: searchLimit).length">{{noResults}}</div>
 		</ng-template>

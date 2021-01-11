@@ -6,14 +6,15 @@ import {
 	EmbeddedViewRef,
 	ApplicationRef
 } from '@angular/core';
-
+import { CoreService } from './core.service';
 @Injectable({
 	providedIn: 'root'
 })
 export class DomService {
 	constructor(private componentFactoryResolver: ComponentFactoryResolver,
 		private appRef: ApplicationRef,
-		private injector: Injector) { }
+		private injector: Injector,
+		private core: CoreService) { }
 	/**
 	* Appends a component to body currently
 	*/
@@ -22,17 +23,20 @@ export class DomService {
 			this.projectComponentInputs(componentRef, options);
 			this.appRef.attachView(componentRef.hostView);
 			const domElem = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
-			let element = document.getElementById(id);
+			let element = this.core.document.getElementById(id);
 			if(element){
 				element.appendChild(domElem);
 			}
-			return domElem;
+			return {
+				nativeElement: domElem,
+				componentRef: componentRef
+			};
 		}
 	/**
 	* Appends a component to body currently
 	*/
 		private providedIn:any = {};
-		appendComponent(component: any, options: any = {}, element = document.body) {
+		appendComponent(component: any, options: any = {}, element = this.core.document.body) {
 			if(options.providedIn){
 				if(this.providedIn[options.providedIn]) return;
 				this.providedIn[options.providedIn] = true;
@@ -42,7 +46,10 @@ export class DomService {
 			this.appRef.attachView(componentRef.hostView);
 			const domElem = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
 			element.appendChild(domElem);
-			return domElem;
+			return {
+				nativeElement: domElem,
+				componentRef: componentRef
+			};
 		}
 	/**
 	* Projects the inputs onto the component

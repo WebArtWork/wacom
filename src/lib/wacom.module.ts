@@ -27,7 +27,7 @@ import { HtmlComponent } from './components/picker/html/html.component';
 import { FilesComponent } from './components/files/files.component';
 import { ClickOutsideDirective } from './directives/click-outside.directive';
 import { PickerSelectOptionsDirective } from './directives/picker.directive';
-import { TableHeadersDirective, TableRowsDirective} from './directives/table.directive';
+import { CellDirective, SortDirective} from './directives/table.directive';
 import { CheckboxComponent } from './components/picker/checkbox/checkbox.component';
 import { RadioComponent } from './components/picker/radio/radio.component';
 import { SelectComponent } from './components/picker/select/select.component';
@@ -54,14 +54,14 @@ import { WframeComponent } from './components/wframe/wframe.component';
 		FilesComponent,
 		ClickOutsideDirective,
 		PickerSelectOptionsDirective,
-		TableHeadersDirective,
-		TableRowsDirective,
+		CellDirective,
 		CheckboxComponent,
 		RadioComponent,
 		SelectComponent,
 		ModalComponent,
 		WframeComponent,
-		MongodatePipe
+		MongodatePipe,
+		SortDirective
 	],
 	exports: [
 		OtaPipe,
@@ -75,8 +75,8 @@ import { WframeComponent } from './components/wframe/wframe.component';
 		TableComponent,
 		ClickOutsideDirective,
 		PickerSelectOptionsDirective,
-		TableHeadersDirective,
-		TableRowsDirective
+		CellDirective,
+		SortDirective
 	],
 	entryComponents: [
 		AlertComponent,

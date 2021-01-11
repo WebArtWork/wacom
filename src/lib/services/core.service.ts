@@ -1,43 +1,73 @@
 import { Router, NavigationEnd } from '@angular/router';
 import { Injectable } from '@angular/core';
-declare var window:any;
 declare var cordova:any;
+declare var window:any;
+declare var localStorage:any;
+declare var document:any;
+declare var navigator:any;
 
 @Injectable({
 	providedIn: 'root'
 })
 export class CoreService {
-	private serial_process(i, arr, callback){
-		if(i>=arr.length) return callback();
-		arr[i](()=>{
-			this.serial_process(++i, arr, callback);
-		});
-	}
-	public device:any;
-	public version:any;
-	public set_version(version='1.0.0'){
-		this.version = version;
-		document.addEventListener('deviceready', () => {
-			this.done('mobile');
-			if(cordova && cordova.getAppVersion){
-				cordova.getAppVersion.getVersionNumber((version)=>{
-					this.version = version;
-				});
-			}
-		});
-	}
+	public localStorage:any = {
+		getItem:()=>{},
+		setItem:()=>{},
+		removeItem:()=>{},
+		clear:()=>{}
+	};
+	public document:any = {
+		querySelectorAll: ()=>{},
+		addEventListener: ()=>{},
+		removeEventListener: ()=>{},
+		documentElement: {},
+		body: {},
+	};
+	public window:any = {
+		location: {
+			host: ''
+		},
+		addEventListener: ()=>{},
+		removeEventListener: ()=>{},
+		setTimeout: ()=>{}
+	};
+	//public cordova:any = {};
+	public navigator:any = {};
 	constructor(private router: Router) {
-		var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+		if(typeof window != undefined) this.window = window;
+		if(typeof localStorage != undefined) this.localStorage = localStorage;
+		if(typeof document != undefined) this.document = document;
+		//if(typeof cordova != undefined) this.cordova = cordova;
+		if(typeof navigator != undefined) this.navigator = navigator;
+		this.host = this.window.location.host.toLowerCase();
+		var userAgent = this.navigator.userAgent || this.navigator.vendor || this.window.opera;
 		if (/windows phone/i.test(userAgent)) {
 			this.device = "windows";
 		}else if (/android/i.test(userAgent)) {
 			this.device = "android";
-		}else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+		}else if (/iPad|iPhone|iPod/.test(userAgent) && !this.window.MSStream) {
 			this.device = "ios";
 		}else this.device = "web";
 		this.set_version();
 	}
-	public host:any = window.location.host.toLowerCase();
+	public host:any;
+	public device:any;
+	public version:any;
+	public set_version(version='1.0.0'){
+		this.version = version;
+		this.document.addEventListener('deviceready', () => {
+			this.done('mobile');
+			if(!cordova.getAppVersion) return;
+			cordova.getAppVersion.getVersionNumber((version)=>{
+				this.version = version;
+			});
+		});
+	}
+
+
+
+
+
 	public parallel(arr, callback){
 		let counter = arr.length;
 		if(counter===0) return callback();
@@ -46,6 +76,12 @@ export class CoreService {
 				if(--counter===0) callback();
 			});
 		}
+	}
+	private serial_process(i, arr, callback){
+		if(i>=arr.length) return callback();
+		arr[i](()=>{
+			this.serial_process(++i, arr, callback);
+		});
 	}
 	public serial(arr, callback){
 		this.serial_process(0, arr, callback);

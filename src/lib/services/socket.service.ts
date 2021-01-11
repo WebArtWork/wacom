@@ -1,12 +1,13 @@
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { Injectable, Inject, Optional } from '@angular/core';
 import * as io from "socket.io-client";
+import { CoreService } from './core.service';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class SocketService {
-	public url = window.location.origin.replace('4200', '8080');
+	public url = '';
 	private io:any;
 	private connected = false;
 	load(){
@@ -24,7 +25,8 @@ export class SocketService {
 			this.connected = true;
 		});
 	}
-	constructor(@Inject(CONFIG_TOKEN) @Optional() private config: Config){
+	constructor(public core: CoreService, @Inject(CONFIG_TOKEN) @Optional() private config: Config){
+		this.url=core.window.location.origin.replace('4200', '8080')
 		if(!this.config) this.config = DEFAULT_CONFIG;
 		if(this.config.socket){
 			this.load();

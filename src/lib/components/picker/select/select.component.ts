@@ -37,7 +37,7 @@ export class SelectComponent implements OnInit {
 		
 	}
 	ngOnInit() {
-		if(!this.multiple) this.inputModel = '';
+		if(!this.multiple) this.inputModel = !this.inputModel&&this.list[0]||this.inputModel&&'';
 		for (var i = 0; i < this.list.length; i++){
 		    if(this.list[i].selected) {
 		    	if(this.multiple) {
@@ -53,8 +53,9 @@ export class SelectComponent implements OnInit {
 	selected(option) {
 		if(!this.multiple) {
 			this.inputModel = this.bindValue&&option[this.bindValue]||option;
-			option.is_selected = true;
+			if(typeof option == 'object')option.is_selected = true;
 			this.count += 1;
+			if(this.dropdownClose)
 			if(this.dropdownClose) this.options = false;
 			this.onAddEvent.emit(option);
 			this.inputModelChange.emit(this.inputModel)

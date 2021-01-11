@@ -14,6 +14,7 @@ import {
   NgZone,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { CoreService } from '../services/core.service';
 
 @Injectable()
 @Directive({ selector: '[clickOutside]' })
@@ -38,6 +39,7 @@ export class ClickOutsideDirective implements OnInit, OnChanges, OnDestroy {
   constructor(
       private _el: ElementRef,
       private _ngZone: NgZone,
+      public core: CoreService,
       @Inject(PLATFORM_ID) private platformId: Object) {
     this._initOnClickBody = this._initOnClickBody.bind(this);
     this._onClickBody = this._onClickBody.bind(this);
@@ -95,7 +97,7 @@ export class ClickOutsideDirective implements OnInit, OnChanges, OnDestroy {
   private _excludeCheck() {
     if (this.exclude) {
       try {
-        const nodes = Array.from(document.querySelectorAll(this.exclude)) as Array<HTMLElement>;
+        const nodes = Array.from(this.core.document.querySelectorAll(this.exclude)) as Array<HTMLElement>;
         if (nodes) {
           this._nodesExcluded = nodes;
         }
@@ -127,7 +129,7 @@ export class ClickOutsideDirective implements OnInit, OnChanges, OnDestroy {
    */
   private _onWindowBlur(ev: Event) {
     setTimeout(() => {
-      if (!document.hidden) {
+      if (!this.core.document.hidden) {
         this._emit(ev);
       }
     });
@@ -151,13 +153,13 @@ export class ClickOutsideDirective implements OnInit, OnChanges, OnDestroy {
 
   private _initClickOutsideListener() {
     this._ngZone.runOutsideAngular(() => {
-      this._events.forEach(e => document.addEventListener(e, this._onClickBody));
+      this._events.forEach(e => this.core.document.addEventListener(e, this._onClickBody));
     });
   }
 
   private _removeClickOutsideListener() {
     this._ngZone.runOutsideAngular(() => {
-      this._events.forEach(e => document.removeEventListener(e, this._onClickBody));
+      this._events.forEach(e => this.core.document.removeEventListener(e, this._onClickBody));
     });
   }
 
@@ -175,13 +177,13 @@ export class ClickOutsideDirective implements OnInit, OnChanges, OnDestroy {
 
   private _initWindowBlurListener() {
     this._ngZone.runOutsideAngular(() => {
-      window.addEventListener('blur', this._onWindowBlur);
+      this.core.window.addEventListener('blur', this._onWindowBlur);
     });
   }
 
   private _removeWindowBlurListener() {
     this._ngZone.runOutsideAngular(() => {
-      window.removeEventListener('blur', this._onWindowBlur);
+      this.core.window.removeEventListener('blur', this._onWindowBlur);
     });
   }
 

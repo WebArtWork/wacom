@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-
+import { CoreService } from './core.service';
 @Injectable({
 	providedIn: 'root'
 })
 export class UiService {
 	public var:any = {};
-	constructor(){
+	constructor(public core: CoreService){
+		this.variables = this.core.localStorage.getItem('css_variables') && JSON.parse(this.core.localStorage.getItem('css_variables')) || {}
 		for (let key in this.variables){
 			this.setProperty(key, this.variables[key]);
 		}
@@ -59,12 +60,12 @@ export class UiService {
 			return false;
 		}
 	/* Css Management*/
-		private variables:any = localStorage.getItem('css_variables') && JSON.parse(localStorage.getItem('css_variables')) || {};
+		private variables:any = {};
 		private save(){
-			localStorage.setItem('css_variables', JSON.stringify(this.variables));
+			this.core.localStorage.setItem('css_variables', JSON.stringify(this.variables));
 		}
 		private setProperty(key, value){
-			document.documentElement.style.setProperty(key, value);
+			this.core.document.documentElement.style.setProperty(key, value);
 		}
 		public set(variables, opts:any={}){
 			if(typeof opts == 'string'){
@@ -73,7 +74,7 @@ export class UiService {
 					opts = { host: opts };
 				}
 			}
-			if(opts.host && window.location.host != opts.host) return;
+			if(opts.host && this.core.window.location.host != opts.host) return;
 			if(Array.isArray(variables)){
 				for (let i = 0; i < variables.length; i++){
 					if( opts.local ){

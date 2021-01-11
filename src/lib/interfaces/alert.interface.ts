@@ -1,9 +1,11 @@
 import { InjectionToken } from '@angular/core';
 
 export interface Alert {
+	onClose?: any;
 	alerts?:object;
 	component?: any;
 	text?:string;
+	icon?:string;
 	type?: string;
 	class?: string;
 	unique?: string;

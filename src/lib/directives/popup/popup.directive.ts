@@ -3,6 +3,7 @@ import { PopupComponent } from './popup.component';
 import { PopupOptionsService } from './popup-options.service';
 import { defaultOptions, backwardCompatibilityOptions } from './options';
 import { PopupOptions } from './popup-options.interface';
+import { CoreService } from '../../services/core.service';
 
 export interface AdComponent {
     data: any;
@@ -97,7 +98,8 @@ export class PopupDirective {
         private elementRef: ElementRef,
         private componentFactoryResolver: ComponentFactoryResolver,
         private appRef: ApplicationRef,
-        private injector: Injector) {}
+        private injector: Injector,
+        private core: CoreService) {}
 
     @HostListener('focusin')
     @HostListener('mouseenter')
@@ -124,7 +126,7 @@ export class PopupDirective {
         }
 
         this.show();
-        this.hideAfterClickTimeoutId = window.setTimeout(() => {
+        this.hideAfterClickTimeoutId = this.core.window.setTimeout(() => {
             this.destroyPopup();
         }, this.options['hideDelayAfterClick'])
     }
@@ -198,11 +200,11 @@ export class PopupDirective {
         this.clearTimeouts();
         this.getElementPosition();
 
-        this.createTimeoutId = window.setTimeout(() => {
+        this.createTimeoutId = this.core.window.setTimeout(() => {
             this.appendComponentToBody(PopupComponent);
         }, this.getShowDelay());
 
-        this.showTimeoutId = window.setTimeout(() => {
+        this.showTimeoutId = this.core.window.setTimeout(() => {
             this.showPopupElem();
         }, this.getShowDelay());
     }
@@ -213,11 +215,11 @@ export class PopupDirective {
         this.clearTimeouts();
 
         if (this.isPopupDestroyed == false) {
-            this.hideTimeoutId = window.setTimeout(() => {
+            this.hideTimeoutId = this.core.window.setTimeout(() => {
                 this.hidePopup();
             }, options.fast ? 0 : this.getHideDelay());
 
-            this.destroyTimeoutId = window.setTimeout(() => {
+            this.destroyTimeoutId = this.core.window.setTimeout(() => {
                 if (!this.componentRef || this.isPopupDestroyed) {
                     return;
                 }
@@ -265,7 +267,7 @@ export class PopupDirective {
         }
         this.appRef.attachView(this.componentRef.hostView);
         const domElem = (this.componentRef.hostView as EmbeddedViewRef < any > ).rootNodes[0] as HTMLElement;
-        document.body.appendChild(domElem);
+        this.core.document.body.appendChild(domElem);
 
         this.componentSubscribe = ( < AdComponent > this.componentRef.instance).events.subscribe((event: any) => {
             this.handleEvents(event);
@@ -325,10 +327,10 @@ export class PopupDirective {
     get isTouchScreen() {
         var prefixes = ' -webkit- -moz- -o- -ms- '.split(' ');
         var mq = function(query) {
-            return window.matchMedia(query).matches;
+            return this.core.window.matchMedia(query).matches;
         }
 
-        if (('ontouchstart' in window)) {
+        if (('ontouchstart' in this.core.window)) {
             return true;
         }
 
