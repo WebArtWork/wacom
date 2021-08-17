@@ -9,6 +9,7 @@ export interface Modal {
 	component?: any;
 	size?: any;
 	timeout?: any;
+	timestart?: any;
 	class?:string;
 	modals?:object;
 	position?: string;
@@ -19,6 +20,7 @@ export interface Modal {
 export const DEFAULT_Modal: Modal = {
 	size: 'mid',
 	timeout: 0,
+	timestart: 0,
 	class: '',
 	modals: {},
 	position: 'tc',

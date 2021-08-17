@@ -18,9 +18,6 @@
 */
 	export * from './lib/directives/click-outside.directive';
 /*
-*	Modules
-*/
-/*
 *	Pipes
 */
 	export * from './lib/pipes/each.pipe';
@@ -48,6 +45,8 @@
 	export * from './lib/services/time.service';
 /*
 *	Initial
+*
+*	make different kind of modules, one which import all, other for piece by piece
 */
 	export * from './lib/wacom.module';
 	export * from './lib/popup.module';

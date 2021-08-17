@@ -13,6 +13,7 @@ export class ModalService {
 		if(!this.config.modal) this.config.modal={};
 		if(!this.config.modal.modals) this.config.modal.modals={};
 	}
+
 	show(opts: Modal){
 		if(typeof opts == 'string' || typeof opts == 'function'){
 			opts = {
@@ -52,6 +53,43 @@ export class ModalService {
 		component = this.dom.appendComponent(ModalComponent, opts);
 		content = this.dom.appendComponent(opts.component, opts, component.nativeElement.children[0].children[0].children[0] as HTMLElement);
 		return component.nativeElement;
+	}
+	open(opts: Modal){ this.show(opts); }
+	small(opts: Modal){
+		if(typeof opts == 'string' || typeof opts == 'function'){
+			opts = {
+				component: opts
+			}
+		}
+		opts.size = 'small';
+		this.show(opts);
+	}
+	mid(opts: Modal){
+		if(typeof opts == 'string' || typeof opts == 'function'){
+			opts = {
+				component: opts
+			}
+		}
+		opts.size = 'mid';
+		this.show(opts);
+	}
+	big(opts: Modal){
+		if(typeof opts == 'string' || typeof opts == 'function'){
+			opts = {
+				component: opts
+			}
+		}
+		opts.size = 'big';
+		this.show(opts);
+	}
+	full(opts: Modal){
+		if(typeof opts == 'string' || typeof opts == 'function'){
+			opts = {
+				component: opts
+			}
+		}
+		opts.size = 'full';
+		this.show(opts);
 	}
 	private opened:any = {};
 	destroy(){

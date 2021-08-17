@@ -24,7 +24,7 @@ export class DomService {
 			this.appRef.attachView(componentRef.hostView);
 			const domElem = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
 			let element = this.core.document.getElementById(id);
-			if(element){
+			if(element && typeof element.appendChild == 'function'){
 				element.appendChild(domElem);
 			}
 			return {
@@ -45,7 +45,9 @@ export class DomService {
 			this.projectComponentInputs(componentRef, options);
 			this.appRef.attachView(componentRef.hostView);
 			const domElem = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
-			element.appendChild(domElem);
+			if(element && typeof element.appendChild == 'function'){
+				element.appendChild(domElem);
+			}
 			return {
 				nativeElement: domElem,
 				componentRef: componentRef

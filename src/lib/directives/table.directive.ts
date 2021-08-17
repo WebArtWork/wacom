@@ -23,3 +23,24 @@ export class SortDirective implements OnInit{
 	ngOnInit() {
 	}
 }
+
+@Directive({
+  selector: 'ng-template[actions]'
+})
+export class ActionsDirective implements OnInit{
+	constructor(public template: TemplateRef<any>) {
+
+	}
+	ngOnInit() {
+	}
+}
+@Directive({
+  selector: 'ng-template[customEdit]'
+})
+export class CustomEditDirective implements OnInit{
+	constructor(public template: TemplateRef<any>) {
+
+	}
+	ngOnInit() {
+	}
+}

@@ -1,4 +1,4 @@
-# wacom waw Angular (ngx) common
+# Angular (ngx) common
 Module which has common services and components which can be used on all projects.
 
 ## Getting Started
@@ -15,21 +15,15 @@ $ npm i --save wacom
 | Name | Description |
 | ------- |:-----:|
 | [**`Core`**](https://www.npmjs.com/package/wacom#core-service) | Common supportive function which can be used in any service |
+| [**`Http`**](https://www.npmjs.com/package/wacom#http-service) | Http layer for HttpClient |
 | [**`Store`**](https://www.npmjs.com/package/wacom#store-service) | Service will is responsible for keeping information on the device |
 | [**`Hash`**](https://www.npmjs.com/package/wacom#hash-service) | Hash management for easily use, storage which stay in url |
-| [**`Dom`**](https://www.npmjs.com/package/wacom#dom-service) | Html DOM management, user friendly service |
 | [**`Render`**](https://www.npmjs.com/package/wacom#render-service) | Make not automated render management well structured |
 | [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service) | Website meta tags management within router |
 | [**`Alert`**](https://www.npmjs.com/package/wacom#alert-service) | Alerts management |
 | [**`Modal`**](https://www.npmjs.com/package/wacom#modal-service) | Modals management |
 | [**`Loader`**](https://www.npmjs.com/package/wacom#loader-service) | Loaders management |
-| [**`Time`**](https://www.npmjs.com/package/wacom#time-service) | Supportive time service |
 | [**`UI`**](https://www.npmjs.com/package/wacom#ui-service) | Supportive UI/UX service |
-| [**`Http`**](https://www.npmjs.com/package/wacom#http-service) | Http layer for HttpClient |
-| [**`File`**](https://www.npmjs.com/package/wacom#file-service) | File management, connect with waw back-end |
-| [**`Mongo`**](https://www.npmjs.com/package/wacom#mongo-service) | Mongo management, connect with waw back-end |
-| [**`Social`**](https://www.npmjs.com/package/wacom#social-service) | Social management, connect with waw back-end |
-| [**`Socket`**](https://www.npmjs.com/package/wacom#socket-service) | Socket management, connect with waw back-end |
 
 ### Components
 | Name | Description |
@@ -336,11 +330,12 @@ import { AlertService } from 'wacom';
 constructor(private alert: AlertService){};
 ```
 ### show `function`
-Opens the alert and return htmlElement of this alert. Example:
+Opens the alert and return htmlElement of this alert.
+Example 1:
 ```javascript
 let my_alert = alert.show({
-	text: 'Hello, world!',
-	type: 'info',
+	text: 'Are you sure?',
+	type: 'question',
 	timeout: 5000,
 	class: 'myClass',
 	position: 'bottomRight',
@@ -356,7 +351,16 @@ let my_alert = alert.show({
 		}
 	}]
 });
-my_alert.remove();
+```
+Example 2:
+```javascript
+let my_alert = alert.show({
+	component: MyCustomComponent,
+	timeout: 5000,
+	class: 'myClass',
+	position: 'center',
+	closable: true
+});
 ```
 ### options
 |  Name            | Type     | Description     |
@@ -371,7 +375,8 @@ my_alert.remove();
 | `closable`       | boolean  | Show "x" close button. |
 | `buttons`        | number   | Array of buttons for your alerts. |
 | `component`      | string or @Component | Component which will be appended into the alert. |
-| `close`          | function | Capture when the alert is closing. |
+| `close`            | function | custom function for close alert. |
+| `onClose`          | function | Capture when the alert is closing. |
 ### destroy `function`
 Close all alerts. Example:
 ```javascript
@@ -394,7 +399,6 @@ let my_modal = modal.show({
 	position: 'center',
 	closable: true
 });
-my_modal.remove();
 ```
 ### options
 |  Name              | Type     | Description     |
@@ -404,15 +408,89 @@ my_modal.remove();
 | `size`             | string   | Size of the modal. |
 | `timeout`          | number  | Amount in milliseconds to close the modal, 0 to disable. |
 | `class`            | string   | Custom class for your modal. |
-| `position`         | string   | Position of the modal(`topLeft`, `topCenter`, `topRight`, `right`, `bottomRight`, `bottomCenter`, `bottomLeft`, `left`, `center`). |
 | `closable`         | boolean  | Show "x" close button. |
 | `unique`           | string | Identificator for your modals. |
 | `close`            | function | custom function for close modal. |
 | `onOpen`           | function | Capture when the modal is opening. |
 | `onClose`          | function | Capture when the modal is closing. |
-| `onClickOutside`   | function | Capture when the alert is closing by click outside. |
 ### destroy `function`
 Close all modals. Example:
 ```javascript
 modal.destroy();
+```
+## Loader Service
+Loader Service is an suportive service for loaders manamanagement.Example of importing loader service:
+```javascript
+import { LoaderService } from 'wacom';
+constructor(private load: LoaderService){};
+```
+### show `function`
+Opens the loader and return htmlElement of this loader. Example:
+```javascript
+let my_loader = load.show({
+	timeout: 5000,
+	class: 'myClass',
+	closable: true
+});
+```
+### options
+|  Name              | Type     | Description     |
+| ---------------    |--------- | --------------- |
+| `append`           | @Component   | Component where the loader will be appended. |
+| `component`        | string or @Component   | Component which will be appended into the loader. |
+| `timeout`          | number  | Amount in milliseconds to close the loader, 0 to disable. |
+| `progress`         | boolean  | Enable timeout progress bar. |
+| `class`            | string   | Custom class for your loader. |
+| `closable`         | boolean  | Show "x" close button. |
+| `close`            | function | custom function for close loader. |
+| `onClose`          | function | Capture when the loader is closing. |
+### destroy `function`
+Close all loaders. Example:
+```javascript
+loader.destroy();
+```
+## UI/UX Service
+UI/UX Service is supportive service for front-end features. This service provides saving css varibles and containes helpful tools for the front developer.
+### var
+Object which can be used to contain all needed fields for front-end.
+### get `function`
+Returns Object with all saved css viriables. 
+Example:
+```javascript
+ui.get();
+```
+Result example: 
+```javascript
+{
+  test: '15px solid'
+}
+```
+### remove `function`
+Removes css varible by the key. 
+Example: 
+```javascript
+ui.remove('css');
+```
+### set `function`
+Method interface sets a new value for a property on a CSS style declaration object and saves all css variables which you have passed. 
+Example: 
+```javascript
+ui.set(variables, options);
+```
+```variables``` - All css varibles you want to pass. If you want to set array of variables you'll need to have specific structure of the array. Example: ```[{key: 'name', value: example}]```. Object will be saved with the same structure. 
+
+```options``` - If you want to save css variables to the localStorage you should pass ```local: true```. Also if you want to save variables only for specific host you should pass ```host: 'hostname'```
+### arr `function`
+Helps developer to generate array with custom length and with elements of specific type. 
+Example: 
+```html
+<div *ngFor="let obj of ui.arr(length, type)"></div>
+```
+```length``` - Length of generated array.
+```type``` - ```'number'||'text'||'date'``` Will set elements with random content at choosed type. 'number' is default type of elements.
+### text `function`
+Helps developer to generate random string with specific length.
+Example: 
+```html
+<span>{{ui.text(length)}}</span>
 ```

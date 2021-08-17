@@ -42,6 +42,7 @@ export interface Config {
 	modal?: {
 		size?: any;
 		timeout?: any;
+		timestart?: any;
 		class?:string;
 		modals?:object;
 		position?: string;
@@ -51,6 +52,7 @@ export interface Config {
 	socket?: any;
 	http?: {
 		replace?: any;
+		err?: any;
 		url?: string;
 	}
 }

@@ -16,6 +16,11 @@ export class HashService {
 			this.done = true;
 			return;
 		}
+		this.load();
+		this.done = true;
+	}
+	load(){
+		this.hash = {};
 		let hash:any = this.core.window.location.hash.replace('#!#', '').replace('#', '').split('&');
 		for(let i = 0; i < hash.length; i++){
 			let holder = hash[i].split('=')[0];
@@ -26,7 +31,6 @@ export class HashService {
 			}
 			this.hash[holder] = value;
 		}
-		this.done = true;
 	}
 	on(field, cb = resp=>{}){
 		if(!this.done) return setTimeout(()=>{
@@ -49,8 +53,9 @@ export class HashService {
 	get(field){
 		return this.hash[field];
 	}
-	clear(field){
-		delete this.hash[field];
+	clear(field?){
+		if(field) delete this.hash[field];
+		else this.hash = {};
 		this.save();
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"name": "wacom",
-	"version": "1.10.18",
+	"version": "1.14.1",
 	"license": "MIT",
 	"repository": "WebArtWork/wacom",
 	"keywords": [
@@ -19,9 +19,7 @@
 		"hash"
 	],
 	"peerDependencies": {
-		"@types/socket.io-client": "^1.x.x",
-		"socket.io-client": "^2.x.x",
-		"@angular/common": "~10.x.x",
-		"@angular/core": "~10.x.x"
+		"@angular/common": "~12.x.x",
+		"@angular/core": "~12.x.x"
 	}
 }

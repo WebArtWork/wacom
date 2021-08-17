@@ -7,40 +7,30 @@ import { DomService } from './dom.service';
 	providedIn: 'root'
 })
 export class LoaderService {
+	public loaders:any = [];
 	constructor(private dom: DomService,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config) {
-		/*if(!this.config) this.config = DEFAULT_CONFIG;
-		if(!this.config.alert){
-			this.config.alert = DEFAULT_Alert;
-		}else{
-			for (let each in DEFAULT_Alert){
-				if(this.config.alert[each]!=undefined) continue;
-			    this.config.alert[each] = DEFAULT_Alert[each];
-			}
-		}
-		this.dom.appendComponent(WrapperComponent);*/
 	}
-
 	show(opts?){
-		/*if(!opts) opts = {};
-		for (let each in this.config.alert){
-			if(each=="class") opts[each] = opts[each]+" "+this.config.alert[each];
-			else if(!opts[each]) opts[each] = this.config.alert[each];
-		}
-		if(typeof opts.component == 'string' && this.config.alert.alerts[opts.component]){
-			opts.component = this.config.alert.alerts[opts.component];
-		}*/
 		let component;
-		if(opts.component){
-			component = this.dom.appendComponent(LoaderComponent, {}, opts.component);
-			return component.nativeElement;
+		opts.close = ()=>{
+			if(component) component.componentRef.destroy();
+			component.nativeElement.remove();
+			if(typeof opts.onClose == 'function') opts.onClose();
+		};
+		if(opts.append){
+			component = this.dom.appendComponent(LoaderComponent, opts, opts.append);
 		}
 		else{
-			component = this.dom.appendComponent(LoaderComponent, {});
-			return component.nativeElement;
+			component = this.dom.appendComponent(LoaderComponent, opts);
 		}
+		this.loaders.push(component);
+		return component.nativeElement;
 	}
 	destroy(){
-
+		for (let i = this.loaders.length-1; i >= 0; i--){
+		    this.loaders[i].componentRef.destroy();
+			this.loaders.splice(i,1);
+		}
 	}
 }

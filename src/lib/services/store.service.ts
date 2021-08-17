@@ -42,7 +42,7 @@ export class StoreService {
 					return setTimeout(()=>{
 						this.set(hold, value, cb);
 					}, 100);
-				} 
+				}
 				this.get(hold, resp=>{
 					if(resp){
 						this.db.transaction((tx) => {
@@ -67,17 +67,26 @@ export class StoreService {
 					return setTimeout(()=>{
 						this.get(hold, cb);
 					}, 100);
-				} 
+				}
 				this.db.executeSql('SELECT value FROM Data where hold=?', [hold], (rs)=>{
 					if(rs.rows && rs.rows.length){
 						cb(rs.rows.item(0).value);
 					}else{
 						cb('');
 					}
-				}, errcb);	
+				}, errcb);
 			}else{
 				cb(this.core.localStorage.getItem('waw_temp_storage_'+hold)||'');
 			}
+		}
+		setd(hold, value, cb:any=()=>{}, errCb:any=()=>{}){
+			value = JSON.stringify(value);
+			this.set(hold, value, cb, errCb);
+		}
+		getd(hold, cb:any=()=>{}, errcb:any=()=>{}){
+			this.get(hold, value=>{
+				cb(value && JSON.parse(value) || null);
+			}, errcb);
 		}
 		remove(hold, cb:any=()=>{}, errcb:any=()=>{}){
 			if(this.core.window.sqlitePlugin){
@@ -85,7 +94,7 @@ export class StoreService {
 					return setTimeout(()=>{
 						this.remove(hold);
 					}, 100);
-				this.db.executeSql('DELETE FROM Data where hold=?', [hold], cb, errcb);	
+				this.db.executeSql('DELETE FROM Data where hold=?', [hold], cb, errcb);
 			}else{
 				this.core.localStorage.removeItem('waw_temp_storage_'+hold);
 				cb();
@@ -128,7 +137,7 @@ export class StoreService {
 				// if(this.data[name].opts.sort == 'string' &&
 				// 	typeof this[this.data[name].opts.sort] == 'function'){
 				// 	this.data[name].all.sort(this[this.data[name].opts.sort](_id));
-				// }else 
+				// }else
 				if(typeof this.data[name].opts.sort == 'function'){
 					this.data[name].all.sort(this.data[name].opts.sort);
 				}

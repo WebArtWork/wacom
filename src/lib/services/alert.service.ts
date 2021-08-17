@@ -42,10 +42,6 @@ export class AlertService {
 			else if(typeof opts[each] == "undefined") opts[each] = this.config.alert[each];
 		}
 		if(this.shortcuts[opts.position]) opts.position = this.shortcuts[opts.position];
-		if(opts.unique){
-			if(this.uniques[opts.unique]) this.uniques[opts.unique].remove();
-			this.uniques[opts.unique] = opts;
-		}
 		if(!opts.position) opts.position='bottomRight';
 		let content;
 		opts.close = ()=>{
@@ -60,27 +56,32 @@ export class AlertService {
 		if(typeof opts.component == 'function'){
 			content = this.dom.appendComponent(opts.component, opts, component.nativeElement.children[0].children[0].children[0] as HTMLElement);
 		}
+		if(opts.unique){
+			if(this.uniques[opts.unique]) this.uniques[opts.unique].remove();
+			this.uniques[opts.unique] = component.nativeElement;
+		}
 		return component.nativeElement;
 	}
+	open(opts: Alert){ this.show(opts); }
 	info(opts: Alert){
 		opts['type']='info';
-		this.show(opts)
+		this.show(opts);
 	}
 	success(opts: Alert){
 		opts['type']='success';
-		this.show(opts)
+		this.show(opts);
 	}
 	warning(opts: Alert){
 		opts['type']='warning';
-		this.show(opts)
+		this.show(opts);
 	}
 	error(opts: Alert){
 		opts['type']='error';
-		this.show(opts)
+		this.show(opts);
 	}
 	question(opts: Alert){
 		opts['type']='question';
-		this.show(opts)
+		this.show(opts);
 	}
 	destroy(){
 		this.core.document.getElementById("bottomRight").innerHTML = ""; 

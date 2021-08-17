@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from './socket.service';
 import { HttpService } from './http.service';
+import { CoreService } from './core.service';
 @Injectable({
 	providedIn: 'root'
 })
@@ -20,9 +20,13 @@ export class MongoService {
 	*/
 		public config(part, opts){
 			if(this.data['opts' + part]) return;
-			this.data['arr' + part] = [];
-			this.data['obj' + part] = {};
-			this.data['opts' + part] = opts = opts||{};
+			if(!this.data['arr' + part]) this.data['arr' + part] = [];
+			if(!this.data['obj' + part]) this.data['obj' + part] = {};
+			if(this.data['opts' + part]){
+				for (let each in opts){
+				    this.data['opts' + part][each] = opts[each];
+				}
+			}else this.data['opts' + part] = opts = opts||{};
 			if(typeof opts.use == 'string'){
 				opts.use = opts.use.split(' ');
 			}
@@ -116,32 +120,47 @@ export class MongoService {
 			}, opts);
 		};
 		public fetch(part, opts=undefined, cb=undefined) {
+			if(opts.query && opts.query._id && !opts.force &&
+				this.data['obj' + part][opts.query._id]){
+				return this.data['obj' + part][opts.query._id];
+			}
 			if (typeof opts == 'function') {
 				cb = opts;
 				opts = {};
 			}
-			this.config(part, opts);
-			let url = '/api/' + part + '/fetch'+(opts.name||'');
+			if(!opts) opts = {};
+			this.config(part, opts); // remove this in future
+			let url = '/api/' + part + '/fetch'+(opts.name||''), doc;
+			if(opts.query && opts.query._id && this.data['obj' + part][opts.query._id]){
+				doc = this.data['obj' + part][opts.query._id];
+			}else{
+				doc = {};
+				for(let key in this.data['opts'+part].replace){
+					this.replace(doc, key, this.data['opts'+part].replace[key]);
+				}
+			}
 			this.http.post(opts.url || url, (opts.query||{}), resp => {
-				if(resp) this.push(part, resp);
+				if(!resp) return cb&&cb(false);
+				for (let each in resp){
+				    doc[each] = resp[each];
+				}
+				for (let each in doc){
+				    doc[each] = resp[each];
+				}
+				this.push(part, doc);
 				if (resp && typeof cb == 'function') {
-					cb(resp);
-				} else if (typeof cb == 'function') {
-					cb(false);
+					cb(doc);
 				}
 			}, opts);
+			return doc;
 		};
 		public get(part, opts=undefined, cb=undefined) {
-			if(typeof opts == 'function'){
-				opts = {
-					err: opts
-				};
-			}
 			if (typeof opts == 'function') {
 				cb = opts;
 				opts = {};
 			}
-			this.config(part, opts);			
+			if(!opts) opts = {};
+			this.config(part, opts); // remove this in future
 			let url = '/api/' + part + '/get'+(opts.name||'')+(opts.param||'');
 			this.http.get(opts.url || url, resp => {
 				if (Array.isArray(resp)) {
@@ -607,7 +626,7 @@ export class MongoService {
 		};
 		public push(part, doc){
 			if(this.data['obj' + part][doc._id]) return this.renew(part, doc);
-			if(this.data['opts'+part].replace){
+			if(this.data['opts' + part].replace){
 				for(let key in this.data['opts'+part].replace){
 					this.replace(doc, key, this.data['opts'+part].replace[key]);
 				}
@@ -706,23 +725,33 @@ export class MongoService {
 	/*
 	*	Endof Mongo Service
 	*/
-	constructor(private http: HttpService, private socket: SocketService){
-		socket.on('create', created=>{
-			this.fetch(created.part, {
-				query: {
-					_id: created._id
-				}
+	public socket:any = {
+		emit: (which, doc)=>{
+			console.log(which, doc, 'is not used on sockets');
+		}
+	};
+	constructor(private http: HttpService, private core: CoreService){
+		this.core.done('socket', socket=>{
+			this.socket = socket;
+			socket.on('create', created => {
+				this.fetch(created.part, {
+					force: true,
+					query: {
+						_id: created._id
+					}
+				});
 			});
-		});
-		socket.on('update', updated=>{
-			this.fetch(updated.part, {
-				query: {
-					_id: updated._id
-				}
+			socket.on('update', updated => {
+				this.fetch(updated.part, {
+					force: true,
+					query: {
+						_id: updated._id
+					}
+				});
 			});
-		});
-		socket.on('delete', deleted=>{
-			this.remove(deleted.part, deleted);
+			socket.on('delete', deleted => {
+				this.remove(deleted.part, deleted);
+			});
 		});
 	}
 }
