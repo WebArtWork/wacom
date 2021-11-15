@@ -1,4 +1,0 @@
-<label *ngFor="let check of list">
-	<input type="checkbox" [name]="check.name" [(ngModel)]="data[check.variable]" [id]="check.id"  (ngModelChange)="format();">
-	<span>{{check.label}}</span>
-</label>

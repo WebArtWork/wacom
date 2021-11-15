@@ -1,4 +1,0 @@
-<label *ngFor="let radio of list">
-	<input type="radio" [name]="radio.name" [(ngModel)]="inputModel" [id]="radio.id" (ngModelChange)="inputModelChange.emit(this.inputModel)" [value]="radio.value">
-	<span>{{radio.label}}</span>
-</label>
