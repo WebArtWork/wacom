@@ -21,8 +21,6 @@ import { LoaderComponent } from './components/loader/loader.component';
 import { WrapperComponent } from './components/alert/wrapper/wrapper.component';
 import { FilesComponent } from './components/files/files.component';
 import { ClickOutsideDirective } from './directives/click-outside.directive';
-import { PickerSelectOptionsDirective } from './directives/picker.directive';
-import { CellDirective, SortDirective, ActionsDirective, CustomEditDirective} from './directives/table.directive';
 import { MetaGuard } from './guard/meta.guard';
 import { MetaService } from './services/meta.service';
 @NgModule({
@@ -38,12 +36,7 @@ import { MetaService } from './services/meta.service';
 		WrapperComponent,
 		FilesComponent,
 		ClickOutsideDirective,
-		PickerSelectOptionsDirective,
-		CellDirective,
 		ModalComponent,
-		SortDirective,
-		ActionsDirective,
-		CustomEditDirective,
 		MongodatePipe,
 		PaginationPipe,
 	],

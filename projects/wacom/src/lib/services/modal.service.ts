@@ -11,9 +11,11 @@ export class ModalService {
 	private _modal: any;
 	constructor(private dom: DomService, private core: CoreService,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config) {
-		this._modal = config.modal;
+		if(!this.config) this.config={};
 		if(!this.config.modal) this.config.modal={};
 		if(!this.config.modal.modals) this.config.modal.modals={};
+		this._modal = config.modal;
+		console.log(this._modal);
 	}
 
 	show(opts: Modal | any){

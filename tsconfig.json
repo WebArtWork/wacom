@@ -24,7 +24,6 @@
     ],
     "paths": {
       "wacom": [
-        "dist/wacom/wacom",
         "dist/wacom"
       ]
     }
