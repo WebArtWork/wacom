@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 	name: 'each'
 })
 export class EachPipe implements PipeTransform {
-	transform(obj: any, holder?: any, refresh?): any {
+	transform(obj: any, holder?: any, refresh?: any): any {
 		if (!obj) { return []; }
 		if (Array.isArray(obj)) { return obj; }
 		if (typeof obj != 'object') { return []; }

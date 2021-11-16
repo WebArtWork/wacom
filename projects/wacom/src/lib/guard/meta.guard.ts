@@ -6,12 +6,14 @@ import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 @Injectable()
 export class MetaGuard implements CanActivate {
 	public static IDENTIFIER = 'MetaGuard';
+	private _meta: any ;
 	public constructor(private metaService: MetaService,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config) {
+		this._meta = config.meta
 		if(!this.config) this.config = DEFAULT_CONFIG;
 	}
 	public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-		this._processRouteMetaTags(route.data && route.data.meta);
+		this._processRouteMetaTags(route.data && route.data['meta']);
 		return true;
 	}
 	private _processRouteMetaTags(meta: any = {}) {
@@ -28,11 +30,11 @@ export class MetaGuard implements CanActivate {
 				this.metaService.setTag(key, meta[prop][key], prop);
 			});
 		});
-		Object.keys(this.config.meta.defaults).forEach(key => {
+		Object.keys(this._meta.defaults).forEach(key => {
 			if (key in meta || key === 'title' || key === 'titleSuffix' || key === 'link') {
 				return;
 			}
-			this.metaService.setTag(key, this.config.meta.defaults[key]);
+			this.metaService.setTag(key, this._meta.defaults[key]);
 		});
 	}
 }

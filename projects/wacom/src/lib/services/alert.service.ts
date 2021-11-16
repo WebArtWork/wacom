@@ -37,7 +37,7 @@ export class AlertService {
 		l: "left",
 		c: "center"
 	};
-	show(opts: string | Alert){
+	show(opts: any | Alert){
 		if (typeof opts === 'string') {
 			opts = {
 				text: opts
@@ -51,7 +51,7 @@ export class AlertService {
 		}
 		if(this.shortcuts[opts.position]) opts.position = this.shortcuts[opts.position];
 		if(!opts.position) opts.position='bottomRight';
-		const content:any;
+		var content:any;
 		opts.close = ()=>{
 			if(content) content.componentRef.destroy();
 			component.nativeElement.remove();

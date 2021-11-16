@@ -14,16 +14,16 @@ export class MongoService {
 	*		Will be initialized only inside get
 	*		Will be used inside push
 	*/
-		private data = {};
+		private data:any = {};
 		private socket: any = {
-			emit: (which, doc) => {
+			emit: (which:any, doc:any) => {
 				console.log(which, doc, 'is not used on sockets');
 			}
 		};
 	/*
 	*	waw crud connect functions
 	*/
-		public config(part, opts){
+		public config(part:any, opts:any){
 			if(this.data['opts' + part]) return;
 			if(!this.data['arr' + part]) this.data['arr' + part] = [];
 			if(!this.data['obj' + part]) this.data['obj' + part] = {};
@@ -71,7 +71,7 @@ export class MongoService {
 					if(typeof opts.groups[key] == 'boolean'){
 						if(opts.groups[key]){
 							opts.groups[key] = {
-								field: function(doc){
+								field: function(doc:any){
 									return doc[key];
 								}
 							}
@@ -97,7 +97,7 @@ export class MongoService {
 				}
 			}
 		};
-		public create(part, doc=undefined, cb=undefined, opts:any={}) {
+		public create(part:any, doc:any=undefined, cb:any=undefined, opts:any={}) {
 			if (typeof doc == 'function') {
 				if(cb) opts = cb;
 				cb = doc;
@@ -124,7 +124,7 @@ export class MongoService {
 				}
 			}, opts);
 		};
-		public fetch(part, opts=undefined, cb=undefined) {
+		public fetch(part:any, opts:any=undefined, cb:any=undefined) {
 			if(opts.query && opts.query._id && !opts.force &&
 				this.data['obj' + part][opts.query._id]){
 				return this.data['obj' + part][opts.query._id];
@@ -135,7 +135,7 @@ export class MongoService {
 			}
 			if(!opts) opts = {};
 			this.config(part, opts); // remove this in future
-			let url = '/api/' + part + '/fetch'+(opts.name||''), doc;
+			let url = '/api/' + part + '/fetch'+(opts.name||''), doc:any;
 			if(opts.query && opts.query._id && this.data['obj' + part][opts.query._id]){
 				doc = this.data['obj' + part][opts.query._id];
 			}else{
@@ -159,7 +159,7 @@ export class MongoService {
 			}, opts);
 			return doc;
 		};
-		public get(part, opts=undefined, cb=undefined) {
+		public get(part:any, opts:any=undefined, cb:any=undefined) {
 			if (typeof opts == 'function') {
 				cb = opts;
 				opts = {};
@@ -180,7 +180,7 @@ export class MongoService {
 			}, opts);
 			return this.data['arr' + part];
 		};
-		public set(part, opts=undefined, resp=undefined) {
+		public set(part:any, opts:any=undefined, resp:any=undefined) {
 			if (Array.isArray(opts)) {
 				resp = opts;
 				opts = undefined;
@@ -196,10 +196,10 @@ export class MongoService {
 				obj: this.data['obj' + part]
 			}
 		};
-		private prepare_update(part, doc, opts){
+		private prepare_update(part:any, doc:any, opts:any){
 			if(opts.fields){
 				if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
-				let _doc = {};
+				let _doc:any = {};
 				for(let i = 0; i < opts.fields.length; i++){
 					_doc[opts.fields[i]] = doc[opts.fields[i]];
 				}
@@ -213,7 +213,7 @@ export class MongoService {
 			}
 			return doc;
 		};
-		public update(part, doc, opts=undefined, cb=undefined) {
+		public update(part:any, doc:any, opts:any=undefined, cb:any=undefined) {
 			if (typeof opts == 'function'){
 				cb = opts;
 				opts = {};
@@ -235,7 +235,7 @@ export class MongoService {
 				}
 			}, opts);
 		};
-		public unique(part, doc, opts=undefined, cb=undefined) {
+		public unique(part:any, doc:any, opts:any=undefined, cb:any=undefined) {
 			if (typeof opts == 'function'){
 				cb = opts;
 				opts = {};
@@ -262,7 +262,7 @@ export class MongoService {
 				}
 			}, opts);
 		};
-		public delete(part, doc, opts=undefined, cb=undefined) {
+		public delete(part:any, doc:any, opts:any=undefined, cb:any=undefined) {
 			if (typeof opts == 'function') {
 				cb = opts;
 				opts = {};
@@ -270,7 +270,7 @@ export class MongoService {
 			if(typeof opts !== 'object') opts = {};
 			if(opts.fields){
 				if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
-				let _doc = {};
+				let _doc:any = {};
 				for(let i = 0; i < opts.fields.length; i++){
 					_doc[opts.fields[i]] = doc[opts.fields[i]];
 				}
@@ -296,12 +296,12 @@ export class MongoService {
 				}
 			}, opts);
 		};
-		public _id(cb){
+		public _id(cb:any){
 			if(typeof cb == 'function'){
 				this.http.get('/waw/newId', cb);
 			}
 		};
-		public to_id(docs){
+		public to_id(docs:any){
 			if(!docs) return [];
 			if(Array.isArray(docs)){
 				docs = docs.slice();
@@ -318,13 +318,13 @@ export class MongoService {
 			}
 			return docs;
 		};
-		public afterWhile(doc, cb, time=1000){
+		public afterWhile(doc:any, cb:any, time=1000){
 			if(typeof cb == 'function' && typeof time == 'number'){
 				clearTimeout(doc.__updateTimeout);
 				doc.__updateTimeout = setTimeout(cb, time);
 			}
 		};
-		public populate(doc, field, part){
+		public populate(doc:any, field:any, part:any):any{
 			if(!doc||!field||!part) return;
 			if(Array.isArray(doc)){
 				for(let i = 0; i < doc.length; i++){
@@ -362,7 +362,7 @@ export class MongoService {
 				}, 100);
 			}
 		};
-		public on(parts, cb) {
+		public on(parts:any, cb:any):any {
    		    if (typeof parts == 'string') {
    		        parts = parts.split(" ");
    		    }
@@ -375,113 +375,113 @@ export class MongoService {
    		    }
    		    cb(this.data);
    		};
-   		public track(index, doc){ return doc && doc._id && doc._id || index; }
+   		public track(index:any, doc:any){ return doc && doc._id && doc._id || index; }
    	/*
 	*	mongo sort filters
 	*/
    		public sortAscId(){
-   			return function(a,b){
+   			return function(a:any,b:any){
    				if(a._id>b._id) return 1;
    				else return -1;
    			}
    		};
    		public sortDescId(){
-   			return function(a,b){
+   			return function(a:any,b:any){
    				if(a._id<b._id) return 1;
    				else return -1;
    			}
    		};
-   		public sortAscString(opts){
+   		public sortAscString(opts:any){
    			if(typeof opts == 'string'){
    				opts = {
    					field: opts
    				}
    			}
-   			return function(a,b){
+   			return function(a:any,b:any){
    				if(a[opts.field].toLowerCase()>b[opts.field].toLowerCase()) return 1;
    				else if(a[opts.field].toLowerCase()<b[opts.field].toLowerCase() || !opts.next) return -1;
    				else return opts.next(a,b);
    			}
    		}
-   		public sortDescString(opts){
+   		public sortDescString(opts:any){
    			if(typeof opts == 'string'){
    				opts = {
    					field: opts
    				}
    			}
-   			return function(a,b){
+   			return function(a:any,b:any){
    				if(a[opts.field].toLowerCase()<b[opts.field].toLowerCase()) return 1;
    				else if(a[opts.field].toLowerCase()>b[opts.field].toLowerCase() || !opts.next) return -1;
    				else return opts.next(a,b);
    			}
    		}
-   		public sortAscDate(opts){
+   		public sortAscDate(opts:any){
    			if(typeof opts == 'string'){
    				opts = {
    					field: opts
    				}
    			}
-   			return function(a,b){
+   			return function(a:any,b:any){
    				if(a[opts.field].getTime()>b[opts.field].getTime()) return 1;
    				else if(a[opts.field].getTime()<b[opts.field].getTime() || !opts.next) return -1;
    				else return opts.next(a,b);
    			}
    		}
-   		public sortDescDate(opts){
+   		public sortDescDate(opts:any){
    			if(typeof opts == 'string'){
    				opts = {
    					field: opts
    				}
    			}
-   			return function(a,b){
+   			return function(a:any,b:any){
    				if(a[opts.field].getTime()<b[opts.field].getTime()) return 1;
    				else if(a[opts.field].getTime()>b[opts.field].getTime() || !opts.next) return -1;
    				else return opts.next(a,b);
    			}
    		}
-   		public sortAscNumber(opts){
+   		public sortAscNumber(opts:any){
    			if(typeof opts == 'string'){
    				opts = {
    					field: opts
    				}
    			}
-   			return function(a,b){
+   			return function(a:any,b:any){
    				if(a[opts.field]>b[opts.field]) return 1;
    				else if(a[opts.field]<b[opts.field] || !opts.next) return -1;
    				else return opts.next(a,b);
    			}
    		}
-   		public sortDescNumber(opts){
+   		public sortDescNumber(opts:any){
    			if(typeof opts == 'string'){
    				opts = {
    					field: opts
    				}
    			}
-   			return function(a,b){
+   			return function(a:any,b:any){
    				if(a[opts.field]<b[opts.field]) return 1;
    				else if(a[opts.field]>b[opts.field] || !opts.next) return -1;
    				else return opts.next(a,b);
    			}
    		}
-   		public sortAscBoolean(opts){
+   		public sortAscBoolean(opts:any){
    			if(typeof opts == 'string'){
    				opts = {
    					field: opts
    				}
    			}
-   			return function(a,b){
+   			return function(a:any,b:any){
    				if(!a[opts.field]&&b[opts.field]) return 1;
    				else if(a[opts.field]&&!b[opts.field] || !opts.next) return -1;
    				else return opts.next(a,b);
    			}
    		}
-   		public sortDescBoolean(opts){
+   		public sortDescBoolean(opts:any){
    			if(typeof opts == 'string'){
    				opts = {
    					field: opts
    				}
    			}
-   			return function(a,b){
+   			return function(a:any,b:any){
    				if(a[opts.field]&&!b[opts.field]) return 1;
    				else if(!a[opts.field]&&b[opts.field] || !opts.next) return -1;
    				else return opts.next(a,b);
@@ -490,48 +490,48 @@ export class MongoService {
 	/*
 	*	mongo replace filters
 	*/
-		public beArr(val, cb){
+		public beArr(val:any, cb:any){
 			if(!Array.isArray(val)) cb([]);
 			else cb(val);
 		};
-		public beObj(val, cb){
+		public beObj(val:any, cb:any){
 			if(typeof val != 'object' || Array.isArray(val) || !val){
 				val = {};
 			}
 			cb(val);
 		};
-		public beDate(val, cb) { cb( new Date(val) ); };
-		public beString(val, cb){
+		public beDate(val:any, cb:any) { cb( new Date(val) ); };
+		public beString(val:any, cb:any){
 			if(typeof val != 'string'){
 				val = '';
 			}
 			cb(val);
 		};
-		public beDoc = (val, cb)=>{
-			this.beObj(val, val=>{
+		public beDoc = (val:any, cb:any)=>{
+			this.beObj(val, (val:any)=>{
 				if(!val._id){
-					this._id(_id=>{
+					this._id((_id:any)=>{
 						val._id = _id;
 						cb(val);
 					});
 				}else cb(val);
 			});
 		};
-		public forceArr(val, cb){ cb([]); };
-		public forceObj(val, cb){ cb({}); };
-		public forceString(val, cb){ cb(''); };
-		public forceDoc = (val, cb) => {
-			this._id(_id=>{
+		public forceArr(val:any, cb:any){ cb([]); };
+		public forceObj(val:any, cb:any){ cb({}); };
+		public forceString(val:any, cb:any){ cb(''); };
+		public forceDoc = (val:any, cb:any) => {
+			this._id((_id:any)=>{
 				cb({
 					_id: _id
 				});
 			});
 		};
-		public getCreated(val, cb, doc){ cb(new Date(parseInt(doc._id.substring(0,8), 16)*1000)); };
+		public getCreated(val:any, cb:any, doc:any){ cb(new Date(parseInt(doc._id.substring(0,8), 16)*1000)); };
 	/*
 	*	mongo local support functions
 	*/
-		private replace(doc, value, rpl){
+		private replace(doc:any, value:any, rpl:any):any{
 			if(value.indexOf('.')>-1){
 				value = value.split('.');
 				let sub = value.shift();
@@ -541,12 +541,12 @@ export class MongoService {
 				return this.replace(doc[sub], value.join('.'), rpl);
 			}
 			if(typeof rpl == 'function'){
-				rpl(doc[value], function(newValue){
+				rpl(doc[value], function(newValue:any){
 					doc[value] = newValue;
 				}, doc);
 			}
 		};
-		public renew(part, doc){
+		public renew(part:any, doc:any){
 			if(!this.data['obj' + part][doc._id]) return this.push(part, doc);
 			if(this.data['opts'+part].replace){
 				for(let key in this.data['opts'+part].replace){
@@ -568,8 +568,8 @@ export class MongoService {
 					if(!this.data['obj' + part][key]){
 						this.data['obj' + part][key] = {};
 					}
-					let fields = {};
-					let set = field => {
+					let fields:any = {};
+					let set = (field:any) => {
 						fields[field] = true;
 						if(!field) return;
 						if(!Array.isArray(this.data['obj' + part][key][field])){
@@ -629,7 +629,7 @@ export class MongoService {
 				}
 			}
 		};
-		public push(part, doc){
+		public push(part:any, doc:any):any{
 			if(this.data['obj' + part][doc._id]) return this.renew(part, doc);
 			if(this.data['opts' + part].replace){
 				for(let key in this.data['opts'+part].replace){
@@ -666,7 +666,7 @@ export class MongoService {
 					if(!this.data['obj' + part][key]){
 						this.data['obj' + part][key] = {};
 					}
-					let set = field => {
+					let set = (field:any) => {
 						if(!field) return;
 						if(!Array.isArray(this.data['obj' + part][key][field])){
 							this.data['obj' + part][key][field] = [];
@@ -676,7 +676,7 @@ export class MongoService {
 							this.data['obj' + part][key][field].sort(g.sort);
 						}
 					}
-					set(g.field(doc, (field)=>{
+					set(g.field(doc, (field:any)=>{
 						set(field);
 					}));
 				}
@@ -696,7 +696,7 @@ export class MongoService {
 				}
 			}
 		};
-		public remove(part, doc){
+		public remove(part:any, doc:any){
 			if(!Array.isArray(this.data['arr' + part])) return;
 			for (let i = 0; i < this.data['arr' + part].length; i++) {
 				if (this.data['arr' + part][i]._id == doc._id) {
@@ -731,9 +731,9 @@ export class MongoService {
 	*	Endof Mongo Service
 	*/
 	constructor(private http: HttpService, private core: CoreService){
-		this.core.done('socket', socket=>{
+		this.core.done('socket', (socket:any)=>{
 			this.socket = socket;
-			socket.on('create', created => {
+			socket.on('create', (created:any) => {
 				this.fetch(created.part, {
 					force: true,
 					query: {
@@ -741,7 +741,7 @@ export class MongoService {
 					}
 				});
 			});
-			socket.on('update', updated => {
+			socket.on('update', (updated:any) => {
 				this.fetch(updated.part, {
 					force: true,
 					query: {
@@ -749,7 +749,7 @@ export class MongoService {
 					}
 				});
 			});
-			socket.on('delete', deleted => {
+			socket.on('delete', (deleted:any) => {
 				this.remove(deleted.part, deleted);
 			});
 		});

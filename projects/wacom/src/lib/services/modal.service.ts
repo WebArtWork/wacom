@@ -8,21 +8,23 @@ import { Modal, DEFAULT_Modal } from '../interfaces/modal.interface';
 	providedIn: 'root'
 })
 export class ModalService {
+	private _modal: any;
 	constructor(private dom: DomService, private core: CoreService,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config) {
+		this._modal = config.modal;
 		if(!this.config.modal) this.config.modal={};
 		if(!this.config.modal.modals) this.config.modal.modals={};
 	}
 
-	show(opts: Modal){
+	show(opts: Modal | any){
 		if(typeof opts == 'string' || typeof opts == 'function'){
 			opts = {
 				component: opts
 			}
 		}
 		if(!opts || typeof opts != 'object') opts = {};
-		if(typeof opts.component == 'string' && this.config.modal.modals[opts.component]){
-			opts.component = this.config.modal.modals[opts.component];
+		if(typeof opts.component == 'string' && this._modal.modals[opts.component]){
+			opts.component = this._modal.modals[opts.component];
 		}
 		if(typeof opts.component != 'function'){
 			console.log("This component does not exists.");
@@ -31,7 +33,7 @@ export class ModalService {
 		if(!opts.class) opts.class='';
 		for (let each in this.config.modal){
 			if(each=="class") opts.class += (opts.class&&' '||'') + this.config.modal.class;
-			else if(!opts[each]) opts[each] = this.config.modal[each];
+			else if(!opts[each]) opts[each] = this._modal[each];
 		}
 		opts.id = Math.floor(Math.random() * Date.now()) + Date.now();
 		this.opened[opts.id] = opts;

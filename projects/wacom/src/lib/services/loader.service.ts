@@ -11,8 +11,8 @@ export class LoaderService {
 	constructor(private dom: DomService,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config) {
 	}
-	show(opts?){
-		let component;
+	show(opts?:any){
+		let component:any;
 		opts.close = ()=>{
 			if(component) component.componentRef.destroy();
 			component.nativeElement.remove();

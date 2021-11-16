@@ -13,13 +13,13 @@ export class UiService {
 	}
 	/* Forms Management */
 		private _forms:any = {};
-		public form(id){
+		public form(id:any){
 			if(typeof id != 'string') return {};
 			if(!this._forms[id]) this._forms[id]={};
 			// add more cool things or submiting, etc
 			return this._forms[id];
 		}
-		public valid(value, kind='email', extra:any=''){
+		public valid(value:any, kind='email', extra:any=''){
 			if(kind=='email'){
 				return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value||'');
 			}else if(kind=='text'){
@@ -64,10 +64,10 @@ export class UiService {
 		private save(){
 			this.core.localStorage.setItem('css_variables', JSON.stringify(this.variables));
 		}
-		private setProperty(key, value){
+		private setProperty(key:any, value:any){
 			this.core.document.documentElement.style.setProperty(key, value);
 		}
-		public set(variables, opts:any={}){
+		public set(variables:any, opts:any={}){
 			if(typeof opts == 'string'){
 				if(opts == 'local') opts = {local: true};
 				else{

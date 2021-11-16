@@ -33,7 +33,7 @@ export class SocketService {
 			this.load();
 		}
 	}
-	on(to, cb = message=>{}){
+	on(to:any, cb = (message:any)=>{}):any{
 		if(!this.config.socket) return;
 		if(!this.connected){
 			return setTimeout(()=>{
@@ -42,7 +42,7 @@ export class SocketService {
 		}
 		this.io.on(to, cb);
 	}
-	emit(to, message, room:any = false){
+	emit(to:any, message:any, room:any = false):any{
 		if(!this.config.socket) return;
 		if(!this.connected){
 			return setTimeout(()=>{

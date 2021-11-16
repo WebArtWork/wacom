@@ -18,7 +18,7 @@ export class DomService {
 	/**
 	* Appends a component to body currently
 	*/
-		appendById(component: any, options: any = {}, id) {
+		appendById(component: any, options: any = {}, id:any) {
 			const componentRef = this.componentFactoryResolver.resolveComponentFactory(component).create(this.injector);
 			this.projectComponentInputs(componentRef, options);
 			this.appRef.attachView(componentRef.hostView);

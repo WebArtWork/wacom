@@ -9,7 +9,7 @@ export class HashService {
 		from: '%20',
 		to: ' '
 	}];
-	public hash = {};
+	public hash:any = {};
 	private done: boolean = false;
 	constructor(public core: CoreService) {
 		if(!this.core.window.location.hash){
@@ -32,7 +32,7 @@ export class HashService {
 			this.hash[holder] = value;
 		}
 	}
-	on(field, cb = resp=>{}){
+	on(field:any, cb = (resp:any)=>{}):any{
 		if(!this.done) return setTimeout(()=>{
 			this.on(field, cb);
 		}, 100);
@@ -46,14 +46,14 @@ export class HashService {
 		}
 		this.core.window.location.hash = hash;
 	}
-	set(field, value){
+	set(field:any, value:any){
 		this.hash[field] = value;
 		this.save();
 	}
-	get(field){
+	get(field:any){
 		return this.hash[field];
 	}
-	clear(field?){
+	clear(field?:any){
 		if(field) delete this.hash[field];
 		else this.hash = {};
 		this.save();

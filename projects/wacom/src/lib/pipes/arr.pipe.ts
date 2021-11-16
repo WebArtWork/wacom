@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 	name: 'arr'
 })
 export class ArrPipe implements PipeTransform {
-	transform(data: any, type?: any, refresh?): any {
+	transform(data: any, type?: any, refresh?:any): any {
 		if(!data) { return []; }
 		if(typeof data == 'string') return data.split(type||' ');
 		if(Array.isArray(data)) { return data; }

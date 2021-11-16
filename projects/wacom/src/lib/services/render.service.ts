@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class RenderService {
 	private now = new Date().getTime();
-	private sectors = {};
+	private sectors:any = {};
 	constructor() {}
 	render(section = ''){
 		if(section){
@@ -14,7 +14,7 @@ export class RenderService {
 			this.now = new Date().getTime();
 		}
 	}
-	on(cdr, section = ''){
+	on(cdr:any, section = ''){
 		if(typeof cdr != 'object' || typeof cdr.markForCheck != 'function') return;
 		let now = this.sectors[section];
 		if(section){

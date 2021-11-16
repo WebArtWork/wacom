@@ -48,7 +48,7 @@ export class FileService {
 				return ()=>{ opts.complete(); };
 			}
 		};
-		public change(event, info){
+		public change(event:any, info:any){
 			if(info.type == 'image'){
 				if(info.multiple){
 					if(typeof info.multiple_cb == 'function'){
@@ -81,7 +81,7 @@ export class FileService {
 				}
 			}else console.log('Provide type `image` or `file` ');
 		};
-		public remove(part, url, opts:any={}, cb:any=resp=>{}){
+		public remove(part:any, url:any, opts:any={}, cb:any=(resp:any)=>{}):any{
 			opts.url = url;
 			if(opts.save){
 				return ()=>{
@@ -91,7 +91,7 @@ export class FileService {
 				this.http.post(opts.api || '/api/'+part+'/file/delete', opts, cb);
 			}
 		};
-		public file(info:any, files, cb:any=()=>{}){
+		public file(info:any, files:any, cb:any=()=>{}){
 			let formData: FormData = new FormData();
 			if(typeof info.append == 'function'){
 				info.append(formData, files);
@@ -118,7 +118,7 @@ export class FileService {
 				});
 			}
 		};
-		public image(info, resp:any=()=>{}){
+		public image(info:any, resp:any=()=>{}):any{
 			if(info.save){
 				return ()=>{
 					this.http.post(info.api||'/api/'+info.part+'/file'+(info.name&&('/'+info.name)||''), info, resp);
@@ -131,7 +131,7 @@ export class FileService {
 	/*
 	*	Common Management
 	*/
-		private update(dataUrl, info:any, file){
+		private update(dataUrl:any, info:any, file:any){
 			if(typeof info.cb == 'function'){
 				info.cb(dataUrl, file);
 			}
@@ -154,7 +154,7 @@ export class FileService {
 				});
 			}
 		};
-		private process(file, info:any){
+		private process(file:any, info:any){
 			if(file.type.indexOf("image/")!=0){
 				if(typeof info.cb == 'function'){
 					info.cb(false, file);

@@ -49,21 +49,13 @@ import { MetaService } from './services/meta.service';
 	],
 	exports: [
 		OtaPipe,
-		ArrPipe,
-		SplicePipe,
 		SafePipe,
 		SearchPipe,
 		EachPipe,
 		MongodatePipe,
-		PaginationPipe,
 		AlertComponent,
 		LoaderComponent,
-		ClickOutsideDirective,
-		PickerSelectOptionsDirective,
-		CellDirective,
-		SortDirective,
-		CustomEditDirective,
-		ActionsDirective,
+		ClickOutsideDirective
 	],
 	entryComponents: [
 		AlertComponent,

@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class TimeService {
 	constructor() {}
-	day(which, format='WeekDay'){
+	day(which:any, format='WeekDay'){
 		return this.WeekDay[which];
 	}
 	private WeekDay:any = {

@@ -7,16 +7,18 @@ const isDefined = (val: any) => typeof val !== 'undefined';
 
 @Injectable()
 export class MetaService {
+	private _meta: any;
 	public constructor(private router: Router, private meta: Meta, private core: CoreService,
 		private titleService: Title, private activatedRoute: ActivatedRoute,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config) {
+		this._meta = config.meta
 		if(!this.config) this.config = DEFAULT_CONFIG;
 		this._warnMissingGuard();
 	}
 	public setTitle(title?: string, titleSuffix?: string): MetaService {
-		let titleContent = isDefined(title) ? title : (this.config.meta.defaults['title'] || '');
-		if (this.config.meta.useTitleSuffix) {
-			titleContent += isDefined(titleSuffix) ? titleSuffix : (this.config.meta.defaults['titleSuffix'] || '');
+		let titleContent = isDefined(title) ? title : (this._meta.defaults['title'] || '');
+		if (this._meta.useTitleSuffix) {
+			titleContent += isDefined(titleSuffix) ? titleSuffix : (this._meta.defaults['titleSuffix'] || '');
 		}
 		this._updateMetaTag('title', titleContent);
 		this._updateMetaTag('og:title', titleContent);
@@ -37,7 +39,7 @@ export class MetaService {
 			throw new Error(`Attempt to set ${tag} through 'setTag': 'title' and 'titleSuffix' are reserved tag names.
 				Please use 'MetaService.setTitle' instead`);
 		}
-		let content = isDefined(value) ? value : (this.config.meta.defaults[tag] || '');
+		let content = isDefined(value) ? value : (this._meta.defaults[tag] || '');
 		this._updateMetaTag(tag, content, prop);
 		if (tag === 'description') {
 			this._updateMetaTag('og:description', content, prop);
@@ -56,14 +58,14 @@ export class MetaService {
 		});
 	}
 	private _warnMissingGuard() {
-		if (isDefined(this.config.meta.warnMissingGuard) && !this.config.meta.warnMissingGuard) {
+		if (isDefined(this._meta.warnMissingGuard) && !this._meta.warnMissingGuard) {
 			return;
 		}
-		const hasDefaultMeta = !!Object.keys(this.config.meta.defaults).length;
+		const hasDefaultMeta = !!Object.keys(this._meta.defaults).length;
 		const hasMetaGuardInArr = (it: any) => (it && it.IDENTIFIER === 'MetaGuard');
 		let hasShownWarnings = false;
 		this.router.config.forEach((route: Route) => {
-			const hasRouteMeta = route.data && route.data.meta;
+			const hasRouteMeta = route.data && route.data['meta'];
 			const showWarning = !isDefined(route.redirectTo)
 			&& (hasDefaultMeta || hasRouteMeta)
 			&& !(route.canActivate || []).some(hasMetaGuardInArr);

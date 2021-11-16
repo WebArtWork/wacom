@@ -141,7 +141,7 @@ export class ClickOutsideDirective implements OnInit, OnChanges, OnDestroy {
     this._ngZone.run(() => this.clickOutside.emit(ev));
   }
 
-  private _shouldExclude(target): boolean {
+  private _shouldExclude(target: any): boolean {
     for (let excludedNode of this._nodesExcluded) {
       if (excludedNode.contains(target)) {
         return true;

@@ -12,7 +12,7 @@ export class PaginationPipe implements PipeTransform {
 		    arr[i].num = i+1;
 		}
 		if(sort.direction) {
-            arr.sort((a, b)=> {
+            arr.sort((a:any, b:any)=> {
                 if (a[sort.title] < b[sort.title]) {
                     return (sort.direction=='desc') ? 1 : -1;
                 }
