@@ -1,11 +1,11 @@
 {
-  "name": "wacom",
-  "version": "0.0.1",
-  "peerDependencies": {
-    "@angular/common": "^13.0.0",
-    "@angular/core": "^13.0.0"
-  },
-  "dependencies": {
-    "tslib": "^2.3.0"
-  }
+    "name": "wacom",
+    "version": "13.0.0",
+    "license": "MIT",
+    "repository": "WebArtWork/wacom",
+    "keywords": ["waw", "ngx", "angular", "crud", "mongo", "modal", "popup", "spinner", "file", "socket", "image", "hash"],
+    "peerDependencies": {
+        "@angular/common": "~8.x.x | ~9.x.x | ~10.x.x | ~11.x.x | ~12.x.x | ~13.x.x",
+        "@angular/core": "~8.x.x | ~9.x.x | ~10.x.x | ~11.x.x | ~12.x.x | ~13.x.x"
+    }
 }

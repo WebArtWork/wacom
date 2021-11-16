@@ -1,0 +1,6 @@
+<div [hidden]="!showModal" class="modal" [ngClass]="class+' '+size" (click)="onClickOutside();">
+	<div class="modal-content" (click)="$event.stopPropagation();">
+		<div><!-- Content Will Drop Here --></div>
+		<span class="close" (click)="close()" *ngIf="closable">&times;</span>
+	</div>
+</div>
