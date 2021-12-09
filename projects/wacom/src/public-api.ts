@@ -20,11 +20,12 @@
 /*
 *	Pipes
 */
-	export * from './lib/pipes/each.pipe';
+	export * from './lib/pipes/arr.pipe';
 	export * from './lib/pipes/mongodate.pipe';
-	export * from './lib/pipes/ota.pipe';
+	export * from './lib/pipes/pagination.pipe';
 	export * from './lib/pipes/safe.pipe';
 	export * from './lib/pipes/search.pipe';
+	export * from './lib/pipes/splice.pipe';
 /*
 *	Services
 */

@@ -4,12 +4,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 /* pipes */
-import { OtaPipe } from './pipes/ota.pipe';
 import { ArrPipe } from './pipes/arr.pipe';
 import { SplicePipe } from './pipes/splice.pipe';
 import { SafePipe } from './pipes/safe.pipe';
 import { SearchPipe } from './pipes/search.pipe';
-import { EachPipe } from './pipes/each.pipe';
 import { MongodatePipe } from './pipes/mongodate.pipe';
 import { PaginationPipe } from './pipes/pagination.pipe';
 /* config */
@@ -25,12 +23,10 @@ import { MetaGuard } from './guard/meta.guard';
 import { MetaService } from './services/meta.service';
 @NgModule({
 	declarations: [
-		OtaPipe,
 		ArrPipe,
 		SplicePipe,
 		SafePipe,
 		SearchPipe,
-		EachPipe,
 		AlertComponent,
 		LoaderComponent,
 		WrapperComponent,
@@ -41,10 +37,8 @@ import { MetaService } from './services/meta.service';
 		PaginationPipe,
 	],
 	exports: [
-		OtaPipe,
 		SafePipe,
 		SearchPipe,
-		EachPipe,
 		MongodatePipe,
 		AlertComponent,
 		LoaderComponent,
@@ -65,7 +59,7 @@ import { MetaService } from './services/meta.service';
 	imports: [CommonModule, FormsModule, HttpClientModule]
 })
 export class WacomModule {
-	static forRoot(config: Config = DEFAULT_CONFIG): ModuleWithProviders<any> {
+	static forRoot(config: Config = DEFAULT_CONFIG): ModuleWithProviders<WacomModule> {
 		return {
 			ngModule: WacomModule,
 			providers: [{
