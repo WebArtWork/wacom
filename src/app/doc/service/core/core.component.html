@@ -1,1 +1,33 @@
-<h1>Core Service</h1>
+<div>
+	<div>
+		<h2>emit(<i>signal</i>, <i>doc</i>)</h2>
+		The emit() method creates an event and sends data when the event is called with the on() method.
+	</div>
+	<div>
+		<h2>on(<i>signal</i>, <i>cb</i>)</h2>
+		Checks the state of the event that was created by the emit() method and allows to get data from it.
+	</div>
+</div>
+<ace style="height:200px"
+  [disabled]="false" 
+  [mode]="'html'"
+  [theme]="'clouds'"
+  [(value)]="value">
+</ace>
+
+<div id="log"></div>
+
+
+<!--   [disabled]="false" 
+  [mode]="'html'"
+  [theme]="'clouds'"
+  [config]="{}"
+  [(value)]="value"
+  (blur)="log($event, 'blur')" 
+  (focus)="log($event, 'focus')" 
+  (copy)="log($event, 'copy')" 
+  (paste)="log($event, 'paste')" 
+  (change)="log($event, 'change')"
+  (changeSession)="log($event, 'changeSession')"
+  (changeCursor)="log($event, 'changeCursor')"
+  (changeSelection)="log($event, 'changeSelection')"> -->

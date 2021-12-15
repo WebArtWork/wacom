@@ -6,5 +6,12 @@ import { Component } from '@angular/core';
 	styleUrls: ['./core.component.scss']
 })
 export class CoreComponent {
+	public value:any = 'Ace Editor';
 	constructor(){}
+
+	log(event:any, txt:any) {
+		console.log('ace event', event);
+		let selector:any = document.querySelector('#log');
+		selector.value += `${txt}\n`;
+	}
 }

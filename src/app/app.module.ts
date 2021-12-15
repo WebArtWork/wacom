@@ -28,6 +28,18 @@ import { SpliceComponent } from './doc/pipe/splice/splice.component';
 import { ConfigComponent } from './doc/interface/config/config.component';
 import { ClickOutsideComponent } from './doc/directive/click-outside/click-outside.component';
 import { FilesComponent } from './doc/component/files/files.component';
+import { AceModule } from 'ngx-ace-wrapper';
+import { ACE_CONFIG } from 'ngx-ace-wrapper';
+import { AceConfigInterface } from 'ngx-ace-wrapper';
+import 'brace';
+import 'brace/mode/text';
+import 'brace/mode/html';
+import 'brace/mode/javascript';
+import 'brace/mode/css';
+import 'brace/theme/github';
+import 'brace/theme/clouds';
+
+const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
 
 @NgModule({
 	declarations: [
@@ -60,12 +72,16 @@ import { FilesComponent } from './doc/component/files/files.component';
   FilesComponent
 	],
 	imports: [
+		AceModule,
 		BrowserModule,
 		WacomModule.forRoot({
 			socket: false
 		})
 	],
-	providers: [],
+	providers: [{
+		provide: ACE_CONFIG,
+		useValue: DEFAULT_ACE_CONFIG
+	}],
 	bootstrap: [AppComponent]
 })
 export class AppModule { }
