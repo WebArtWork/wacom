@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ModalService } from 'wacom';
 import { LocalComponent } from './modals/local/local.component';
+import { ManagerService } from './manager.service';
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
@@ -12,5 +13,8 @@ export class AppComponent {
 			component: LocalComponent
 		});
 	}
-	constructor(public modal: ModalService){}
+	constructor(
+		public modal: ModalService,
+		private _managerService: ManagerService
+	){}
 }

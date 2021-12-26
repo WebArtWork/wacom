@@ -29,6 +29,8 @@
 /*
 *	Services
 */
+	export * from './lib/services/base.service';
+	export * from './lib/services/crud.service';
 	export * from './lib/services/meta.service';
 	export * from './lib/services/store.service';
 	export * from './lib/services/http.service';
