@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, Inject, Optional, SkipSelf } from '@angular/core';
 import { MongoService } from './mongo.service';
 import { AlertService } from './alert.service';
 import { BaseService } from './base.service';
@@ -9,8 +9,8 @@ import { BaseService } from './base.service';
 export class CrudService extends BaseService {
 	constructor(
 		@Inject(String) private collection: string,
-		private mongo: MongoService,
-		private alert: AlertService
+		@Optional() @SkipSelf() private mongo: MongoService,
+		@Optional() @SkipSelf() private alert: AlertService
 	) {
 		super();
 	}
