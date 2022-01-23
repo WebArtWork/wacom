@@ -630,6 +630,9 @@ export class MongoService {
 			}
 		};
 		public push(part:any, doc:any):any{
+			if(!this.data['arr' + part]) this.data['arr' + part] = [];
+			if(!this.data['obj' + part]) this.data['obj' + part] = {};
+			if(!this.data['opts' + part]) this.data['opts' + part] = {};
 			if(this.data['obj' + part][doc._id]) return this.renew(part, doc);
 			if(this.data['opts' + part].replace){
 				for(let key in this.data['opts'+part].replace){
@@ -733,6 +736,7 @@ export class MongoService {
 	constructor(private http: HttpService, private core: CoreService){
 		this.core.done('socket', (socket:any)=>{
 			this.socket = socket;
+			console.log('Socket initialize', socket);
 			socket.on('create', (created:any) => {
 				this.fetch(created.part, {
 					force: true,

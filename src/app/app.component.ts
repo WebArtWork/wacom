@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ModalService } from 'wacom';
+import { ModalService, MongoService } from 'wacom';
 import { LocalComponent } from './modals/local/local.component';
 import { ManagerService } from './manager.service';
 @Component({
@@ -15,6 +15,8 @@ export class AppComponent {
 	}
 	constructor(
 		public modal: ModalService,
-		private _managerService: ManagerService
-	){}
+		private _managerService: ManagerService,
+		public mongo: MongoService
+	){
+	}
 }
