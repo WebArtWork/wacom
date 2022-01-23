@@ -6,9 +6,9 @@ import { CrudService, AlertService, MongoService } from 'wacom';
 })
 export class ManagerService extends CrudService {
 	constructor(
-		private mongo: MongoService,
-		private alert: AlertService
+		public override mongo: MongoService,
+		public override alert: AlertService
 	){
-		super('manager');
+		super('manager', mongo, alert);
 	}
 }
