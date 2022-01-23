@@ -218,8 +218,8 @@ export class CoreService {
 		public ready(signal:string){
 			return this.done_next[signal];
 		};
-		public next(signal:string, cb:()=>void) {
-			if(this.done_next[signal]) cb();
+		public next(signal:string, cb:(message:any)=>void) {
+			if (this.done_next[signal]) cb(this.done_next[signal]);
 			else {
 				setTimeout(()=>{
 					this.next(signal, cb);
