@@ -1,5 +1,6 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
+import { retryWhen } from 'rxjs';
 declare var cordova:any;
 @Injectable({
 	providedIn: 'root'
@@ -200,7 +201,8 @@ export class CoreService {
 			}
 		}
 		private _ids:any = {};
-		public on(signal:string, cb:()=>{}):any{
+		public on(signal:string, cb:any):any {
+			if (typeof cb !== 'function') return;
 			let id = Math.floor(Math.random() * Date.now()) + 1;
 			if(this._ids[id]) return this.on(signal, cb);
 			this._ids[id]=true;

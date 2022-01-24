@@ -172,6 +172,18 @@ export class MongoService {
 					for (let i = 0; i < resp.length; i++) {
 						this.push(part,resp[i]);
 					}
+					for (let i = 0; i < this.data['arr' + part].length; i++) {
+						let remove = true;
+						for (let j = 0; j < resp.length; j++) {
+							if (resp[j]._id === this.data['arr' + part][i]._id) {
+								remove = false;
+								break;
+							}
+						}
+						if (remove) {
+							this.remove(part, this.data['arr' + part][i]);
+						}
+					}
 					if (typeof cb == 'function') cb(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);
 				} else if (typeof cb == 'function') {
 					cb(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);

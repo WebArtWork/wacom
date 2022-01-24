@@ -1,6 +1,6 @@
 {
     "name": "wacom",
-    "version": "13.0.1",
+    "version": "13.0.2",
     "license": "MIT",
     "repository": "WebArtWork/wacom",
     "keywords": ["waw", "ngx", "angular", "crud", "mongo", "modal", "popup", "spinner", "file", "socket", "image", "hash"],
