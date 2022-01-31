@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ModalService, MongoService } from 'wacom';
+import { StoreService, ModalService, MongoService } from 'wacom';
 import { LocalComponent } from './modals/local/local.component';
 import { ManagerService } from './manager.service';
 @Component({
@@ -14,9 +14,14 @@ export class AppComponent {
 		});
 	}
 	constructor(
+		public store: StoreService,
 		public modal: ModalService,
 		private _managerService: ManagerService,
 		public mongo: MongoService
 	){
+		this.store.get('test', (message:any)=>{
+			console.log('GET: ', message);
+		});
+		this.store.set('test', 'Hello World');
 	}
 }

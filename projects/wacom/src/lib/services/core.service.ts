@@ -69,7 +69,7 @@ export class CoreService {
 			});
 		});
 	}
-	ios(){
+	ios() {
 		return [
 			'iPad Simulator',
 			'iPhone Simulator',
