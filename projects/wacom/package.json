@@ -1,11 +1,20 @@
 {
     "name": "wacom",
-    "version": "13.0.2",
+    "version": "13.0.3",
     "license": "MIT",
     "repository": "WebArtWork/wacom",
-    "keywords": ["waw", "ngx", "angular", "crud", "mongo", "modal", "popup", "spinner", "file", "socket", "image", "hash"],
-    "peerDependencies": {
-        "@angular/common": "~8.x.x | ~9.x.x | ~10.x.x | ~11.x.x | ~12.x.x | ~13.x.x",
-        "@angular/core": "~8.x.x | ~9.x.x | ~10.x.x | ~11.x.x | ~12.x.x | ~13.x.x"
-    }
+    "keywords": [
+        "angular",
+        "spinner",
+        "socket",
+        "mongo",
+        "popup",
+        "modal",
+        "image",
+        "crud",
+        "file",
+        "waw",
+        "ngx",
+        "hash"
+    ]
 }

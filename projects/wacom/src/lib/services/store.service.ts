@@ -19,10 +19,10 @@ export class StoreService {
 		}
 		if (window.indexedDB) {
 			const request = window.indexedDB.open("database", 3);
-			request.onsuccess = function(event) {
-				this.store = event.target.result.createObjectStore("Data", {
-					keyPath: "id"
-				});
+			request.onsuccess = (event:any)=>{
+				// this.store = event.target.result.createObjectStore("Data", {
+				// 	keyPath: "id"
+				// });
 			};
 		} else {
 			this.core.document.addEventListener('deviceready', () => {
@@ -45,17 +45,16 @@ export class StoreService {
 	}
 	set(hold: any, value: any, cb:any=()=>{}, errCb:any=()=>{}): any {
 		if(this.store) {
-			const objectStore = db.transaction(["Data"], "readwrite").objectStore("Data");
-			const request = objectStore.get(hold);
+			const request = this.store.get(hold);
 			request.onerror = errCb;
-			request.onsuccess = function(event) {
+			request.onsuccess = (event:any)=>{
 				if (event.target.result) {
 					event.target.result.data = value;
-					const requestUpdate = objectStore.put(event.target.result);
+					const requestUpdate = this.store.put(event.target.result);
 					requestUpdate.onerror = errCb;
 					requestUpdate.onsuccess = cb;
 				} else {
-					objectStore.add({
+					this.store.add({
 						id: hold,
 						data: value
 					});
@@ -81,11 +80,9 @@ export class StoreService {
 	}
 	get(hold: any, cb:any=()=>{}, errcb:any=()=>{}): any {
 		if (this.store) {
-			const transaction = db.transaction(["Data"]);
-			const objectStore = transaction.objectStore("Data");
-			const request = objectStore.get(hold);
+			const request = this.store.get(hold);
 			request.onerror = errcb;
-			request.onsuccess = function(event) {
+			request.onsuccess = (event:any)=>{
 				cb(event.target.result.data);
 			};
 		} else if (this.core.window.sqlitePlugin && this.db) {
@@ -118,9 +115,7 @@ export class StoreService {
 	}
 	remove(hold:any, cb:any=()=>{}, errcb:any=()=>{}): any {
 		if (this.store) {
-			const transaction = db.transaction(["Data"]);
-			const objectStore = transaction.objectStore("Data");
-			const request = objectStore.delete(hold);
+			const request = this.store.delete(hold);
 			request.onerror = errcb;
 			request.onsuccess = cb;
 		} else if(this.core.window.sqlitePlugin && this.db){
