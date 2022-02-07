@@ -15,7 +15,6 @@ export class ModalService {
 		if(!this.config.modal) this.config.modal={};
 		if(!this.config.modal.modals) this.config.modal.modals={};
 		this._modal = config.modal;
-		console.log(this._modal);
 	}
 
 	show(opts: Modal | any){
