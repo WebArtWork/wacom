@@ -13,20 +13,16 @@ export class StoreService {
 		if(!this.config) this.config = DEFAULT_CONFIG;
 		/* IndexedDB Initialize */
 		if(!this.core.ssr) {
-			console.log('no ssr');
 			window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 			window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction || {READ_WRITE: "readwrite"};
 			window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 		}
-		console.log('window.indexedDB');
-		console.log(window.indexedDB);
 		if (!this.core.ssr && window.indexedDB) {
 			const request = window.indexedDB.open("database", 3);
 			request.onsuccess = (event:any)=>{
-				console.log('store set');
-				this.store = event.target.result.createObjectStore("Data", {
-					keyPath: "id"
-				});
+				// this.store = event.target.result.createObjectStore("Data", {
+				// 	keyPath: "id"
+				// });
 			};
 		} else {
 			this.core.document.addEventListener('deviceready', () => {
