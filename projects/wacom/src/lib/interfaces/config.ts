@@ -7,7 +7,7 @@ export interface Config {
 		defaults?: {
 			title?: string;
 			titleSuffix?: string;
-		} & { [key: string]: string | undefined; };		
+		} & { [key: string]: string | undefined; };
 	};
 	database?: {
 		_id?: string;
@@ -48,6 +48,12 @@ export interface Config {
 		position?: string;
 		closable?: boolean;
 		unique?: string;
+	};
+	popup?: {
+		popups?: object;
+	};
+	loader?: {
+		loaders?: object;
 	};
 	socket?: any;
 	http?: {

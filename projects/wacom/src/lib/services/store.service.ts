@@ -44,9 +44,7 @@ export class StoreService {
 		}
 	}
 	set(hold: any, value: any, cb:any=()=>{}, errCb:any=()=>{}): any {
-		console.log(this.store);
 		if(this.store) {
-			console.log('set to indexdb');
 			const request = this.store.get(hold);
 			request.onerror = errCb;
 			request.onsuccess = (event:any)=>{
@@ -82,7 +80,6 @@ export class StoreService {
 	}
 	get(hold: any, cb:any=()=>{}, errcb:any=()=>{}): any {
 		if (this.store) {
-			console.log('get from indexdb');
 			const request = this.store.get(hold);
 			request.onerror = errcb;
 			request.onsuccess = (event:any)=>{
