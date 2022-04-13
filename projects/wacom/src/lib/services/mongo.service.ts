@@ -32,7 +32,7 @@ export class MongoService {
 				    this.data['opts' + part][each] = opts[each];
 				}
 			}else this.data['opts' + part] = opts = opts||{};
-			if(typeof opts.use == 'string'){
+			if(typeof opts.use === 'string'){
 				opts.use = opts.use.split(' ');
 			}
 			if(opts.query){
@@ -46,14 +46,14 @@ export class MongoService {
 				}
 			}
 			if(opts.groups){
-				if(typeof opts.groups == 'string'){
+				if(typeof opts.groups === 'string'){
 					opts.groups = opts.groups.split(' ');
 				}
 				if(Array.isArray(opts.groups)){
 					let arr = opts.groups;
 					opts.groups = {};
 					for(let i = 0; i < arr.length; i++){
-						if(typeof arr[i] == 'string'){
+						if(typeof arr[i] === 'string'){
 							opts.groups[arr[i]] = true;
 						}else {
 							for(let key in arr[i]){
@@ -95,6 +95,14 @@ export class MongoService {
 					}
 					this.data['obj' + part][key] = {};
 				}
+			}
+			if(opts.fields) {
+				if (typeof opts.fields === 'string') {
+					opts.fields = opts.fields.split(' ');
+				}
+			}
+			if (!Array.isArray(opts.fields)) {
+				opts.fields = [];
 			}
 		};
 		public create(part:any, doc:any=undefined, cb:any=undefined, opts:any={}) {
@@ -210,7 +218,7 @@ export class MongoService {
 		};
 		private prepare_update(part:any, doc:any, opts:any){
 			if(opts.fields){
-				if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
+				if(typeof opts.fields === 'string') opts.fields = opts.fields.split(' ');
 				let _doc:any = {};
 				for(let i = 0; i < opts.fields.length; i++){
 					_doc[opts.fields[i]] = doc[opts.fields[i]];
@@ -281,7 +289,7 @@ export class MongoService {
 			}
 			if(typeof opts !== 'object') opts = {};
 			if(opts.fields){
-				if(typeof opts.fields == 'string') opts.fields = opts.fields.split(' ');
+				if(typeof opts.fields === 'string') opts.fields = opts.fields.split(' ');
 				let _doc:any = {};
 				for(let i = 0; i < opts.fields.length; i++){
 					_doc[opts.fields[i]] = doc[opts.fields[i]];
@@ -365,7 +373,7 @@ export class MongoService {
 						}
 					}
 					return;
-				}else if(typeof doc[field] == 'string'){
+				}else if(typeof doc[field] === 'string'){
 					doc[field] = this.data['obj'+part][doc[field]] || null;
 				}else return;
 			}else{
@@ -375,7 +383,7 @@ export class MongoService {
 			}
 		};
 		public on(parts:any, cb:any):any {
-   		    if (typeof parts == 'string') {
+   		    if (typeof parts === 'string') {
    		        parts = parts.split(" ");
    		    }
    		    for (var i = 0; i < parts.length; i++) {
@@ -404,7 +412,7 @@ export class MongoService {
    			}
    		};
    		public sortAscString(opts:any){
-   			if(typeof opts == 'string'){
+   			if(typeof opts === 'string'){
    				opts = {
    					field: opts
    				}
@@ -416,7 +424,7 @@ export class MongoService {
    			}
    		}
    		public sortDescString(opts:any){
-   			if(typeof opts == 'string'){
+   			if(typeof opts === 'string'){
    				opts = {
    					field: opts
    				}
@@ -428,7 +436,7 @@ export class MongoService {
    			}
    		}
    		public sortAscDate(opts:any){
-   			if(typeof opts == 'string'){
+   			if(typeof opts === 'string'){
    				opts = {
    					field: opts
    				}
@@ -440,7 +448,7 @@ export class MongoService {
    			}
    		}
    		public sortDescDate(opts:any){
-   			if(typeof opts == 'string'){
+   			if(typeof opts === 'string'){
    				opts = {
    					field: opts
    				}
@@ -452,7 +460,7 @@ export class MongoService {
    			}
    		}
    		public sortAscNumber(opts:any){
-   			if(typeof opts == 'string'){
+   			if(typeof opts === 'string'){
    				opts = {
    					field: opts
    				}
@@ -464,7 +472,7 @@ export class MongoService {
    			}
    		}
    		public sortDescNumber(opts:any){
-   			if(typeof opts == 'string'){
+   			if(typeof opts === 'string'){
    				opts = {
    					field: opts
    				}
@@ -476,7 +484,7 @@ export class MongoService {
    			}
    		}
    		public sortAscBoolean(opts:any){
-   			if(typeof opts == 'string'){
+   			if(typeof opts === 'string'){
    				opts = {
    					field: opts
    				}
@@ -488,7 +496,7 @@ export class MongoService {
    			}
    		}
    		public sortDescBoolean(opts:any){
-   			if(typeof opts == 'string'){
+   			if(typeof opts === 'string'){
    				opts = {
    					field: opts
    				}
@@ -570,6 +578,16 @@ export class MongoService {
 			}
 			for (let each in doc){
 				this.data['obj' + part][doc._id][each] = doc[each];
+			}
+			for (let i = 0; i < this.data['opts' + part].fields.length; i++) {
+				const field = this.data['opts' + part].fields;
+				if (!this.data['obj' + part][doc[field]]) {
+					this.data['obj' + part][doc[field]] = doc;
+					continue;
+				}
+				for (let each in doc) {
+					this.data['obj' + part][doc[field]][each] = doc[each];
+				}
 			}
 			if(this.data['opts'+part].groups){
 				for(let key in this.data['opts'+part].groups){

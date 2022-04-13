@@ -13,6 +13,7 @@ export class CoreService {
 	public navigator:any; // = navigator;
 	//public cordova:any; // = cordova;
 	constructor(@Inject(PLATFORM_ID) private platformId:boolean) {
+		console.log(this.ids2id('a', 'b'));
 		if(isPlatformServer(this.platformId)){
 			this.localStorage = {
 				getItem:()=>{},
@@ -99,6 +100,15 @@ export class CoreService {
 	/*
 	*	Supportive
 	*/
+		public ids2id(...args:any[]) {
+			args.sort( (a, b) => {
+				if (Number(a.toString().substring(0, 8)) > Number(b.toString().substring(0, 8))){
+					return 1;
+				}
+				return -1;
+			});
+			return args.join();
+		}
 		public parallel(arr: any[], callback:()=>void){
 			let counter = arr.length;
 			if(counter===0) return callback();
