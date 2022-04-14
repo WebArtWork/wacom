@@ -581,12 +581,12 @@ export class MongoService {
 			}
 			for (let i = 0; i < this.data['opts' + part].fields.length; i++) {
 				const field = this.data['opts' + part].fields;
-				if (!this.data['obj' + part][doc[field]]) {
-					this.data['obj' + part][doc[field]] = doc;
+				if (!this.data['obj' + part][field]) {
+					this.data['obj' + part][field] = doc;
 					continue;
 				}
 				for (let each in doc) {
-					this.data['obj' + part][doc[field]][each] = doc[each];
+					this.data['obj' + part][field][each] = doc[each];
 				}
 			}
 			if(this.data['opts'+part].groups){
@@ -714,18 +714,28 @@ export class MongoService {
 					}));
 				}
 			}
-			if(this.data['opts'+part].query){
-				for(let key in this.data['opts'+part].query){
-					let query = this.data['opts'+part].query[key];
-					if(typeof query.ignore == 'function' && query.ignore(doc)) continue;
-					if(typeof query.allow == 'function' && !query.allow(doc)) continue;
-					if(!this.data['obj' + part][key]){
+			if (this.data['opts' + part].query) {
+				for (let key in this.data['opts' + part].query) {
+					let query = this.data['opts' + part].query[key];
+					if (typeof query.ignore == 'function' && query.ignore(doc)) continue;
+					if (typeof query.allow == 'function' && !query.allow(doc)) continue;
+					if (!this.data['obj' + part][key]) {
 						this.data['obj' + part][key] = [];
 					}
 					this.data['obj' + part][key].push(doc);
-					if(typeof query.sort == 'function'){
+					if (typeof query.sort == 'function') {
 						this.data['obj' + part][key].sort(query.sort);
 					}
+				}
+			}
+			for (let i = 0; i < this.data['opts' + part].fields.length; i++) {
+				const field = this.data['opts' + part].fields;
+				if (!this.data['obj' + part][field]) {
+					this.data['obj' + part][field] = doc;
+					continue;
+				}
+				for (let each in doc) {
+					this.data['obj' + part][field][each] = doc[each];
 				}
 			}
 		};
