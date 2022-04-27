@@ -4,33 +4,22 @@ import { Injectable } from '@angular/core';
 	providedIn: 'root'
 })
 export class RenderService {
-	private now = new Date().getTime();
-	private sectors:any = {};
 	constructor() {}
-	render(section = ''){
-		if(section){
-			this.sectors[section] = new Date().getTime();
-		}else{
-			this.now = new Date().getTime();
-		}
+	private pipes:any = {};
+	on(event, cb){
+		if(!this.pipes[event]) this.pipes[event] = [];
+		this.pipes[event].push(cb);
+		const index = this.pipes[event].length-1;
+		return ()=>{
+			this.pipes[event][index] = false;
+		};
 	}
-	on(cdr:any, section = ''){
-		if(typeof cdr != 'object' || typeof cdr.markForCheck != 'function') return;
-		let now = this.sectors[section];
-		if(section){
-			setInterval(()=>{
-				if(now != this.sectors[section]){
-					now = this.sectors[section];
-					cdr.markForCheck();
-				}
-			}, 500);
-		}else{
-			setInterval(()=>{
-				if(now != this.now){
-					now = this.now;
-					cdr.markForCheck();
-				}
-			}, 500);
+	render(event, param=null){
+		if(!this.pipes[event]) return;
+		for(let i = 0; i < this.pipes[event].length; i++){
+			if(typeof this.pipes[event][i] === 'function'){
+				this.pipes[event][i](param);
+			}
 		}
 	}
 }
