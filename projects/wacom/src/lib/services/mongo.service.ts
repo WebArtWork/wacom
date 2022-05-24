@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpService } from './http.service';
 import { CoreService } from './core.service';
+import { Subject } from 'rxjs';
 @Injectable({
 	providedIn: 'root'
 })
@@ -130,7 +131,9 @@ export class MongoService {
 				}else if (typeof cb == 'function') {
 					cb(false);
 				}
-			}, opts);
+			}, {
+				url: opts.base_url || this.http.url
+			});
 		};
 		public fetch(part:any, opts:any=undefined, cb:any=undefined) {
 			if(opts.query && opts.query._id && !opts.force &&
@@ -164,7 +167,9 @@ export class MongoService {
 				if (resp && typeof cb == 'function') {
 					cb(doc);
 				}
-			}, opts);
+			}, {
+				url: opts.base_url || this.http.url
+			});
 			return doc;
 		};
 		public get(part:any, opts:any=undefined, cb:any=undefined) {
@@ -180,16 +185,18 @@ export class MongoService {
 					for (let i = 0; i < resp.length; i++) {
 						this.push(part,resp[i]);
 					}
-					for (let i = 0; i < this.data['arr' + part].length; i++) {
-						let remove = true;
-						for (let j = 0; j < resp.length; j++) {
-							if (resp[j]._id === this.data['arr' + part][i]._id) {
-								remove = false;
-								break;
+					if (!opts.paginate) {
+						for (let i = 0; i < this.data['arr' + part].length; i++) {
+							let remove = true;
+							for (let j = 0; j < resp.length; j++) {
+								if (resp[j]._id === this.data['arr' + part][i]._id) {
+									remove = false;
+									break;
+								}
 							}
-						}
-						if (remove) {
-							this.remove(part, this.data['arr' + part][i]);
+							if (remove) {
+								this.remove(part, this.data['arr' + part][i]);
+							}
 						}
 					}
 					if (typeof cb == 'function') cb(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);
@@ -197,7 +204,9 @@ export class MongoService {
 					cb(this.data['arr' + part], this.data['obj' + part], opts.name||'', resp);
 				}
 				this.data['loaded'+part]=true;
-			}, opts);
+			}, {
+				url: opts.base_url || this.http.url
+			});
 			return this.data['arr' + part];
 		};
 		public set(part:any, opts:any=undefined, resp:any=undefined) {
@@ -253,7 +262,9 @@ export class MongoService {
 				} else if (typeof cb == 'function') {
 					cb(false);
 				}
-			}, opts);
+			}, {
+				url: opts.base_url || this.http.url
+			});
 		};
 		public unique(part:any, doc:any, opts:any=undefined, cb:any=undefined) {
 			if (typeof opts == 'function'){
@@ -280,22 +291,24 @@ export class MongoService {
 				} else if (typeof cb == 'function') {
 					cb(false);
 				}
-			}, opts);
+			}, {
+				url: opts.base_url || this.http.url
+			});
 		};
 		public delete(part:any, doc:any, opts:any=undefined, cb:any=undefined) {
 			if (typeof opts == 'function') {
 				cb = opts;
 				opts = {};
 			}
-			if(typeof opts !== 'object') opts = {};
-			if(opts.fields){
+			if (typeof opts !== 'object') opts = {};
+			if (opts.fields) {
 				if(typeof opts.fields === 'string') opts.fields = opts.fields.split(' ');
 				let _doc:any = {};
 				for(let i = 0; i < opts.fields.length; i++){
 					_doc[opts.fields[i]] = doc[opts.fields[i]];
 				}
 				doc = _doc;
-			}else{
+			} else {
 				doc={
 					_id:doc._id
 				}
@@ -314,7 +327,9 @@ export class MongoService {
 				} else if (typeof cb == 'function') {
 					cb(false);
 				}
-			}, opts);
+			}, {
+				url: opts.base_url || this.http.url
+			});
 		};
 		public _id(cb:any){
 			if(typeof cb == 'function'){
@@ -580,13 +595,13 @@ export class MongoService {
 				this.data['obj' + part][doc._id][each] = doc[each];
 			}
 			for (let i = 0; i < this.data['opts' + part].fields.length; i++) {
-				const field = this.data['opts' + part].fields;
-				if (!this.data['obj' + part][field]) {
-					this.data['obj' + part][field] = doc;
+				const field = this.data['opts' + part].fields[i];
+				if (!this.data['obj' + part][doc[field]]) {
+					this.data['obj' + part][doc[field]] = doc;
 					continue;
 				}
 				for (let each in doc) {
-					this.data['obj' + part][field][each] = doc[each];
+					this.data['obj' + part][doc[field]][each] = doc[each];
 				}
 			}
 			if(this.data['opts'+part].groups){
@@ -729,13 +744,13 @@ export class MongoService {
 				}
 			}
 			for (let i = 0; i < this.data['opts' + part].fields.length; i++) {
-				const field = this.data['opts' + part].fields;
-				if (!this.data['obj' + part][field]) {
-					this.data['obj' + part][field] = doc;
+				const field = this.data['opts' + part].fields[i];
+				if (!this.data['obj' + part][doc[field]]) {
+					this.data['obj' + part][doc[field]] = doc;
 					continue;
 				}
 				for (let each in doc) {
-					this.data['obj' + part][field][each] = doc[each];
+					this.data['obj' + part][doc[field]][each] = doc[each];
 				}
 			}
 		};
@@ -748,6 +763,10 @@ export class MongoService {
 				}
 			}
 			delete this.data['obj' + part][doc._id];
+			for (let i = 0; i < this.data['opts' + part].fields.length; i++) {
+				const field = this.data['opts' + part].fields[i];
+				delete this.data['obj' + part][doc[field]];
+			}
 			if(this.data['opts'+part].groups){
 				for(let key in this.data['opts'+part].groups){
 					for(let field in this.data['obj' + part][key]){

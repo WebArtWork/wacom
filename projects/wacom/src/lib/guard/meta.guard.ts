@@ -9,7 +9,7 @@ export class MetaGuard implements CanActivate {
 	private _meta: any ;
 	public constructor(private metaService: MetaService,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config) {
-		this._meta = config.meta
+		this._meta = config.meta;
 		if(!this.config) this.config = DEFAULT_CONFIG;
 	}
 	public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {

@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 export class RenderService {
 	constructor() {}
 	private pipes:any = {};
-	on(event, cb){
+	on(event: string, cb: any){
 		if(!this.pipes[event]) this.pipes[event] = [];
 		this.pipes[event].push(cb);
 		const index = this.pipes[event].length-1;
@@ -14,7 +14,7 @@ export class RenderService {
 			this.pipes[event][index] = false;
 		};
 	}
-	render(event, param=null){
+	render(event: string, param=null){
 		if(!this.pipes[event]) return;
 		for(let i = 0; i < this.pipes[event].length; i++){
 			if(typeof this.pipes[event][i] === 'function'){

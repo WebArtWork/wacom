@@ -9,23 +9,6 @@ export interface Config {
 			titleSuffix?: string;
 		} & { [key: string]: string | undefined; };
 	};
-	database?: {
-		_id?: string;
-		collections?: [{
-			_id?: string;
-			name: string;
-			opts?: {
-				replace?:any;
-				sort?: any;
-				query?: any;
-				groups?: any;
-			};
-			all?: [];
-			by_id?: object;
-			query?: object;
-			groups?: object;
-		}];
-	};
 	alert?: {
 		alerts?:object;
 		text?:string;
@@ -58,6 +41,7 @@ export interface Config {
 	socket?: any;
 	http?: {
 		replace?: any;
+		headers?: any;
 		err?: any;
 		url?: string;
 	}

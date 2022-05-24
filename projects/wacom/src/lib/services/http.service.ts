@@ -2,15 +2,15 @@ import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, first } from 'rxjs/operators';
 import { StoreService } from './store.service';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class HttpService {
+	public url = '';
 	private _http: any;
-	private url = '';
 	private headers:any = {};
 	private http_headers = new HttpHeaders(this.headers);
 	set(key:any, value:any){
@@ -31,9 +31,17 @@ export class HttpService {
 		this._http = config.http;
 		if (!this.config) this.config = DEFAULT_CONFIG;
 		if (!this._http) this._http = {};
+		if (typeof config.headers === 'object') {
+			for (const header in config.headers) {
+				this.headers[header] = config.headers[header];
+			}
+			this.http_headers = new HttpHeaders(this.headers);
+		}
 		this.store.getJson('http_headers', (headers:any)=>{
 			if(headers) {
-				this.headers = headers;
+				for (const header in headers){
+					this.headers[header] = headers[header];
+				}
 				this.http_headers = new HttpHeaders(this.headers);
 			}
 			this.url = this._http.url || '';
@@ -51,13 +59,18 @@ export class HttpService {
 				this.post(url, doc, callback, opts);
 			}, 100);
 		}
-		this.http.post<any>((opts.url||this.url)+url, doc, {
+		const observable = this.http.post<any>((opts.url||this.url)+url, doc, {
 			headers: this.http_headers
-		}).pipe(catchError(this.handleError(opts.err))).subscribe(resp=>{
+		});
+		observable.pipe(
+			first(),
+			catchError(this.handleError(opts.err))
+		).subscribe(resp=>{
 			if(typeof this._http.replace == 'function'){
 				this._http.replace(resp, callback);
 			}else callback(resp);
 		});
+		return observable;
 	}
 	put(url:any, doc:any, callback=(resp:any) => {}, opts:any={}):any{
 		if(typeof opts == 'function'){
@@ -71,13 +84,18 @@ export class HttpService {
 				this.put(url, doc, callback, opts);
 			}, 100);
 		}
-		this.http.put<any>((opts.url||this.url)+url, doc, {
+		const observable = this.http.put<any>((opts.url||this.url)+url, doc, {
 			headers: this.http_headers
-		}).pipe(catchError(this.handleError(opts.err))).subscribe(resp=>{
+		});
+		observable.pipe(
+			first(),
+			catchError(this.handleError(opts.err))
+		).subscribe(resp=>{
 			if(typeof this._http.replace == 'function'){
 				this._http.replace(resp, callback);
 			}else callback(resp);
 		});
+		return observable;
 	}
 	patch(url:any, doc:any, callback=(resp:any) => {}, opts:any={}):any{
 		if(typeof opts == 'function'){
@@ -91,13 +109,18 @@ export class HttpService {
 				this.patch(url, doc, callback, opts);
 			}, 100);
 		}
-		this.http.patch<any>((opts.url||this.url)+url, doc, {
+		const observable = this.http.patch<any>((opts.url||this.url)+url, doc, {
 			headers: this.http_headers
-		}).pipe(catchError(this.handleError(opts.err))).subscribe(resp=>{
+		});
+		observable.pipe(
+			first(),
+			catchError(this.handleError(opts.err))
+		).subscribe(resp=>{
 			if(typeof this._http.replace == 'function'){
 				this._http.replace(resp, callback);
 			}else callback(resp);
 		});
+		return observable;
 	}
 	delete(url:any, doc:any, callback=(resp:any) => {}, opts:any={}):any{
 		if(typeof opts == 'function'){
@@ -111,14 +134,19 @@ export class HttpService {
 				this.delete(url, doc, callback, opts);
 			}, 100);
 		}
-		this.http.request<any>('delete', (opts.url||this.url)+url, {
+		const observable = this.http.request<any>('delete', (opts.url||this.url)+url, {
 			headers: this.http_headers,
 			body: doc || {}
-		}).pipe(catchError(this.handleError(opts.err))).subscribe(resp=>{
+		});
+		observable.pipe(
+			first(),
+			catchError(this.handleError(opts.err))
+		).subscribe(resp=>{
 			if(typeof this._http.replace == 'function'){
 				this._http.replace(resp, callback);
 			}else callback(resp);
 		});
+		return observable;
 	}
 	get(url:any, callback=(resp:any) => {}, opts:any={}):any{
 		if(typeof opts == 'function'){
@@ -135,14 +163,19 @@ export class HttpService {
 		let params:any = {
 			headers: this.http_headers
 		};
-		if(opts.params){
+		if (opts.params){
 			params.params = opts.params;
 		}
-		this.http.get<any>((opts.url||this.url)+url, params).pipe(catchError(this.handleError(opts.err))).subscribe(resp=>{
+		const observable = this.http.get<any>((opts.url || this.url) + url, params);
+		observable.pipe(
+			first(),
+			catchError(this.handleError(opts.err))
+		).subscribe(resp=>{
 			if(typeof this._http.replace == 'function'){
 				this._http.replace(resp, callback);
 			}else callback(resp);
 		});
+		return observable;
 	}
 	// http management
 	private locked = false;
