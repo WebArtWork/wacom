@@ -55,6 +55,7 @@ export const DEFAULT_CONFIG: Config = {
 	},
 	socket: false,
 	http: {
-		url: ''
+		url: '',
+		headers: {}
 	}
 }

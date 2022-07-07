@@ -31,9 +31,9 @@ export class HttpService {
 		this._http = config.http;
 		if (!this.config) this.config = DEFAULT_CONFIG;
 		if (!this._http) this._http = {};
-		if (typeof config.headers === 'object') {
-			for (const header in config.headers) {
-				this.headers[header] = config.headers[header];
+		if (typeof this._http.headers === 'object') {
+			for (const header in this._http.headers) {
+				this.headers[header] = this._http.headers[header];
 			}
 			this.http_headers = new HttpHeaders(this.headers);
 		}
@@ -53,7 +53,11 @@ export class HttpService {
 				err: opts
 			}
 		}
-		if(!opts.err) opts.err = (err:HttpErrorResponse)=>{};
+		if (!opts.err && this._http.err) {
+			opts.err = this._http.err;
+		} else if (!opts.err) {
+			opts.err = (err: HttpErrorResponse) => { };
+		}
 		if(this.locked){
 			return setTimeout(()=>{
 				this.post(url, doc, callback, opts);
@@ -78,7 +82,11 @@ export class HttpService {
 				err: opts
 			}
 		}
-		if(!opts.err) opts.err = (err:HttpErrorResponse)=>{};
+		if (!opts.err && this._http.err) {
+			opts.err = this._http.err;
+		} else if (!opts.err) {
+			opts.err = (err: HttpErrorResponse) => { };
+		}
 		if(this.locked){
 			return setTimeout(()=>{
 				this.put(url, doc, callback, opts);
@@ -103,7 +111,11 @@ export class HttpService {
 				err: opts
 			}
 		}
-		if(!opts.err) opts.err = (err:HttpErrorResponse)=>{};
+		if (!opts.err && this._http.err) {
+			opts.err = this._http.err;
+		} else if (!opts.err) {
+			opts.err = (err: HttpErrorResponse) => { };
+		}
 		if(this.locked){
 			return setTimeout(()=>{
 				this.patch(url, doc, callback, opts);
@@ -128,7 +140,11 @@ export class HttpService {
 				err: opts
 			}
 		}
-		if(!opts.err) opts.err = (err:HttpErrorResponse)=>{};
+		if (!opts.err && this._http.err) {
+			opts.err = this._http.err;
+		} else if (!opts.err) {
+			opts.err = (err: HttpErrorResponse) => { };
+		}
 		if(this.locked){
 			return setTimeout(()=>{
 				this.delete(url, doc, callback, opts);
@@ -154,7 +170,11 @@ export class HttpService {
 				err: opts
 			}
 		}
-		if(!opts.err) opts.err = (err:HttpErrorResponse)=>{};
+		if (!opts.err && this._http.err) {
+			opts.err = this._http.err;
+		} else if (!opts.err) {
+			opts.err = (err: HttpErrorResponse) => { };
+		}
 		if(this.locked){
 			return setTimeout(()=>{
 				this.get(url, callback, opts);
