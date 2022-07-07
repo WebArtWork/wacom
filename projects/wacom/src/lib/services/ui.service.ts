@@ -36,16 +36,21 @@ export class UiService {
 				} else if(extra == 4) {
 					return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%&!-_]))(?=.{8,})/.test(value||'');
 				} else return !!value;
-			} else if(kind=='password') {
-				if(!value) return 0;
+			} else if (kind == 'password' && typeof value === 'string') {
 				let counter = 0;
-				if(/^((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9]))/.test(value||'')) {
+				if (value.length > 8) {
 					counter++;
-				} else if(/^(((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,})/.test(value||'')) {
+				}
+				if (/[a-z]/.test(value)) {
 					counter++;
-				} else if(/^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]))(?=.{8,})/.test(value||'')) {
+				}
+				if (/[A-Z]/.test(value)) {
 					counter++;
-				} else if(/^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%&!-_]))(?=.{8,})/.test(value||'')) {
+				}
+				if (/[1-9]/.test(value)) {
+					counter++;
+				}
+				if (/[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(value)) {
 					counter++;
 				}
 				return counter;
