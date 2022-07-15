@@ -53,7 +53,11 @@ export class HttpService {
 				err: opts
 			}
 		}
-		if(!opts.err) opts.err = (err:HttpErrorResponse)=>{};
+		if (!opts.err && this._http.err) {
+			opts.err = this._http.err;
+		} else if (!opts.err) {
+			opts.err = (err: HttpErrorResponse) => { };
+		}
 		if(this.locked){
 			return setTimeout(()=>{
 				this.post(url, doc, callback, opts);
@@ -78,7 +82,11 @@ export class HttpService {
 				err: opts
 			}
 		}
-		if(!opts.err) opts.err = (err:HttpErrorResponse)=>{};
+		if (!opts.err && this._http.err) {
+			opts.err = this._http.err;
+		} else if (!opts.err) {
+			opts.err = (err: HttpErrorResponse) => { };
+		}
 		if(this.locked){
 			return setTimeout(()=>{
 				this.put(url, doc, callback, opts);
@@ -103,7 +111,11 @@ export class HttpService {
 				err: opts
 			}
 		}
-		if(!opts.err) opts.err = (err:HttpErrorResponse)=>{};
+		if (!opts.err && this._http.err) {
+			opts.err = this._http.err;
+		} else if (!opts.err) {
+			opts.err = (err: HttpErrorResponse) => { };
+		}
 		if(this.locked){
 			return setTimeout(()=>{
 				this.patch(url, doc, callback, opts);
@@ -128,7 +140,11 @@ export class HttpService {
 				err: opts
 			}
 		}
-		if(!opts.err) opts.err = (err:HttpErrorResponse)=>{};
+		if (!opts.err && this._http.err) {
+			opts.err = this._http.err;
+		} else if (!opts.err) {
+			opts.err = (err: HttpErrorResponse) => { };
+		}
 		if(this.locked){
 			return setTimeout(()=>{
 				this.delete(url, doc, callback, opts);
@@ -154,7 +170,11 @@ export class HttpService {
 				err: opts
 			}
 		}
-		if(!opts.err) opts.err = (err:HttpErrorResponse)=>{};
+		if (!opts.err && this._http.err) {
+			opts.err = this._http.err;
+		} else if (!opts.err) {
+			opts.err = (err: HttpErrorResponse) => { };
+		}
 		if(this.locked){
 			return setTimeout(()=>{
 				this.get(url, callback, opts);

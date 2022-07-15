@@ -22,28 +22,8 @@ $ npm i --save wacom
 | [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service) | Website meta tags management within router |
 | [**`Alert`**](https://www.npmjs.com/package/wacom#alert-service) | Alerts management |
 | [**`Modal`**](https://www.npmjs.com/package/wacom#modal-service) | Modals management |
-| [**`Loader`**](https://www.npmjs.com/package/wacom#loader-service) | Loaders management |
 | [**`UI`**](https://www.npmjs.com/package/wacom#ui-service) | Supportive UI/UX service |
 
-### Components
-| Name | Description |
-| ------- |:-----:|
-| [**`Picker`**](https://www.npmjs.com/package/wacom#picker-component) | Huge common component which is used to take information from user |
-
-## Core Service
-### device
-### version
-### set_version
-### host
-### parallel
-### serial
-### each
-### afterWhile
-### emit
-### on
-### done
-### ready
-### next
 ## Mongo Service
 Mongo Service is an suportive service for combining angular 6 client with waw CRUD back-end. Which means that you have to use [waw Framework](https://www.npmjs.com/package/waw) or you have to made your back-end routes in a way of waw crud. Example of importing mongo service:
 ```javascript
@@ -63,29 +43,17 @@ mongo.create('colName', {
 connecting with waw CRUD read. As parameters accepting name of mongo collection, optionally options, optionally callback which will return all documents in array as first parameter and in object with doc._id placeholder for doc as second parameter. Function returning directing array which will host the documents. Example:
 ```javascript
 mongo.get('colName',{
-	replace: {
+	replace: { // will create or modify selected fields on documents
 		name: function(val, cb, doc){
 			cb(val+'_modified')
 		}
 	},
-	name: 'me',
-	next: {
-		name: 'friends',
-		next: {
-			name: 'near',
-			next: {
-				name: 'city',
-				next: {
-					name: 'country'
-				}
-			}
-		}
-	},
-	populate: [{
+	name: 'me', // customized query
+	populate: [{ // will fill id with document
 		field: 'author',
 		part: 'user'
 	}],
-	groups: 'city name' || ['city', 'name'] || {
+	groups: 'city name' || ['city', 'name'] || { // will make objects with arrays by selected query
 		first_name: {
 			field: function(doc, cb){
 				if(doc.name.split(' ').length>1) cb(doc.name.split(' ')[1]);
@@ -102,7 +70,7 @@ mongo.get('colName',{
 			}
 		}
 	},
-	query: {
+	query: { // will make arrays by selected query
 		male: function(doc){
 			return doc.gender;
 		},
@@ -118,7 +86,8 @@ mongo.get('colName',{
 				return 1;
 			}
 		}
-	}
+	},
+	fields: 'url' // will fill obj with docs by url field
 }, (arr, obj, name, resp) => {
 /*
 *	arr will be array with total docs from that part
@@ -137,7 +106,7 @@ works in the same way as populate of mongodb but in the client side. This works 
 makings arrays which show different documents inside specific placeholders. As example we can have list of users in specific town or country, so we don't have to create pipes for that.
 #### next `options`
 works as level of pulling different documents from the server. This is mostly made for performance, so user can have the info he needs directly.
-### updateAll `function`
+### update `function`
 connecting with waw CRUD updateAll. As parameters accepting name of mongo collection, document object, optionally options and optionally callback function which will return the document. Example:
 ```javascript
 mongo.updateAll('colName', {
@@ -149,10 +118,10 @@ mongo.updateAll('colName', {
 	console.log('document is updated');
 });
 ```
-### updateUnique `function`
+### unique `function`
 connecting with waw CRUD updateUnique. As parameters accepting name of mongo collection, object with document _id and field value, optionally options and optionally callback function which will return if field has been updated. Example:
 ```javascript
-mongo.updateUnique('colName', {
+mongo.unique('colName', {
 	name: doc.name,
 	_id: doc._id
 }, {
