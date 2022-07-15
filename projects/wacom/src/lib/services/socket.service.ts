@@ -24,7 +24,6 @@ export class SocketService {
 		this.io.on('connect', (socket:any) => {
 			this.connected = true;
 		});
-
 	}
 	constructor(public core: CoreService, @Inject(CONFIG_TOKEN) @Optional() private config: Config){
 		this.core.done('socket', this);
