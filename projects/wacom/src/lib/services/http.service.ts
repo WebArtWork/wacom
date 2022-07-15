@@ -31,9 +31,9 @@ export class HttpService {
 		this._http = config.http;
 		if (!this.config) this.config = DEFAULT_CONFIG;
 		if (!this._http) this._http = {};
-		if (typeof config.headers === 'object') {
-			for (const header in config.headers) {
-				this.headers[header] = config.headers[header];
+		if (typeof this._http.headers === 'object') {
+			for (const header in this._http.headers) {
+				this.headers[header] = this._http.headers[header];
 			}
 			this.http_headers = new HttpHeaders(this.headers);
 		}

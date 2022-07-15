@@ -38,6 +38,8 @@ import 'brace/mode/javascript';
 import 'brace/mode/css';
 import 'brace/theme/github';
 import 'brace/theme/clouds';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
 
@@ -67,12 +69,14 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
 		SafeComponent,
 		SearchComponent,
 		SpliceComponent,
-  ConfigComponent,
-  ClickOutsideComponent,
-  FilesComponent
+		ConfigComponent,
+		ClickOutsideComponent,
+		FilesComponent
 	],
 	imports: [
 		AceModule,
+		CommonModule,
+		FormsModule,
 		BrowserModule,
 		WacomModule.forRoot({
 			socket: false

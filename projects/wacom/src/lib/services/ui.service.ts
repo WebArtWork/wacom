@@ -20,19 +20,19 @@ export class UiService {
 			return this._forms[id];
 		}
 		public valid(value:any, kind='email', extra:any=''){
-			if(kind=='email'){
+			if(kind === 'email'){
 				return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value||'');
-			}else if(kind=='text'){
+			}else if(kind === 'text'){
 				return typeof value == 'string';
-			}else if(kind=='array'){
+			}else if(kind === 'array'){
 				return Array.isArray(value);
-			}else if(kind=='object'){
+			}else if(kind === 'object'){
 				if(typeof value == 'object' && !Array.isArray(value) && value!=null){
 					return true;
 				}
-			}else if(kind=='number'){
+			}else if(kind === 'number'){
 				return typeof value == 'number';
-			}else if(kind=='password'){
+			}else if(kind === 'password'){
 				if(!value) return false;
 				if(extra == 1){
 					return /^((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9]))/.test(value||'');
@@ -43,21 +43,28 @@ export class UiService {
 				}else if(extra == 4){
 					return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%&!-_]))(?=.{8,})/.test(value||'');
 				}else return !!value;
-			}else if(kind=='password'){
-				if(!value) return 0;
-				let counter = 0;
-				if(/^((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9]))/.test(value||'')){
-					counter++;
-				}else if(/^(((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,})/.test(value||'')){
-					counter++;
-				}else if(/^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]))(?=.{8,})/.test(value||'')){
-					counter++;
-				}else if(/^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%&!-_]))(?=.{8,})/.test(value||'')){
-					counter++;
-				}
-				return counter;
 			}
 			return false;
+		}
+		public level(value:string){
+			if ( !value ) return 0;
+			let level = 0;
+			if ( /\d/.test(value) ) {
+				level++;
+			}
+			if ( /[a-z]/.test(value) ) {
+				level++;
+			}
+			if ( /[A-Z]/.test(value) ) {
+				level++;
+			}
+			if ( /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(value) ) {
+				level++;
+			}
+			if ( value.length > 8 ) {
+				level++;
+			}
+			return level;
 		}
 	/* Css Management*/
 		private variables:any = {};

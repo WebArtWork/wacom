@@ -40,8 +40,8 @@ export interface Config {
 	};
 	socket?: any;
 	http?: {
-		replace?: any;
 		headers?: any;
+		replace?: any;
 		err?: any;
 		url?: string;
 	}

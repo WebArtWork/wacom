@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { StoreService, ModalService, MongoService } from 'wacom';
+import { StoreService, ModalService, MongoService, UiService } from 'wacom';
 import { LocalComponent } from './modals/local/local.component';
 import { ManagerService } from './manager.service';
 @Component({
@@ -8,6 +8,7 @@ import { ManagerService } from './manager.service';
 	styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+	public password = '';
 	local_modal(){
 		this.modal.show({
 			component: LocalComponent
@@ -17,7 +18,7 @@ export class AppComponent {
 		public store: StoreService,
 		public modal: ModalService,
 		private _managerService: ManagerService,
-		public mongo: MongoService
+		public ui: UiService
 	){
 		this.store.get('test', (message:any)=>{
 			console.log('GET: ', message);
