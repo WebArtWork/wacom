@@ -1,5 +1,7 @@
 import { InjectionToken } from '@angular/core';
-
+export interface Any {
+	[key: string]: string;
+}
 export interface Config {
 	meta?: {
 		useTitleSuffix?: boolean;
