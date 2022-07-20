@@ -4,7 +4,7 @@
 		<div class="waw-alert-body">
 			<div *ngIf="!component" class="waw-alert-texts">
 				<div *ngIf="icon" class="{{icon}}"></div>
-				<div class="waw-alert-message slideIn">{{text.slice(0, 50)}}</div>
+				<div class="waw-alert-message slideIn">{{text}}</div>
 			</div>
 			<div *ngIf="!component&&type=='question'">
 				<button class="alert-btn" *ngFor="let b of buttons" (click)="remove(); b.callback&&b.callback();">{{b.text}}</button>
