@@ -13,7 +13,6 @@ export class CoreService {
 	public navigator:any; // = navigator;
 	//public cordova:any; // = cordova;
 	constructor(@Inject(PLATFORM_ID) private platformId:boolean) {
-		console.log(this.ids2id('a', 'b'));
 		if(isPlatformServer(this.platformId)){
 			this.localStorage = {
 				getItem:()=>{},
@@ -249,6 +248,18 @@ export class CoreService {
 				if(typeof which === 'object') which.__locked = false;
 				else this.locked[which] = false;
 			});
+		}
+		public copy(from:any, to:any) {
+			for(const each in from) {
+				if (
+					Array.isArray(from[each]) ||
+					typeof from[each] !== 'object'
+				) {
+					to[each] = from[each];
+				} else {
+					this.copy(from[each], to[each]);
+				}
+			}
 		}
 	/* End of Core*/
 }

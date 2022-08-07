@@ -14,7 +14,7 @@ export class RenderService {
 			this.pipes[event][index] = false;
 		};
 	}
-	render(event: string, param=null){
+	render(event = '', param = null){
 		if(!this.pipes[event]) return;
 		for(let i = 0; i < this.pipes[event].length; i++){
 			if(typeof this.pipes[event][i] === 'function'){

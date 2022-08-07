@@ -46,6 +46,28 @@ export interface Config {
 		replace?: any;
 		err?: any;
 		url?: string;
+	},
+	store?: {
+		set?: (
+			hold: any,
+			value: any,
+			cb: ()=>void,
+			errCb: () => void
+		) => void,
+		get?: (
+			hold: any,
+			cb: ()=>void,
+			errCb: () => void
+		) => void,
+		remove?: (
+			hold: any,
+			cb: ()=>void,
+			errCb: () => void
+		) => void,
+		clear?: (
+			cb: ()=>void,
+			errCb: () => void
+		) => void
 	}
 }
 export const CONFIG_TOKEN = new InjectionToken<Config>('config');
@@ -59,5 +81,6 @@ export const DEFAULT_CONFIG: Config = {
 	http: {
 		url: '',
 		headers: {}
-	}
+	},
+	store: {}
 }
