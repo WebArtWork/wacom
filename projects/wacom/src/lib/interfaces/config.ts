@@ -56,7 +56,7 @@ export interface Config {
 		) => void,
 		get?: (
 			hold: any,
-			cb: ()=>void,
+			cb: (value: string)=>void,
 			errCb: () => void
 		) => void,
 		remove?: (
