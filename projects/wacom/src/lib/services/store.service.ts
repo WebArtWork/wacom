@@ -55,7 +55,7 @@ export class StoreService {
 	}
 	getJson(
 		hold: string,
-		callback: (value: object | null) => void = () => { },
+		callback: (value: any) => void = () => { },
 		errCallback: () => void = () => { }
 	){
 		this.get(hold, (value:string) => {
