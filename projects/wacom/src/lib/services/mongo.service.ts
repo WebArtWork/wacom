@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpService } from './http.service';
 import { CoreService } from './core.service';
 import { Subject } from 'rxjs';
+import { StoreService } from './store.service';
 @Injectable({
 	providedIn: 'root'
 })
@@ -105,6 +106,17 @@ export class MongoService {
 			if (!Array.isArray(opts.fields)) {
 				opts.fields = [];
 			}
+			this.store.getJson('mongo' + part, data => {
+				if (data && Array.isArray(data)) {
+					for (let i = 0; i < data.length; i++) {
+						this.push(part, data[i]);
+					}
+				}
+			});
+			return {
+				arr: this.data['arr' + part],
+				obj: this.data['obj' + part]
+			};
 		};
 		public create(part:any, doc:any=undefined, cb:any=undefined, opts:any={}) {
 			if (typeof doc == 'function') {
@@ -562,7 +574,9 @@ export class MongoService {
 				});
 			});
 		};
-		public getCreated(val:any, cb:any, doc:any){ cb(new Date(parseInt(doc._id.substring(0,8), 16)*1000)); };
+		public getCreated(val:any, cb:any, doc:any){
+			cb(new Date(parseInt(doc._id.substring(0,8), 16)*1000));
+		};
 	/*
 	*	mongo local support functions
 	*/
@@ -753,6 +767,7 @@ export class MongoService {
 					this.data['obj' + part][doc[field]][each] = doc[each];
 				}
 			}
+			this.store.setJson('mongo' + part, this.data['arr' + part]);
 		};
 		public remove(part:any, doc:any){
 			if(!Array.isArray(this.data['arr' + part])) return;
@@ -792,7 +807,11 @@ export class MongoService {
 	/*
 	*	Endof Mongo Service
 	*/
-	constructor(private http: HttpService, private core: CoreService){
+	constructor(
+		private store: StoreService,
+		private http: HttpService,
+		private core: CoreService
+	) {
 		this.core.next('socket', (socket:any)=>{
 			this.socket = socket;
 			socket.on('create', (created:any) => {
