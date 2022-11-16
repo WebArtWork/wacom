@@ -12,6 +12,10 @@ export class SocketService {
 	setUrl(url: string): void {
 		this._url = url;
 
+		if (!this._config.socket) {
+			this._config.socket = true;
+		}
+
 		this.load();
 	}
 
