@@ -7,48 +7,87 @@ import * as io from "socket.io-client";
 	providedIn: 'root'
 })
 export class SocketService {
-	public url = '';
-	private io:any;
-	private connected = false;
+	private _url = '';
+
+	setUrl(url: string): void {
+		this._url = url;
+
+		this.load();
+	}
+
+	private _io:any;
+
+	private _connect = !!this._config.socket;
+
+	private _connected = false;
+
+	private _opts: any = {};
+
 	load(){
-		if (!this.config.socket || !io) return;
+		if (!this._config.socket || !io) {
+			return;
+		}
+
 		const ioFunc = (io as any).default ? (io as any).default : io;
-		if (typeof this.config.socket == 'object' && this.config.socket.url) {
-			this.url = this.config.socket.url;
-		}
-		let opts = {};
-		if (typeof this.config.socket == 'object' && this.config.socket.opts) {
-			opts = this.config.socket.opts;
-		}
-		this.io = ioFunc(this.url, opts);
-		this.io.on('connect', (socket:any) => {
-			this.connected = true;
+
+
+		this._io = ioFunc(this._url, this._opts);
+
+		this._io.on('connect', (socket:any) => {
+			this._connected = true;
 		});
 	}
-	constructor(public core: CoreService, @Inject(CONFIG_TOKEN) @Optional() private config: Config){
-		this.core.done('socket', this);
-		this.url=core.window.location.origin.replace('4200', '8080')
-		if(!this.config) this.config = DEFAULT_CONFIG;
-		if(this.config.socket){
+
+	constructor(
+		@Inject(CONFIG_TOKEN) @Optional() private _config: Config,
+		private _core: CoreService
+	){
+		this._core.done('socket', this);
+
+		this._url = this._core.window.location.origin.replace('4200', '8080');
+
+		if(!this._config) this._config = DEFAULT_CONFIG;
+
+		if (typeof this._config.socket === 'object') {
+			if (this._config.socket.url) {
+				this._url = this._config.socket.url;
+			}
+
+			if (this._config.socket.opts) {
+				this._opts = this._config.socket.opts;
+			}
+		}
+
+		if(this._config.socket){
 			this.load();
 		}
 	}
+
 	on(to:any, cb = (message:any)=>{}):any{
-		if(!this.config.socket) return;
-		if(!this.connected){
+		if(!this._config.socket) {
+			return;
+		}
+
+		if(!this._connected){
 			return setTimeout(()=>{
 				this.on(to, cb);
 			}, 100);
 		}
-		this.io.on(to, cb);
+
+		this._io.on(to, cb);
 	}
+
 	emit(to:any, message:any, room:any = false):any{
-		if(!this.config.socket) return;
-		if(!this.connected){
+		if(!this._config.socket) {
+			return;
+		}
+
+		if(!this._connected){
 			return setTimeout(()=>{
 				this.emit(to, message, room);
 			}, 100);
 		}
-		this.io.emit(to, message, room);
+
+		this._io.emit(to, message, room);
 	}
 }
