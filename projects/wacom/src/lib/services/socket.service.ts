@@ -21,25 +21,20 @@ export class SocketService {
 
 	private _io:any;
 
-	private _connect = !!this._config.socket;
-
 	private _connected = false;
 
 	private _opts: any = {};
 
 	load(){
-		if (!this._config.socket || !io) {
-			return;
+		if (io) {
+			const ioFunc = (io as any).default ? (io as any).default : io;
+
+			this._io = ioFunc(this._url, this._opts);
+
+			this._io.on('connect', (socket:any) => {
+				this._connected = true;
+			});
 		}
-
-		const ioFunc = (io as any).default ? (io as any).default : io;
-
-
-		this._io = ioFunc(this._url, this._opts);
-
-		this._io.on('connect', (socket:any) => {
-			this._connected = true;
-		});
 	}
 
 	constructor(
