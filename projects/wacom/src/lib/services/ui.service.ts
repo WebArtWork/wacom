@@ -21,7 +21,7 @@ export class UiService {
 		}
 		public valid(value:any, kind = 'email', extra = 0) {
 			if(kind === 'email') {
-				return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value||'');
+				return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,10})+$/.test(value||'');
 			} else if(kind === 'text') {
 				return typeof value == 'string';
 			} else if(kind === 'array') {
