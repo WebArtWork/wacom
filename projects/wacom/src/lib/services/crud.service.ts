@@ -1,60 +1,88 @@
-import { Injectable, Inject } from '@angular/core';
-import { MongoService } from './mongo.service';
-import { AlertService } from './alert.service';
-import { BaseService } from './base.service';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { HttpService, StoreService } from 'wacom';
+
+interface CrudOptions {
+	replace: string;
+	query: string;
+	group: string;
+}
 
 @Injectable({
 	providedIn: 'root'
 })
-export class CrudService extends BaseService {
+export default abstract class CrudService<Document> {
+	private _url = '/api/';
+
 	constructor(
-		@Inject(String) private collection: string,
-		public mongo: MongoService,
-		public alert: AlertService
+		private _module: string,
+		private _http: HttpService,
+		private _store: StoreService
 	) {
-		super();
+		this._url += this._module;
 	}
-	public docs = [];
-	public _docs: any = {};
-	public doc = (doc_id: string) => {
-		if (!this._docs[doc_id]) {
-			this._docs[doc_id] = this.mongo.fetch(this.collection, {
-				query: {
-					_id: doc_id
-				}
-			});
-		}
-		return this._docs[doc_id];
+	/*
+		doc should be able to:
+		1) stored locally
+		2) send into back-end into different ways [http,socket]
+		3) have temporary id {MODULE_Date.now()}
+		4) work as MongoService via read function
+	*/
+
+	create(doc: Document): Observable<Document> {
+		const obs = this._http.post(this._url + '/create', doc);
+		return obs;
 	}
-	public create = (doc: object = {}, callback: Function = (obj: object) =>{}, text: string = '')=>{
-		if((doc as any)._id) return this.save(doc, callback);
-		this.mongo.create(this.collection, doc, (created: object) => {
-			if(typeof callback === 'function') callback(created);
-			if(text) this.alert.show({ text });
-		});
+
+	read(opts: CrudOptions): Observable<Document> {
+		const obs = this._http.get(this._url + '/get');
+		return obs;
 	}
-	public read = (params: object = {}, callback: Function = (obj: object) =>{}, text: string = '')=>{
-		this.docs = this.mongo.get(this.collection, params, (arr: any, obj: object)=>{
-			this._docs = obj;
-			if(typeof callback === 'function') callback(obj);
-			if(text) this.alert.show({ text });
-		});
+
+	update(doc: Document): Observable<Document> {
+		const obs = this._http.put(this._url + '/update', doc);
+		return obs;
 	}
-	public update = (doc: object, callback: Function = (obj: object) =>{}, text: string = '')=>{
-		this.mongo.afterWhile(doc, () => {
-			this.save(doc, callback, text);
-		});
+
+	delete(doc: Document): Observable<Document> {
+		const obs = this._http.delete(this._url + '/delete', doc);
+		return obs;
 	}
-	public save = (doc: object, callback: Function = (obj: object) =>{}, text: string = '')=>{
-		this.mongo.update(this.collection, doc, (updated: object)=>{
-			if(typeof callback === 'function') callback(updated);
-			if(text) this.alert.show({ text });
-		});
-	}
-	public delete = (doc: object, callback: Function = (obj: object) =>{}, text: string = '')=>{
-		this.mongo.delete(this.collection, doc, (deleted: object)=>{
-			if(typeof callback === 'function') callback(deleted);
-			if(text) this.alert.show({ text });
-		});
+
+	set(doc: Document): void { }
+
+	// get(module: string, id: string): Document {}
+	// getAll(module: string): Document[] {}
+}
+
+
+/*
+Create -> Post
+Read   -> Get
+Update -> Put
+Delete -> Delete
+
+
+import { Injectable } from "@angular/core";
+import { HttpService, StoreService } from "wacom";
+import CrudService from "./crud.service";
+
+interface Bird {
+	name: string;
+	description: string;
+}
+
+@Injectable({
+	providedIn: 'root'
+})
+export class BirdService extends CrudService<Bird> {
+	constructor(
+		_http: HttpService,
+		_store: StoreService
+	) {
+		super('bird', _http, _store);
+		console.log(this.create);
 	}
 }
+
+*/
