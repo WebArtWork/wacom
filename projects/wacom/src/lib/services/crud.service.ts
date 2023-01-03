@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpService, StoreService } from 'wacom';
+import { HttpService } from './http.service';
+import { StoreService } from './store.service';
 
 interface CrudOptions {
 	replace: string;
