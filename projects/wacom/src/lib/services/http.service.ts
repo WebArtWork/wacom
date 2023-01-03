@@ -1,7 +1,7 @@
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { throwError } from 'rxjs';
+import { Subject, throwError } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
 import { StoreService } from './store.service';
 
@@ -100,6 +100,8 @@ export class HttpService {
 			}, 100);
 		}
 
+		const subject = new Subject();
+
 		const observable = this.http.post<any>((opts.url||this.url)+url, doc, {
 			headers: this.http_headers
 		});
@@ -109,14 +111,19 @@ export class HttpService {
 			catchError(this.handleError(opts.err))
 		).subscribe(resp=>{
 			if (typeof this._http.replace === 'function') {
-				this._http.replace(resp, callback);
+				this._http.replace(resp, ()=>{
+					callback(resp);
+					subject.next(resp);
+				});
 			} else {
 				callback(resp);
+				subject.next(resp);
 			}
 		});
 
-		return observable;
+		return subject;
 	}
+
 	put(url:any, doc:any, callback=(resp:any) => {}, opts:any={}):any{
 		if (typeof opts === 'function'){
 			opts = {
@@ -136,6 +143,8 @@ export class HttpService {
 			}, 100);
 		}
 
+		const subject = new Subject();
+
 		const observable = this.http.put<any>((opts.url||this.url)+url, doc, {
 			headers: this.http_headers
 		});
@@ -145,14 +154,19 @@ export class HttpService {
 			catchError(this.handleError(opts.err))
 		).subscribe(resp=>{
 			if (typeof this._http.replace === 'function'){
-				this._http.replace(resp, callback);
+				this._http.replace(resp, ()=>{
+					callback(resp);
+					subject.next(resp);
+				});
 			} else {
 				callback(resp);
+				subject.next(resp);
 			}
 		});
 
-		return observable;
+		return subject;
 	}
+
 	patch(url:any, doc:any, callback=(resp:any) => {}, opts:any={}):any{
 		if (typeof opts === 'function'){
 			opts = {
@@ -172,6 +186,8 @@ export class HttpService {
 			}, 100);
 		}
 
+		const subject = new Subject();
+
 		const observable = this.http.patch<any>((opts.url||this.url)+url, doc, {
 			headers: this.http_headers
 		});
@@ -181,14 +197,19 @@ export class HttpService {
 			catchError(this.handleError(opts.err))
 		).subscribe(resp=>{
 			if (typeof this._http.replace === 'function'){
-				this._http.replace(resp, callback);
+				this._http.replace(resp, ()=>{
+					callback(resp);
+					subject.next(resp);
+				});
 			} else {
 				callback(resp);
+				subject.next(resp);
 			}
 		});
 
-		return observable;
+		return subject;
 	}
+
 	delete(url:any, doc:any, callback=(resp:any) => {}, opts:any={}):any{
 		if (typeof opts === 'function'){
 			opts = {
@@ -208,6 +229,8 @@ export class HttpService {
 			}, 100);
 		}
 
+		const subject = new Subject();
+
 		const observable = this.http.request<any>('delete', (opts.url||this.url)+url, {
 			headers: this.http_headers,
 			body: doc || {}
@@ -218,12 +241,19 @@ export class HttpService {
 			catchError(this.handleError(opts.err))
 		).subscribe(resp=>{
 			if (typeof this._http.replace === 'function'){
-				this._http.replace(resp, callback);
-			} else callback(resp);
+				this._http.replace(resp, ()=>{
+					callback(resp);
+					subject.next(resp);
+				});
+			} else {
+				callback(resp);
+				subject.next(resp);
+			}
 		});
 
-		return observable;
+		return subject;
 	}
+
 	get(url:any, callback=(resp:any) => {}, opts:any={}):any{
 		if (typeof opts === 'function'){
 			opts = {
@@ -251,6 +281,8 @@ export class HttpService {
 			params.params = opts.params;
 		}
 
+		const subject = new Subject();
+
 		const observable = this.http.get<any>((opts.url || this.url) + url, params);
 
 		observable.pipe(
@@ -258,11 +290,17 @@ export class HttpService {
 			catchError(this.handleError(opts.err))
 		).subscribe(resp=>{
 			if (typeof this._http.replace === 'function'){
-				this._http.replace(resp, callback);
-			} else callback(resp);
+				this._http.replace(resp, ()=>{
+					callback(resp);
+					subject.next(resp);
+				});
+			} else {
+				callback(resp);
+				subject.next(resp);
+			}
 		});
 
-		return observable;
+		return subject;
 	}
 
 	private _locked = false;
