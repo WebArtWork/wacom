@@ -48,6 +48,7 @@ export interface Config {
 		url?: string;
 	},
 	store?: {
+		prefix?: string;
 		set?: (
 			hold: any,
 			value: any,
@@ -82,5 +83,7 @@ export const DEFAULT_CONFIG: Config = {
 		url: '',
 		headers: {}
 	},
-	store: {}
+	store: {
+		prefix: ''
+	}
 }

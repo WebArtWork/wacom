@@ -1,7 +1,6 @@
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { Injectable, Inject, Optional } from '@angular/core';
 import { CoreService } from './core.service';
-const window:any = {};
 
 @Injectable({
 	providedIn: 'root'
@@ -13,12 +12,17 @@ export class StoreService {
 	) {
 		if (!this.config) this.config = DEFAULT_CONFIG;
 	}
+
 	set(
 		hold: string,
 		value: string,
 		callback: () => void = () => { },
 		errCallback: () => void = () => { }
 	): void {
+		if (this.config.store?.prefix) {
+			hold = this.config.store?.prefix + hold
+		}
+
 		if (
 			this.config.store &&
 			this.config.store.set
@@ -30,11 +34,16 @@ export class StoreService {
 			callback();
 		}
 	}
+
 	get(
 		hold: string,
 		callback: (value: string) => void = () => { },
 		errCallback: () => void = () => { }
 	): any {
+		if (this.config.store?.prefix) {
+			hold = this.config.store?.prefix + hold
+		}
+
 		if (
 			this.config.store &&
 			this.config.store.get
@@ -44,6 +53,7 @@ export class StoreService {
 			callback(this.core.localStorage.getItem('temp_storage_'+hold)||'');
 		}
 	}
+
 	setJson(
 		hold: string,
 		value: any,
@@ -51,8 +61,10 @@ export class StoreService {
 		errCallback: () => void = () => { }
 	) {
 		value = JSON.stringify(value);
+
 		this.set(hold, value, callback, errCallback);
 	}
+
 	getJson(
 		hold: string,
 		callback: (value: any) => void = () => { },
@@ -63,17 +75,23 @@ export class StoreService {
 				try {
 					value = JSON.parse(value);
 				} catch(e) {}
+
 				callback(typeof value === 'object' && value || null);
 			} else {
 				callback(null);
 			}
 		}, errCallback);
 	}
+
 	remove(
 		hold: string,
 		callback: () => void = () => { },
 		errCallback: () => void = () => { }
 	): void {
+		if (this.config.store?.prefix) {
+			hold = this.config.store?.prefix + hold
+		}
+
 		if (
 			this.config.store &&
 			this.config.store.remove
@@ -84,6 +102,7 @@ export class StoreService {
 			callback();
 		}
 	}
+
 	clear(
 		callback: () => void = () => { },
 		errCallback: () => void = () => { }
@@ -95,6 +114,7 @@ export class StoreService {
 			this.config.store.clear(callback, errCallback);
 		} else {
 			this.core.localStorage.clear();
+
 			callback();
 		}
 	}
