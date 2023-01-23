@@ -1,17 +1,23 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+
 import { isPlatformServer } from '@angular/common';
-import { retryWhen } from 'rxjs';
+
 declare var cordova:any;
+
 @Injectable({
 	providedIn: 'root'
 })
 export class CoreService {
-	public ssr = isPlatformServer(this.platformId);
-	public localStorage:any; // = localStorage;
-	public document:any; // = document;
-	public window:any; // = window;
-	public navigator:any; // = navigator;
-	//public cordova:any; // = cordova;
+	ssr = isPlatformServer(this.platformId);
+
+	localStorage:any; // = localStorage;
+
+	document:any; // = document;
+
+	window:any; // = window;
+
+	navigator:any; // = navigator;
+
 	constructor(@Inject(PLATFORM_ID) private platformId:boolean) {
 		if(isPlatformServer(this.platformId)){
 			this.localStorage = {
@@ -19,14 +25,16 @@ export class CoreService {
 				setItem:()=>{},
 				removeItem:()=>{},
 				clear:()=>{}
-			};;
+			};
+
 			this.document = {
 				querySelectorAll: ()=>{},
 				addEventListener: ()=>{},
 				removeEventListener: ()=>{},
 				documentElement: {},
 				body: {},
-			};;
+			};
+
 			this.window = {
 				location: {
 					host: ''
@@ -35,40 +43,58 @@ export class CoreService {
 				removeEventListener: ()=>{},
 				setTimeout: ()=>{}
 			};;
+
 			this.navigator = {
 				userAgent: '',
 				platform: ''
 			};
 		}else{
 			this.localStorage = localStorage;
+
 			this.document = document;
+
 			this.window = window;
+
 			this.navigator = navigator;
 		}
+
 		this.host = this.window.location.host.toLowerCase();
-		var userAgent = this.navigator.userAgent || this.navigator.vendor || this.window.opera;
+
+		const userAgent = this.navigator.userAgent || this.navigator.vendor || this.window.opera;
+
 		if (/windows phone/i.test(userAgent)) {
 			this.device = "windows";
-		}else if (/android/i.test(userAgent)) {
+		} else if (/android/i.test(userAgent)) {
 			this.device = "android";
-		}else if (this.ios()) {
+		} else if (this.ios()) {
 			this.device = "ios";
-		}else this.device = "web";
+		} else {
+			this.device = "web";
+		}
+
 		this.set_version();
 	}
-	public host:any;
-	public device:any;
-	public version:any;
-	public set_version(version='1.0.0'){
+
+	host:any;
+
+	device:any;
+
+	version:any;
+
+	set_version(version='1.0.0') {
 		this.version = version;
+
 		this.document.addEventListener('deviceready', () => {
 			this.done('mobile');
-			if(!cordova.getAppVersion) return;
-			cordova.getAppVersion.getVersionNumber((version:string)=>{
-				this.version = version;
-			});
+
+			if (cordova.getAppVersion) {
+				cordova.getAppVersion.getVersionNumber((version:string)=>{
+					this.version = version;
+				});
+			}
 		});
 	}
+
 	ios() {
 		return [
 			'iPad Simulator',
@@ -85,53 +111,70 @@ export class CoreService {
 	*	Pipes
 	*/
 		ota(obj: any, holder?:boolean): any {
-			if(Array.isArray(obj)) return obj;
-			if(typeof obj != 'object') return [];
+			if (Array.isArray(obj)) return obj;
+
+			if (typeof obj != 'object') return [];
+
 			let arr = [];
-			for(let each in obj){
-				if(obj[each]){
-					if(holder) arr.push(each);
-					else arr.push(obj[each]);
+
+			for (const each in obj) {
+				if (obj[each]){
+					if (holder) {
+						arr.push(each);
+					} else {
+						arr.push(obj[each]);
+					}
 				}
 			}
+
 			return arr;
 		}
 	/*
 	*	Supportive
 	*/
-		public ids2id(...args:any[]) {
+		ids2id(...args:any[]) {
 			args.sort( (a, b) => {
 				if (Number(a.toString().substring(0, 8)) > Number(b.toString().substring(0, 8))){
 					return 1;
 				}
 				return -1;
 			});
+
 			return args.join();
 		}
-		public parallel(arr: any[], callback:()=>void){
+
+		parallel(arr: any[], callback:()=>void){
 			let counter = arr.length;
+
 			if(counter===0) return callback();
+
 			for (let i = 0; i < arr.length; i++) {
 				arr[i](function(){
 					if(--counter===0) callback();
 				});
 			}
 		}
+
 		private serial_process(i:number, arr:any[], callback:()=>void){
 			if(i>=arr.length) return callback();
+
 			arr[i](()=>{
 				this.serial_process(++i, arr, callback);
 			});
 		}
-		public serial(arr:any[], callback:()=>void){
+
+		serial(arr:any[], callback:()=>void){
 			this.serial_process(0, arr, callback);
 		}
-		public each(arrOrObj:any, func:any, callback:()=>void, isSerial=false){
+
+		each(arrOrObj:any, func:any, callback:()=>void, isSerial=false){
 			if(typeof callback == 'boolean'){
 				isSerial = callback;
+
 				callback = ()=>{};
 			}
-			if(Array.isArray(arrOrObj)){
+
+			if (Array.isArray(arrOrObj)) {
 				let counter = arrOrObj.length;
 				if(counter===0) return callback();
 				if(isSerial){
@@ -152,8 +195,8 @@ export class CoreService {
 						}, i);
 					}
 				}
-			}else if(typeof arrOrObj == 'object'){
-				if(isSerial){
+			} else if(typeof arrOrObj == 'object') {
+				if (isSerial) {
 					let serialArr = [];
 					let arr:any = [];
 					for(let each in arrOrObj){
@@ -172,7 +215,7 @@ export class CoreService {
 						});
 					}
 					this.serial_process(0, serialArr, callback);
-				}else{
+				} else{
 					let counter = 1;
 					for(let each in arrOrObj){
 						counter++;
@@ -182,54 +225,84 @@ export class CoreService {
 					}
 					if(--counter===0) callback();
 				}
-			}else callback();
+			} else callback();
 		}
+
 		private _afterWhile:any = {};
-		public afterWhile(doc:any, cb:()=>void, time=1000){
+
+		afterWhile(doc:any, cb:()=>void, time=1000){
 			if(typeof doc == 'function'){
 				cb = doc;
+
 				doc = 'common';
 			}
+
 			if(typeof doc == 'string'){
 				if(!this._afterWhile[doc]) this._afterWhile[doc]={};
+
 				doc = this._afterWhile[doc];
 			}
+
 			if(typeof cb == 'function' && typeof time == 'number'){
 				clearTimeout(doc.__updateTimeout);
+
 				doc.__updateTimeout = setTimeout(cb, time);
 			}
 		};
+
 		// Signal
 		private cb:any = {};
-		public emit(signal:string, doc:any={}){
-			if(!this.cb[signal]) this.cb[signal] = {};
+
+		emit(signal:string, doc:any={}){
+			if (!this.cb[signal]) {
+				this.cb[signal] = {};
+			}
+
 			for (let each in this.cb[signal]){
 				if(typeof this.cb[signal][each] == 'function'){
 					this.cb[signal][each](doc);
 				}
 			}
 		}
+
 		private _ids:any = {};
-		public on(signal:string, cb:any):any {
-			if (typeof cb !== 'function') return;
+
+		on(signal:string, cb:any):any {
+			if (typeof cb !== 'function') {
+				return;
+			}
+
 			let id = Math.floor(Math.random() * Date.now()) + 1;
-			if(this._ids[id]) return this.on(signal, cb);
+
+			if (this._ids[id]) {
+				return this.on(signal, cb);
+			}
+
 			this._ids[id]=true;
-			if(!this.cb[signal]) this.cb[signal] = {};
+
+			if (!this.cb[signal]) {
+				this.cb[signal] = {};
+			}
+
 			this.cb[signal][id] = cb;
+
 			return ()=>{
 				this.cb[signal][id] = null;
 			}
 		}
+
 		// On Done
 		private done_next:any = {};
-		public done(signal:string, doc:any = true) {
+
+		done(signal:string, doc:any = true) {
 			this.done_next[signal] = doc;
 		};
-		public ready(signal:string){
+
+		ready(signal:string){
 			return this.done_next[signal];
 		};
-		public next(signal:string, cb:(message:any)=>void) {
+
+		next(signal:string, cb:(message:any)=>void) {
 			if (this.done_next[signal]) cb(this.done_next[signal]);
 			else {
 				setTimeout(()=>{
@@ -239,17 +312,30 @@ export class CoreService {
 		};
 
 		private locked:any = {};
-		public lock(which:any, func:any){
-			if(typeof which === 'object' && which.__locked) return;
-			else if(this.locked[which]) return;
-			if(typeof which === 'object') which.__locked = true;
-			else this.locked[which] = true;
+
+		lock(which:any, func:any){
+			if (typeof which === 'object' && which.__locked) {
+				return;
+			} else if(this.locked[which]) {
+				return;
+			}
+
+			if (typeof which === 'object') {
+				which.__locked = true;
+			} else {
+				this.locked[which] = true;
+			}
+
 			func(()=>{
-				if(typeof which === 'object') which.__locked = false;
-				else this.locked[which] = false;
+				if (typeof which === 'object') {
+					which.__locked = false;
+				} else {
+					this.locked[which] = false;
+				}
 			});
 		}
-		public copy(from:any, to:any) {
+
+		copy(from:any, to:any) {
 			for(const each in from) {
 				if (
 					Array.isArray(from[each]) ||
