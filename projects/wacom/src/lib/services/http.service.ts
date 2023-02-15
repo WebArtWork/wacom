@@ -1,21 +1,31 @@
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { Injectable, Inject, Optional } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Subject, throwError } from 'rxjs';
+import {
+	HttpClient,
+	HttpErrorResponse,
+	HttpHeaders,
+} from '@angular/common/http';
+import { Subject } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
 import { StoreService } from './store.service';
 
 @Injectable({
-	providedIn: 'root'
+	providedIn: 'root',
 })
 export class HttpService {
-	public url = '';
+	err_handle(err: HttpErrorResponse, next: () => void) {
+		if (typeof next === 'function') {
+			next();
+		}
+	}
 
-	private _http: any;
+	prepare_handle(url: string, body: unknown) {}
 
-	private headers:any = {};
-
-	private http_headers = new HttpHeaders(this.headers);
+	response_handle(url: string, body: unknown, next: () => void) {
+		if (typeof next === 'function') {
+			next();
+		}
+	}
 
 	constructor(
 		private store: StoreService,
@@ -30,26 +40,29 @@ export class HttpService {
 
 		if (typeof this._http.headers === 'object') {
 			for (const header in this._http.headers) {
-				this.headers[header] = this._http.headers[header];
+				this._headers[header] = this._http.headers[header];
 			}
 
-			this.http_headers = new HttpHeaders(this.headers);
+			this._http_headers = new HttpHeaders(this._headers);
 		}
 
-		this.store.get('http_url', (url:any)=>{
+		this.store.get('http_url', (url: any) => {
 			this.url = url || this._http.url || '';
 		});
 
-		this.store.getJson('http_headers', (headers:any)=>{
+		this.store.getJson('http_headers', (headers: any) => {
 			if (headers) {
-				for (const header in headers){
-					this.headers[header] = headers[header];
+				for (const header in headers) {
+					this._headers[header] = headers[header];
 				}
 
-				this.http_headers = new HttpHeaders(this.headers);
+				this._http_headers = new HttpHeaders(this._headers);
 			}
 		});
 	}
+
+
+	url = '';
 
 	setUrl(url: string) {
 		this.url = url;
@@ -61,204 +74,130 @@ export class HttpService {
 		this.store.remove('http_url');
 	}
 
+	private _http: any;
+
+	private _headers: any = {};
+
+	private _http_headers = new HttpHeaders(this._headers);
+
 	set(key: any, value: any) {
-		this.headers[key] = value;
+		this._headers[key] = value;
 
-		this.store.setJson('http_headers', this.headers);
+		this.store.setJson('http_headers', this._headers);
 
-		this.http_headers = new HttpHeaders(this.headers);
+		this._http_headers = new HttpHeaders(this._headers);
 	}
 
 	header(key: any) {
-		return this.headers[key];
+		return this._headers[key];
 	}
 
 	remove(key: any) {
-		delete this.headers[key];
+		delete this._headers[key];
 
-		this.http_headers = new HttpHeaders(this.headers);
+		this._http_headers = new HttpHeaders(this._headers);
 
-		this.store.setJson('http_headers', this.headers);
+		this.store.setJson('http_headers', this._headers);
 	}
 
-	post(url:any, doc:any, callback=(resp:any) => {}, opts:any={}):any{
-		if (typeof opts === 'function'){
+	_httpMethod(method: string) {
+		if(method === 'post') {
+			return this.http.post<any>;
+		} else if (method === 'put') {
+			return this.http.put<any>;
+		} else if (method === 'patch') {
+			return this.http.patch<any>;
+		} else {
+			return this.http.delete<any>;
+		}
+	}
+
+	_post(
+		url: string,
+		doc: unknown,
+		callback = (resp: unknown) => { },
+		opts: any = {},
+		method = 'post'
+	): any {
+		if (typeof opts === 'function') {
 			opts = {
-				err: opts
-			}
+				err: opts,
+			};
 		}
 
-		if (!opts.err && this._http.err) {
-			opts.err = this._http.err;
-		} else if (!opts.err) {
+		if (!opts.err) {
 			opts.err = (err: HttpErrorResponse) => { };
 		}
 
-		if (this._locked){
-			return setTimeout(()=>{
-				this.post(url, doc, callback, opts);
+		if (this._locked) {
+			return setTimeout(() => {
+				this._post(url, doc, callback, opts, method);
 			}, 100);
 		}
 
+		const _url = (opts.url || this.url) + url;
+
+		this.prepare_handle(_url, doc);
+
 		const subject = new Subject();
 
-		const observable = this.http.post<any>((opts.url||this.url)+url, doc, {
-			headers: this.http_headers
+		const observable = this._httpMethod(method)(_url, doc, {
+			headers: this._http_headers,
 		});
 
-		observable.pipe(
-			first(),
-			catchError(this.handleError(opts.err))
-		).subscribe(resp=>{
-			if (typeof this._http.replace === 'function') {
-				this._http.replace(resp, ()=>{
+		observable
+			.pipe(first(), catchError(this.handleError(opts.err)))
+			.subscribe((resp: unknown) => {
+				this.response_handle(_url, resp, () => {
 					callback(resp);
 					subject.next(resp);
 				});
-			} else {
-				callback(resp);
-				subject.next(resp);
-			}
-		});
+			});
 
 		return subject;
 	}
 
-	put(url:any, doc:any, callback=(resp:any) => {}, opts:any={}):any{
-		if (typeof opts === 'function'){
-			opts = {
-				err: opts
-			}
-		}
-
-		if (!opts.err && this._http.err) {
-			opts.err = this._http.err;
-		} else if (!opts.err) {
-			opts.err = (err: HttpErrorResponse) => { };
-		}
-
-		if (this._locked){
-			return setTimeout(()=>{
-				this.put(url, doc, callback, opts);
-			}, 100);
-		}
-
-		const subject = new Subject();
-
-		const observable = this.http.put<any>((opts.url||this.url)+url, doc, {
-			headers: this.http_headers
-		});
-
-		observable.pipe(
-			first(),
-			catchError(this.handleError(opts.err))
-		).subscribe(resp=>{
-			if (typeof this._http.replace === 'function'){
-				this._http.replace(resp, ()=>{
-					callback(resp);
-					subject.next(resp);
-				});
-			} else {
-				callback(resp);
-				subject.next(resp);
-			}
-		});
-
-		return subject;
+	post(
+		url: any,
+		doc: any,
+		callback = (resp: any) => { },
+		opts: any = {}
+	): any {
+		this._post(url, doc, callback, opts);
 	}
 
-	patch(url:any, doc:any, callback=(resp:any) => {}, opts:any={}):any{
-		if (typeof opts === 'function'){
-			opts = {
-				err: opts
-			}
-		}
-
-		if (!opts.err && this._http.err) {
-			opts.err = this._http.err;
-		} else if (!opts.err) {
-			opts.err = (err: HttpErrorResponse) => { };
-		}
-
-		if (this._locked){
-			return setTimeout(()=>{
-				this.patch(url, doc, callback, opts);
-			}, 100);
-		}
-
-		const subject = new Subject();
-
-		const observable = this.http.patch<any>((opts.url||this.url)+url, doc, {
-			headers: this.http_headers
-		});
-
-		observable.pipe(
-			first(),
-			catchError(this.handleError(opts.err))
-		).subscribe(resp=>{
-			if (typeof this._http.replace === 'function'){
-				this._http.replace(resp, ()=>{
-					callback(resp);
-					subject.next(resp);
-				});
-			} else {
-				callback(resp);
-				subject.next(resp);
-			}
-		});
-
-		return subject;
+	put(
+		url: any,
+		doc: any,
+		callback = (resp: any) => { },
+		opts: any = {}
+	): any {
+		this._post(url, doc, callback, opts, 'put');
 	}
 
-	delete(url:any, doc:any, callback=(resp:any) => {}, opts:any={}):any{
-		if (typeof opts === 'function'){
-			opts = {
-				err: opts
-			}
-		}
-
-		if (!opts.err && this._http.err) {
-			opts.err = this._http.err;
-		} else if (!opts.err) {
-			opts.err = (err: HttpErrorResponse) => { };
-		}
-
-		if (this._locked){
-			return setTimeout(()=>{
-				this.delete(url, doc, callback, opts);
-			}, 100);
-		}
-
-		const subject = new Subject();
-
-		const observable = this.http.request<any>('delete', (opts.url||this.url)+url, {
-			headers: this.http_headers,
-			body: doc || {}
-		});
-
-		observable.pipe(
-			first(),
-			catchError(this.handleError(opts.err))
-		).subscribe(resp=>{
-			if (typeof this._http.replace === 'function'){
-				this._http.replace(resp, ()=>{
-					callback(resp);
-					subject.next(resp);
-				});
-			} else {
-				callback(resp);
-				subject.next(resp);
-			}
-		});
-
-		return subject;
+	patch(
+		url: any,
+		doc: any,
+		callback = (resp: any) => { },
+		opts: any = {}
+	): any {
+		this._post(url, doc, callback, opts, 'patch');
 	}
 
-	get(url:any, callback=(resp:any) => {}, opts:any={}):any{
-		if (typeof opts === 'function'){
+	delete(
+		url: any,
+		doc: any,
+		callback = (resp: any) => { },
+		opts: any = {}
+	): any {
+		this._post(url, doc, callback, opts, 'delete');
+	}
+
+	get(url: any, callback = (resp: any) => { }, opts: any = {}): any {
+		if (typeof opts === 'function') {
 			opts = {
-				err: opts
-			}
+				err: opts,
+			};
 		}
 
 		if (!opts.err && this._http.err) {
@@ -267,63 +206,55 @@ export class HttpService {
 			opts.err = (err: HttpErrorResponse) => { };
 		}
 
-		if (this._locked){
-			return setTimeout(()=>{
+		if (this._locked) {
+			return setTimeout(() => {
 				this.get(url, callback, opts);
 			}, 100);
 		}
 
-		let params:any = {
-			headers: this.http_headers
+		let params: any = {
+			headers: this._http_headers,
 		};
 
-		if (opts.params){
+		if (opts.params) {
 			params.params = opts.params;
 		}
 
 		const subject = new Subject();
 
-		const observable = this.http.get<any>((opts.url || this.url) + url, params);
+		const _url = (opts.url || this.url) + url;
 
-		observable.pipe(
-			first(),
-			catchError(this.handleError(opts.err))
-		).subscribe(resp=>{
-			if (typeof this._http.replace === 'function'){
-				this._http.replace(resp, ()=>{
+		const observable = this.http.get<any>(_url, params);
+
+		observable
+			.pipe(first(), catchError(this.handleError(opts.err)))
+			.subscribe((resp) => {
+				this.response_handle(_url, resp, () => {
 					callback(resp);
 					subject.next(resp);
 				});
-			} else {
-				callback(resp);
-				subject.next(resp);
-			}
-		});
+			});
 
 		return subject;
 	}
 
 	private _locked = false;
 
-	lock(){
+	lock() {
 		this._locked = true;
 	}
 
-	unlock(){
+	unlock() {
 		this._locked = false;
 	}
 
-	err(callback:any){
-		if (typeof callback === 'function'){
-			this._http.err = callback;
-		}
+	private handleError(callback: any) {
+		return (error: HttpErrorResponse) => {
+			this.err_handle(error, () => {
+				if (typeof callback === 'function') {
+					callback(error);
+				}
+			});
+		};
 	}
-
-	private handleError(cb:any = this._http.err) {
-		return function(error: HttpErrorResponse){
-			cb && cb(error);
-
-			return throwError("We can't connect to the server");
-		}
-	};
 }

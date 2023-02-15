@@ -43,8 +43,6 @@ export interface Config {
 	socket?: any;
 	http?: {
 		headers?: any;
-		replace?: any;
-		err?: any;
 		url?: string;
 	},
 	store?: {
