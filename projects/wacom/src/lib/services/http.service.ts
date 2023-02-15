@@ -1,5 +1,6 @@
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { Injectable, Inject, Optional } from '@angular/core';
+import { Observable } from 'rxjs';
 import {
 	HttpClient,
 	HttpErrorResponse,
@@ -19,7 +20,7 @@ export class HttpService {
 		}
 	}
 
-	prepare_handle(url: string, body: unknown) {}
+	prepare_handle(url: string, body: unknown) { }
 
 	response_handle(url: string, body: unknown, next: () => void) {
 		if (typeof next === 'function') {
@@ -30,11 +31,9 @@ export class HttpService {
 	constructor(
 		private store: StoreService,
 		private http: HttpClient,
-		@Inject(CONFIG_TOKEN) @Optional() private config: Config
+		@Inject(CONFIG_TOKEN) @Optional() private _config: Config
 	) {
-		this._http = config.http;
-
-		if (!this.config) this.config = DEFAULT_CONFIG;
+		this._http = this._config.http;
 
 		if (!this._http) this._http = {};
 
@@ -60,7 +59,6 @@ export class HttpService {
 			}
 		});
 	}
-
 
 	url = '';
 
@@ -101,7 +99,7 @@ export class HttpService {
 	}
 
 	_httpMethod(method: string) {
-		if(method === 'post') {
+		if (method === 'post') {
 			return this.http.post<any>;
 		} else if (method === 'put') {
 			return this.http.put<any>;
@@ -129,7 +127,7 @@ export class HttpService {
 			opts.err = (err: HttpErrorResponse) => { };
 		}
 
-		if (this._locked) {
+		if (this._locked && !opts.skipLock) {
 			return setTimeout(() => {
 				this._post(url, doc, callback, opts, method);
 			}, 100);
@@ -157,30 +155,15 @@ export class HttpService {
 		return subject;
 	}
 
-	post(
-		url: any,
-		doc: any,
-		callback = (resp: any) => { },
-		opts: any = {}
-	): any {
+	post(url: any, doc: any, callback = (resp: any) => { }, opts: any = {}): any {
 		this._post(url, doc, callback, opts);
 	}
 
-	put(
-		url: any,
-		doc: any,
-		callback = (resp: any) => { },
-		opts: any = {}
-	): any {
+	put(url: any, doc: any, callback = (resp: any) => { }, opts: any = {}): any {
 		this._post(url, doc, callback, opts, 'put');
 	}
 
-	patch(
-		url: any,
-		doc: any,
-		callback = (resp: any) => { },
-		opts: any = {}
-	): any {
+	patch(url: any, doc: any, callback = (resp: any) => { }, opts: any = {}): any {
 		this._post(url, doc, callback, opts, 'patch');
 	}
 
@@ -206,7 +189,7 @@ export class HttpService {
 			opts.err = (err: HttpErrorResponse) => { };
 		}
 
-		if (this._locked) {
+		if (this._locked && !opts.skipLock) {
 			return setTimeout(() => {
 				this.get(url, callback, opts);
 			}, 100);
@@ -249,7 +232,7 @@ export class HttpService {
 	}
 
 	private handleError(callback: any) {
-		return (error: HttpErrorResponse) => {
+		return (error: HttpErrorResponse): any => {
 			this.err_handle(error, () => {
 				if (typeof callback === 'function') {
 					callback(error);
