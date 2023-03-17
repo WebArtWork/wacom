@@ -46,7 +46,7 @@ export default abstract class CrudService<Document> {
 	}
 
 	delete(doc: Document): Observable<Document> {
-		const obs = this._http.delete(this._url + '/delete', doc);
+		const obs = this._http.delete(this._url + '/delete/id');
 		return obs;
 	}
 

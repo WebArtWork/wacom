@@ -6,6 +6,12 @@ import { CoreService } from './core.service';
 	providedIn: 'root'
 })
 export class StoreService {
+	private _prefix = '';
+
+	setPrefix(prefix: string): void {
+		this._prefix = prefix;
+	}
+
 	constructor(
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config,
 		private core: CoreService
@@ -21,6 +27,10 @@ export class StoreService {
 	): void {
 		if (this.config.store?.prefix) {
 			hold = this.config.store?.prefix + hold
+		}
+
+		if (this._prefix) {
+			hold = this._prefix + hold
 		}
 
 		if (
@@ -42,6 +52,10 @@ export class StoreService {
 	): any {
 		if (this.config.store?.prefix) {
 			hold = this.config.store?.prefix + hold
+		}
+
+		if (this._prefix) {
+			hold = this._prefix + hold
 		}
 
 		if (

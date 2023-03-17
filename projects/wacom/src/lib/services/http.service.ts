@@ -1,6 +1,5 @@
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { Injectable, Inject, Optional } from '@angular/core';
-import { Observable } from 'rxjs';
+import { CONFIG_TOKEN, Config } from '../interfaces/config';
 import {
 	HttpClient,
 	HttpErrorResponse,
@@ -14,9 +13,13 @@ import { StoreService } from './store.service';
 	providedIn: 'root',
 })
 export class HttpService {
-	err_handle(err: HttpErrorResponse, next: () => void) {
+	err_handle(
+		err: HttpErrorResponse,
+		next: (err: HttpErrorResponse) => void,
+		retry: () => void
+	) {
 		if (typeof next === 'function') {
-			next();
+			next(err);
 		}
 	}
 
@@ -98,15 +101,17 @@ export class HttpService {
 		this.store.setJson('http_headers', this._headers);
 	}
 
-	_httpMethod(method: string) {
+	_httpMethod(method: string, _url: string, doc: unknown, headers: any) {
 		if (method === 'post') {
-			return this.http.post<any>;
+			return this.http.post<any>(_url, doc, headers);
 		} else if (method === 'put') {
-			return this.http.put<any>;
+			return this.http.put<any>(_url, doc, headers);
 		} else if (method === 'patch') {
-			return this.http.patch<any>;
+			return this.http.patch<any>(_url, doc, headers);
+		} else if (method === 'delete') {
+			return this.http.delete<any>(_url, headers);
 		} else {
-			return this.http.delete<any>;
+			return this.http.get<any>(_url, headers);
 		}
 	}
 
@@ -115,7 +120,8 @@ export class HttpService {
 		doc: unknown,
 		callback = (resp: unknown) => { },
 		opts: any = {},
-		method = 'post'
+		method = 'post',
+		subject = new Subject()
 	): any {
 		if (typeof opts === 'function') {
 			opts = {
@@ -127,24 +133,33 @@ export class HttpService {
 			opts.err = (err: HttpErrorResponse) => { };
 		}
 
-		if (this._locked && !opts.skipLock) {
-			return setTimeout(() => {
-				this._post(url, doc, callback, opts, method);
+		if (this.locked && !opts.skipLock) {
+			const wait = setTimeout(() => {
+				this._post(url, doc, callback, opts, method, subject);
 			}, 100);
+
+			this.awaitLocked.push(wait);
+
+			return subject;
 		}
 
 		const _url = (opts.url || this.url) + url;
 
 		this.prepare_handle(_url, doc);
 
-		const subject = new Subject();
-
-		const observable = this._httpMethod(method)(_url, doc, {
+		const observable = this._httpMethod(method, _url, doc, {
 			headers: this._http_headers,
 		});
 
 		observable
-			.pipe(first(), catchError(this.handleError(opts.err)))
+			.pipe(
+				first(),
+				catchError(
+					this.handleError(opts.err, () => {
+						this._post(url, doc, callback, opts, method);
+					})
+				)
+			)
 			.subscribe((resp: unknown) => {
 				this.response_handle(_url, resp, () => {
 					callback(resp);
@@ -167,77 +182,49 @@ export class HttpService {
 		this._post(url, doc, callback, opts, 'patch');
 	}
 
-	delete(
-		url: any,
-		doc: any,
-		callback = (resp: any) => { },
-		opts: any = {}
-	): any {
-		this._post(url, doc, callback, opts, 'delete');
+	delete(url: any, callback = (resp: any) => { }, opts: any = {}): any {
+		this._post(url, null, callback, opts, 'delete');
 	}
 
 	get(url: any, callback = (resp: any) => { }, opts: any = {}): any {
-		if (typeof opts === 'function') {
-			opts = {
-				err: opts,
-			};
-		}
-
-		if (!opts.err && this._http.err) {
-			opts.err = this._http.err;
-		} else if (!opts.err) {
-			opts.err = (err: HttpErrorResponse) => { };
-		}
-
-		if (this._locked && !opts.skipLock) {
-			return setTimeout(() => {
-				this.get(url, callback, opts);
-			}, 100);
-		}
-
-		let params: any = {
-			headers: this._http_headers,
-		};
-
-		if (opts.params) {
-			params.params = opts.params;
-		}
-
-		const subject = new Subject();
-
-		const _url = (opts.url || this.url) + url;
-
-		const observable = this.http.get<any>(_url, params);
-
-		observable
-			.pipe(first(), catchError(this.handleError(opts.err)))
-			.subscribe((resp) => {
-				this.response_handle(_url, resp, () => {
-					callback(resp);
-					subject.next(resp);
-				});
-			});
-
-		return subject;
+		this._post(url, null, callback, opts, 'get');
 	}
 
-	private _locked = false;
+	locked = false;
+
+	awaitLocked: any = [];
+
+	clearLocked() {
+		for (const awaitLocked of this.awaitLocked){
+			clearTimeout(awaitLocked);
+		}
+		this.awaitLocked = [];
+	}
 
 	lock() {
-		this._locked = true;
+		this.locked = true;
 	}
 
 	unlock() {
-		this._locked = false;
+		this.locked = false;
 	}
 
-	private handleError(callback: any) {
+	private handleError(callback: any, retry: () => void) {
 		return (error: HttpErrorResponse): any => {
-			this.err_handle(error, () => {
-				if (typeof callback === 'function') {
-					callback(error);
+			this.err_handle(
+				error,
+				() => {
+					if (typeof callback === 'function') {
+						callback(error);
+					}
+				},
+				() => {
+					if (typeof retry === 'function') {
+						retry();
+					}
 				}
-			});
+			);
+			// Observable, Promise, ReadableStream, Array, AsyncIterable, or Iterable.
 		};
 	}
 }
