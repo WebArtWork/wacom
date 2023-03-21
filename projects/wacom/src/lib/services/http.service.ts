@@ -156,7 +156,7 @@ export class HttpService {
 				first(),
 				catchError(
 					this.handleError(opts.err, () => {
-						this._post(url, doc, callback, opts, method);
+						this._post(url, doc, callback, opts, method, subject);
 					})
 				)
 			)
@@ -171,23 +171,23 @@ export class HttpService {
 	}
 
 	post(url: any, doc: any, callback = (resp: any) => { }, opts: any = {}): any {
-		this._post(url, doc, callback, opts);
+		return this._post(url, doc, callback, opts);
 	}
 
 	put(url: any, doc: any, callback = (resp: any) => { }, opts: any = {}): any {
-		this._post(url, doc, callback, opts, 'put');
+		return this._post(url, doc, callback, opts, 'put');
 	}
 
 	patch(url: any, doc: any, callback = (resp: any) => { }, opts: any = {}): any {
-		this._post(url, doc, callback, opts, 'patch');
+		return this._post(url, doc, callback, opts, 'patch');
 	}
 
 	delete(url: any, callback = (resp: any) => { }, opts: any = {}): any {
-		this._post(url, null, callback, opts, 'delete');
+		return this._post(url, null, callback, opts, 'delete');
 	}
 
 	get(url: any, callback = (resp: any) => { }, opts: any = {}): any {
-		this._post(url, null, callback, opts, 'get');
+		return this._post(url, null, callback, opts, 'get');
 	}
 
 	locked = false;
@@ -210,21 +210,25 @@ export class HttpService {
 	}
 
 	private handleError(callback: any, retry: () => void) {
-		return (error: HttpErrorResponse): any => {
-			this.err_handle(
-				error,
-				() => {
-					if (typeof callback === 'function') {
-						callback(error);
+		return (error: HttpErrorResponse): Promise<void> => {
+			return new Promise((resolve, reject) => {
+				this.err_handle(
+					error,
+					() => {
+						if (typeof callback === 'function') {
+							callback(error);
+						}
+					},
+					() => {
+						if (typeof retry === 'function') {
+							retry();
+						}
 					}
-				},
-				() => {
-					if (typeof retry === 'function') {
-						retry();
-					}
-				}
-			);
-			// Observable, Promise, ReadableStream, Array, AsyncIterable, or Iterable.
+				);
+				console.log(error);
+
+				resolve();
+			});
 		};
 	}
 }
