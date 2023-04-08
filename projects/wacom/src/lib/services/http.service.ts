@@ -9,10 +9,13 @@ import { Subject } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
 import { StoreService } from './store.service';
 
+
 @Injectable({
 	providedIn: 'root',
 })
 export class HttpService {
+	public errors: ((err: HttpErrorResponse) => {})[] = [];
+
 	err_handle(
 		err: HttpErrorResponse,
 		next: (err: HttpErrorResponse) => void,
@@ -20,6 +23,11 @@ export class HttpService {
 	) {
 		if (typeof next === 'function') {
 			next(err);
+		}
+		for (const callback of this.errors) {
+			if ( typeof callback === 'function') {
+				callback(err);
+			}
 		}
 	}
 
@@ -195,7 +203,7 @@ export class HttpService {
 	awaitLocked: any = [];
 
 	clearLocked() {
-		for (const awaitLocked of this.awaitLocked){
+		for (const awaitLocked of this.awaitLocked) {
 			clearTimeout(awaitLocked);
 		}
 		this.awaitLocked = [];
