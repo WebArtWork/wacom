@@ -343,6 +343,10 @@ export class CoreService {
 				) {
 					to[each] = from[each];
 				} else {
+					if (typeof to[each] !== 'object') {
+						to[each] = {};
+					}
+
 					this.copy(from[each], to[each]);
 				}
 			}
