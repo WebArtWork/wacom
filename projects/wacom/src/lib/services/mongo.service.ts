@@ -106,13 +106,13 @@ export class MongoService {
 			if (!Array.isArray(opts.fields)) {
 				opts.fields = [];
 			}
-			this.store.getJson('mongo' + part, data => {
-				if (data && Array.isArray(data)) {
-					for (let i = 0; i < data.length; i++) {
-						this.push(part, data[i]);
-					}
-				}
-			});
+			// this.store.getJson('mongo' + part, data => {
+			// 	if (data && Array.isArray(data)) {
+			// 		for (let i = 0; i < data.length; i++) {
+			// 			this.push(part, data[i]);
+			// 		}
+			// 	}
+			// });
 			return {
 				arr: this.data['arr' + part],
 				obj: this.data['obj' + part]
@@ -767,7 +767,7 @@ export class MongoService {
 					this.data['obj' + part][doc[field]][each] = doc[each];
 				}
 			}
-			this.store.setJson('mongo' + part, this.data['arr' + part]);
+			// this.store.setJson('mongo' + part, this.data['arr' + part]);
 		};
 		public remove(part:any, doc:any){
 			if(!Array.isArray(this.data['arr' + part])) return;
