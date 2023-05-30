@@ -3,31 +3,33 @@ import { Component, OnInit } from '@angular/core';
 @Component({
 	selector: 'lib-modal',
 	templateUrl: './modal.component.html',
-	styleUrls: ['./modal.component.scss']
+	styleUrls: ['./modal.component.scss'],
 })
-export class ModalComponent implements OnInit{
-	public class: string = "";
-	public size: string = "flex";
-	public closable:boolean = true;
-	public close:any;
-	public onOpen:any;
-	public onClickOutside:any;
-	public timestart:any;
-	public timeout:any;
-
-	public showModal=false;
-	constructor(){
-
-	}
-	ngOnInit(){
-		if(typeof this.onClickOutside != 'function'){
-			this.onClickOutside = this.close;
+export class ModalComponent implements OnInit {
+	class: string = '';
+	size: string = 'flex';
+	closable: boolean = true;
+	close: any;
+	onOpen: any;
+	onClickOutside: any;
+	timestart: any;
+	timeout: any;
+	showModal = false;
+	allowClose = true;
+	ngOnInit() {
+		if (typeof this.onClickOutside !== 'function') {
+			this.onClickOutside = () => {
+				if (this.allowClose) {
+					this.close();
+				}
+				this.allowClose = true;
+			};
 		}
-		if(typeof this.onOpen == 'function') this.onOpen();
+		if (typeof this.onOpen == 'function') this.onOpen();
 	}
-	ngAfterViewInit(){
-		setTimeout(()=>{
-			this.showModal=true;
-		}, this.timestart||0);
+	ngAfterViewInit() {
+		setTimeout(() => {
+			this.showModal = true;
+		}, this.timestart || 0);
 	}
 }
