@@ -11,22 +11,26 @@ export class ModalComponent implements OnInit {
 	closable: boolean = true;
 	close: any;
 	onOpen: any;
-	onClickOutside: any;
 	timestart: any;
 	timeout: any;
 	showModal = false;
 	allowClose = true;
+	onClickOutside: any;
 	ngOnInit() {
 		if (typeof this.onClickOutside !== 'function') {
-			this.onClickOutside = () => {
-				if (this.allowClose) {
-					this.close();
-				}
-				this.allowClose = true;
-			};
+			this.onClickOutside = this.close;
+			// this.onClickOutside = () => {
+			// 	if (this.allowClose) {
+			// 		this.close();
+			// 	}
+
+			// 	this.allowClose = true;
+			// };
 		}
+
 		if (typeof this.onOpen == 'function') this.onOpen();
 	}
+
 	ngAfterViewInit() {
 		setTimeout(() => {
 			this.showModal = true;
