@@ -19,117 +19,137 @@ export class StoreService {
 		if (!this.config) this.config = DEFAULT_CONFIG;
 	}
 
-	set(
+	async set(
 		hold: string,
 		value: string,
-		callback: () => void = () => { },
-		errCallback: () => void = () => { }
-	): void {
+		cb?: () => void,
+		errCb?: () => void
+	): Promise<boolean> {
 		if (this.config.store?.prefix) {
-			hold = this.config.store?.prefix + hold
+			hold = this.config.store.prefix + hold;
 		}
 
-		if (this._prefix) {
-			hold = this._prefix + hold
-		}
-
-		if (
-			this.config.store &&
-			this.config.store.set
-		) {
-			this.config.store.set(hold, value, callback, errCallback);
-		} else {
-			try { this.core.localStorage.setItem('temp_storage_'+hold, value); }
-			catch(e){ errCallback(); }
-			callback();
-		}
-	}
-
-	get(
-		hold: string,
-		callback: (value: string) => void = () => { },
-		errCallback: () => void = () => { }
-	): any {
-		if (this.config.store?.prefix) {
-			hold = this.config.store?.prefix + hold
-		}
-
-		if (this._prefix) {
-			hold = this._prefix + hold
-		}
-
-		if (
-			this.config.store &&
-			this.config.store.get
-		) {
-			this.config.store.get(hold, callback, errCallback);
-		} else {
-			callback(this.core.localStorage.getItem('temp_storage_'+hold)||'');
-		}
-	}
-
-	setJson(
-		hold: string,
-		value: any,
-		callback: () => void = () => { },
-		errCallback: () => void = () => { }
-	) {
-		value = JSON.stringify(value);
-
-		this.set(hold, value, callback, errCallback);
-	}
-
-	getJson(
-		hold: string,
-		callback: (value: any) => void = () => { },
-		errCallback: () => void = () => { }
-	){
-		this.get(hold, (value:string) => {
-			if (value) {
-				try {
-					value = JSON.parse(value);
-				} catch(e) {}
-
-				callback(typeof value === 'object' && value || null);
+		try {
+			if (this.config.store?.set) {
+				return this.config.store.set(hold, value, cb, errCb);
 			} else {
-				callback(null);
+				this.core.localStorage.setItem(hold, value);
+
+				cb && cb();
+
+				return true;
 			}
-		}, errCallback);
+		} catch (err) {
+			console.error(err);
+
+			errCb && errCb();
+
+			return false;
+		}
 	}
 
-	remove(
+	async get(
 		hold: string,
-		callback: () => void = () => { },
-		errCallback: () => void = () => { }
-	): void {
+		cb?: (value: string) => void,
+		errCb?: () => void
+	): Promise<string> {
 		if (this.config.store?.prefix) {
-			hold = this.config.store?.prefix + hold
+			hold = this.config.store.prefix + hold;
 		}
 
-		if (
-			this.config.store &&
-			this.config.store.remove
-		) {
-			this.config.store.remove(hold, callback, errCallback);
-		} else {
-			this.core.localStorage.removeItem('temp_storage_'+hold);
-			callback();
+		try {
+			if (this.config.store?.get) {
+				return this.config.store.get(hold, cb, errCb);
+			} else {
+				const value = this.core.localStorage.getItem(hold) || '';
+
+				cb && cb(value);
+
+				return value;
+			}
+		} catch (err) {
+			console.error(err);
+
+			errCb && errCb();
+
+			return '';
 		}
 	}
 
-	clear(
-		callback: () => void = () => { },
-		errCallback: () => void = () => { }
-	): any {
-		if (
-			this.config.store &&
-			this.config.store.clear
-		) {
-			this.config.store.clear(callback, errCallback);
-		} else {
-			this.core.localStorage.clear();
 
-			callback();
+	async setJson(
+		hold: string,
+		value: unknown,
+		cb?: () => void,
+		errCb?: () => void
+	): Promise<boolean> {
+		return this.set(hold, JSON.stringify(value), cb, errCb);
+	}
+
+	async getJson(
+		hold: string,
+		cb?: (value: any) => void,
+		errCb?: () => void
+	): Promise<any> {
+		let value: any = await this.get(hold, undefined, errCb);
+
+		if (value) {
+			try {
+				value = JSON.parse(value as string);
+			} catch (err) {}
+
+			cb && cb(value);
+
+			return value;
+		} else {
+			cb && cb(null);
+
+			return null;
+		}
+	}
+
+	async remove(hold: string, cb?: () => void, errCb?: () => void): Promise<boolean> {
+		if (this.config.store?.prefix) {
+			hold = this.config.store.prefix + hold;
+		}
+
+		try {
+			if (this.config.store?.remove) {
+				await this.config.store.remove(hold, cb, errCb);
+			} else {
+				this.core.localStorage.removeItem(hold);
+			}
+
+			cb && cb();
+
+			return true;
+		} catch (err) {
+			console.error(err);
+
+			errCb && errCb();
+
+			return false;
+		}
+	}
+
+	async clear(cb?: () => void, errCb?: () => void): Promise<boolean> {
+		try {
+			if (this.config.store?.clear) {
+				this.config.store.clear();
+			} else {
+				this.core.localStorage.clear();
+			}
+
+			cb && cb();
+
+			return true;
+		} catch (err) {
+			console.error(err);
+
+			errCb && errCb();
+
+			return false;
+
 		}
 	}
 }

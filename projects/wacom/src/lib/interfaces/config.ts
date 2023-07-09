@@ -50,23 +50,23 @@ export interface Config {
 		set?: (
 			hold: any,
 			value: any,
-			cb: ()=>void,
-			errCb: () => void
-		) => void,
+			cb?: () => void,
+			errCb?: () => void
+		) => Promise<boolean>,
 		get?: (
 			hold: any,
-			cb: (value: string)=>void,
-			errCb: () => void
-		) => void,
+			cb?: (value: string) => void,
+			errCb?: () => void
+		) => Promise<string>,
 		remove?: (
 			hold: any,
-			cb: ()=>void,
-			errCb: () => void
-		) => void,
+			cb?: () => void,
+			errCb?: () => void
+		) => Promise<boolean>,
 		clear?: (
-			cb: ()=>void,
-			errCb: () => void
-		) => void
+			cb?: () => void,
+			errCb?: () => void
+		) => Promise<boolean>
 	}
 }
 export const CONFIG_TOKEN = new InjectionToken<Config>('config');
