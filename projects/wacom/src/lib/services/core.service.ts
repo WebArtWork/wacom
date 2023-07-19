@@ -8,7 +8,7 @@ declare var cordova:any;
 	providedIn: 'root'
 })
 export class CoreService {
-	ssr = isPlatformServer(this.platformId);
+	ssr = false;
 
 	localStorage:any; // = localStorage;
 
@@ -19,6 +19,8 @@ export class CoreService {
 	navigator:any; // = navigator;
 
 	constructor(@Inject(PLATFORM_ID) private platformId:boolean) {
+		this.ssr = isPlatformServer(this.platformId)
+
 		if(isPlatformServer(this.platformId)){
 			this.localStorage = {
 				getItem:()=>{},
