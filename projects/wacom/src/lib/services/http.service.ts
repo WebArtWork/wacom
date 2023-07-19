@@ -62,8 +62,6 @@ export class HttpService {
 		});
 
 		this.store.getJson('http_headers', (headers: any) => {
-			console.log('headers', headers);
-			
 			if (headers) {
 				for (const header in headers) {
 					this._headers[header] = headers[header];
