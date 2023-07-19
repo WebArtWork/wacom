@@ -2,6 +2,8 @@ import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { Injectable, Inject, Optional } from '@angular/core';
 import { CoreService } from './core.service';
 
+type ResponseData<T> = T | null;
+
 @Injectable({
 	providedIn: 'root'
 })
@@ -35,14 +37,14 @@ export class StoreService {
 			} else {
 				this.core.localStorage.setItem(hold, value);
 
-				cb && cb();
+				cb?.();
 
 				return true;
 			}
 		} catch (err) {
 			console.error(err);
 
-			errCb && errCb();
+			errCb?.();
 
 			return false;
 		}
@@ -70,7 +72,7 @@ export class StoreService {
 		} catch (err) {
 			console.error(err);
 
-			errCb && errCb();
+			errCb?.();
 
 			return '';
 		}
@@ -86,23 +88,23 @@ export class StoreService {
 		return this.set(hold, JSON.stringify(value), cb, errCb);
 	}
 
-	async getJson(
+	async getJson<T = any>(
 		hold: string,
-		cb?: (value: any) => void,
+		cb?: <Y>(value: Y | T | null) => void,
 		errCb?: () => void
-	): Promise<any> {
-		let value: any = await this.get(hold, undefined, errCb);
+	): Promise<T | null> {
+		let value: string | null = await this.get(hold, undefined, errCb);
 
 		if (value) {
 			try {
 				value = JSON.parse(value as string);
 			} catch (err) {}
 
-			cb && cb(value);
+			cb?.(value as T);
 
-			return value;
+			return value as T;
 		} else {
-			cb && cb(null);
+			cb?.(null);
 
 			return null;
 		}
@@ -120,13 +122,13 @@ export class StoreService {
 				this.core.localStorage.removeItem(hold);
 			}
 
-			cb && cb();
+			cb?.();
 
 			return true;
 		} catch (err) {
 			console.error(err);
 
-			errCb && errCb();
+			errCb?.();
 
 			return false;
 		}
@@ -140,13 +142,13 @@ export class StoreService {
 				this.core.localStorage.clear();
 			}
 
-			cb && cb();
+			cb?.();
 
 			return true;
 		} catch (err) {
 			console.error(err);
 
-			errCb && errCb();
+			errCb?.();
 
 			return false;
 
