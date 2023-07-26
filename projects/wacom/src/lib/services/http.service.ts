@@ -164,9 +164,12 @@ export class HttpService {
 			.pipe(
 				first(),
 				catchError(
-					this.handleError(opts.err, () => {
-						this._post(url, doc, callback, opts, method, subject);
-					})
+					(error: HttpErrorResponse) => {
+						subject.error(error);
+						return this.handleError(opts.err, () => {
+							this._post(url, doc, callback, opts, method, subject);
+						})(error);;
+					}
 				)
 			)
 			.subscribe((resp: unknown) => {
@@ -234,7 +237,6 @@ export class HttpService {
 						}
 					}
 				);
-				console.log(error);
 
 				resolve();
 			});
