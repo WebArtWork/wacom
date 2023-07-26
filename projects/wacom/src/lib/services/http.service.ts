@@ -5,7 +5,7 @@ import {
 	HttpErrorResponse,
 	HttpHeaders,
 } from '@angular/common/http';
-import { Subject } from 'rxjs';
+import { EMPTY, Subject } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
 import { StoreService } from './store.service';
 
@@ -165,10 +165,11 @@ export class HttpService {
 				first(),
 				catchError(
 					(error: HttpErrorResponse) => {
-						subject.error(error);
-						return this.handleError(opts.err, () => {
+						this.handleError(opts.err, () => {
 							this._post(url, doc, callback, opts, method, subject);
-						})(error);;
+						})(error);
+						subject.error(error);
+						return EMPTY;
 					}
 				)
 			)
