@@ -21,11 +21,32 @@ export class StoreService {
 		if (!this.config) this.config = DEFAULT_CONFIG;
 	}
 
-	async set(
+	set(
 		hold: string,
 		value: string,
-		cb?: () => void,
-		errCb?: () => void
+		callback: () => void = () => { },
+		errCallback: () => void = () => { }
+	): void {
+		if (this.config.store?.prefix) {
+			hold = this.config.store?.prefix + hold
+		}
+
+		if (this._prefix) {
+			hold = this._prefix + hold
+		}
+
+		if (this.config.store?.set) {
+			this.config.store.set(hold, value, callback, errCallback);
+		} else {
+			try { this.core.localStorage.setItem('temp_storage_' + hold, value); }
+			catch (e) { errCallback(); }
+			callback();
+		}
+	}
+
+	async setAsync(
+		hold: string,
+		value: string,
 	): Promise<boolean> {
 		if (this.config.store?.prefix) {
 			hold = this.config.store.prefix + hold;
@@ -33,27 +54,41 @@ export class StoreService {
 
 		try {
 			if (this.config.store?.set) {
-				return this.config.store.set(hold, value, cb, errCb);
+				return this.config.store.set(hold, value);
 			} else {
 				this.core.localStorage.setItem(hold, value);
-
-				cb?.();
 
 				return true;
 			}
 		} catch (err) {
 			console.error(err);
 
-			errCb?.();
-
 			return false;
 		}
 	}
 
-	async get(
+	get(
 		hold: string,
-		cb?: (value: string) => void,
-		errCb?: () => void
+		callback: (value: string) => void = () => { },
+		errCallback: () => void = () => { }
+	): any {
+		if (this.config.store?.prefix) {
+			hold = this.config.store?.prefix + hold
+		}
+
+		if (this._prefix) {
+			hold = this._prefix + hold
+		}
+
+		if (this.config.store?.get) {
+			this.config.store.get(hold, callback, errCallback);
+		} else {
+			callback(this.core.localStorage.getItem('temp_storage_' + hold) || '');
+		}
+	}
+
+	async getAsync(
+		hold: string,
 	): Promise<string> {
 		if (this.config.store?.prefix) {
 			hold = this.config.store.prefix + hold;
@@ -61,50 +96,65 @@ export class StoreService {
 
 		try {
 			if (this.config.store?.get) {
-				return this.config.store.get(hold, cb, errCb);
+				return this.config.store.get(hold);
 			} else {
 				const value = this.core.localStorage.getItem(hold) || '';
-
-				cb && cb(value);
 
 				return value;
 			}
 		} catch (err) {
 			console.error(err);
 
-			errCb?.();
-
 			return '';
 		}
 	}
 
-
-	async setJson(
+	setJson(
 		hold: string,
-		value: unknown,
-		cb?: () => void,
-		errCb?: () => void
-	): Promise<boolean> {
-		return this.set(hold, JSON.stringify(value), cb, errCb);
+		value: any,
+		callback: () => void = () => { },
+		errCallback: () => void = () => { }
+	) {
+		value = JSON.stringify(value);
+
+		this.set(hold, value, callback, errCallback);
 	}
 
-	async getJson<T = any>(
+	async setJsonAsync(
 		hold: string,
-		cb?: <Y>(value: Y | T | null) => void,
-		errCb?: () => void
-	): Promise<T | null> {
-		let value: string | null = await this.get(hold, undefined, errCb);
+		value: unknown,
+	): Promise<boolean> {
+		return this.setAsync(hold, JSON.stringify(value));
+	}
+
+	getJson(
+		hold: string,
+		callback: (value: any) => void = () => { },
+		errCallback: () => void = () => { }
+	) {
+		this.get(hold, (value: string) => {
+			if (value) {
+				try {
+					value = JSON.parse(value);
+				} catch (e) { }
+
+				callback(typeof value === 'object' && value || null);
+			} else {
+				callback(null);
+			}
+		}, errCallback);
+	}
+
+	async getJsonAsync<T = any>(hold: string): Promise<T | null> {
+		let value: string | null = await this.getAsync(hold);
 
 		if (value) {
 			try {
 				value = JSON.parse(value as string);
-			} catch (err) {}
-
-			cb?.(value as T);
+			} catch (err) { }
 
 			return value as T;
 		} else {
-			cb?.(null);
 
 			return null;
 		}
