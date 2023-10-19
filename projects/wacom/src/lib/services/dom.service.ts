@@ -4,70 +4,106 @@ import {
 	ComponentFactoryResolver,
 	ComponentRef,
 	EmbeddedViewRef,
-	ApplicationRef
+	ApplicationRef,
 } from '@angular/core';
 import { CoreService } from './core.service';
 @Injectable({
-	providedIn: 'root'
+	providedIn: 'root',
 })
 export class DomService {
-	constructor(private componentFactoryResolver: ComponentFactoryResolver,
+	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private appRef: ApplicationRef,
 		private injector: Injector,
-		private core: CoreService) { }
+		private core: CoreService
+	) { }
+
 	/**
-	* Appends a component to body currently
-	*/
-		appendById(component: any, options: any = {}, id:any) {
-			const componentRef = this.componentFactoryResolver.resolveComponentFactory(component).create(this.injector);
-			this.projectComponentInputs(componentRef, options);
-			this.appRef.attachView(componentRef.hostView);
-			const domElem = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
-			let element = this.core.document.getElementById(id);
-			if(element && typeof element.appendChild == 'function'){
-				element.appendChild(domElem);
-			}
-			return {
-				nativeElement: domElem,
-				componentRef: componentRef
-			};
+	 * Appends a component to body currently
+	 */
+	appendById(component: any, options: any = {}, id: any) {
+		const componentRef = this.componentFactoryResolver
+			.resolveComponentFactory(component)
+			.create(this.injector);
+		this.projectComponentInputs(componentRef, options);
+		this.appRef.attachView(componentRef.hostView);
+		const domElem = (componentRef.hostView as EmbeddedViewRef<any>)
+			.rootNodes[0] as HTMLElement;
+		let element = this.core.document.getElementById(id);
+		if (element && typeof element.appendChild == 'function') {
+			element.appendChild(domElem);
 		}
+		return {
+			nativeElement: domElem,
+			componentRef: componentRef,
+		};
+	}
+
 	/**
-	* Appends a component to body currently
-	*/
-		private providedIn:any = {};
-		appendComponent(component: any, options: any = {}, element = this.core.document.body) {
-			if(options.providedIn){
-				if(this.providedIn[options.providedIn]) return;
-				this.providedIn[options.providedIn] = true;
-			}
-			const componentRef = this.componentFactoryResolver.resolveComponentFactory(component).create(this.injector);
-			this.projectComponentInputs(componentRef, options);
-			this.appRef.attachView(componentRef.hostView);
-			const domElem = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
-			if(element && typeof element.appendChild == 'function'){
-				element.appendChild(domElem);
-			}
-			return {
-				nativeElement: domElem,
-				componentRef: componentRef
-			};
+	 * Appends a component to body currently
+	 */
+	private providedIn: any = {};
+	appendComponent(
+		component: any,
+		options: any = {},
+		element = this.core.document.body
+	) {
+		if (options.providedIn) {
+			if (this.providedIn[options.providedIn]) return;
+			this.providedIn[options.providedIn] = true;
 		}
+		const componentRef = this.componentFactoryResolver
+			.resolveComponentFactory(component)
+			.create(this.injector);
+		this.projectComponentInputs(componentRef, options);
+		this.appRef.attachView(componentRef.hostView);
+		const domElem = (componentRef.hostView as EmbeddedViewRef<any>)
+			.rootNodes[0] as HTMLElement;
+		if (element && typeof element.appendChild == 'function') {
+			element.appendChild(domElem);
+		}
+		return {
+			nativeElement: domElem,
+			componentRef: componentRef,
+		};
+	}
+
 	/**
-	* Projects the inputs onto the component
-	*/
-		projectComponentInputs(component: ComponentRef<any>, options: any): ComponentRef<any> {
-			if(options) {
-				const props = Object.getOwnPropertyNames(options);
-				for(const prop of props) {
-					component.instance[prop] = options[prop];
-				}
+	 * Appends a component to body currently
+	 */
+	getComponentRef(
+		component: any,
+		options: any = {}
+	) {
+		const componentRef = this.componentFactoryResolver
+			.resolveComponentFactory(component)
+			.create(this.injector);
+
+		this.projectComponentInputs(componentRef, options);
+
+		this.appRef.attachView(componentRef.hostView);
+
+		return componentRef;
+	}
+
+	/**
+	 * Projects the inputs onto the component
+	 */
+	projectComponentInputs(
+		component: ComponentRef<any>,
+		options: any
+	): ComponentRef<any> {
+		if (options) {
+			const props = Object.getOwnPropertyNames(options);
+			for (const prop of props) {
+				component.instance[prop] = options[prop];
 			}
-			return component;
 		}
+		return component;
+	}
 	/*
-	*	End of Dom Service
-	*/
+	 *	End of Dom Service
+	 */
 }
 
 /*
