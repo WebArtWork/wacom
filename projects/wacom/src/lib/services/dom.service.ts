@@ -69,7 +69,7 @@ export class DomService {
 	}
 
 	/**
-	 * Appends a component to body currently
+	 * get a Component Ref
 	 */
 	getComponentRef(
 		component: any,
