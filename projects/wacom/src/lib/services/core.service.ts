@@ -252,6 +252,31 @@ export class CoreService {
 			}
 		};
 
+		copy(from:any, to:any) {
+			for(const each in from) {
+				if (
+					Array.isArray(from[each]) ||
+					typeof from[each] !== 'object'
+				) {
+					to[each] = from[each];
+				} else {
+					if (typeof to[each] !== 'object') {
+						to[each] = {};
+					}
+
+					this.copy(from[each], to[each]);
+				}
+			}
+		}
+
+		capitalizeFirstLetter(string: string) {
+			if (string) {
+				return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+			} else {
+				return '';
+			}
+		}
+
 		// Signal
 		private cb:any = {};
 
@@ -335,23 +360,6 @@ export class CoreService {
 					this.locked[which] = false;
 				}
 			});
-		}
-
-		copy(from:any, to:any) {
-			for(const each in from) {
-				if (
-					Array.isArray(from[each]) ||
-					typeof from[each] !== 'object'
-				) {
-					to[each] = from[each];
-				} else {
-					if (typeof to[each] !== 'object') {
-						to[each] = {};
-					}
-
-					this.copy(from[each], to[each]);
-				}
-			}
 		}
 	/* End of Core*/
 }
