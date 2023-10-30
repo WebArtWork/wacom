@@ -298,7 +298,7 @@ export class MongoService {
 					}
 					this.renew(part, current_doc);
 				}
-				if (resp && typeof cb == 'function') {
+				if ((resp || typeof resp === 'string') && typeof cb == 'function') {
 					cb(resp);
 				} else if (typeof cb == 'function') {
 					cb(false);
