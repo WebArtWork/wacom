@@ -9,17 +9,17 @@ import { CoreService } from '../../services/core.service';
 
 export class AlertComponent {
 	@ViewChild('alert', {static:false}) alert:any;
-	public component: any;
-	public text: string = "";
-	public class: string = "";
-	public type: string = "info";
-	public progress: boolean = true;
-	public position: string = 'bottomRight'; // [bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter or center]
-	public icon: string = '';
-	public timeout: any = 5000;
-	public close: any;
-	public closable: any = true;
-	public buttons: any = []; /*[{text, callback}]*/
+	component: any;
+	text: string = "";
+	class: string = "";
+	type: string = "info";
+	progress: boolean = true;
+	position: string = 'bottomRight'; // [bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter or center]
+	icon: string = '';
+	timeout: any = 5000;
+	close: any;
+	closable: any = true;
+	buttons: any = []; /*[{text, callback}]*/
 
 	constructor(private elementRef: ElementRef, public core: CoreService) {
 		setTimeout(()=>{
