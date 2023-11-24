@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { StoreService, ModalService, MongoService, UiService } from 'wacom';
+import { StoreService, ModalService, UiService, AlertService } from 'wacom';
 import { LocalComponent } from './modals/local/local.component';
-import { ManagerService } from './manager.service';
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
@@ -17,9 +16,13 @@ export class AppComponent {
 	constructor(
 		public store: StoreService,
 		public modal: ModalService,
-		private _managerService: ManagerService,
-		public ui: UiService
-	){
+		public ui: UiService,
+		private _alert: AlertService
+	) {
+		this._alert.show({
+			text: 'Hello World',
+			timeout: 0
+		});
 		this.store.get('test', (message:any)=>{
 			console.log('GET: ', message);
 		});
