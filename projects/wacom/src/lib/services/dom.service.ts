@@ -5,7 +5,7 @@ import {
 	ComponentRef,
 	EmbeddedViewRef,
 	ApplicationRef,
-	ViewContainerRef
+	// ViewContainerRef
 } from '@angular/core';
 import { CoreService } from './core.service';
 @Injectable({
@@ -14,7 +14,7 @@ import { CoreService } from './core.service';
 export class DomService {
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
-		private viewContainerRef: ViewContainerRef,
+		// private viewContainerRef: ViewContainerRef,
 		private appRef: ApplicationRef,
 		private injector: Injector,
 		private core: CoreService
@@ -24,10 +24,16 @@ export class DomService {
 	 * Appends a component to body currently
 	 */
 	appendById(component: any, options: any = {}, id: any) {
-		const componentRef = this.viewContainerRef.createComponent(component);
-		// const componentRef = this.componentFactoryResolver
-		// 	.resolveComponentFactory(component)
-		// 	.create(this.injector);
+		// const componentRef = this.viewContainerRef.createComponent(component);
+
+		// const appRef = this.injector.get(ApplicationRef);
+		// const compRef = createComponentRef(component, this.injector);
+		// appRef.attachView(compRef.hostView);
+
+		const componentRef = this.componentFactoryResolver
+			.resolveComponentFactory(component)
+			.create(this.injector);
+
 		this.projectComponentInputs(componentRef, options);
 		this.appRef.attachView(componentRef.hostView);
 		const domElem = (componentRef.hostView as EmbeddedViewRef<any>)
@@ -55,10 +61,10 @@ export class DomService {
 			if (this.providedIn[options.providedIn]) return;
 			this.providedIn[options.providedIn] = true;
 		}
-		const componentRef = this.viewContainerRef.createComponent(component);
-		// const componentRef = this.componentFactoryResolver
-		// 	.resolveComponentFactory(component)
-		// 	.create(this.injector);
+		// const componentRef = this.viewContainerRef.createComponent(component);
+		const componentRef = this.componentFactoryResolver
+			.resolveComponentFactory(component)
+			.create(this.injector);
 		this.projectComponentInputs(componentRef, options);
 		this.appRef.attachView(componentRef.hostView);
 		const domElem = (componentRef.hostView as EmbeddedViewRef<any>)
