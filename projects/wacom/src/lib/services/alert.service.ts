@@ -11,6 +11,7 @@ import { Alert, DEFAULT_Alert } from '../interfaces/alert.interface';
 })
 export class AlertService {
 	private alert: any;
+	private _container: any;
 	constructor(
 		private dom: DomService,
 		private core: CoreService,
@@ -26,7 +27,7 @@ export class AlertService {
 				this.alert[each] = DEFAULT_Alert[each];
 			}
 		}
-		this.dom.appendComponent(WrapperComponent);
+		this._container = this.dom.appendComponent(WrapperComponent);
 	}
 	private uniques: any = {};
 	private shortcuts: any = {
@@ -40,6 +41,18 @@ export class AlertService {
 		l: 'left',
 		c: 'center',
 	};
+	private positionNumber: any = {
+		topLeft: 3,
+		topCenter: 4,
+		topRight: 2,
+		right: '',
+		bottomRight: 0,
+		bottomCenter: 5,
+		bottomLeft: 1,
+		left: '',
+		center: 6,
+	};
+
 	show(opts: any | Alert) {
 		if (typeof opts === 'string') {
 			opts = {
@@ -58,39 +71,40 @@ export class AlertService {
 		var content: any;
 		opts.close = () => {
 			if (content) content.componentRef.destroy();
-			component.nativeElement.remove();
+			opts.component.nativeElement.remove();
 			if (typeof (opts as Alert).onClose == 'function')
 				(opts as Alert).onClose();
 		};
-		let component = this.dom.appendById(AlertComponent, opts, opts.position);
+		// let component = this.dom.appendById(AlertComponent, opts, opts.position);
+		let customElement = false;
+
 		if (
 			typeof opts.component == 'string' &&
 			this.alert.alerts[opts.component]
 		) {
 			opts.component = this.alert.alerts[opts.component];
+			customElement = true;
+		} else {
+			opts.component = this.dom.appendById(AlertComponent, opts, opts.position);
 		}
 
-		console.log(component.nativeElement);
 		if (
-			typeof opts.component === 'function' &&
-			component.nativeElement &&
-			Array.isArray(component.nativeElement.children) &&
-			Array.isArray(component.nativeElement.children[0].children) &&
-			Array.isArray(component.nativeElement.children[0].children[0].children)
+			typeof opts.component === 'function'
 		) {
+
 			content = this.dom.appendComponent(
 				opts.component,
 				opts,
-				component.nativeElement.children[0].children[0]
-					.children[0] as HTMLElement
+				this._container.nativeElement.children[0].children[this.positionNumber[opts.position] || 0]
+				// component.nativeElement.children[0].children[0].children[0] as HTMLElement
 			);
 		}
 
 		if (opts.unique) {
 			if (this.uniques[opts.unique]) this.uniques[opts.unique].remove();
-			this.uniques[opts.unique] = component.nativeElement;
+			this.uniques[opts.unique] = opts.component.nativeElement;
 		}
-		return component.nativeElement;
+		return opts.component.nativeElement;
 	}
 	open(opts: Alert) {
 		this.show(opts);

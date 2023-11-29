@@ -30,6 +30,7 @@ import { ClickOutsideComponent } from './doc/directive/click-outside/click-outsi
 import { FilesComponent } from './doc/component/files/files.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TestalertComponent } from './testalert/testalert.component';
 
 @NgModule({
 	declarations: [
@@ -67,6 +68,11 @@ import { FormsModule } from '@angular/forms';
 		BrowserModule,
 		WacomModule.forRoot({
 			socket: false,
+			alert: {
+				alerts: {
+					test: TestalertComponent
+				}
+			}
 		}),
 	],
 	bootstrap: [AppComponent],

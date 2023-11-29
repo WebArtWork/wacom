@@ -20,9 +20,15 @@ export class AppComponent {
 		private _alert: AlertService
 	) {
 		this._alert.show({
-			text: 'Hello World',
+			component: 'test',
 			timeout: 0
 		});
+
+		// this._alert.show({
+		// 	text: 'Hello World',
+		// 	timeout: 0
+		// });
+
 		this.store.get('test', (message:any)=>{
 			console.log('GET: ', message);
 		});
