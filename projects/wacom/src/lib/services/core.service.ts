@@ -255,8 +255,10 @@ export class CoreService {
 		copy(from:any, to:any) {
 			for(const each in from) {
 				if (
+					typeof from[each] !== 'object' ||
+					from[each] instanceof Date ||
 					Array.isArray(from[each]) ||
-					typeof from[each] !== 'object'
+					from[each] === null
 				) {
 					to[each] = from[each];
 				} else {
