@@ -262,7 +262,12 @@ export class CoreService {
 				) {
 					to[each] = from[each];
 				} else {
-					if (typeof to[each] !== 'object') {
+					if (
+						typeof to[each] !== 'object' ||
+						to[each] instanceof Date ||
+						Array.isArray(to[each]) ||
+						to[each] === null
+					) {
 						to[each] = {};
 					}
 
