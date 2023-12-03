@@ -91,7 +91,6 @@ export class AlertService {
 		if (
 			typeof opts.component === 'function'
 		) {
-
 			content = this.dom.appendComponent(
 				opts.component,
 				opts,
@@ -104,6 +103,17 @@ export class AlertService {
 			if (this.uniques[opts.unique]) this.uniques[opts.unique].remove();
 			this.uniques[opts.unique] = opts.component.nativeElement;
 		}
+
+		if (typeof opts.timeout !== 'number') {
+			opts.timeout = 2000;
+		}
+
+		if (opts.timeout) {
+			setTimeout(() => {
+				opts.close();
+			}, opts.timeout);
+		}
+
 		return opts.component.nativeElement;
 	}
 	open(opts: Alert) {
