@@ -4,8 +4,8 @@ import { HttpService } from './http.service';
 import { DomService } from './dom.service';
 import { CoreService } from './core.service';
 import { Injectable } from '@angular/core';
-import { throwError } from 'rxjs'; 
-import { catchError } from 'rxjs/operators'; 
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
 	providedIn: 'root'
@@ -109,7 +109,7 @@ export class FileService {
 					this.http.post(info.api || '/api/' + info.part + '/file'+(info.name&&('/'+info.name)||''), formData, resp => {
 						if(resp && typeof info.resp == 'function') info.resp(resp);
 						if(resp && typeof cb == 'function') cb(resp);
-					});					
+					});
 				}
 			}else{
 				this.http.post(info.api || '/api/' + info.part + '/file'+(info.name&&('/'+info.name)||''), formData, resp => {
@@ -126,7 +126,7 @@ export class FileService {
 			}else{
 				this.http.post(info.api||'/api/'+info.part+'/file'+(info.name&&('/'+info.name)||''), info, resp);
 			}
-			
+
 		};
 	/*
 	*	Common Management
@@ -169,22 +169,28 @@ export class FileService {
 				info.resize.width = info.resize.width || 1920;
 				info.resize.height = info.resize.height || 1080;
 			}
-			let reader = new FileReader();
+			const reader = new FileReader();
 			reader.onload = (loadEvent:any)=>{
 				if(!info.resize){
 					return this.update(loadEvent.target.result, info, file);
 				}
-				let canvasElement = this.core.document.createElement('canvas');
-				let imageElement = this.core.document.createElement('img');
-				imageElement.onload = ()=>{
-					let infoRatio = info.resize.width / info.resize.height;
-					let imgRatio = imageElement.width / imageElement.height;
+				const canvasElement = this.core.document.createElement('canvas');
+				const imageElement = this.core.document.createElement('img');
+				imageElement.onload = () => {
+					if (
+						imageElement.width < info.resize.width &&
+						imageElement.height < info.resize.height
+					) {
+						return this.update(loadEvent.target.result, info, file);
+					}
+					const infoRatio = info.resize.width / info.resize.height;
+					const imgRatio = imageElement.width / imageElement.height;
 					let width, height;
 					if (imgRatio > infoRatio) {
-						width = info.resize.width;
+						width = Math.min(info.resize.width, imageElement.width);
 						height = width / imgRatio;
 					} else {
-						height = info.resize.height;
+						height = Math.min(info.resize.height, imageElement.height);
 						width = height * imgRatio;
 					}
 					canvasElement.width = width;
