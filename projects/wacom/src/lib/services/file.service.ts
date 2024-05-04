@@ -178,8 +178,8 @@ export class FileService {
 				const imageElement = this.core.document.createElement('img');
 				imageElement.onload = () => {
 					if (
-						imageElement.width < info.resize.width &&
-						imageElement.height < info.resize.height
+						imageElement.width <= info.resize.width &&
+						imageElement.height <= info.resize.height
 					) {
 						return this.update(loadEvent.target.result, info, file);
 					}
