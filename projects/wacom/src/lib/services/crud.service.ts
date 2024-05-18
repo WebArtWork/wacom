@@ -3,14 +3,8 @@ import { Observable } from 'rxjs';
 import { HttpService } from './http.service';
 import { StoreService } from './store.service';
 
-interface CrudOptions {
-	replace: string;
-	query: string;
-	group: string;
-}
-
 @Injectable({
-	providedIn: 'root'
+	providedIn: 'root',
 })
 export default abstract class CrudService<Document> {
 	private _url = '/api/';
@@ -29,19 +23,31 @@ export default abstract class CrudService<Document> {
 		3) have temporary id {MODULE_Date.now()}
 		4) work as MongoService via read function
 	*/
+	private _perPage = 20;
+	setPerPage(_perPage: number) {
+		this._perPage = _perPage;
+	}
+	get(page: number | undefined): Observable<Document> {
+		if (typeof page === 'number') {
+			const obs = this._http.get(
+				`${this._url}/get?skip=${this._perPage * (page - 1)}&limit=${
+					this._perPage
+				}`
+			);
+			return obs;
+		} else {
+			const obs = this._http.get(`${this._url}/get`);
+			return obs;
+		}
+	}
 
 	create(doc: Document): Observable<Document> {
 		const obs = this._http.post(this._url + '/create', doc);
 		return obs;
 	}
 
-	read(opts: CrudOptions): Observable<Document> {
-		const obs = this._http.get(this._url + '/get');
-		return obs;
-	}
-
 	update(doc: Document): Observable<Document> {
-		const obs = this._http.put(this._url + '/update', doc);
+		const obs = this._http.post(this._url + '/update', doc);
 		return obs;
 	}
 
@@ -49,20 +55,13 @@ export default abstract class CrudService<Document> {
 		const obs = this._http.delete(this._url + '/delete/id');
 		return obs;
 	}
-
-	set(doc: Document): void { }
-
-	// get(module: string, id: string): Document {}
-	// getAll(module: string): Document[] {}
 }
-
 
 /*
 Create -> Post
 Read   -> Get
 Update -> Put
 Delete -> Delete
-
 
 import { Injectable } from "@angular/core";
 import { HttpService, StoreService } from "wacom";
