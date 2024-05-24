@@ -1,7 +1,7 @@
 /* initialize */
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from './interfaces/config';
 import { NgModule, ModuleWithProviders } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { MetaService } from './services/meta.service';
 import { MetaGuard } from './guard/meta.guard';
 import { CommonModule } from '@angular/common';
@@ -43,16 +43,13 @@ const COMPONENTS = [
 	AlertComponent
 ];
 
-@NgModule({
-	imports: [CommonModule, FormsModule, HttpClientModule],
-	declarations: [...LOCAL_COMPONENTS, ...PIPES, ...COMPONENTS, ...DIRECTIVES],
-	exports: [...PIPES, ...COMPONENTS, ...DIRECTIVES],
-	providers: [
-		{ provide: CONFIG_TOKEN, useValue: DEFAULT_CONFIG },
-		MetaGuard,
-		MetaService
-	]
-})
+@NgModule({ declarations: [...LOCAL_COMPONENTS, ...PIPES, ...COMPONENTS, ...DIRECTIVES],
+    exports: [...PIPES, ...COMPONENTS, ...DIRECTIVES], imports: [CommonModule, FormsModule], providers: [
+        { provide: CONFIG_TOKEN, useValue: DEFAULT_CONFIG },
+        MetaGuard,
+        MetaService,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class WacomModule {
 	static forRoot(config: Config = DEFAULT_CONFIG): ModuleWithProviders<WacomModule> {
 		return {
