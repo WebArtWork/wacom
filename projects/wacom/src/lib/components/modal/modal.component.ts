@@ -29,11 +29,21 @@ export class ModalComponent implements OnInit {
 		}
 
 		if (typeof this.onOpen == 'function') this.onOpen();
+
+		window.addEventListener('popstate', this.popStateListener.bind(this));
 	}
 
 	ngAfterViewInit() {
 		setTimeout(() => {
 			this.showModal = true;
 		}, this.timestart || 0);
+	}
+
+	ngOnDestroy(): void {
+		window.removeEventListener('popstate', this.popStateListener.bind(this));
+	}
+
+	popStateListener(e: Event) {
+		this.close();
 	}
 }
