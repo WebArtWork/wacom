@@ -1,17 +1,18 @@
 {
-    "name": "wacom",
-    "version": "18.0.0",
-    "license": "MIT",
-    "repository": "WebArtWork/wacom",
-    "keywords": [
-        "angular",
-        "socket",
-        "modal",
-        "image",
-        "crud",
-        "file",
-        "waw",
-        "ngx",
-        "hash"
-    ]
+	"name": "wacom",
+	"version": "18.0.1",
+	"license": "MIT",
+	"repository": "WebArtWork/wacom",
+	"keywords": [
+		"angular",
+		"ngx",
+		"socket",
+		"modal",
+		"image",
+		"crud",
+		"file",
+		"waw",
+		"ngx",
+		"hash"
+	]
 }
