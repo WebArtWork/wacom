@@ -95,7 +95,11 @@ export class ModalService {
 		this.show(opts);
 	}
 	private opened:any = {};
-	destroy(){
+	allCanBeDestroyed = true;
+	destroy() {
+		if (!this.allCanBeDestroyed) {
+			return;
+		}
 		for (let each in this.opened){
 		    this.opened[each].close();
 		}
