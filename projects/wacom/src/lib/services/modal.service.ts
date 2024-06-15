@@ -17,7 +17,10 @@ export class ModalService {
 		this._modal = config.modal;
 	}
 
-	show(opts: Modal | any){
+	show(opts: Modal | any) {
+		if (this.locked) {
+			return;
+		}
 		if(typeof opts == 'string' || typeof opts == 'function'){
 			opts = {
 				component: opts
@@ -95,9 +98,9 @@ export class ModalService {
 		this.show(opts);
 	}
 	private opened:any = {};
-	allCanBeDestroyed = true;
+	locked = false;
 	destroy() {
-		if (!this.allCanBeDestroyed) {
+		if (this.locked) {
 			return;
 		}
 		for (let each in this.opened){
