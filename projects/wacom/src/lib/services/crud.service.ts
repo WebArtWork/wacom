@@ -37,12 +37,12 @@ export abstract class CrudService<Document extends CrudDocument> {
 			this._config._id || '_id'
 		]?.toString() as string;
 	}
-	new(): CrudDocument {
+	new(): Document {
 		return {
 			_id: Date.now().toString(),
 			__created: false,
 			__modified: false
-		};
+		} as Document;
 	}
 	constructor(
 		private _config: CrudConfig<Document>,
@@ -59,6 +59,9 @@ export abstract class CrudService<Document extends CrudDocument> {
 		});
 	}
 	private docs: Document[] = [];
+	doc(_id: string): Document {
+		return this.docs.find((d) => this._id(d) === _id) || this.new();
+	}
 	addDoc(doc: Document) {
 		if (typeof this._config.replace === 'function') {
 			this._config.replace(doc);
