@@ -3,6 +3,7 @@ import { HttpService } from './http.service';
 import { StoreService } from './store.service';
 import { AlertService } from './alert.service';
 import { CoreService } from './core.service';
+import { CrudDocument } from '../interfaces/crud.interface';
 
 interface CrudOptions<Document> {
 	name?: string;
@@ -20,12 +21,6 @@ interface CrudConfig<Document> {
 interface GetConfig {
 	page?: number;
 	perPage?: number;
-}
-
-export interface CrudDocument {
-	_id: string;
-	__created: boolean;
-	__modified: boolean;
 }
 
 export default abstract class CrudService<Document extends CrudDocument> {
