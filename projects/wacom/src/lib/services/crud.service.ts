@@ -23,7 +23,7 @@ interface GetConfig {
 	perPage?: number;
 }
 
-export default abstract class CrudService<Document extends CrudDocument> {
+export abstract class CrudService<Document extends CrudDocument> {
 	/*
 		doc should be able to:
 		1) stored locally
