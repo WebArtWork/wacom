@@ -41,7 +41,7 @@ export abstract class CrudService<Document extends CrudDocument> {
 		return {
 			_id: Date.now().toString(),
 			__created: false,
-			__modified: false
+			__modified: false,
 		} as Document;
 	}
 	constructor(
@@ -130,7 +130,8 @@ export abstract class CrudService<Document extends CrudDocument> {
 	): Observable<Document[]> {
 		if (typeof config.page === 'number') {
 			const obs = this._http.get(
-				`${this._url}/get${options.name || ''}?skip=${this._perPage * (config.page - 1)
+				`${this._url}/get${options.name || ''}?skip=${
+					this._perPage * (config.page - 1)
 				}&limit=${this._perPage}`
 			);
 			obs.subscribe(
@@ -194,7 +195,7 @@ export abstract class CrudService<Document extends CrudDocument> {
 					if (options.alert) {
 						this._alert.show({
 							unique: this._config.name + 'create',
-							text: options.alert
+							text: options.alert,
 						});
 					}
 				} else {
@@ -203,6 +204,7 @@ export abstract class CrudService<Document extends CrudDocument> {
 						options.errCallback(resp);
 					}
 				}
+				this._core.emit(this._config.name + '_create', doc);
 			},
 			(resp: unknown) => {
 				doc.__created = false;
@@ -233,7 +235,7 @@ export abstract class CrudService<Document extends CrudDocument> {
 					if (options.alert) {
 						this._alert.show({
 							unique: this._config.name + 'create',
-							text: options.alert
+							text: options.alert,
 						});
 					}
 				} else {
@@ -277,7 +279,7 @@ export abstract class CrudService<Document extends CrudDocument> {
 					if (options.alert) {
 						this._alert.show({
 							unique: this._config.name + 'create',
-							text: options.alert
+							text: options.alert,
 						});
 					}
 				} else {
@@ -285,6 +287,7 @@ export abstract class CrudService<Document extends CrudDocument> {
 						options.errCallback(resp);
 					}
 				}
+				this._core.emit(this._config.name + '_update', doc);
 			},
 			(resp: unknown) => {
 				if (typeof options.errCallback === 'function') {
@@ -317,7 +320,7 @@ export abstract class CrudService<Document extends CrudDocument> {
 					if (options.alert) {
 						this._alert.show({
 							unique: this._config.name + 'create',
-							text: options.alert
+							text: options.alert,
 						});
 					}
 				} else {
@@ -325,6 +328,7 @@ export abstract class CrudService<Document extends CrudDocument> {
 						options.errCallback(resp);
 					}
 				}
+				this._core.emit(this._config.name + '_delete', doc);
 			},
 			(resp: unknown) => {
 				if (typeof options.errCallback === 'function') {
