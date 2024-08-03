@@ -16,13 +16,20 @@ $ npm i --save wacom
 | [**`Http`**](https://www.npmjs.com/package/wacom#http-service) | Http layer for HttpClient |
 | [**`Store`**](https://www.npmjs.com/package/wacom#store-service) | Service will is responsible for keeping information on the device |
 | [**`Hash`**](https://www.npmjs.com/package/wacom#hash-service) | Hash management for easily use, storage which stay in url |
-| [**`Render`**](https://www.npmjs.com/package/wacom#render-service) | Make not automated render management well structured |
 | [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service) | Website meta tags management within router |
-| [**`Alert`**](https://www.npmjs.com/package/wacom#alert-service) | Alerts management |
-| [**`Modal`**](https://www.npmjs.com/package/wacom#modal-service) | Modals management |
 | [**`UI`**](https://www.npmjs.com/package/wacom#ui-service) | Supportive UI/UX service |
+| [**`Crud`**](https://www.npmjs.com/package/wacom#crud-service) | Modals management |
 
-## Core Service
+## [Core Service](#core-service)
+
+### SSR and Platform Services Initialization
+The `CoreService` manages the initialization of various platform-specific services depending on whether the application is running on the server or the client.
+#### Properties
+- `ssr` (boolean): Indicates whether the application is running on the server side.
+- `localStorage` (any): Local storage object. Uses a mock object on the server side.
+- `navigator` (any): Navigator object. Uses a mock object on the server side.
+- `document` (any): Document object. Uses a mock object on the server side.
+- `window` (any): Window object. Uses a mock object on the server side.
 
 ### String Prototype Extension
 The `CoreService` extends the `String` prototype with a `capitalize` method, allowing you to capitalize the first letter of any string instance.
@@ -137,10 +144,67 @@ coreService.copy(source, target);
 console.log(target); // Output: { a: 1, b: { c: 2 } }
 ```
 
+### Device Detection
+The `CoreService` provides methods to detect the client's device type (mobile, tablet, or web).
+#### Properties
+- `device` (string): The detected device type.
+#### Methods
+##### `detectDevice(): void`
+Detects the device type based on the user agent.
+- **Example**:
+```Typescript
+coreService.detectDevice();
+```
 
+##### `isMobile(): boolean`
+Checks if the device is a mobile device.
+- **Returns**:
+  - `boolean`: Returns true if the device is a mobile device.
 
+- **Example**:
+```Typescript
+console.log(coreService.isMobile()); // Output: true or false
+```
 
+##### `isTablet(): boolean`
+Checks if the device is a tablet.
+- **Returns**:
+  - `boolean`: Returns true if the device is a tablet.
 
+- **Example**:
+```Typescript
+console.log(coreService.isTablet()); // Output: true or false
+```
+
+##### `isWeb(): boolean`
+Checks if the device is a web browser.
+- **Returns**:
+  - `boolean`: Returns true if the device is a web browser.
+
+- **Example**:
+```Typescript
+console.log(coreService.isWeb()); // Output: true or false
+```
+
+##### `isAndroid(): boolean`
+Checks if the device is an Android device.
+- **Returns**:
+  - `boolean`: Returns true if the device is an Android device.
+
+- **Example**:
+```Typescript
+console.log(coreService.isAndroid()); // Output: true or false
+```
+
+##### `isIos(): boolean`
+Checks if the device is an iOS device.
+- **Returns**:
+  - `boolean`: Returns true if the device is an iOS device.
+
+- **Example**:
+```Typescript
+console.log(coreService.isIos()); // Output: true or false
+```
 
 ### Version Management
 The `CoreService` provides methods for managing the application's version. The version is dynamically constructed from the app version and the date version.
@@ -404,3 +468,814 @@ In this example:
 3. The `onUnlock` method returns a Promise that resolves when the resource is unlocked, allowing the code to wait until the resource is available again.
 
 This ensures controlled access to the resource, preventing race conditions and ensuring data integrity.
+
+
+## [Http Service](#http-service)
+The `HttpService` provides a centralized and configurable way to handle HTTP requests within an Angular application. It simplifies various aspects of making HTTP requests, including error handling, headers management, and request locking.
+## Properties
+### `url: string`
+The base URL for HTTP requests.
+### `errors: Array<(err: HttpErrorResponse, retry?: () => void) => void>`
+Array of error handling callbacks.
+### `locked: boolean`
+Indicates whether the HTTP service is locked to prevent concurrent requests.
+### `awaitLocked: any[]`
+Array of timeouts for locked requests.
+## Methods
+### `setUrl(url: string): void`
+Sets the base URL for HTTP requests.
+**Parameters**:
+- `url` (string): The base URL to set.
+
+**Example**:
+```Typescript
+coreService.setUrl('https://api.example.com');
+```
+### `removeUrl(): void`
+Removes the base URL for HTTP requests.
+
+**Example**:
+```Typescript
+coreService.removeUrl();
+```
+### `setHeader(key: string, value: string): void`
+Sets an HTTP header.
+
+**Parameters**:
+- `key` (string): The header key.
+- `value` (string): The header value.
+
+**Example**:
+```Typescript
+coreService.setHeader('Authorization', 'Bearer token');
+```
+### `getHeader(key: string): string | undefined`
+Gets the value of an HTTP header.
+
+**Parameters**:
+- `key` (string): The header key.
+
+**Returns**:
+- `string | undefined`: The value of the header.
+
+**Example**:
+```Typescript
+const authHeader = coreService.getHeader('Authorization');
+```
+### `removeHeader(key: string): void`
+Removes an HTTP header.
+
+**Parameters**:
+- `key` (string): The header key to remove.
+
+**Example**:
+```Typescript
+coreService.removeHeader('Authorization');
+```
+### `post<T>(url: string, body: any, options: any = {}): Observable<T>`
+Makes an HTTP POST request.
+
+**Parameters**:
+- `url` (string): The URL to send the request to.
+- `body` (any): The body of the request.
+- `options` (any): Optional parameters.
+
+**Returns**:
+- `Observable<T>`: An Observable of the HTTP response.
+
+**Example**:
+```Typescript
+coreService.post('endpoint', { data: 'value' }).subscribe(response => console.log(response));
+```
+### `put<T>(url: string, body: any, options: any = {}): Observable<T>`
+Makes an HTTP PUT request.
+
+**Parameters**:
+- `url` (string): The URL to send the request to.
+- `body` (any): The body of the request.
+- `options` (any): Optional parameters.
+
+**Returns**:
+- `Observable<T>`: An Observable of the HTTP response.
+
+**Example**:
+```Typescript
+coreService.put('endpoint', { data: 'value' }).subscribe(response => console.log(response));
+```
+### `patch<T>(url: string, body: any, options: any = {}): Observable<T>`
+Makes an HTTP PATCH request.
+
+**Parameters**:
+- `url` (string): The URL to send the request to.
+- `body` (any): The body of the request.
+- `options` (any): Optional parameters.
+
+**Returns**:
+- `Observable<T>`: An Observable of the HTTP response.
+
+**Example**:
+```Typescript
+coreService.patch('endpoint', { data: 'value' }).subscribe(response => console.log(response));
+```
+### `delete<T>(url: string, options: any = {}): Observable<T>`
+Makes an HTTP DELETE request.
+
+**Parameters**:
+- `url` (string): The URL to send the request to.
+- `options` (any): Optional parameters.
+
+**Returns**:
+- `Observable<T>`: An Observable of the HTTP response.
+
+**Example**:
+```Typescript
+coreService.delete('endpoint').subscribe(response => console.log(response));
+```
+### `get<T>(url: string, options: any = {}): Observable<T>`
+Makes an HTTP GET request.
+
+**Parameters**:
+- `url` (string): The URL to send the request to.
+- `options` (any): Optional parameters.
+
+**Returns**:
+- `Observable<T>`: An Observable of the HTTP response.
+
+**Example**:
+```Typescript
+coreService.get('endpoint').subscribe(response => console.log(response));
+```
+### `lock(): void`
+Locks the HTTP service to prevent concurrent requests.
+
+**Example**:
+```Typescript
+coreService.lock();
+```
+### `unlock(): void`
+Unlocks the HTTP service to allow requests.
+
+**Example**:
+```Typescript
+coreService.unlock();
+```
+
+
+## [Store Service](#store-service)
+The `StoreService` manages local storage in a configurable manner. It can set, get, and remove items from storage, with support for asynchronous operations and JSON serialization.
+### Properties
+#### `_prefix: string`
+The prefix for storage keys.
+### Methods
+#### `setPrefix(prefix: string): void`
+Sets the prefix for storage keys.
+**Parameters**:
+- `prefix` (string): The prefix to set.
+
+**Example**:
+```Typescript
+storeService.setPrefix('app_');
+```
+#### `set(key: string, value: string, callback: () => void = () => {}, errCallback: () => void = () => {}): void`
+Sets a value in storage.
+
+**Parameters**:
+- `key` (string): The storage key.
+- `value` (string): The value to store.
+- `callback` (function): The callback to execute on success.
+- `errCallback` (function): The callback to execute on error.
+
+**Example**:
+```Typescript
+storeService.set('key', 'value', () => console.log('Success'), () => console.log('Error'));
+```
+
+#### `setAsync(key: string, value: string): Promise<boolean>`
+Sets a value in storage asynchronously.
+
+**Parameters**:
+- `key` (string): The storage key.
+- `value` (string): The value to store.
+
+**Returns**:
+- `Promise<boolean>`: A promise that resolves to a boolean indicating success.
+
+**Example**:
+```Typescript
+await storeService.setAsync('key', 'value');
+```
+
+#### `get(key: string, callback: (value: string) => void = () => {}, errCallback: () => void = () => {}): void`
+Gets a value from storage.
+
+**Parameters**:
+- `key` (string): The storage key.
+- `callback` (function): The callback to execute with the retrieved value.
+- `errCallback` (function): The callback to execute on error.
+
+**Example**:
+```Typescript
+storeService.get('key', value => console.log(value), () => console.log('Error'));
+```
+
+#### `getAsync(key: string): Promise<string>`
+Gets a value from storage asynchronously.
+
+**Parameters**:
+- `key` (string): The storage key.
+
+**Returns**:
+- `Promise<string>`: A promise that resolves to the retrieved value.
+
+**Example**:
+```Typescript
+const value = await storeService.getAsync('key');
+```
+
+#### `setJson(key: string, value: any, callback: () => void = () => {}, errCallback: () => void = () => {}): void`
+Sets a JSON value in storage.
+
+**Parameters**:
+- `key` (string): The storage key.
+- `value` (any): The value to store.
+- `callback` (function): The callback to execute on success.
+- `errCallback` (function): The callback to execute on error.
+
+**Example**:
+```Typescript
+storeService.setJson('key', { data: 'value' }, () => console.log('Success'), () => console.log('Error'));
+```
+
+#### `setJsonAsync(key: string, value: any): Promise<boolean>`
+Sets a JSON value in storage asynchronously.
+
+**Parameters**:
+- `key` (string): The storage key.
+- `value` (any): The value to store.
+
+**Returns**:
+- `Promise<boolean>`: A promise that resolves to a boolean indicating success.
+
+**Example**:
+```Typescript
+await storeService.setJsonAsync('key', { data: 'value' });
+```
+
+#### `getJson(key: string, callback: (value: any) => void = () => {}, errCallback: () => void = () => {}): void`
+Gets a JSON value from storage.
+
+**Parameters**:
+- `key` (string): The storage key.
+- `callback` (function): The callback to execute with the retrieved value.
+- `errCallback` (function): The callback to execute on error.
+
+**Example**:
+```Typescript
+storeService.getJson('key', value => console.log(value), () => console.log('Error'));
+```
+
+#### `getJsonAsync<T = any>(key: string): Promise<T | null>`
+Gets a JSON value from storage asynchronously.
+
+**Parameters**:
+- `key` (string): The storage key.
+
+**Returns**:
+- `Promise<T | null>`: A promise that resolves to the retrieved value.
+
+**Example**:
+```Typescript
+const value = await storeService.getJsonAsync('key');
+```
+
+#### `remove(key: string, callback?: () => void, errCallback?: () => void): Promise<boolean>`
+Removes a value from storage.
+
+**Parameters**:
+- `key` (string): The storage key.
+- `callback` (function): The callback to execute on success.
+- `errCallback` (function): The callback to execute on error.
+
+**Returns**:
+- `Promise<boolean>`: A promise that resolves to a boolean indicating success.
+
+**Example**:
+```Typescript
+await storeService.remove('key', () => console.log('Success'), () => console.log('Error'));
+```
+
+#### `clear(callback?: () => void, errCallback?: () => void): Promise<boolean>`
+Clears all values from storage.
+
+**Parameters**:
+- `callback` (function): The callback to execute on success.
+- `errCallback` (function): The callback to execute on error.
+
+**Returns**:
+- `Promise<boolean>`: A promise that resolves to a boolean indicating success.
+
+**Example**:
+```Typescript
+await storeService.clear(() => console.log('Success'), () => console.log('Error'));
+```
+
+#### `applyPrefix(key: string): string`
+Applies the configured prefix to a storage key.
+
+**Parameters**:
+- `key` (string): The storage key.
+
+**Returns**:
+- `string`: The prefixed storage key.
+
+**Example**:
+```Typescript
+const prefixedKey = storeService.applyPrefix('key');
+```
+
+
+
+## [Hash Service](#hash-service)
+The `HashService` manages the URL hash in an Angular application. It can parse, set, get, and clear hash values, providing a simple API for manipulating the URL hash.
+### Properties
+#### `hash: { [key: string]: string }`
+The object containing the parsed hash values.
+### Methods
+#### `initialize(): void`
+Initializes the hash service by loading the current hash from the URL.
+**Example**:
+```Typescript
+hashService.initialize();
+```
+#### `load(): void`
+Loads the current hash from the URL into the hash object.
+
+**Example**:
+```Typescript
+hashService.load();
+```
+
+#### `applyReplacements(str: string | undefined): string`
+Applies replacements to a given string based on the replacements array.
+
+**Parameters**:
+- `str` (string | undefined): The string to apply replacements to.
+
+**Returns**:
+- `string`: The string with replacements applied.
+
+**Example**:
+```Typescript
+const result = hashService.applyReplacements('hello%20world');
+```
+
+#### `on(field: string, cb: (value: string) => void): void`
+Executes a callback with the value of a specific hash field once the hash is loaded.
+
+**Parameters**:
+- `field` (string): The hash field to get the value for.
+- `cb` (function): The callback to execute with the value.
+
+**Example**:
+```Typescript
+hashService.on('key', value => console.log(value));
+```
+
+#### `save(): void`
+Saves the current hash object to the URL.
+
+**Example**:
+```Typescript
+hashService.save();
+```
+
+#### `set(field: string, value: string): void`
+Sets a value for a specific hash field and updates the URL.
+
+**Parameters**:
+- `field` (string): The hash field to set the value for.
+- `value` (string): The value to set.
+
+**Example**:
+```Typescript
+hashService.set('key', 'value');
+```
+
+#### `get(field: string): string | undefined`
+Gets the value of a specific hash field.
+
+**Parameters**:
+- `field` (string): The hash field to get the value for.
+
+**Returns**:
+- `string | undefined`: The value of the hash field.
+
+**Example**:
+```Typescript
+const value = hashService.get('key');
+```
+
+#### `clear(field?: string): void`
+Clears a specific hash field or all hash fields and updates the URL.
+
+**Parameters**:
+- `field` (string | undefined): The hash field to clear. If not provided, clears all hash fields.
+
+**Example**:
+```Typescript
+hashService.clear('key');
+hashService.clear();
+```
+
+
+## [Meta Service](#meta-service)
+The `MetaService` manages meta tags and titles in an Angular application. It allows setting defaults, updating meta tags, and configuring titles dynamically.
+### Methods
+#### `setDefaults(defaults: { [key: string]: string }): void`
+Sets the default meta tags.
+
+**Parameters**:
+- `defaults` (object): The default meta tags.
+
+**Example**:
+```Typescript
+metaService.setDefaults({ title: 'Default Title', description: 'Default Description' });
+```
+#### `setTitle(title?: string, titleSuffix?: string): MetaService`
+Sets the title and optional title suffix.
+
+**Parameters**:
+- `title` (string): The title to set.
+- `titleSuffix` (string): The title suffix to append.
+
+**Returns**:
+- `MetaService`: The MetaService instance.
+
+**Example**:
+```Typescript
+metaService.setTitle('My Page Title', ' | My Website');
+```
+
+#### `setLink(links: { [key: string]: string }): MetaService`
+Sets link tags.
+
+**Parameters**:
+- `links` (object): The links to set.
+
+**Returns**:
+- `MetaService`: The MetaService instance.
+
+**Example**:
+```Typescript
+metaService.setLink({ canonical: 'https://example.com', stylesheet: 'https://example.com/style.css' });
+```
+
+#### `setTag(tag: string, value: string, prop?: string): MetaService`
+Sets a meta tag.
+
+**Parameters**:
+- `tag` (string): The meta tag name.
+- `value` (string): The meta tag value.
+- `prop` (string): The meta tag property.
+
+**Returns**:
+- `MetaService`: The MetaService instance.
+
+**Example**:
+```Typescript
+metaService.setTag('description', 'This is a description', 'name');
+```
+
+#### `removeTag(tag: string, prop?: string): void`
+Removes a meta tag.
+
+**Parameters**:
+- `tag` (string): The meta tag name.
+- `prop` (string): The meta tag property.
+
+**Example**:
+```Typescript
+metaService.removeTag('description', 'name');
+```
+
+### Private Methods
+
+#### `_updateMetaTag(tag: string, value: string, prop?: string): void`
+Updates a meta tag.
+
+**Parameters**:
+- `tag` (string): The meta tag name.
+- `value` (string): The meta tag value.
+- `prop` (string): The meta tag property.
+
+#### `_warnMissingGuard(): void`
+Warns about missing meta guards in routes.
+
+**Example**:
+```Typescript
+metaService._warnMissingGuard();
+```
+
+
+## [UI Service](#ui-service)
+The `UiService` manages various UI-related tasks in an Angular application, including CSS management, form validation, and generating sample data for UI components.
+### Methods
+#### `form(id: string): any`
+Manages form states.
+
+**Parameters**:
+- `id` (string): The form identifier.
+
+**Returns**:
+- `any`: The form state object.
+
+**Example**:
+```Typescript
+const formState = uiService.form('contactForm');
+```
+#### `valid(value: any, kind = 'email', extra = 0): boolean`
+Validates input values based on the specified type.
+
+**Parameters**:
+- `value` (any): The value to validate.
+- `kind` (string): The type of validation.
+- `extra` (number): Additional validation criteria.
+
+**Returns**:
+- `boolean`: True if the value is valid, false otherwise.
+
+**Example**:
+```Typescript
+const isValidEmail = uiService.valid('test@example.com', 'email');
+```
+#### `level(value = ''): number`
+Determines the strength of a password.
+
+**Parameters**:
+- `value` (string): The password to evaluate.
+
+**Returns**:
+- `number`: The strength level of the password.
+
+**Example**:
+```Typescript
+const passwordLevel = uiService.level('Password123!');
+```
+#### `set(variables: { [key: string]: string }, opts: any = {}): void`
+Sets multiple CSS variables.
+
+**Parameters**:
+- `variables` (object): The CSS variables to set.
+- `opts` (any): Options for setting the variables.
+
+**Example**:
+```Typescript
+uiService.set({ '--primary-color': '#ff0000' }, 'local');
+```
+#### `get(): { [key: string]: string }`
+Retrieves the stored CSS variables.
+
+**Returns**:
+- `object`: The stored CSS variables.
+
+**Example**:
+```Typescript
+const cssVariables = uiService.get();
+```
+#### `remove(keys: string | string[]): void`
+Removes specified CSS variables.
+
+**Parameters**:
+- `keys` (string | array): The keys of the CSS variables to remove.
+
+**Example**:
+```Typescript
+uiService.remove('primary-color secondary-color');
+```
+#### `arr(arrLen = 10, type: string = 'number'): any[]`
+Generates an array of sample data.
+
+**Parameters**:
+- `arrLen` (number): The length of the array.
+- `type` (string): The type of data to generate.
+
+**Returns**:
+- `array`: An array of sample data.
+
+**Example**:
+```Typescript
+const sampleArray = uiService.arr(5, 'text');
+```
+#### `text(length = 10): string`
+Generates a random text string.
+
+**Parameters**:
+- `length` (number): The length of the text string.
+
+**Returns**:
+- `string`: A random text string.
+
+**Example**:
+```Typescript
+const randomText = uiService.text(15);
+```
+
+
+## [Crud Service](#crud-service)
+The `CrudService` is designed to manage CRUD (Create, Read, Update, Delete) operations in an Angular application. It interacts with an API, stores documents locally, and provides methods for handling various CRUD operations.
+### Methods
+#### `new(): Document`
+Creates a new document with a temporary ID.
+**Returns**:
+- `Document`: A new document instance.
+
+**Example**:
+```Typescript
+const newDoc = crudService.new();
+```
+
+#### `doc(_id: string): Document`
+Retrieves a document by its ID.
+
+**Parameters**:
+- `_id` (string): The document ID.
+
+**Returns**:
+- `Document`: The document instance.
+
+**Example**:
+```Typescript
+const doc = crudService.doc('12345');
+```
+
+#### `configDocs(name: string, config: (doc: Document, container: unknown) => void, reset: () => unknown): unknown`
+Configures documents for a specific name.
+
+**Parameters**:
+- `name` (string): The configuration name.
+- `config` (function): The configuration function.
+- `reset` (function): The reset function.
+
+**Returns**:
+- `unknown`: The configured documents.
+
+**Example**:
+```Typescript
+crudService.configDocs('myConfig', (doc, container) => { /* config logic */ }, () => { /* reset logic */ });
+```
+
+#### `getConfigedDocs(name: string): unknown`
+Retrieves the configured documents for a specific name.
+
+**Parameters**:
+- `name` (string): The configuration name.
+
+**Returns**:
+- `unknown`: The configured documents.
+
+**Example**:
+```Typescript
+const configedDocs = crudService.getConfigedDocs('myConfig');
+```
+
+#### `reconfigureDocs(name: string = ''): void`
+Reconfigures documents for a specific name or all names.
+
+**Parameters**:
+- `name` (string): The configuration name (optional).
+
+**Example**:
+```Typescript
+crudService.reconfigureDocs('myConfig');
+```
+
+#### `setPerPage(_perPage: number): void`
+Sets the number of documents per page.
+
+**Parameters**:
+- `_perPage` (number): The number of documents per page.
+
+**Example**:
+```Typescript
+crudService.setPerPage(10);
+```
+
+#### `get(config: GetConfig = {}, options: CrudOptions<Document> = {}): Observable<Document[]>`
+Retrieves documents from the API.
+
+**Parameters**:
+- `config` (object): The get configuration.
+- `options` (object): The CRUD options.
+
+**Returns**:
+- `Observable<Document[]>`: An observable of the retrieved documents.
+
+**Example**:
+```Typescript
+crudService.get({ page: 1 }, { callback: (docs) => console.log(docs) });
+```
+
+#### `create(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> | void`
+Creates a new document in the API.
+
+**Parameters**:
+- `doc` (Document): The document to create.
+- `options` (object): The CRUD options.
+
+**Returns**:
+- `Observable<Document> | void`: An observable of the created document or void if the document was already created.
+
+**Example**:
+```Typescript
+crudService.create(newDoc, { callback: (doc) => console.log(doc) });
+```
+
+#### `fetch(query: object = {}, options: CrudOptions<Document> = {}): Observable<Document>`
+Fetches a document from the API based on a query.
+
+**Parameters**:
+- `query` (object): The query object.
+- `options` (object): The CRUD options.
+
+**Returns**:
+- `Observable<Document>`: An observable of the fetched document.
+
+**Example**:
+```Typescript
+crudService.fetch({ name: 'example' }, { callback: (doc) => console.log(doc) });
+```
+
+#### `updateAfterWhile(doc: Document, options: CrudOptions<Document> = {}): void`
+Updates a document after a specified delay.
+
+**Parameters**:
+- `doc` (Document): The document to update.
+- `options` (object): The CRUD options.
+
+**Example**:
+```Typescript
+crudService.updateAfterWhile(doc, { callback: (doc) => console.log(doc) });
+```
+
+#### `update(doc: Document, options: CrudOptions<Document> = {}): Observable<Document>`
+Updates a document in the API.
+
+**Parameters**:
+- `doc` (Document): The document to update.
+- `options` (object): The CRUD options.
+
+**Returns**:
+- `Observable<Document>`: An observable of the updated document.
+
+**Example**:
+```Typescript
+crudService.update(doc, { callback: (doc) => console.log(doc) });
+```
+
+#### `delete(doc: Document, options: CrudOptions<Document> = {}): Observable<Document>`
+Deletes a document from the API.
+
+**Parameters**:
+- `doc` (Document): The document to delete.
+- `options` (object): The CRUD options.
+
+**Returns**:
+- `Observable<Document>`: An observable of the deleted document.
+
+**Example**:
+```Typescript
+crudService.delete(doc, { callback: (doc) => console.log(doc) });
+```
+
+### Interfaces
+
+#### `CrudDocument`
+Represents a CRUD document.
+
+**Properties**:
+- `_id` (string): The document ID.
+- `__created` (boolean): Indicates if the document is created.
+- `__modified` (boolean): Indicates if the document is modified.
+
+**Example**:
+```Typescript
+interface CrudDocument {
+  _id: string;
+  __created: boolean;
+  __modified: boolean;
+}
+```
+
+
+## [File Service](#file-service)
+
+
+
+
+
+
+
+
+## [Socket Service](#socket-service)
+## [Date Service](#date-service)
+## [Dom Service](#dom-service)

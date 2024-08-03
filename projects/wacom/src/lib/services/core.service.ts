@@ -1,4 +1,5 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformServer } from '@angular/common';
 import { Subject, Observable } from 'rxjs';
 
 // Add capitalize method to String prototype if it doesn't already exist
@@ -24,7 +25,53 @@ declare var cordova: any;
 	providedIn: 'root',
 })
 export class CoreService {
-	constructor() {
+	ssr = false;
+	localStorage: any; // = localStorage;
+	navigator: any; // = navigator;
+	document: any; // = document;
+	window: any; // = window;
+	constructor(@Inject(PLATFORM_ID) private platformId: boolean) {
+		this.ssr = isPlatformServer(this.platformId);
+
+		if (isPlatformServer(this.platformId)) {
+			this.localStorage = {
+				getItem: () => { },
+				setItem: () => { },
+				removeItem: () => { },
+				clear: () => { },
+			};
+
+			this.document = {
+				querySelectorAll: () => { },
+				addEventListener: () => { },
+				removeEventListener: () => { },
+				documentElement: {},
+				body: {},
+			};
+
+			this.window = {
+				location: {
+					host: '',
+				},
+				addEventListener: () => { },
+				removeEventListener: () => { },
+				setTimeout: () => { },
+			};
+
+			this.navigator = {
+				userAgent: '',
+				platform: '',
+			};
+		} else {
+			this.localStorage = localStorage;
+
+			this.document = document;
+
+			this.window = window;
+
+			this.navigator = navigator;
+		}
+
 		this.detectDevice();
 	}
 
@@ -42,11 +89,9 @@ export class CoreService {
 		for (const each in obj) {
 			if (
 				obj.hasOwnProperty(each) &&
-				(
-					obj[each] ||
+				(obj[each] ||
 					typeof obj[each] === 'number' ||
-					typeof obj[each] === 'boolean'
-				)
+					typeof obj[each] === 'boolean')
 			) {
 				if (holder) {
 					arr.push(each);
@@ -66,13 +111,19 @@ export class CoreService {
 	 * @param {string} [compareField='_id'] - The field to use for comparison.
 	 * @returns {any[]} The modified `fromArray` with elements removed.
 	 */
-	splice(removeArray: any[], fromArray: any[], compareField: string = '_id'): any[] {
+	splice(
+		removeArray: any[],
+		fromArray: any[],
+		compareField: string = '_id'
+	): any[] {
 		if (!Array.isArray(removeArray) || !Array.isArray(fromArray)) {
 			return fromArray;
 		}
 
-		const removeSet = new Set(removeArray.map(item => item[compareField]));
-		return fromArray.filter(item => !removeSet.has(item[compareField]));
+		const removeSet = new Set(
+			removeArray.map((item) => item[compareField])
+		);
+		return fromArray.filter((item) => !removeSet.has(item[compareField]));
 	}
 
 	/**
@@ -84,7 +135,10 @@ export class CoreService {
 	 */
 	ids2id(...args: string[]): string {
 		args.sort((a, b) => {
-			if (Number(a.toString().substring(0, 8)) > Number(b.toString().substring(0, 8))) {
+			if (
+				Number(a.toString().substring(0, 8)) >
+				Number(b.toString().substring(0, 8))
+			) {
 				return 1;
 			}
 			return -1;
@@ -103,19 +157,24 @@ export class CoreService {
 	 * @param {() => void} [cb] - The callback function to execute after the delay.
 	 * @param {number} [time=1000] - The delay time in milliseconds.
 	 */
-	afterWhile(doc: string | object | (() => void), cb?: () => void, time: number = 1000): void {
+	afterWhile(
+		doc: string | object | (() => void),
+		cb?: () => void,
+		time: number = 1000
+	): void {
 		if (typeof doc === 'function') {
-			cb = doc;
+			cb = doc as () => void;
 			doc = 'common';
 		}
 
 		if (typeof cb === 'function' && typeof time === 'number') {
 			if (typeof doc === 'string') {
 				clearTimeout(this._afterWhile[doc]);
-				this._afterWhile[doc] = window.setTimeout(cb, time);
+				this._afterWhile[doc] = this.window.setTimeout(cb, time);
 			} else if (typeof doc === 'object') {
 				clearTimeout((doc as { __afterWhile: number }).__afterWhile);
-				(doc as { __afterWhile: number }).__afterWhile = window.setTimeout(cb, time);
+				(doc as { __afterWhile: number }).__afterWhile =
+					this.window.setTimeout(cb, time);
 			} else {
 				console.warn('badly configured after while');
 			}
@@ -153,19 +212,22 @@ export class CoreService {
 		}
 	}
 
-
 	// Device management
-	device: string;
+	device: string = '';
 	/**
 	 * Detects the device type based on the user agent.
 	 */
 	detectDevice(): void {
-		const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+		const userAgent =
+			this.navigator.userAgent || this.navigator.vendor || (this.window as any).opera;
 		if (/windows phone/i.test(userAgent)) {
 			this.device = 'Windows Phone';
 		} else if (/android/i.test(userAgent)) {
 			this.device = 'Android';
-		} else if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {
+		} else if (
+			/iPad|iPhone|iPod/.test(userAgent) &&
+			!(this.window as any).MSStream
+		) {
 			this.device = 'iOS';
 		} else {
 			this.device = 'Web';
@@ -177,7 +239,11 @@ export class CoreService {
 	 * @returns {boolean} - Returns true if the device is a mobile device.
 	 */
 	isMobile(): boolean {
-		return this.device === 'Windows Phone' || this.device === 'Android' || this.device === 'iOS';
+		return (
+			this.device === 'Windows Phone' ||
+			this.device === 'Android' ||
+			this.device === 'iOS'
+		);
 	}
 
 	/**
@@ -211,7 +277,6 @@ export class CoreService {
 	isIos(): boolean {
 		return this.device === 'iOS';
 	}
-
 
 	// Version management
 	version = '1.0.0';
@@ -283,7 +348,6 @@ export class CoreService {
 		delete this._signals[signal];
 	}
 
-
 	// Await management
 	private _completed: Record<string, boolean> = {};
 	private _completeResolvers: Record<string, (() => void)[]> = {};
@@ -295,7 +359,7 @@ export class CoreService {
 	complete(task: string): void {
 		this._completed[task] = true;
 		if (this._completeResolvers[task]) {
-			this._completeResolvers[task].forEach(resolve => resolve());
+			this._completeResolvers[task].forEach((resolve) => resolve());
 			this._completeResolvers[task] = [];
 		}
 	}
@@ -326,7 +390,6 @@ export class CoreService {
 		return !!this._completed[task];
 	}
 
-
 	// Locking management
 	private _locked: Record<string, boolean> = {};
 	private _unlockResolvers: Record<string, (() => void)[]> = {};
@@ -349,7 +412,7 @@ export class CoreService {
 	unlock(which: string): void {
 		this._locked[which] = false;
 		if (this._unlockResolvers[which]) {
-			this._unlockResolvers[which].forEach(resolve => resolve());
+			this._unlockResolvers[which].forEach((resolve) => resolve());
 			this._unlockResolvers[which] = [];
 		}
 	}

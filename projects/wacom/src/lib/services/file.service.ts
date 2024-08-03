@@ -1,210 +1,269 @@
-import { FilesComponent } from '../components/files/files.component';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { HttpService } from './http.service';
 import { DomService } from './dom.service';
 import { CoreService } from './core.service';
-import { Injectable } from '@angular/core';
-import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { FilesComponent } from '../components/files/files.component';
+
+interface FileOptions {
+	id: string;
+	type?: string;
+	resize?: number | { width: number; height: number };
+	multiple?: boolean;
+	multiple_cb?: (files: { dataUrl: string; file: File }[]) => void;
+	cb?: (dataUrl: string | false, file: File) => void;
+	save?: boolean;
+	complete?: () => void;
+	api?: string;
+	part?: string;
+	name?: string;
+	body?: () => object | object;
+	resp?: (response: any) => void;
+	append?: (formData: FormData, files: File[]) => void;
+	multiple_files?: { dataUrl: string; file: File }[];
+	multiple_counter?: number;
+	url?: string;
+}
 
 @Injectable({
-	providedIn: 'root'
+	providedIn: 'root',
 })
 export class FileService {
-	private added:any = {};
-	private files:any = [];
-	constructor(private dom: DomService, private core: CoreService, private http: HttpService) {
+	private added: Record<string, FileOptions> = {};
+	private files: FileOptions[] = [];
+
+	constructor(
+		private dom: DomService,
+		private core: CoreService,
+		private http: HttpService
+	) {
 		this.dom.appendComponent(FilesComponent, {
-			fs: this
+			fs: this,
 		});
 	}
-	/*
-	*	Input Management
-	*/
-		public add(opts:any){
-			if(typeof opts == 'string'){
-				opts = {
-					id: opts
-				};
-			}
-			if(!opts.id) return console.log('You have to pass ID into file object');
-			if(!opts.type) opts.type='image';
-			if(typeof opts.resize == 'number'){
-				opts.resize = {
-					width: opts.resize,
-					height: opts.resize
-				};
-			}
-			if(this.added[opts.id]){
-				for (let i = this.files.length-1; i >= 0; i--){
-				    if(this.files[i].id == opts.id){
-				    	this.files.splice(i, 1);
-				    }
+
+	/**
+	 * Adds a file input configuration.
+	 *
+	 * @param opts - The file options.
+	 */
+	public add(opts: FileOptions | string): void | (() => void) {
+		if (typeof opts === 'string') {
+			opts = { id: opts };
+		}
+
+		if (!opts.id) {
+			console.log('You have to pass ID into file object');
+			return;
+		}
+
+		opts.type = opts.type || 'image';
+
+		if (typeof opts.resize === 'number') {
+			opts.resize = { width: opts.resize, height: opts.resize };
+		}
+
+		if (this.added[opts.id]) {
+			this.files = this.files.filter((file) => file.id !== opts.id);
+		}
+
+		this.files.push(opts);
+		this.added[opts.id] = opts;
+
+		if (opts.save) {
+			return () => {
+				opts.complete?.();
+			};
+		}
+	}
+
+	/**
+	 * Handles file input change event.
+	 *
+	 * @param event - The input change event.
+	 * @param info - The file options.
+	 */
+	public change(event: Event, info: FileOptions): void {
+		const input = event.target as HTMLInputElement;
+		if (!input.files) return;
+
+		if (info.type === 'image') {
+			if (info.multiple) {
+				if (info.multiple_cb) {
+					info.multiple_files = [];
+					info.multiple_counter = input.files.length;
 				}
+				Array.from(input.files).forEach((file) => this.process(file, info));
+			} else {
+				this.process(input.files[0], info);
 			}
-			this.files.push(opts);
-			this.added[opts.id] = opts;
-			if(opts.save){
-				return ()=>{ opts.complete(); };
+		} else if (info.type === 'file') {
+			if (info.multiple) {
+				info.multiple_cb?.(Array.from(input.files).map(file => ({ dataUrl: '', file })));
 			}
-		};
-		public change(event:any, info:any){
-			if(info.type == 'image'){
-				if(info.multiple){
-					if(typeof info.multiple_cb == 'function'){
-						info.multiple_files = [];
-						info.multiple_counter = event.target.files.length;
-					}
-					for (let i = 0; i < event.target.files.length; i++){
-						this.process(event.target.files[i], info);
-					}
-				}else{
-					this.process(event.target.files[0], info);
-				}
-			}else if(info.type == 'file'){
-				if(info.multiple){
-					if(typeof info.multiple_cb == 'function'){
-						info.multiple_cb(event.target.files);
-					}
-					for (let i = 0; i < event.target.files.length; i++){
-						if(typeof info.cb == 'function'){
-							info.cb(event.target.files[i]);
-						}
-					}
-				}else{
-					if(typeof info.cb == 'function'){
-						info.cb(event.target.files[0]);
-					}
-				}
-				if(info.part || info.url){
-					this.file(info, event.target.files);
-				}
-			}else console.log('Provide type `image` or `file` ');
-		};
-		public remove(part:any, url:any, opts:any={}, cb:any=(resp:any)=>{}):any{
-			opts.url = url;
-			if(opts.save){
-				return ()=>{
-					this.http.post(opts.api || '/api/'+part+'/file/delete', opts, cb);
-				};
-			}else{
-				this.http.post(opts.api || '/api/'+part+'/file/delete', opts, cb);
+			Array.from(input.files).forEach((file) => info.cb?.('', file));
+			if (info.part || info.url) {
+				this.uploadFiles(info, input.files as File[]);
 			}
-		};
-		public file(info:any, files:any, cb:any=()=>{}){
-			let formData: FormData = new FormData();
-			if(typeof info.append == 'function'){
-				info.append(formData, files);
-			}else{
-				for (let i = 0; i < files.length; i++){
-					formData.append('file['+i+']', files[i]);
-				}
-			}
-			let body = typeof info.body == 'function' && info.body() ||  (typeof info.body == 'object' && info.body || {});
-			for (let each in body){
-			    formData.append(each, body[each]);
-			}
-			if(info.save){
-				info.complete = ()=>{
-					this.http.post(info.api || '/api/' + info.part + '/file'+(info.name&&('/'+info.name)||''), formData, resp => {
-						if(resp && typeof info.resp == 'function') info.resp(resp);
-						if(resp && typeof cb == 'function') cb(resp);
-					});
-				}
-			}else{
-				this.http.post(info.api || '/api/' + info.part + '/file'+(info.name&&('/'+info.name)||''), formData, resp => {
-					if(resp && typeof info.resp == 'function') info.resp(resp);
-					if(resp && typeof cb == 'function') cb(resp);
+		} else {
+			console.log('Provide type `image` or `file`');
+		}
+	}
+
+	/**
+	 * Removes a file.
+	 *
+	 * @param part - The part of the API.
+	 * @param url - The URL of the file.
+	 * @param opts - Additional options.
+	 * @param cb - The callback function.
+	 */
+	public remove(part: string, url: string, opts: any = {}, cb: (resp: any) => void = () => { }): void | (() => void) {
+		opts.url = url;
+		if (opts.save) {
+			return () => {
+				this.http.post(opts.api || `/api/${part}/file/delete`, opts, cb);
+			};
+		} else {
+			this.http.post(opts.api || `/api/${part}/file/delete`, opts, cb);
+		}
+	}
+
+	/**
+	 * Uploads files to the server.
+	 *
+	 * @param info - The file options.
+	 * @param files - The files to upload.
+	 * @param cb - The callback function.
+	 */
+	public uploadFiles(info: FileOptions, files: File[], cb: (resp: any) => void = () => { }): void {
+		const formData = new FormData();
+
+		if (info.append) {
+			info.append(formData, files);
+		} else {
+			files.forEach((file, index) => formData.append(`file[${index}]`, file));
+		}
+
+		const body = typeof info.body === 'function' ? info.body() : (info.body || {});
+		Object.entries(body).forEach(([key, value]) => formData.append(key, value));
+
+		if (info.save) {
+			info.complete = () => {
+				this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, formData, (resp) => {
+					info.resp?.(resp);
+					cb(resp);
 				});
+			};
+		} else {
+			this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, formData, (resp) => {
+				info.resp?.(resp);
+				cb(resp);
+			});
+		}
+	}
+
+	/**
+	 * Uploads an image to the server.
+	 *
+	 * @param info - The file options.
+	 * @param cb - The callback function.
+	 */
+	public image(info: FileOptions, cb: (resp: any) => void = () => { }): void | (() => void) {
+		if (info.save) {
+			return () => {
+				this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, info, cb);
+			};
+		} else {
+			this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, info, cb);
+		}
+	}
+
+	/**
+	 * Updates the file information after processing.
+	 *
+	 * @param dataUrl - The data URL of the processed file.
+	 * @param info - The file options.
+	 * @param file - The file object.
+	 */
+	private update(dataUrl: string, info: FileOptions, file: File): void {
+		info.cb?.(dataUrl, file);
+		if (info.multiple_cb) {
+			info.multiple_files.push({ dataUrl, file });
+			if (--info.multiple_counter === 0) info.multiple_cb(info.multiple_files);
+		}
+
+		if (!info.part) return;
+
+		const obj = typeof info.body === 'function' ? info.body() : (info.body || {});
+		obj['dataUrl'] = dataUrl;
+
+		if (info.save) {
+			info.complete = () => {
+				this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, obj, (resp) => {
+					info.cb?.(resp);
+				});
+			};
+		} else {
+			this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, obj, (resp) => {
+				info.cb?.(resp);
+			});
+		}
+	}
+
+	/**
+	 * Processes an image file for resizing.
+	 *
+	 * @param file - The file object.
+	 * @param info - The file options.
+	 */
+	private process(file: File, info: FileOptions): void {
+		if (!file.type.startsWith('image/')) {
+			info.cb?.(false, file);
+			if (info.multiple_cb) {
+				info.multiple_files.push({ dataUrl: '', file });
+				if (--info.multiple_counter === 0) info.multiple_cb(info.multiple_files);
 			}
-		};
-		public image(info:any, resp:any=()=>{}):any{
-			if(info.save){
-				return ()=>{
-					this.http.post(info.api||'/api/'+info.part+'/file'+(info.name&&('/'+info.name)||''), info, resp);
-				};
-			}else{
-				this.http.post(info.api||'/api/'+info.part+'/file'+(info.name&&('/'+info.name)||''), info, resp);
+			return;
+		}
+
+		if (info.resize) {
+			info.resize.width = info.resize.width || 1920;
+			info.resize.height = info.resize.height || 1080;
+		}
+
+		const reader = new FileReader();
+		reader.onload = (loadEvent) => {
+			if (!info.resize) {
+				return this.update(loadEvent.target?.result as string, info, file);
 			}
 
-		};
-	/*
-	*	Common Management
-	*/
-		private update(dataUrl:any, info:any, file:any){
-			if(typeof info.cb == 'function'){
-				info.cb(dataUrl, file);
-			}
-			if(typeof info.multiple_cb == 'function'){
-				info.multiple_files.push({dataUrl: dataUrl, file: file});
-				if(--info.multiple_counter == 0) info.multiple_cb(info.multiple_files);
-			}
-			if(!info.part) return;
-			let obj = typeof info.body == 'function' && info.body() || {};
-			obj.dataUrl = dataUrl;
-			if(info.save){
-				info.complete = ()=>{
-					this.http.post(info.api||'/api/'+info.part+'/file'+(info.name&&('/'+info.name)||''), obj, resp => {
-						if(resp && typeof info.cb == 'function') info.cb(resp);
-					});
-				};
-			}else{
-				this.http.post(info.api||'/api/'+info.part+'/file'+(info.name&&('/'+info.name)||''), obj, resp => {
-					if(resp && typeof info.cb == 'function') info.cb(resp);
-				});
-			}
-		};
-		private process(file:any, info:any){
-			if(file.type.indexOf("image/")!=0){
-				if(typeof info.cb == 'function'){
-					info.cb(false, file);
+			const canvas = this.core.document.createElement('canvas');
+			const img = this.core.document.createElement('img');
+			img.onload = () => {
+				if (img.width <= info.resize.width && img.height <= info.resize.height) {
+					return this.update(loadEvent.target?.result as string, info, file);
 				}
-				if(typeof info.multiple_cb == 'function'){
-					info.multiple_files.push({file: file});
-					if(--info.multiple_counter == 0) info.multiple_cb(info.multiple_files);
+
+				const infoRatio = info.resize.width / info.resize.height;
+				const imgRatio = img.width / img.height;
+				let width, height;
+				if (imgRatio > infoRatio) {
+					width = Math.min(info.resize.width, img.width);
+					height = width / imgRatio;
+				} else {
+					height = Math.min(info.resize.height, img.height);
+					width = height * imgRatio;
 				}
-				return;
-			}
-			if(info.resize){
-				info.resize.width = info.resize.width || 1920;
-				info.resize.height = info.resize.height || 1080;
-			}
-			const reader = new FileReader();
-			reader.onload = (loadEvent:any)=>{
-				if(!info.resize){
-					return this.update(loadEvent.target.result, info, file);
-				}
-				const canvasElement = this.core.document.createElement('canvas');
-				const imageElement = this.core.document.createElement('img');
-				imageElement.onload = () => {
-					if (
-						imageElement.width <= info.resize.width &&
-						imageElement.height <= info.resize.height
-					) {
-						return this.update(loadEvent.target.result, info, file);
-					}
-					const infoRatio = info.resize.width / info.resize.height;
-					const imgRatio = imageElement.width / imageElement.height;
-					let width, height;
-					if (imgRatio > infoRatio) {
-						width = Math.min(info.resize.width, imageElement.width);
-						height = width / imgRatio;
-					} else {
-						height = Math.min(info.resize.height, imageElement.height);
-						width = height * imgRatio;
-					}
-					canvasElement.width = width;
-					canvasElement.height = height;
-					let context = canvasElement.getContext('2d');
-					context.drawImage(imageElement, 0, 0 , width, height);
-					let dataUrl = canvasElement.toDataURL('image/jpeg', 1);
-					return this.update(dataUrl, info, file);
-				};
-				imageElement.src = loadEvent.target.result;
+
+				canvas.width = width;
+				canvas.height = height;
+				const context = canvas.getContext('2d');
+				context.drawImage(img, 0, 0, width, height);
+				const dataUrl = canvas.toDataURL('image/jpeg', 1);
+				this.update(dataUrl, info, file);
 			};
-			reader.readAsDataURL(file);
+			img.src = loadEvent.target?.result as string;
 		};
-	/*
-	*	End Of
-	*/
+		reader.readAsDataURL(file);
+	}
 }
