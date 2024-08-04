@@ -18,7 +18,12 @@ $ npm i --save wacom
 | [**`Hash`**](https://www.npmjs.com/package/wacom#hash-service) | Hash management for easily use, storage which stay in url |
 | [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service) | Website meta tags management within router |
 | [**`UI`**](https://www.npmjs.com/package/wacom#ui-service) | Supportive UI/UX service |
-| [**`Crud`**](https://www.npmjs.com/package/wacom#crud-service) | Modals management |
+| [**`Crud`**](https://www.npmjs.com/package/wacom#crud-service) | Provides basic CRUD operations for managing data with HTTP services |
+| [**`File`**](https://www.npmjs.com/package/wacom#file-service) | Handles file uploads, image processing, and file management tasks |
+| [**`Socket`**](https://www.npmjs.com/package/wacom#socket-service) | Manages WebSocket connections and real-time data communication |
+| [**`Time`**](https://www.npmjs.com/package/wacom#time-service) | Provides utilities for date and time manipulation and formatting |
+| [**`Dom`**](https://www.npmjs.com/package/wacom#dom-service) | Facilitates DOM manipulation and dynamic component loading |
+
 
 ## [Core Service](#core-service)
 
@@ -471,155 +476,155 @@ This ensures controlled access to the resource, preventing race conditions and e
 
 
 ## [Http Service](#http-service)
-The `HttpService` provides a centralized and configurable way to handle HTTP requests within an Angular application. It simplifies various aspects of making HTTP requests, including error handling, headers management, and request locking.
-## Properties
-### `url: string`
-The base URL for HTTP requests.
-### `errors: Array<(err: HttpErrorResponse, retry?: () => void) => void>`
-Array of error handling callbacks.
-### `locked: boolean`
-Indicates whether the HTTP service is locked to prevent concurrent requests.
-### `awaitLocked: any[]`
-Array of timeouts for locked requests.
-## Methods
-### `setUrl(url: string): void`
+The `HttpService` provides an HTTP layer for `HttpClient` in Angular, supporting both callbacks and observables for various HTTP operations.
+### Methods
+#### `setUrl(url: string)`
 Sets the base URL for HTTP requests.
 **Parameters**:
-- `url` (string): The base URL to set.
+- `url` (string): The base URL.
 
 **Example**:
 ```Typescript
-coreService.setUrl('https://api.example.com');
+httpService.setUrl('https://api.example.com');
 ```
-### `removeUrl(): void`
+#### `removeUrl()`
 Removes the base URL for HTTP requests.
-
 **Example**:
 ```Typescript
-coreService.removeUrl();
+httpService.removeUrl();
 ```
-### `setHeader(key: string, value: string): void`
-Sets an HTTP header.
-
+#### `set(key: string, value: string)`
+Sets a header for HTTP requests.
 **Parameters**:
 - `key` (string): The header key.
 - `value` (string): The header value.
 
 **Example**:
 ```Typescript
-coreService.setHeader('Authorization', 'Bearer token');
+httpService.set('Authorization', 'Bearer token');
 ```
-### `getHeader(key: string): string | undefined`
-Gets the value of an HTTP header.
-
+#### `header(key: string): string`
+Gets the value of a specified header.
 **Parameters**:
 - `key` (string): The header key.
 
 **Returns**:
-- `string | undefined`: The value of the header.
+- The header value.
 
 **Example**:
 ```Typescript
-const authHeader = coreService.getHeader('Authorization');
+const authHeader = httpService.header('Authorization');
 ```
-### `removeHeader(key: string): void`
-Removes an HTTP header.
-
+#### `remove(key: string)`
+Removes a specified header.
 **Parameters**:
-- `key` (string): The header key to remove.
+- `key` (string): The header key.
 
 **Example**:
 ```Typescript
-coreService.removeHeader('Authorization');
+httpService.remove('Authorization');
 ```
-### `post<T>(url: string, body: any, options: any = {}): Observable<T>`
-Makes an HTTP POST request.
-
+#### `post(url: string, doc: any, callback = (resp: any) => {}, opts: any = {}): Observable<any>`
+Performs a POST request.
 **Parameters**:
-- `url` (string): The URL to send the request to.
-- `body` (any): The body of the request.
-- `options` (any): Optional parameters.
+- `url` (string): The URL for the request.
+- `doc` (any): The request body.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
 
 **Returns**:
-- `Observable<T>`: An Observable of the HTTP response.
+- An observable for the request.
 
 **Example**:
 ```Typescript
-coreService.post('endpoint', { data: 'value' }).subscribe(response => console.log(response));
+httpService.post('/endpoint', data, (resp) => {
+  console.log(resp);
+}).subscribe();
 ```
-### `put<T>(url: string, body: any, options: any = {}): Observable<T>`
-Makes an HTTP PUT request.
-
+#### `put(url: string, doc: any, callback = (resp: any) => {}, opts: any = {}): Observable<any>`
+Performs a PUT request.
 **Parameters**:
-- `url` (string): The URL to send the request to.
-- `body` (any): The body of the request.
-- `options` (any): Optional parameters.
+- `url` (string): The URL for the request.
+- `doc` (any): The request body.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
 
 **Returns**:
-- `Observable<T>`: An Observable of the HTTP response.
+- An observable for the request.
 
 **Example**:
 ```Typescript
-coreService.put('endpoint', { data: 'value' }).subscribe(response => console.log(response));
+httpService.put('/endpoint', data, (resp) => {
+  console.log(resp);
+}).subscribe();
 ```
-### `patch<T>(url: string, body: any, options: any = {}): Observable<T>`
-Makes an HTTP PATCH request.
-
+#### `patch(url: string, doc: any, callback = (resp: any) => {}, opts: any = {}): Observable<any>`
+Performs a PATCH request.
 **Parameters**:
-- `url` (string): The URL to send the request to.
-- `body` (any): The body of the request.
-- `options` (any): Optional parameters.
+- `url` (string): The URL for the request.
+- `doc` (any): The request body.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
 
 **Returns**:
-- `Observable<T>`: An Observable of the HTTP response.
+- An observable for the request.
 
 **Example**:
 ```Typescript
-coreService.patch('endpoint', { data: 'value' }).subscribe(response => console.log(response));
+httpService.patch('/endpoint', data, (resp) => {
+  console.log(resp);
+}).subscribe();
 ```
-### `delete<T>(url: string, options: any = {}): Observable<T>`
-Makes an HTTP DELETE request.
-
+#### `delete(url: string, callback = (resp: any) => {}, opts: any = {}): Observable<any>`
+Performs a DELETE request.
 **Parameters**:
-- `url` (string): The URL to send the request to.
-- `options` (any): Optional parameters.
+- `url` (string): The URL for the request.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
 
 **Returns**:
-- `Observable<T>`: An Observable of the HTTP response.
+- An observable for the request.
 
 **Example**:
 ```Typescript
-coreService.delete('endpoint').subscribe(response => console.log(response));
+httpService.delete('/endpoint', (resp) => {
+  console.log(resp);
+}).subscribe();
 ```
-### `get<T>(url: string, options: any = {}): Observable<T>`
-Makes an HTTP GET request.
-
+#### `get(url: string, callback = (resp: any) => {}, opts: any = {}): Observable<any>`
+Performs a GET request.
 **Parameters**:
-- `url` (string): The URL to send the request to.
-- `options` (any): Optional parameters.
+- `url` (string): The URL for the request.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
 
 **Returns**:
-- `Observable<T>`: An Observable of the HTTP response.
+- An observable for the request.
 
 **Example**:
 ```Typescript
-coreService.get('endpoint').subscribe(response => console.log(response));
+httpService.get('/endpoint', (resp) => {
+  console.log(resp);
+}).subscribe();
 ```
-### `lock(): void`
-Locks the HTTP service to prevent concurrent requests.
-
+#### `clearLocked()`
+Clears all locked requests.
 **Example**:
 ```Typescript
-coreService.lock();
+httpService.clearLocked();
 ```
-### `unlock(): void`
-Unlocks the HTTP service to allow requests.
-
+#### `lock()`
+Locks the service to prevent further requests.
 **Example**:
 ```Typescript
-coreService.unlock();
+httpService.lock();
 ```
-
+#### `unlock()`
+Unlocks the service to allow requests.
+**Example**:
+```Typescript
+httpService.unlock();
+```
 
 ## [Store Service](#store-service)
 The `StoreService` manages local storage in a configurable manner. It can set, get, and remove items from storage, with support for asynchronous operations and JSON serialization.
@@ -1248,10 +1253,8 @@ crudService.delete(doc, { callback: (doc) => console.log(doc) });
 ```
 
 ### Interfaces
-
 #### `CrudDocument`
 Represents a CRUD document.
-
 **Properties**:
 - `_id` (string): The document ID.
 - `__created` (boolean): Indicates if the document is created.
@@ -1268,14 +1271,476 @@ interface CrudDocument {
 
 
 ## [File Service](#file-service)
+The `FileService` is designed to handle file uploads, image processing, and file management tasks in an Angular application. It interacts with the `HttpService` to send files to the server and provides utilities for image resizing and validation.
+### Methods
+#### `add(opts: FileOptions | string): void | (() => void)`
+Adds a file input configuration.
+**Parameters**:
+- `opts` (FileOptions | string): The file options or a string ID.
 
+**Example**:
+```Typescript
+fs.add({
+  id: 'fileInput',
+  type: 'image',
+  resize: 200,
+  cb: (dataUrl, file) => {
+    console.log('File processed:', dataUrl, file);
+  },
+  save: true,
+});
+```
+#### `change(event: Event, info: FileOptions): void`
+Handles file input change event.
+**Parameters**:
+- `event` (Event): The input change event.
+- `info` (FileOptions): The file options.
 
+**Example**:
+```Typescript
+<input type="file" (change)="fs.change($event, fileOptions)">
+```
+#### `remove(part: string, url: string, opts: any = {}, cb: (resp: any) => void = () => {}): void | (() => void)`
+Removes a file.
 
+**Parameters**:
+- `part` (string): The part of the API.
+- `url` (string): The URL of the file.
+- `opts` (object): Additional options.
+- `cb` (function): The callback function.
 
+**Example**:
+```Typescript
+fs.remove('images', 'https://example.com/image.jpg', {}, (resp) => {
+  console.log('File removed:', resp);
+});
+```
+#### `uploadFiles(info: FileOptions, files: File[], cb: (resp: any) => void = () => {}): void`
+Uploads files to the server.
+**Parameters**:
+- `info` (FileOptions): The file options.
+- `files` (File[]): The files to upload.
+- `cb` (function): The callback function.
 
+**Example**:
+```Typescript
+const files = document.getElementById('fileInput').files;
+fs.uploadFiles(fileOptions, files, (resp) => {
+  console.log('Files uploaded:', resp);
+});
+```
+#### `image(info: FileOptions, cb: (resp: any) => void = () => {}): void | (() => void)`
+Uploads an image to the server.
+**Parameters**:
+- `info` (FileOptions): The file options.
+- `cb` (function): The callback function.
 
+**Example**:
+```Typescript
+fs.image({
+  api: '/api/upload',
+  part: 'images',
+  name: 'profilePic',
+}, (resp) => {
+  console.log('Image uploaded:', resp);
+});
+```
+### Interfaces
+#### `FileOptions`
+Represents the file options for uploading and processing files.
+**Properties**:
+- `id` (string): The unique ID for the file input.
+- `type` (string): The type of file ('image' or 'file').
+- `resize` (number | object): The dimensions for resizing the image.
+- `multiple` (boolean): Indicates if multiple files can be uploaded.
+- `multiple_cb` (function): Callback function for multiple files.
+- `cb` (function): Callback function for file processing.
+- `save` (boolean): Indicates if the file should be saved.
+- `complete` (function): Function to call when the file is saved.
+- `api` (string): The API endpoint for uploading the file.
+- `part` (string): The part of the API.
+- `name` (string): The name of the file.
+- `body` (function | object): Function or object to generate the request body.
+- `resp` (function): Function to handle the response.
+- `append` (function): Function to append files to FormData.
+- `multiple_files` (array): Array of multiple files.
+- `multiple_counter` (number): Counter for multiple files.
+- `url` (string): The URL for the file.
+
+**Example**:
+```Typescript
+const fileOptions: FileOptions = {
+  id: 'fileInput',
+  type: 'image',
+  resize: { width: 200, height: 200 },
+  multiple: true,
+  multiple_cb: (files) => {
+    console.log('Multiple files processed:', files);
+  },
+  cb: (dataUrl, file) => {
+    console.log('File processed:', dataUrl, file);
+  },
+  save: true,
+  api: '/api/upload',
+  part: 'images',
+  name: 'profilePic',
+  body: () => ({ userId: 123 }),
+  resp: (response) => {
+    console.log('Server response:', response);
+  },
+};
+```
 
 
 ## [Socket Service](#socket-service)
-## [Date Service](#date-service)
+The `SocketService` manages WebSocket connections using `socket.io`. It handles setting up the connection, listening for events, and emitting messages.
+### Methods
+#### `setUrl(url: string): void`
+Sets the URL for the WebSocket connection and reloads the socket.
+**Parameters**:
+- `url` (string): The URL of the WebSocket server.
+
+**Example**:
+```Typescript
+socketService.setUrl('https://example.com');
+```
+#### `on(to: string, cb: (message: any) => void = () => {}): void`
+
+Subscribes to a WebSocket event.
+
+**Parameters**:
+- `to` (string): The event to subscribe to.
+- `cb` (function): The callback function to execute when the event is received.
+
+**Example**:
+```Typescript
+socketService.on('message', (msg) => {
+  console.log('Received message:', msg);
+});
+```
+#### `emit(to: string, message: any, room: any = false): void`
+
+Emits a message to a WebSocket event.
+
+**Parameters**:
+- `to` (string): The event to emit the message to.
+- `message` (any): The message to emit.
+- `room` (any): Optional room to emit the message to.
+
+**Example**:
+```Typescript
+socketService.emit('message', { text: 'Hello, World!' });
+```
+### Usage Example
+
+```typescript
+import { SocketService } from 'wacom';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  constructor(private socketService: SocketService) {
+    this.socketService.setUrl('https://example.com');
+    this.socketService.on('connect', () => {
+      console.log('Connected to WebSocket');
+    });
+    this.socketService.on('message', (msg) => {
+      console.log('Received message:', msg);
+    });
+  }
+
+  sendMessage() {
+    this.socketService.emit('message', { text: 'Hello, World!' });
+  }
+}
+```
+
+
+## [Time Service](#time-service)
+The `TimeService` provides comprehensive date and time management, including timezone handling, formatting dates, and utility functions for calendar operations.
+### Methods
+#### `getDayName(date: Date, format: 'short' | 'long' = 'long'): string`
+Returns the name of the day of the week for a given date.
+
+**Parameters**:
+- `date` (Date): The date for which to get the day of the week.
+- `format` ('short' | 'long'): The format in which to return the day name. Default is 'long'.
+
+**Returns**:
+- The name of the day of the week.
+
+**Example**:
+```Typescript
+const dayName = timeService.getDayName(new Date(), 'short');
+console.log(dayName); // Output: 'Mon'
+```
+#### `formatDate(date: Date, format: string = 'mediumDate', timezone: string = 'UTC'): string`
+Formats a date according to the specified format and timezone.
+
+**Parameters**:
+- `date` (Date): The date to format.
+- `format` (string): The format string (see Angular DatePipe documentation for format options).
+- `timezone` (string): The timezone to use for formatting.
+
+**Returns**:
+- The formatted date string.
+
+**Example**:
+```Typescript
+const formattedDate = timeService.formatDate(new Date(), 'fullDate', 'America/New_York');
+console.log(formattedDate); // Output: 'Monday, January 1, 2023'
+```
+#### `convertToTimezone(date: Date, timezone: string): Date`
+Converts a date to a different timezone.
+**Parameters**:
+- `date` (Date): The date to convert.
+- `timezone` (string): The timezone to convert to.
+
+**Returns**:
+- The date in the new timezone.
+
+**Example**:
+```Typescript
+const dateInTimezone = timeService.convertToTimezone(new Date(), 'Asia/Tokyo');
+console.log(dateInTimezone);
+```
+#### `startOfDay(date: Date): Date`
+Returns the start of the day for a given date.
+**Parameters**:
+- `date` (Date): The date for which to get the start of the day.
+
+**Returns**:
+- The start of the day (midnight) for the given date.
+
+**Example**:
+```Typescript
+const startOfDay = timeService.startOfDay(new Date());
+console.log(startOfDay); // Output: '2023-01-01T00:00:00.000Z'
+```
+#### `endOfDay(date: Date): Date`
+Returns the end of the day for a given date.
+**Parameters**:
+- `date` (Date): The date for which to get the end of the day.
+
+**Returns**:
+- The end of the day (one millisecond before midnight) for the given date.
+
+**Example**:
+```Typescript
+const endOfDay = timeService.endOfDay(new Date());
+console.log(endOfDay); // Output: '2023-01-01T23:59:59.999Z'
+```
+#### `getDaysInMonth(month: number, year: number): number`
+Returns the number of days in a given month and year.
+**Parameters**:
+- `month` (number): The month (0-11).
+- `year` (number): The year.
+
+**Returns**:
+- The number of days in the month.
+
+**Example**:
+```Typescript
+const daysInMonth = timeService.getDaysInMonth(1, 2023);
+console.log(daysInMonth); // Output: 28
+```
+#### `isLeapYear(year: number): boolean`
+Checks if a given year is a leap year.
+**Parameters**:
+- `year` (number): The year to check.
+
+**Returns**:
+- True if the year is a leap year, false otherwise.
+
+**Example**:
+```Typescript
+const isLeap = timeService.isLeapYear(2024);
+console.log(isLeap); // Output: true
+```
+#### `addDays(date: Date, days: number): Date`
+Adds a specified number of days to a date.
+**Parameters**:
+- `date` (Date): The date to which to add days.
+- `days` (number): The number of days to add.
+
+**Returns**:
+- The new date with the added days.
+
+**Example**:
+```Typescript
+const newDate = timeService.addDays(new Date(), 10);
+console.log(newDate);
+```
+#### `addMonths(date: Date, months: number): Date`
+Adds a specified number of months to a date.
+**Parameters**:
+- `date` (Date): The date to which to add months.
+- `months` (number): The number of months to add.
+
+**Returns**:
+- The new date with the added months.
+
+**Example**:
+```Typescript
+const newDate = timeService.addMonths(new Date(), 2);
+console.log(newDate);
+```
+#### `addYears(date: Date, years: number): Date`
+Adds a specified number of years to a date.
+**Parameters**:
+- `date` (Date): The date to which to add years.
+- `years` (number): The number of years to add.
+
+**Returns**:
+- The new date with the added years.
+
+**Example**:
+```Typescript
+const newDate = timeService.addYears(new Date(), 5);
+console.log(newDate);
+```
+#### `subtractDays(date: Date, days: number): Date`
+Subtracts a specified number of days from a date.
+**Parameters**:
+- `date` (Date): The date from which to subtract days.
+- `days` (number): The number of days to subtract.
+
+**Returns**:
+- The new date with the subtracted days.
+
+**Example**:
+```Typescript
+const newDate = timeService.subtractDays(new Date(), 5);
+console.log(newDate);
+```
+#### `subtractMonths(date: Date, months: number): Date`
+Subtracts a specified number of months from a date.
+**Parameters**:
+- `date` (Date): The date from which to subtract months.
+- `months` (number): The number of months to subtract.
+
+**Returns**:
+- The new date with the subtracted months.
+
+**Example**:
+```Typescript
+const newDate = timeService.subtractMonths(new Date(), 3);
+console.log(newDate);
+```
+#### `subtractYears(date: Date, years: number): Date`
+Subtracts a specified number of years from a date.
+**Parameters**:
+- `date` (Date): The date from which to subtract years.
+- `years` (number): The number of years to subtract.
+
+**Returns**:
+- The new date with the subtracted years.
+
+**Example**:
+```Typescript
+const newDate = timeService.subtractYears(new Date(), 2);
+console.log(newDate);
+```
+#### `isSameDay(date1: Date, date2: Date): boolean`
+Checks if two dates are on the same day.
+**Parameters**:
+- `date1` (Date): The first date.
+- `date2` (Date): The second date.
+
+**Returns**:
+- True if the dates are on the same day, false otherwise.
+
+**Example**:
+```Typescript
+const sameDay = timeService.isSameDay(new Date(), new Date());
+console.log(sameDay); // Output: true
+```
+
+
 ## [Dom Service](#dom-service)
+The `DomService` facilitates DOM manipulation and dynamic component loading in Angular applications.
+### Methods
+#### `appendById(component: any, options: any = {}, id: string): { nativeElement: HTMLElement, componentRef: ComponentRef<any> }`
+Appends a component to a specified element by ID.
+
+**Parameters**:
+- `component` (any): The component to append.
+- `options` (any): The options to project into the component.
+- `id` (string): The ID of the element to append the component to.
+
+**Returns**:
+- An object containing the native element and the component reference.
+
+**Example**:
+```Typescript
+const result = domService.appendById(MyComponent, { inputProp: 'value' }, 'elementId');
+console.log(result.nativeElement); // Output: The native DOM element
+console.log(result.componentRef); // Output: The component reference
+```
+#### `appendComponent(component: any, options: any = {}, element: HTMLElement = this.core.document.body): { nativeElement: HTMLElement, componentRef: ComponentRef<any> }`
+Appends a component to a specified element or to the body.
+**Parameters**:
+- `component` (any): The component to append.
+- `options` (any): The options to project into the component.
+- `element` (HTMLElement): The element to append the component to. Defaults to body.
+
+**Returns**:
+- An object containing the native element and the component reference.
+
+**Example**:
+```Typescript
+const result = domService.appendComponent(MyComponent, { inputProp: 'value' });
+console.log(result.nativeElement); // Output: The native DOM element
+console.log(result.componentRef); // Output: The component reference
+```
+#### `getComponentRef(component: any, options: any = {}): ComponentRef<any>`
+Gets a reference to a dynamically created component.
+**Parameters**:
+- `component` (any): The component to create.
+- `options` (any): The options to project into the component.
+
+**Returns**:
+- The component reference.
+
+**Example**:
+```Typescript
+const componentRef = domService.getComponentRef(MyComponent, { inputProp: 'value' });
+console.log(componentRef); // Output: The component reference
+```
+#### `projectComponentInputs(component: ComponentRef<any>, options: any): ComponentRef<any>`
+Projects the inputs onto the component.
+**Parameters**:
+- `component` (ComponentRef<any>): The component reference.
+- `options` (any): The options to project into the component.
+
+**Returns**:
+- The component reference with the projected inputs.
+
+**Example**:
+```Typescript
+const componentRef = domService.getComponentRef(MyComponent);
+domService.projectComponentInputs(componentRef, { inputProp: 'value' });
+console.log(componentRef.instance.inputProp); // Output: 'value'
+```
+### Usage Example
+```Typescript
+import { DomService } from './dom.service';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  constructor(private domService: DomService) {}
+
+  addComponent() {
+    const result = this.domService.appendById(MyComponent, { inputProp: 'value' }, 'elementId');
+    console.log(result.nativeElement); // Output: The native DOM element
+    console.log(result.componentRef); // Output: The component reference
+  }
+}
+```

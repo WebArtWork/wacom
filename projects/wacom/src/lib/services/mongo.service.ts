@@ -813,7 +813,7 @@ export class MongoService {
 		private core: CoreService
 	) {
 		console.warn('Mongo Service is deprecated');
-		this.core.next('socket', (socket:any)=>{
+		this.core.onComplete('socket').then((socket:any)=>{
 			this.socket = socket;
 			socket.on('create', (created:any) => {
 				this.fetch(created.part, {

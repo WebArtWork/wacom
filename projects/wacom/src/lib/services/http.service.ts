@@ -1,7 +1,7 @@
 import { Injectable, Inject, Optional } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { CONFIG_TOKEN, Config } from '../interfaces/config';
-import { EMPTY, Subject, Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { EMPTY, Observable, Subject } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
 import { StoreService } from './store.service';
 
@@ -9,227 +9,180 @@ import { StoreService } from './store.service';
 	providedIn: 'root',
 })
 export class HttpService {
-	private errors: Array<(err: HttpErrorResponse, retry?: () => void) => void> = [];
-	private _http: any = {};
-	private _headers: { [key: string]: string } = {};
-	private _httpHeaders = new HttpHeaders(this._headers);
-	private url = '';
-	private locked = false;
-	private awaitLocked: any[] = [];
+	errors: ((err: HttpErrorResponse, retry?: () => void) => {})[] = [];
+	url = '';
+	locked = false;
+	awaitLocked: any[] = [];
+	private _http: any;
+	private _headers: any = {};
+	private _http_headers = new HttpHeaders(this._headers);
 
-	/**
-	 * Constructor to initialize HttpService.
-	 *
-	 * @param store - Instance of StoreService to manage storage.
-	 * @param http - Instance of HttpClient to make HTTP requests.
-	 * @param config - Optional configuration for HTTP service.
-	 */
 	constructor(
 		private store: StoreService,
 		private http: HttpClient,
-		@Inject(CONFIG_TOKEN) @Optional() private config: Config
+		@Inject(CONFIG_TOKEN) @Optional() private _config: Config
 	) {
-		this._http = this.config?.http || {};
-		this.initializeHeaders(this._http.headers);
+		this._http = this._config.http || {};
 
-		this.store.get('http_url', (url: string) => {
+		if (typeof this._http.headers === 'object') {
+			for (const header in this._http.headers) {
+				this._headers[header] = this._http.headers[header];
+			}
+			this._http_headers = new HttpHeaders(this._headers);
+		}
+
+		this.store.get('http_url', (url: any) => {
 			this.url = url || this._http.url || '';
 		});
 
-		this.store.getJson('http_headers', (headers: { [key: string]: string }) => {
+		this.store.getJson('http_headers', (headers: any) => {
 			if (headers) {
-				this.initializeHeaders(headers);
+				for (const header in headers) {
+					this._headers[header] = headers[header];
+				}
+				this._http_headers = new HttpHeaders(this._headers);
 			}
 		});
 	}
 
-	/**
-	 * Initializes HTTP headers.
-	 *
-	 * @param headers - Headers to initialize.
-	 */
-	private initializeHeaders(headers: { [key: string]: string } = {}): void {
-		for (const header in headers) {
-			this._headers[header] = headers[header];
-		}
-		this._httpHeaders = new HttpHeaders(this._headers);
-	}
-
-	/**
-	 * Sets the base URL for HTTP requests.
-	 *
-	 * @param url - The base URL to set.
-	 */
-	public setUrl(url: string): void {
+	setUrl(url: string) {
 		this.url = url;
 		this.store.set('http_url', url);
 	}
 
-	/**
-	 * Removes the base URL for HTTP requests.
-	 */
-	public removeUrl(): void {
+	removeUrl() {
 		this.url = this._http.url || '';
 		this.store.remove('http_url');
 	}
 
-	/**
-	 * Sets an HTTP header.
-	 *
-	 * @param key - The header key.
-	 * @param value - The header value.
-	 */
-	public setHeader(key: string, value: string): void {
+	set(key: any, value: any) {
 		this._headers[key] = value;
 		this.store.setJson('http_headers', this._headers);
-		this._httpHeaders = new HttpHeaders(this._headers);
+		this._http_headers = new HttpHeaders(this._headers);
 	}
 
-	/**
-	 * Gets the value of an HTTP header.
-	 *
-	 * @param key - The header key.
-	 * @returns The value of the header.
-	 */
-	public getHeader(key: string): string | undefined {
+	header(key: any) {
 		return this._headers[key];
 	}
 
-	/**
-	 * Removes an HTTP header.
-	 *
-	 * @param key - The header key to remove.
-	 */
-	public removeHeader(key: string): void {
+	remove(key: any) {
 		delete this._headers[key];
-		this._httpHeaders = new HttpHeaders(this._headers);
+		this._http_headers = new HttpHeaders(this._headers);
 		this.store.setJson('http_headers', this._headers);
 	}
 
-	/**
-	 * Makes an HTTP POST request.
-	 *
-	 * @param url - The URL to send the request to.
-	 * @param body - The body of the request.
-	 * @param options - Optional parameters.
-	 * @returns An Observable of the HTTP response.
-	 */
-	public post<T>(url: string, body: any, options: any = {}): Observable<T> {
-		return this.request<T>('post', url, body, options);
+	private _httpMethod(method: string, _url: string, doc: unknown, headers: any): Observable<any> {
+		if (method === 'post') {
+			return this.http.post<any>(_url, doc, headers);
+		} else if (method === 'put') {
+			return this.http.put<any>(_url, doc, headers);
+		} else if (method === 'patch') {
+			return this.http.patch<any>(_url, doc, headers);
+		} else if (method === 'delete') {
+			return this.http.delete<any>(_url, headers);
+		} else {
+			return this.http.get<any>(_url, headers);
+		}
 	}
 
-	/**
-	 * Makes an HTTP PUT request.
-	 *
-	 * @param url - The URL to send the request to.
-	 * @param body - The body of the request.
-	 * @param options - Optional parameters.
-	 * @returns An Observable of the HTTP response.
-	 */
-	public put<T>(url: string, body: any, options: any = {}): Observable<T> {
-		return this.request<T>('put', url, body, options);
-	}
-
-	/**
-	 * Makes an HTTP PATCH request.
-	 *
-	 * @param url - The URL to send the request to.
-	 * @param body - The body of the request.
-	 * @param options - Optional parameters.
-	 * @returns An Observable of the HTTP response.
-	 */
-	public patch<T>(url: string, body: any, options: any = {}): Observable<T> {
-		return this.request<T>('patch', url, body, options);
-	}
-
-	/**
-	 * Makes an HTTP DELETE request.
-	 *
-	 * @param url - The URL to send the request to.
-	 * @param options - Optional parameters.
-	 * @returns An Observable of the HTTP response.
-	 */
-	public delete<T>(url: string, options: any = {}): Observable<T> {
-		return this.request<T>('delete', url, null, options);
-	}
-
-	/**
-	 * Makes an HTTP GET request.
-	 *
-	 * @param url - The URL to send the request to.
-	 * @param options - Optional parameters.
-	 * @returns An Observable of the HTTP response.
-	 */
-	public get<T>(url: string, options: any = {}): Observable<T> {
-		return this.request<T>('get', url, null, options);
-	}
-
-	/**
-	 * General method to make HTTP requests.
-	 *
-	 * @param method - The HTTP method to use.
-	 * @param url - The URL to send the request to.
-	 * @param body - The body of the request.
-	 * @param options - Optional parameters.
-	 * @returns An Observable of the HTTP response.
-	 */
-	private request<T>(method: string, url: string, body: any, options: any): Observable<T> {
-		if (this.locked && !options.skipLock) {
-			const subject = new Subject<T>();
-			const wait = setTimeout(() => {
-				this.request<T>(method, url, body, options).subscribe(subject);
-			}, 100);
-			this.awaitLocked.push(wait);
-			return subject.asObservable();
+	private _post(
+		url: string,
+		doc: unknown,
+		callback = (resp: unknown) => { },
+		opts: any = {},
+		method = 'post'
+	): Observable<any> {
+		if (typeof opts === 'function') {
+			opts = { err: opts };
 		}
 
-		const fullUrl = (options.url || this.url) + url;
-		this.prepareHandle(fullUrl, body);
+		if (!opts.err) {
+			opts.err = (err: HttpErrorResponse) => { };
+		}
 
-		const observable = this.http.request<T>(method, fullUrl, {
-			body,
-			headers: this._httpHeaders,
-			...options,
-		});
+		if (this.locked && !opts.skipLock) {
+			const wait = setTimeout(() => {
+				this._post(url, doc, callback, opts, method);
+			}, 100);
 
-		return observable.pipe(
-			first(),
-			catchError((error: HttpErrorResponse) => this.handleError<T>(options.err, () => this.request<T>(method, url, body, options))(error))
-		) as Observable<T>;
+			this.awaitLocked.push(wait);
+			return new Subject().asObservable();
+		}
+
+		const _url = (opts.url || this.url) + url;
+
+		this.prepare_handle(_url, doc);
+
+		const observable = this._httpMethod(method, _url, doc, { headers: this._http_headers });
+
+		observable
+			.pipe(
+				first(),
+				catchError((error: HttpErrorResponse) => {
+					this.handleError(opts.err, () => {
+						this._post(url, doc, callback, opts, method);
+					})(error);
+					return EMPTY;
+				})
+			)
+			.subscribe((resp: unknown) => {
+				this.response_handle(_url, resp, () => {
+					callback(resp);
+				});
+			});
+
+		return observable;
 	}
 
-	/**
-	 * Prepares the request before sending.
-	 *
-	 * @param url - The URL of the request.
-	 * @param body - The body of the request.
-	 */
-	private prepareHandle(url: string, body: any): void {
-		// Custom preparation logic
+	post(url: string, doc: any, callback = (resp: any) => { }, opts: any = {}): Observable<any> {
+		return this._post(url, doc, callback, opts);
 	}
 
-	/**
-	 * Handles HTTP errors.
-	 *
-	 * @param callback - The error callback.
-	 * @param retry - The retry function.
-	 * @returns A function that handles the error.
-	 */
-	private handleError<T>(callback: (err: HttpErrorResponse) => void, retry: () => void): (error: HttpErrorResponse) => Observable<T> {
-		return (error: HttpErrorResponse): Observable<T> => {
-			this.errHandle(error, callback, retry);
-			return EMPTY;
+	put(url: string, doc: any, callback = (resp: any) => { }, opts: any = {}): Observable<any> {
+		return this._post(url, doc, callback, opts, 'put');
+	}
+
+	patch(url: string, doc: any, callback = (resp: any) => { }, opts: any = {}): Observable<any> {
+		return this._post(url, doc, callback, opts, 'patch');
+	}
+
+	delete(url: string, callback = (resp: any) => { }, opts: any = {}): Observable<any> {
+		return this._post(url, null, callback, opts, 'delete');
+	}
+
+	get(url: string, callback = (resp: any) => { }, opts: any = {}): Observable<any> {
+		return this._post(url, null, callback, opts, 'get');
+	}
+
+	clearLocked() {
+		for (const awaitLocked of this.awaitLocked) {
+			clearTimeout(awaitLocked);
+		}
+		this.awaitLocked = [];
+	}
+
+	lock() {
+		this.locked = true;
+	}
+
+	unlock() {
+		this.locked = false;
+	}
+
+	private handleError(callback: any, retry: () => void) {
+		return (error: HttpErrorResponse): Promise<void> => {
+			return new Promise((resolve) => {
+				this.err_handle(error, callback, retry);
+				resolve();
+			});
 		};
 	}
 
-	/**
-	 * Central error handling method.
-	 *
-	 * @param err - The HTTP error.
-	 * @param next - The next error callback.
-	 * @param retry - The retry function.
-	 */
-	private errHandle(err: HttpErrorResponse, next: (err: HttpErrorResponse) => void, retry: () => void): void {
+	private err_handle(
+		err: HttpErrorResponse,
+		next: (err: HttpErrorResponse) => void,
+		retry: () => void
+	) {
 		if (typeof next === 'function') {
 			next(err);
 		}
@@ -241,28 +194,11 @@ export class HttpService {
 		}
 	}
 
-	/**
-	 * Locks the HTTP service to prevent concurrent requests.
-	 */
-	public lock(): void {
-		this.locked = true;
-	}
+	private prepare_handle(url: string, body: unknown) { }
 
-	/**
-	 * Unlocks the HTTP service to allow requests.
-	 */
-	public unlock(): void {
-		this.locked = false;
-		this.clearLocked();
-	}
-
-	/**
-	 * Clears the list of locked requests.
-	 */
-	private clearLocked(): void {
-		for (const timeout of this.awaitLocked) {
-			clearTimeout(timeout);
+	private response_handle(url: string, body: unknown, next: () => void) {
+		if (typeof next === 'function') {
+			next();
 		}
-		this.awaitLocked = [];
 	}
 }

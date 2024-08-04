@@ -102,7 +102,7 @@ export class FileService {
 			}
 			Array.from(input.files).forEach((file) => info.cb?.('', file));
 			if (info.part || info.url) {
-				this.uploadFiles(info, input.files as File[]);
+				this.uploadFiles(info, input.files as any);
 			}
 		} else {
 			console.log('Provide type `image` or `file`');
@@ -149,13 +149,13 @@ export class FileService {
 
 		if (info.save) {
 			info.complete = () => {
-				this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, formData, (resp) => {
+				this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, formData, (resp: any) => {
 					info.resp?.(resp);
 					cb(resp);
 				});
 			};
 		} else {
-			this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, formData, (resp) => {
+			this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, formData, (resp: any) => {
 				info.resp?.(resp);
 				cb(resp);
 			});
@@ -185,7 +185,8 @@ export class FileService {
 	 * @param info - The file options.
 	 * @param file - The file object.
 	 */
-	private update(dataUrl: string, info: FileOptions, file: File): void {
+	// private update(dataUrl: string, info: FileOptions, file: File): void {
+	private update(dataUrl: string, info: any, file: File): void {
 		info.cb?.(dataUrl, file);
 		if (info.multiple_cb) {
 			info.multiple_files.push({ dataUrl, file });
@@ -199,12 +200,12 @@ export class FileService {
 
 		if (info.save) {
 			info.complete = () => {
-				this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, obj, (resp) => {
+				this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, obj, (resp: any) => {
 					info.cb?.(resp);
 				});
 			};
 		} else {
-			this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, obj, (resp) => {
+			this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, obj, (resp: any) => {
 				info.cb?.(resp);
 			});
 		}
@@ -216,7 +217,8 @@ export class FileService {
 	 * @param file - The file object.
 	 * @param info - The file options.
 	 */
-	private process(file: File, info: FileOptions): void {
+	// private process(file: File, info: FileOptions): void {
+	private process(file: File, info: any): void {
 		if (!file.type.startsWith('image/')) {
 			info.cb?.(false, file);
 			if (info.multiple_cb) {
