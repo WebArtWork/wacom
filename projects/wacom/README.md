@@ -1087,7 +1087,7 @@ const randomText = uiService.text(15);
 
 
 ## [Crud Service](#crud-service)
-The `CrudService` is designed to manage CRUD (Create, Read, Update, Delete) operations in an Angular application. It interacts with an API, stores documents locally, and provides methods for handling various CRUD operations.
+The `CrudService` is designed to manage CRUD (Create, Read, Update, Delete) operations in an Angular application. It interacts with an API, stores documents locally, and provides methods for handling various CRUD operations. It should be extended by specific services that manage different document types.
 ### Methods
 #### `new(): Document`
 Creates a new document with a temporary ID.
@@ -1096,12 +1096,10 @@ Creates a new document with a temporary ID.
 
 **Example**:
 ```Typescript
-const newDoc = crudService.new();
+const newDoc = workService.new();
 ```
-
 #### `doc(_id: string): Document`
 Retrieves a document by its ID.
-
 **Parameters**:
 - `_id` (string): The document ID.
 
@@ -1110,9 +1108,25 @@ Retrieves a document by its ID.
 
 **Example**:
 ```Typescript
-const doc = crudService.doc('12345');
+const doc = workService.doc('12345');
 ```
+#### `addDoc(doc: Document): void`
+Adds or updates a document in the local store.
 
+**Parameters**:
+- `doc` (Document): The document to add or update.
+
+**Example**:
+```Typescript
+workService.addDoc(doc);
+```
+#### `setDocs(): void`
+Saves the current state of documents to local storage.
+
+**Example**:
+```Typescript
+workService.setDocs();
+```
 #### `configDocs(name: string, config: (doc: Document, container: unknown) => void, reset: () => unknown): unknown`
 Configures documents for a specific name.
 
@@ -1126,9 +1140,8 @@ Configures documents for a specific name.
 
 **Example**:
 ```Typescript
-crudService.configDocs('myConfig', (doc, container) => { /* config logic */ }, () => { /* reset logic */ });
+workService.configDocs('myConfig', (doc, container) => { /* config logic */ }, () => { /* reset logic */ });
 ```
-
 #### `getConfigedDocs(name: string): unknown`
 Retrieves the configured documents for a specific name.
 
@@ -1140,9 +1153,8 @@ Retrieves the configured documents for a specific name.
 
 **Example**:
 ```Typescript
-const configedDocs = crudService.getConfigedDocs('myConfig');
+const configedDocs = workService.getConfigedDocs('myConfig');
 ```
-
 #### `reconfigureDocs(name: string = ''): void`
 Reconfigures documents for a specific name or all names.
 
@@ -1151,9 +1163,8 @@ Reconfigures documents for a specific name or all names.
 
 **Example**:
 ```Typescript
-crudService.reconfigureDocs('myConfig');
+workService.reconfigureDocs('myConfig');
 ```
-
 #### `setPerPage(_perPage: number): void`
 Sets the number of documents per page.
 
@@ -1162,9 +1173,8 @@ Sets the number of documents per page.
 
 **Example**:
 ```Typescript
-crudService.setPerPage(10);
+workService.setPerPage(10);
 ```
-
 #### `get(config: GetConfig = {}, options: CrudOptions<Document> = {}): Observable<Document[]>`
 Retrieves documents from the API.
 
@@ -1177,9 +1187,8 @@ Retrieves documents from the API.
 
 **Example**:
 ```Typescript
-crudService.get({ page: 1 }, { callback: (docs) => console.log(docs) });
+workService.get({ page: 1 }, { callback: (docs) => console.log(docs) });
 ```
-
 #### `create(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> | void`
 Creates a new document in the API.
 
@@ -1192,9 +1201,8 @@ Creates a new document in the API.
 
 **Example**:
 ```Typescript
-crudService.create(newDoc, { callback: (doc) => console.log(doc) });
+workService.create(newDoc, { callback: (doc) => console.log(doc) });
 ```
-
 #### `fetch(query: object = {}, options: CrudOptions<Document> = {}): Observable<Document>`
 Fetches a document from the API based on a query.
 
@@ -1207,9 +1215,8 @@ Fetches a document from the API based on a query.
 
 **Example**:
 ```Typescript
-crudService.fetch({ name: 'example' }, { callback: (doc) => console.log(doc) });
+workService.fetch({ name: 'example' }, { callback: (doc) => console.log(doc) });
 ```
-
 #### `updateAfterWhile(doc: Document, options: CrudOptions<Document> = {}): void`
 Updates a document after a specified delay.
 
@@ -1219,9 +1226,8 @@ Updates a document after a specified delay.
 
 **Example**:
 ```Typescript
-crudService.updateAfterWhile(doc, { callback: (doc) => console.log(doc) });
+workService.updateAfterWhile(doc, { callback: (doc) => console.log(doc) });
 ```
-
 #### `update(doc: Document, options: CrudOptions<Document> = {}): Observable<Document>`
 Updates a document in the API.
 
@@ -1234,9 +1240,8 @@ Updates a document in the API.
 
 **Example**:
 ```Typescript
-crudService.update(doc, { callback: (doc) => console.log(doc) });
+workService.update(doc, { callback: (doc) => console.log(doc) });
 ```
-
 #### `delete(doc: Document, options: CrudOptions<Document> = {}): Observable<Document>`
 Deletes a document from the API.
 
@@ -1249,12 +1254,12 @@ Deletes a document from the API.
 
 **Example**:
 ```Typescript
-crudService.delete(doc, { callback: (doc) => console.log(doc) });
+workService.delete(doc, { callback: (doc) => console.log(doc) });
 ```
-
 ### Interfaces
 #### `CrudDocument`
 Represents a CRUD document.
+
 **Properties**:
 - `_id` (string): The document ID.
 - `__created` (boolean): Indicates if the document is created.
@@ -1266,6 +1271,58 @@ interface CrudDocument {
   _id: string;
   __created: boolean;
   __modified: boolean;
+}
+```
+### Code sample use
+```Typescript
+import { Injectable } from '@angular/core';
+import {
+	AlertService,
+	CoreService,
+	HttpService,
+	StoreService,
+	CrudService,
+	CrudDocument
+} from 'wacom';
+
+export interface Work extends CrudDocument {
+	name: string;
+	description: string;
+}
+
+@Injectable({
+	providedIn: 'root'
+})
+export class WorkService extends CrudService<Work> {
+	works: Work[] = [];
+	constructor(
+		_http: HttpService,
+		_store: StoreService,
+		_alert: AlertService,
+		_core: CoreService
+	) {
+		super(
+			{
+				name: 'work'
+			},
+			_http,
+			_store,
+			_alert,
+			_core
+		);
+		this.get().subscribe((works: Work[]) =>
+			this.works.push(...works)
+		);
+		_core.on('work_create', (work: Work) => {
+			this.works.push(work);
+		});
+		_core.on('work_delete', (work: Work) => {
+			this.works.splice(
+				this.works.findIndex((o) => o._id === work._id),
+				1
+			);
+		});
+	}
 }
 ```
 
