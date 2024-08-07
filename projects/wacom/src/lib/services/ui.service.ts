@@ -7,6 +7,8 @@ import { CoreService } from './core.service';
 export class UiService {
 	private variables: { [key: string]: string } = {};
 	private _forms: { [key: string]: any } = {};
+	// global variable use for design purposes
+	var: Record<string, unknown> = {};
 
 	constructor(private core: CoreService) {
 		const storedVariables = this.core.localStorage.getItem('css_variables');
