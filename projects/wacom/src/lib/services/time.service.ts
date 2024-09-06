@@ -177,4 +177,40 @@ export class TimeService {
 			date1.getDate() === date2.getDate()
 		);
 	}
+
+	/**
+	 * Returns the ISO week number for a given date.
+	 *
+	 * @param date - The date for which to get the week number.
+	 * @returns The ISO week number (1-53).
+	 */
+	getWeekNumber(date: Date): number {
+		const tempDate = new Date(date.getTime());
+		tempDate.setHours(0, 0, 0, 0);
+		// Set to nearest Thursday: current date + 4 - current day number, making Thursday day 4
+		tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
+		const yearStart = new Date(tempDate.getFullYear(), 0, 1);
+		// Calculate full weeks to nearest Thursday
+		return Math.ceil((((tempDate.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+	}
+
+	/**
+	 * Returns the number of weeks in a month for a given month and year.
+	 *
+	 * @param month - The month (0-11).
+	 * @param year - The year.
+	 * @returns The number of weeks in the month.
+	 */
+	getWeeksInMonth(month: number, year: number): number {
+		const firstDayOfMonth = new Date(year, month, 1);
+		const lastDayOfMonth = new Date(year, month + 1, 0);
+		// Get ISO week numbers for the first and last day of the month
+		const firstWeek = this.getWeekNumber(firstDayOfMonth);
+		let lastWeek = this.getWeekNumber(lastDayOfMonth);
+		// Special case: when January 1st is in the last week of the previous year
+		if (firstWeek > lastWeek) {
+			lastWeek = this.getWeekNumber(new Date(year, 11, 31)); // Get week of the last day of the year
+		}
+		return lastWeek - firstWeek + 1;
+	}
 }
