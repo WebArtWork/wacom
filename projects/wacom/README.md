@@ -1716,6 +1716,37 @@ const sameDay = timeService.isSameDay(new Date(), new Date());
 console.log(sameDay); // Output: true
 ```
 
+#### `getWeekNumber(date: Date): number`
+Returns the ISO week number for a given date.
+
+**Parameters**:
+- `date` (Date): The date for which to get the week number.
+
+**Returns**:
+- The ISO week number (1-53).
+
+**Example**:
+```Typescript
+const weekNumber = timeService.getWeekNumber(new Date());
+console.log(weekNumber); // Output: 35 (example)
+```
+
+#### `getWeeksInMonth(month: number, year: number): number`
+Returns the number of weeks in a month for a given month and year.
+
+**Parameters**:
+- `month` (number): The month (0-11).
+- `year` (number): The year.
+
+**Returns**:
+- The number of weeks in the month.
+
+**Example**:
+```Typescript
+const weeksInMonth = timeService.getWeeksInMonth(2, 2025);
+console.log(weeksInMonth); // Output: 6 (example for March 2025)
+```
+
 
 ## [Dom Service](#dom-service)
 The `DomService` facilitates DOM manipulation and dynamic component loading in Angular applications.
