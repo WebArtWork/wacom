@@ -3,9 +3,11 @@ import { Injectable } from '@angular/core';
 	providedIn: 'root'
 })
 export class BaseService {
-	public now = new Date().getTime();
-	public _now = ()=>{
+	now = new Date().getTime();
+
+	_now = ()=>{
 		this.now = new Date().getTime();
 	}
+
 	constructor() {}
 }
