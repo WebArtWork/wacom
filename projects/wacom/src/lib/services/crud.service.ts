@@ -4,6 +4,7 @@ import { StoreService } from './store.service';
 import { AlertService } from './alert.service';
 import { CoreService } from './core.service';
 import { CrudDocument } from '../interfaces/crud.interface';
+import { BaseService } from './base.service';
 
 interface CrudOptions<Document> {
 	name?: string;
@@ -23,18 +24,9 @@ interface GetConfig {
 	perPage?: number;
 }
 
-export abstract class CrudService<Document extends CrudDocument> {
-	private _url = '/api/';
-	private docs: Document[] = [];
-	private _perPage = 20;
-	private _names: string[] = [];
-	private _configuredDocs: Record<string, unknown> = {};
-	private _docsConfiguration: Record<
-		string,
-		(doc: Document, container: unknown) => void
-	> = {};
-	private _docsReset: Record<string, () => unknown> = {};
-
+export abstract class CrudService<
+	Document extends CrudDocument
+> extends BaseService {
 	constructor(
 		private _config: CrudConfig<Document>,
 		private _http: HttpService,
@@ -42,31 +34,22 @@ export abstract class CrudService<Document extends CrudDocument> {
 		private _alert: AlertService,
 		private _core: CoreService
 	) {
+		super();
+
 		this._url += this._config.name;
+
 		this._store.getJson('docs_' + this._config.name, (docs) => {
 			if (docs) {
-				this.docs = docs;
+				this._docs = docs;
 			}
 		});
 	}
 
 	/**
-	 * Generates a unique ID for a document.
-	 *
-	 * @param doc - The document for which to generate the ID.
-	 * @returns The unique ID as a string.
-	 */
-	private _id(doc: Document): string {
-		return (doc as unknown as Record<string, unknown>)[
-			this._config._id || '_id'
-		]?.toString() as string;
-	}
-
-	/**
 	 * Sets the documents in the local storage.
 	 */
-	private setDocs(): void {
-		this._store.setJson('docs_' + this._config.name, this.docs);
+	setDocs(): void {
+		this._store.setJson('docs_' + this._config.name, this._docs);
 	}
 
 	/**
@@ -74,19 +57,22 @@ export abstract class CrudService<Document extends CrudDocument> {
 	 *
 	 * @param doc - The document to add.
 	 */
-	private addDoc(doc: Document): void {
+	addDoc(doc: Document): void {
 		if (this._config.replace) {
 			this._config.replace(doc);
 		}
-		const existingDoc = this.docs.find(
+
+		const existingDoc = this._docs.find(
 			(d) => this._id(d) === this._id(doc)
 		);
+
 		if (existingDoc) {
 			this._core.copy(doc, existingDoc);
 			this._core.copy(existingDoc, doc);
 		} else {
-			this.docs.push(doc);
+			this._docs.push(doc);
 		}
+
 		this.setDocs();
 	}
 
@@ -95,8 +81,9 @@ export abstract class CrudService<Document extends CrudDocument> {
 	 *
 	 * @returns A new document instance.
 	 */
-	new(): Document {
+	new(doc: Document = {} as Document): Document {
 		return {
+			...doc,
 			_id: Date.now().toString(),
 			__created: false,
 			__modified: false,
@@ -110,58 +97,7 @@ export abstract class CrudService<Document extends CrudDocument> {
 	 * @returns The document instance.
 	 */
 	doc(_id: string): Document {
-		return this.docs.find((d) => this._id(d) === _id) || this.new();
-	}
-
-	/**
-	 * Configures documents for a specific name.
-	 *
-	 * @param name - The configuration name.
-	 * @param config - The configuration function.
-	 * @param reset - The reset function.
-	 * @returns The configured documents.
-	 */
-	configDocs(
-		name: string,
-		config: (doc: Document, container: unknown) => void,
-		reset: () => unknown
-	): unknown {
-		if (this._names.includes(name)) {
-			return this.getConfigedDocs(name);
-		}
-		this._names.push(name);
-		this._docsReset[name] = reset;
-		this._docsConfiguration[name] = config;
-		this.reconfigureDocs(name);
-		return this.getConfigedDocs(name);
-	}
-
-	/**
-	 * Retrieves the configured documents for a specific name.
-	 *
-	 * @param name - The configuration name.
-	 * @returns The configured documents.
-	 */
-	getConfigedDocs(name: string): unknown {
-		return this._configuredDocs[name];
-	}
-
-	/**
-	 * Reconfigures documents for a specific name or all names.
-	 *
-	 * @param name - The configuration name (optional).
-	 */
-	reconfigureDocs(name: string = ''): void {
-		const names = name ? [name] : this._names;
-		for (const _name of names) {
-			this._configuredDocs[_name] = this._docsReset[_name]();
-			for (const doc of this.docs) {
-				this._docsConfiguration[_name](
-					doc,
-					this._configuredDocs[_name]
-				);
-			}
-		}
+		return this._docs.find((d) => this._id(d) === _id) || this.new();
 	}
 
 	/**
@@ -185,22 +121,27 @@ export abstract class CrudService<Document extends CrudDocument> {
 		options: CrudOptions<Document> = {}
 	): Observable<Document[]> {
 		const url = `${this._url}/get${options.name || ''}`;
+
 		const params =
 			typeof config.page === 'number'
 				? `?skip=${this._perPage * (config.page - 1)}&limit=${
 						this._perPage
 				  }`
 				: '';
+
 		const obs = this._http.get(`${url}${params}`);
+
 		obs.subscribe(
 			(resp: unknown) => {
 				(resp as Document[]).forEach((doc) => this.addDoc(doc));
+
 				if (options.callback) options.callback(resp as Document[]);
 			},
 			(err: unknown) => {
 				if (options.errCallback) options.errCallback(err);
 			}
 		);
+
 		return obs as Observable<Document[]>;
 	}
 
@@ -216,31 +157,42 @@ export abstract class CrudService<Document extends CrudDocument> {
 		options: CrudOptions<Document> = {}
 	): Observable<Document> | void {
 		if (doc.__created) return;
+
 		doc.__created = true;
+
 		const obs = this._http.post(
 			`${this._url}/create${options.name || ''}`,
 			doc
 		);
+
 		obs.subscribe(
 			(resp: unknown) => {
 				if (resp) {
 					this._core.copy(resp, doc);
+
 					this.addDoc(doc);
-					this.reconfigureDocs();
+
+					this._filterDocuments();
+
 					if (options.callback) options.callback(doc);
-					if (options.alert)
+
+					if (options.alert) {
 						this._alert.show({
 							unique: `${this._config.name}create`,
 							text: options.alert,
 						});
+					}
 				} else {
 					doc.__created = false;
+
 					if (options.errCallback) options.errCallback(resp);
 				}
+
 				this._core.emit(`${this._config.name}_create`, doc);
 			},
 			(err: unknown) => {
 				doc.__created = false;
+
 				if (options.errCallback) options.errCallback(err);
 			}
 		);
@@ -262,23 +214,32 @@ export abstract class CrudService<Document extends CrudDocument> {
 			`${this._url}/fetch${options.name || ''}`,
 			query
 		);
+
 		obs.subscribe(
 			(resp: unknown) => {
 				if (resp) {
 					this.addDoc(resp as Document);
-					this.reconfigureDocs();
+
+					this._filterDocuments();
+
 					if (options.callback) options.callback(resp as Document);
-					if (options.alert)
+
+					if (options.alert) {
 						this._alert.show({
 							unique: `${this._config.name}create`,
 							text: options.alert,
 						});
+					}
 				} else {
-					if (options.errCallback) options.errCallback(resp as Document);
+					if (options.errCallback) {
+						options.errCallback(resp as Document);
+					}
 				}
 			},
 			(err: unknown) => {
-				if (options.errCallback) options.errCallback(err);
+				if (options.errCallback) {
+					options.errCallback(err);
+				}
 			}
 		);
 		return obs as Observable<Document>;
@@ -292,6 +253,7 @@ export abstract class CrudService<Document extends CrudDocument> {
 	 */
 	updateAfterWhile(doc: Document, options: CrudOptions<Document> = {}): void {
 		doc.__modified = true;
+
 		this._core.afterWhile(this._id(doc), () => {
 			this.update(doc, options);
 		});
@@ -309,16 +271,23 @@ export abstract class CrudService<Document extends CrudDocument> {
 		options: CrudOptions<Document> = {}
 	): Observable<Document> {
 		doc.__modified = true;
+
 		const obs = this._http.post(
 			`${this._url}/update${options.name || ''}`,
 			doc
 		);
+
 		obs.subscribe(
 			(resp: unknown) => {
 				if (resp) {
 					doc.__modified = false;
+
 					this._core.copy(resp, doc);
-					if (options.callback) options.callback(doc);
+
+					if (options.callback) {
+						options.callback(doc);
+					}
+
 					if (options.alert)
 						this._alert.show({
 							unique: `${this._config.name}update`,
@@ -327,12 +296,16 @@ export abstract class CrudService<Document extends CrudDocument> {
 				} else {
 					if (options.errCallback) options.errCallback(resp);
 				}
+
 				this._core.emit(`${this._config.name}_update`, doc);
 			},
 			(err: unknown) => {
-				if (options.errCallback) options.errCallback(err);
+				if (options.errCallback) {
+					options.errCallback(err);
+				}
 			}
 		);
+
 		return obs as Observable<Document>;
 	}
 
@@ -351,29 +324,154 @@ export abstract class CrudService<Document extends CrudDocument> {
 			`${this._url}/delete${options.name || ''}`,
 			doc
 		);
+
 		obs.subscribe(
 			(resp: unknown) => {
 				if (resp) {
-					this.docs = this.docs.filter(
+					this._docs = this._docs.filter(
 						(d) => this._id(d) !== this._id(doc)
 					);
+
 					this.setDocs();
-					this.reconfigureDocs();
-					if (options.callback) options.callback(doc);
-					if (options.alert)
+
+					this._filterDocuments();
+
+					if (options.callback) {
+						options.callback(doc);
+					}
+
+					if (options.alert) {
 						this._alert.show({
 							unique: `${this._config.name}delete`,
 							text: options.alert,
 						});
+					}
 				} else {
-					if (options.errCallback) options.errCallback(resp);
+					if (options.errCallback) {
+						options.errCallback(resp);
+					}
 				}
+
 				this._core.emit(`${this._config.name}_delete`, doc);
 			},
 			(err: unknown) => {
-				if (options.errCallback) options.errCallback(err);
+				if (options.errCallback) {
+					options.errCallback(err);
+				}
 			}
 		);
+
 		return obs as Observable<Document>;
 	}
+
+	private _url = '/api/';
+
+	private _docs: Document[] = [];
+
+	private _perPage = 20;
+
+	private _filteredDocumentsCallbacks: (()=> void)[] = [];
+
+	/**
+	 * Generates a unique ID for a document.
+	 *
+	 * @param doc - The document for which to generate the ID.
+	 * @returns The unique ID as a string.
+	 */
+	private _id(doc: Document): string {
+		return (doc as unknown as Record<string, unknown>)[
+			this._config._id || '_id'
+		]?.toString() as string;
+	}
+
+	private _filterDocuments(): void {
+		for (const callback of this._filteredDocumentsCallbacks) {
+			callback();
+		}
+	}
+
+	private _filteredDocuments(
+		storeObject: Record<string, Document[]>,
+		field: string | ((doc: Document) => boolean) = 'name',
+		sort: (a: Document, b: Document ) => number = (a: Document, b: Document ) => {
+			if (a[this._id(a)] < b[this._id(b)]) return -1;
+
+			if (a[this._id(a)] > b[this._id(b)]) return 1;
+
+			return 0;
+		}
+	): () => void {
+		const callback = (): void => {
+			/* remove docs if they were removed */
+			for (const parentId in storeObject) {
+				for (
+					let i = storeObject[parentId].length - 1;
+					i >= 0;
+					i--
+				) {
+					if (typeof field === 'function') {
+						for (const doc of storeObject[parentId]) {
+							if (!field(doc)) {
+								storeObject[parentId].splice(i, 1);
+							}
+						}
+					} else if (
+						!this._docs.find((doc: Document) =>
+							Array.isArray(doc[field])
+								? doc[field].includes(
+										storeObject[parentId][i][this._id(doc)]
+								  )
+								: doc[field] ===
+								  storeObject[parentId][i][this._id(doc)]
+						)
+					) {
+						storeObject[parentId].splice(i, 1);
+					}
+				}
+			}
+
+			/* add docs if they are not added */
+			for (const child of this._docs) {
+				if (!child[field] || !child[field]?.length) {
+					continue;
+				}
+
+				if (Array.isArray(child[field])) {
+					child[field].forEach((_field: string) => {
+						storeObject[_field] =
+							storeObject[_field] || [];
+
+						if (
+							!storeObject[_field].find(
+								(c) => c._id === child._id
+							)
+						) {
+							storeObject[_field].push(child);
+						}
+					});
+				} else {
+					storeObject[child[field]] =
+						storeObject[child[field]] || [];
+
+					if (
+						!storeObject[child[field]].find(
+							(c) => c._id === child._id
+						)
+					) {
+						storeObject[child[field]].push(child);
+					}
+				}
+			}
+
+
+			/* sort the array's */
+			for (const parentId in storeObject) {
+				storeObject[parentId].sort(sort);
+			}
+		};
+
+		this._filteredDocumentsCallbacks.push(callback);
+
+		return callback;
+	};
 }

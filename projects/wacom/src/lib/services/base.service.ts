@@ -5,9 +5,7 @@ import { Injectable } from '@angular/core';
 export class BaseService {
 	now = new Date().getTime();
 
-	_now = ()=>{
+	refreshNow(): void {
 		this.now = new Date().getTime();
 	}
-
-	constructor() {}
 }
