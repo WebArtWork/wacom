@@ -39,8 +39,8 @@ export abstract class CrudService<
 		this._url += this._config.name;
 
 		this._store.getJson('docs_' + this._config.name, (docs) => {
-			if (docs) {
-				this._docs = docs;
+			if (Array.isArray(docs)) {
+				this._docs.push(...docs);
 			}
 		});
 	}
@@ -53,7 +53,27 @@ export abstract class CrudService<
 	}
 
 	/**
-	 * Adds a document to the local storage.
+	 * Get docs from crud service
+	 */
+	getDocs(): Document[] {
+		return this._docs;
+	}
+
+	/**
+	 * Adds documents to crud service.
+	 *
+	 * @param doc - The document to add.
+	 */
+	addDocs(docs: Document[]): void {
+		if (Array.isArray(docs)) {
+			for (const doc of docs) {
+				this.addDoc(doc);
+			}
+		}
+	}
+
+	/**
+	 * Adds a document to crud service.
 	 *
 	 * @param doc - The document to add.
 	 */
@@ -370,7 +390,7 @@ export abstract class CrudService<
 
 	private _perPage = 20;
 
-	private _filteredDocumentsCallbacks: (()=> void)[] = [];
+	private _filteredDocumentsCallbacks: (() => void)[] = [];
 
 	/**
 	 * Generates a unique ID for a document.
@@ -392,8 +412,11 @@ export abstract class CrudService<
 
 	private _filteredDocuments(
 		storeObject: Record<string, Document[]>,
-		field: string | ((doc: Document) => boolean) = 'name',
-		sort: (a: Document, b: Document ) => number = (a: Document, b: Document ) => {
+		field: string | ((doc: Document) => boolean) = 'author',
+		sort: (a: Document, b: Document) => number = (
+			a: Document,
+			b: Document
+		) => {
 			if (a[this._id(a)] < b[this._id(b)]) return -1;
 
 			if (a[this._id(a)] > b[this._id(b)]) return 1;
@@ -404,11 +427,7 @@ export abstract class CrudService<
 		const callback = (): void => {
 			/* remove docs if they were removed */
 			for (const parentId in storeObject) {
-				for (
-					let i = storeObject[parentId].length - 1;
-					i >= 0;
-					i--
-				) {
+				for (let i = storeObject[parentId].length - 1; i >= 0; i--) {
 					if (typeof field === 'function') {
 						for (const doc of storeObject[parentId]) {
 							if (!field(doc)) {
@@ -431,38 +450,39 @@ export abstract class CrudService<
 			}
 
 			/* add docs if they are not added */
-			for (const child of this._docs) {
-				if (!child[field] || !child[field]?.length) {
+			for (const doc of this._docs) {
+				if (!doc[field] || !doc[field]?.length) {
 					continue;
 				}
 
-				if (Array.isArray(child[field])) {
-					child[field].forEach((_field: string) => {
-						storeObject[_field] =
-							storeObject[_field] || [];
+				if (typeof field === 'function') {
+					if (field(doc)) {
+
+					}
+				} else if (Array.isArray(doc[field])) {
+					doc[field].forEach((_field: string) => {
+						storeObject[_field] = storeObject[_field] || [];
 
 						if (
 							!storeObject[_field].find(
-								(c) => c._id === child._id
+								(c) => c._id === doc._id
 							)
 						) {
-							storeObject[_field].push(child);
+							storeObject[_field].push(doc);
 						}
 					});
 				} else {
-					storeObject[child[field]] =
-						storeObject[child[field]] || [];
+					storeObject[doc[field]] = storeObject[doc[field]] || [];
 
 					if (
-						!storeObject[child[field]].find(
-							(c) => c._id === child._id
+						!storeObject[doc[field]].find(
+							(c) => c._id === doc._id
 						)
 					) {
-						storeObject[child[field]].push(child);
+						storeObject[doc[field]].push(doc);
 					}
 				}
 			}
-
 
 			/* sort the array's */
 			for (const parentId in storeObject) {
@@ -473,5 +493,5 @@ export abstract class CrudService<
 		this._filteredDocumentsCallbacks.push(callback);
 
 		return callback;
-	};
+	}
 }
