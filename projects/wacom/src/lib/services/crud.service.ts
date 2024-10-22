@@ -384,6 +384,96 @@ export abstract class CrudService<
 		return obs as Observable<Document>;
 	}
 
+	filteredDocuments(
+		storeObject: Record<string, Document[]>,
+		field: string | ((doc: Document) => string) = 'author',
+		valid?: (doc: Document) => boolean,
+		sort: (a: Document, b: Document) => number = (
+			a: Document,
+			b: Document
+		) => {
+			if (a[this._id(a)] < b[this._id(b)]) return -1;
+
+			if (a[this._id(a)] > b[this._id(b)]) return 1;
+
+			return 0;
+		}
+	): () => void {
+		const callback = (): void => {
+			/* remove docs if they were removed */
+			for (const parentId in storeObject) {
+				for (let i = storeObject[parentId].length - 1; i >= 0; i--) {
+					const _field =
+						typeof field === 'function'
+							? field(storeObject[parentId][i])
+							: field;
+					const _doc: any = storeObject[parentId][i];
+
+					if (
+						!this._docs.find((doc: any) =>
+							Array.isArray(doc[_field])
+								? doc[_field].includes(_doc[this._id(doc)])
+								: doc[_field] === _doc[this._id(doc)]
+						)
+					) {
+						storeObject[parentId].splice(i, 1);
+					}
+				}
+			}
+
+			/* add docs if they are not added */
+			for (const doc of this._docs) {
+				const _field = typeof field === 'function' ? field(doc) : field;
+
+				if (
+					typeof valid === 'function'
+						? !valid(doc)
+						: Array.isArray(doc[_field])
+						? !doc[_field]?.length
+						: !doc[_field]
+				) {
+					continue;
+				}
+
+				if (typeof field === 'function') {
+					if (
+						field(doc) &&
+						!storeObject[doc[_field]].find((c) => c._id === doc._id)
+					) {
+						storeObject[doc[_field]].push(doc);
+					}
+				} else if (Array.isArray(doc[_field])) {
+					doc[_field].forEach((_field: string) => {
+						storeObject[_field] = storeObject[_field] || [];
+
+						if (
+							!storeObject[_field].find((c) => c._id === doc._id)
+						) {
+							storeObject[_field].push(doc);
+						}
+					});
+				} else {
+					storeObject[doc[_field]] = storeObject[doc[_field]] || [];
+
+					if (
+						!storeObject[doc[_field]].find((c) => c._id === doc._id)
+					) {
+						storeObject[doc[_field]].push(doc);
+					}
+				}
+			}
+
+			/* sort the array's */
+			for (const parentId in storeObject) {
+				storeObject[parentId].sort(sort);
+			}
+		};
+
+		this._filteredDocumentsCallbacks.push(callback);
+
+		return callback;
+	}
+
 	private _url = '/api/';
 
 	private _docs: Document[] = [];
@@ -408,90 +498,5 @@ export abstract class CrudService<
 		for (const callback of this._filteredDocumentsCallbacks) {
 			callback();
 		}
-	}
-
-	private _filteredDocuments(
-		storeObject: Record<string, Document[]>,
-		field: string | ((doc: Document) => boolean) = 'author',
-		sort: (a: Document, b: Document) => number = (
-			a: Document,
-			b: Document
-		) => {
-			if (a[this._id(a)] < b[this._id(b)]) return -1;
-
-			if (a[this._id(a)] > b[this._id(b)]) return 1;
-
-			return 0;
-		}
-	): () => void {
-		const callback = (): void => {
-			/* remove docs if they were removed */
-			for (const parentId in storeObject) {
-				for (let i = storeObject[parentId].length - 1; i >= 0; i--) {
-					if (typeof field === 'function') {
-						for (const doc of storeObject[parentId]) {
-							if (!field(doc)) {
-								storeObject[parentId].splice(i, 1);
-							}
-						}
-					} else if (
-						!this._docs.find((doc: Document) =>
-							Array.isArray(doc[field])
-								? doc[field].includes(
-										storeObject[parentId][i][this._id(doc)]
-								  )
-								: doc[field] ===
-								  storeObject[parentId][i][this._id(doc)]
-						)
-					) {
-						storeObject[parentId].splice(i, 1);
-					}
-				}
-			}
-
-			/* add docs if they are not added */
-			for (const doc of this._docs) {
-				if (!doc[field] || !doc[field]?.length) {
-					continue;
-				}
-
-				if (typeof field === 'function') {
-					if (field(doc)) {
-
-					}
-				} else if (Array.isArray(doc[field])) {
-					doc[field].forEach((_field: string) => {
-						storeObject[_field] = storeObject[_field] || [];
-
-						if (
-							!storeObject[_field].find(
-								(c) => c._id === doc._id
-							)
-						) {
-							storeObject[_field].push(doc);
-						}
-					});
-				} else {
-					storeObject[doc[field]] = storeObject[doc[field]] || [];
-
-					if (
-						!storeObject[doc[field]].find(
-							(c) => c._id === doc._id
-						)
-					) {
-						storeObject[doc[field]].push(doc);
-					}
-				}
-			}
-
-			/* sort the array's */
-			for (const parentId in storeObject) {
-				storeObject[parentId].sort(sort);
-			}
-		};
-
-		this._filteredDocumentsCallbacks.push(callback);
-
-		return callback;
 	}
 }
