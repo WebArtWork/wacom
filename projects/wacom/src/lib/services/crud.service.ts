@@ -392,9 +392,9 @@ export abstract class CrudService<
 			a: Document,
 			b: Document
 		) => {
-			if (a[this._id(a)] < b[this._id(b)]) return -1;
+			if ((a as any)[this._id(a)] < (b as any)[this._id(b)]) return -1;
 
-			if (a[this._id(a)] > b[this._id(b)]) return 1;
+			if ((a as any)[this._id(a)] > (b as any)[this._id(b)]) return 1;
 
 			return 0;
 		}
@@ -428,9 +428,9 @@ export abstract class CrudService<
 				if (
 					typeof valid === 'function'
 						? !valid(doc)
-						: Array.isArray(doc[_field])
-						? !doc[_field]?.length
-						: !doc[_field]
+						: Array.isArray((doc as any)[_field])
+						? !(doc as any)[_field]?.length
+						: !(doc as any)[_field]
 				) {
 					continue;
 				}
@@ -438,12 +438,14 @@ export abstract class CrudService<
 				if (typeof field === 'function') {
 					if (
 						field(doc) &&
-						!storeObject[doc[_field]].find((c) => c._id === doc._id)
+						!storeObject[(doc as any)[_field]].find(
+							(c) => c._id === doc._id
+						)
 					) {
-						storeObject[doc[_field]].push(doc);
+						storeObject[(doc as any)[_field]].push(doc);
 					}
-				} else if (Array.isArray(doc[_field])) {
-					doc[_field].forEach((_field: string) => {
+				} else if (Array.isArray((doc as any)[_field])) {
+					(doc as any)[_field].forEach((_field: string) => {
 						storeObject[_field] = storeObject[_field] || [];
 
 						if (
@@ -453,12 +455,15 @@ export abstract class CrudService<
 						}
 					});
 				} else {
-					storeObject[doc[_field]] = storeObject[doc[_field]] || [];
+					storeObject[(doc as any)[_field]] =
+						storeObject[(doc as any)[_field]] || [];
 
 					if (
-						!storeObject[doc[_field]].find((c) => c._id === doc._id)
+						!storeObject[(doc as any)[_field]].find(
+							(c) => c._id === doc._id
+						)
 					) {
-						storeObject[doc[_field]].push(doc);
+						storeObject[(doc as any)[_field]].push(doc);
 					}
 				}
 			}
