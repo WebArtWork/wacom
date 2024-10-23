@@ -1085,21 +1085,28 @@ Generates a random text string.
 const randomText = uiService.text(15);
 ```
 
-
 ## [Crud Service](#crud-service)
 The `CrudService` is designed to manage CRUD (Create, Read, Update, Delete) operations in an Angular application. It interacts with an API, stores documents locally, and provides methods for handling various CRUD operations. It should be extended by specific services that manage different document types.
+
 ### Methods
-#### `new(): Document`
-Creates a new document with a temporary ID.
+
+***
+#### `new(doc: Document = {}): Document`
+Creates a new document with a temporary ID and status flags.
+
+**Parameters**:
+- `doc` (Document, optional): A base document to initialize.
+
 **Returns**:
-- `Document`: A new document instance.
+- `Document`: A new document instance with default properties.
 
 **Example**:
-```Typescript
-const newDoc = workService.new();
-```
+    const newDoc = workService.new();
+
+***
 #### `doc(_id: string): Document`
-Retrieves a document by its ID.
+Retrieves a document by its ID. If the document doesn't exist, a new one is created.
+
 **Parameters**:
 - `_id` (string): The document ID.
 
@@ -1107,156 +1114,153 @@ Retrieves a document by its ID.
 - `Document`: The document instance.
 
 **Example**:
-```Typescript
-const doc = workService.doc('12345');
-```
+    const doc = workService.doc('12345');
+
+***
 #### `addDoc(doc: Document): void`
-Adds or updates a document in the local store.
+Adds a new document or updates an existing document in the local store. It will attempt to update the document if it already exists in the collection.
 
 **Parameters**:
 - `doc` (Document): The document to add or update.
 
 **Example**:
-```Typescript
-workService.addDoc(doc);
-```
+    workService.addDoc(doc);
+
+***
+#### `addDocs(docs: Document[]): void`
+Adds multiple documents to the service. Each document will either be added or updated depending on whether it already exists.
+
+**Parameters**:
+- `docs` (Document[]): The array of documents to add.
+
+**Example**:
+    workService.addDocs(docs);
+
+***
 #### `setDocs(): void`
 Saves the current state of documents to local storage.
 
 **Example**:
-```Typescript
-workService.setDocs();
-```
-#### `configDocs(name: string, config: (doc: Document, container: unknown) => void, reset: () => unknown): unknown`
-Configures documents for a specific name.
+    workService.setDocs();
 
-**Parameters**:
-- `name` (string): The configuration name.
-- `config` (function): The configuration function.
-- `reset` (function): The reset function.
+***
+#### `getDocs(): Document[]`
+Retrieves the current list of documents stored locally.
 
 **Returns**:
-- `unknown`: The configured documents.
+- `Document[]`: The list of documents.
 
 **Example**:
-```Typescript
-workService.configDocs('myConfig', (doc, container) => { /* config logic */ }, () => { /* reset logic */ });
-```
-#### `getConfigedDocs(name: string): unknown`
-Retrieves the configured documents for a specific name.
+    const docs = workService.getDocs();
 
-**Parameters**:
-- `name` (string): The configuration name.
-
-**Returns**:
-- `unknown`: The configured documents.
-
-**Example**:
-```Typescript
-const configedDocs = workService.getConfigedDocs('myConfig');
-```
-#### `reconfigureDocs(name: string = ''): void`
-Reconfigures documents for a specific name or all names.
-
-**Parameters**:
-- `name` (string): The configuration name (optional).
-
-**Example**:
-```Typescript
-workService.reconfigureDocs('myConfig');
-```
+***
 #### `setPerPage(_perPage: number): void`
-Sets the number of documents per page.
+Sets the number of documents to display per page for pagination.
 
 **Parameters**:
 - `_perPage` (number): The number of documents per page.
 
 **Example**:
-```Typescript
-workService.setPerPage(10);
-```
+    workService.setPerPage(10);
+
+***
 #### `get(config: GetConfig = {}, options: CrudOptions<Document> = {}): Observable<Document[]>`
-Retrieves documents from the API.
+Fetches a list of documents from the API with optional pagination and other settings.
 
 **Parameters**:
-- `config` (object): The get configuration.
-- `options` (object): The CRUD options.
+- `config` (object, optional): The configuration for pagination (`page` and `perPage`).
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
 
 **Returns**:
 - `Observable<Document[]>`: An observable of the retrieved documents.
 
 **Example**:
-```Typescript
-workService.get({ page: 1 }, { callback: (docs) => console.log(docs) });
-```
+    workService.get({ page: 1 }, { callback: (docs) => console.log(docs) });
+
+***
 #### `create(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> | void`
-Creates a new document in the API.
+Creates a new document in the API and adds it to the local store. The document is only created once.
 
 **Parameters**:
 - `doc` (Document): The document to create.
-- `options` (object): The CRUD options.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
 
 **Returns**:
 - `Observable<Document> | void`: An observable of the created document or void if the document was already created.
 
 **Example**:
-```Typescript
-workService.create(newDoc, { callback: (doc) => console.log(doc) });
-```
+    workService.create(newDoc, { callback: (doc) => console.log(doc) });
+
+***
 #### `fetch(query: object = {}, options: CrudOptions<Document> = {}): Observable<Document>`
-Fetches a document from the API based on a query.
+Fetches a document from the API based on a query object and adds it to the local store.
 
 **Parameters**:
-- `query` (object): The query object.
-- `options` (object): The CRUD options.
+- `query` (object, optional): The query object to filter the documents.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
 
 **Returns**:
 - `Observable<Document>`: An observable of the fetched document.
 
 **Example**:
-```Typescript
-workService.fetch({ name: 'example' }, { callback: (doc) => console.log(doc) });
-```
+    workService.fetch({ name: 'example' }, { callback: (doc) => console.log(doc) });
+
+***
 #### `updateAfterWhile(doc: Document, options: CrudOptions<Document> = {}): void`
-Updates a document after a specified delay.
+Updates a document after a specified delay using a core service function to handle the delay.
 
 **Parameters**:
 - `doc` (Document): The document to update.
-- `options` (object): The CRUD options.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
 
 **Example**:
-```Typescript
-workService.updateAfterWhile(doc, { callback: (doc) => console.log(doc) });
-```
+    workService.updateAfterWhile(doc, { callback: (doc) => console.log(doc) });
+
+***
 #### `update(doc: Document, options: CrudOptions<Document> = {}): Observable<Document>`
-Updates a document in the API.
+Updates a document in the API and reflects the changes locally.
 
 **Parameters**:
 - `doc` (Document): The document to update.
-- `options` (object): The CRUD options.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
 
 **Returns**:
 - `Observable<Document>`: An observable of the updated document.
 
 **Example**:
-```Typescript
-workService.update(doc, { callback: (doc) => console.log(doc) });
-```
+    workService.update(doc, { callback: (doc) => console.log(doc) });
+
+***
+#### `unique(doc: Document, options: CrudOptions<Document> = {}): Observable<Document>`
+Unique update a document field in the API.
+
+**Parameters**:
+- `doc` (Document): The document to update.
+- `options` (CrudOptions<Document>, optional): Optional callback and error handling configuration.
+
+**Returns**:
+- `Observable<Document>`: An observable that resolves with the updated document.
+
+**Example**:
+    workService.unique(doc, { callback: (doc) => console.log('Document updated', doc) });
+
+***
 #### `delete(doc: Document, options: CrudOptions<Document> = {}): Observable<Document>`
-Deletes a document from the API.
+Deletes a document from the API and updates the local store.
 
 **Parameters**:
 - `doc` (Document): The document to delete.
-- `options` (object): The CRUD options.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
 
 **Returns**:
 - `Observable<Document>`: An observable of the deleted document.
 
 **Example**:
-```Typescript
-workService.delete(doc, { callback: (doc) => console.log(doc) });
-```
+    workService.delete(doc, { callback: (doc) => console.log(doc) });
+***
 ### Interfaces
+
+***
 #### `CrudDocument`
 Represents a CRUD document.
 
@@ -1266,63 +1270,53 @@ Represents a CRUD document.
 - `__modified` (boolean): Indicates if the document is modified.
 
 **Example**:
-```Typescript
-interface CrudDocument {
-  _id: string;
-  __created: boolean;
-  __modified: boolean;
-}
-```
+    interface CrudDocument {
+        _id: string;
+        __created: boolean;
+        __modified: boolean;
+    }
+***
 ### Code sample use
-```Typescript
+```typescript
 import { Injectable } from '@angular/core';
 import {
-	AlertService,
-	CoreService,
-	HttpService,
-	StoreService,
-	CrudService,
-	CrudDocument
+    AlertService,
+    CoreService,
+    HttpService,
+    StoreService,
+    CrudService,
+    CrudDocument
 } from 'wacom';
 
 export interface Work extends CrudDocument {
-	name: string;
-	description: string;
+    name: string;
+    description: string;
 }
 
 @Injectable({
-	providedIn: 'root'
+    providedIn: 'root'
 })
 export class WorkService extends CrudService<Work> {
-	works: Work[] = [];
-	constructor(
-		_http: HttpService,
-		_store: StoreService,
-		_alert: AlertService,
-		_core: CoreService
-	) {
-		super(
-			{
-				name: 'work'
-			},
-			_http,
-			_store,
-			_alert,
-			_core
-		);
-		this.get().subscribe((works: Work[]) =>
-			this.works.push(...works)
-		);
-		_core.on('work_create', (work: Work) => {
-			this.works.push(work);
-		});
-		_core.on('work_delete', (work: Work) => {
-			this.works.splice(
-				this.works.findIndex((o) => o._id === work._id),
-				1
-			);
-		});
-	}
+    works: Work[] = this.getDocs();
+
+    constructor(
+        _http: HttpService,
+        _store: StoreService,
+        _alert: AlertService,
+        _core: CoreService
+    ) {
+        super(
+            {
+                name: 'work'
+            },
+            _http,
+            _store,
+            _alert,
+            _core
+        );
+
+        this.get();
+    }
 }
 ```
 

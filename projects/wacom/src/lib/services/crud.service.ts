@@ -24,9 +24,47 @@ interface GetConfig {
 	perPage?: number;
 }
 
+/**
+ * Abstract class representing a CRUD (Create, Read, Update, Delete) service.
+ *
+ * This class provides methods for managing documents, interacting with an API,
+ * and storing/retrieving data from local storage. It is designed to be extended
+ * for specific document types.
+ *
+ * @template Document - The type of the document the service handles.
+ */
 export abstract class CrudService<
 	Document extends CrudDocument
 > extends BaseService {
+	/**
+	 * URL for the API.
+	 */
+	private _url = '/api/';
+
+	/**
+	 * Array of documents managed by this service.
+	 */
+	private _docs: Document[] = [];
+
+	/**
+	 * Number of documents per page.
+	 */
+	private _perPage = 20;
+
+	/**
+	 * Callbacks for filtering documents.
+	 */
+	private _filteredDocumentsCallbacks: (() => void)[] = [];
+
+	/**
+	 * Constructs a CRUD service instance.
+	 *
+	 * @param _config - Configuration options for the CRUD service.
+	 * @param _http - Service to handle HTTP requests.
+	 * @param _store - Service to manage local storage of documents.
+	 * @param _alert - Service to display alerts.
+	 * @param _core - Core service for utility functions.
+	 */
 	constructor(
 		private _config: CrudConfig<Document>,
 		private _http: HttpService,
@@ -38,6 +76,7 @@ export abstract class CrudService<
 
 		this._url += this._config.name;
 
+		// Load documents from local storage.
 		this._store.getJson('docs_' + this._config.name, (docs) => {
 			if (Array.isArray(docs)) {
 				this._docs.push(...docs);
@@ -46,23 +85,25 @@ export abstract class CrudService<
 	}
 
 	/**
-	 * Sets the documents in the local storage.
+	 * Saves the current set of documents to local storage.
 	 */
 	setDocs(): void {
 		this._store.setJson('docs_' + this._config.name, this._docs);
 	}
 
 	/**
-	 * Get docs from crud service
+	 * Retrieves the current list of documents.
+	 *
+	 * @returns The list of documents.
 	 */
 	getDocs(): Document[] {
 		return this._docs;
 	}
 
 	/**
-	 * Adds documents to crud service.
+	 * Adds multiple documents to the service and saves them to local storage.
 	 *
-	 * @param doc - The document to add.
+	 * @param docs - An array of documents to add.
 	 */
 	addDocs(docs: Document[]): void {
 		if (Array.isArray(docs)) {
@@ -73,7 +114,7 @@ export abstract class CrudService<
 	}
 
 	/**
-	 * Adds a document to crud service.
+	 * Adds a single document to the service. If it already exists, it will be updated.
 	 *
 	 * @param doc - The document to add.
 	 */
@@ -87,9 +128,11 @@ export abstract class CrudService<
 		);
 
 		if (existingDoc) {
+			// Update the existing document
 			this._core.copy(doc, existingDoc);
 			this._core.copy(existingDoc, doc);
 		} else {
+			// Add new document
 			this._docs.push(doc);
 		}
 
@@ -97,9 +140,10 @@ export abstract class CrudService<
 	}
 
 	/**
-	 * Creates a new document with a temporary ID.
+	 * Creates a new document with a temporary ID and status flags.
 	 *
-	 * @returns A new document instance.
+	 * @param doc - Optional base document to use for the new document.
+	 * @returns A new document instance with default properties.
 	 */
 	new(doc: Document = {} as Document): Document {
 		return {
@@ -111,30 +155,30 @@ export abstract class CrudService<
 	}
 
 	/**
-	 * Retrieves a document by its ID.
+	 * Retrieves a document by its unique ID or creates a new one if it doesn't exist.
 	 *
-	 * @param _id - The document ID.
-	 * @returns The document instance.
+	 * @param _id - The document ID to search for.
+	 * @returns The found document or a new document if not found.
 	 */
 	doc(_id: string): Document {
 		return this._docs.find((d) => this._id(d) === _id) || this.new();
 	}
 
 	/**
-	 * Sets the number of documents per page.
+	 * Sets the number of documents to display per page.
 	 *
-	 * @param _perPage - The number of documents per page.
+	 * @param _perPage - Number of documents per page.
 	 */
 	setPerPage(_perPage: number): void {
 		this._perPage = _perPage;
 	}
 
 	/**
-	 * Retrieves documents from the API.
+	 * Fetches a list of documents from the API with optional pagination.
 	 *
-	 * @param config - The get configuration.
-	 * @param options - The CRUD options.
-	 * @returns An observable of the retrieved documents.
+	 * @param config - Optional pagination configuration.
+	 * @param options - Optional callback and error handling configuration.
+	 * @returns An observable that resolves with the list of documents.
 	 */
 	get(
 		config: GetConfig = {},
@@ -151,26 +195,30 @@ export abstract class CrudService<
 
 		const obs = this._http.get(`${url}${params}`);
 
-		obs.subscribe(
-			(resp: unknown) => {
+		obs.subscribe({
+			next: (resp: unknown): void => {
 				(resp as Document[]).forEach((doc) => this.addDoc(doc));
 
-				if (options.callback) options.callback(resp as Document[]);
+				if (options.callback) {
+					options.callback(resp as Document[]);
+				}
 			},
-			(err: unknown) => {
-				if (options.errCallback) options.errCallback(err);
-			}
-		);
+			error: (err: unknown): void => {
+				if (options.errCallback) {
+					options.errCallback(err);
+				}
+			},
+		});
 
 		return obs as Observable<Document[]>;
 	}
 
 	/**
-	 * Creates a new document in the API.
+	 * Sends a request to the API to create a new document.
 	 *
 	 * @param doc - The document to create.
-	 * @param options - The CRUD options.
-	 * @returns An observable of the created document or void if the document was already created.
+	 * @param options - Optional callback and error handling configuration.
+	 * @returns An observable that resolves with the created document, or void if already created.
 	 */
 	create(
 		doc: Document,
@@ -185,8 +233,8 @@ export abstract class CrudService<
 			doc
 		);
 
-		obs.subscribe(
-			(resp: unknown) => {
+		obs.subscribe({
+			next: (resp: unknown) => {
 				if (resp) {
 					this._core.copy(resp, doc);
 
@@ -194,7 +242,9 @@ export abstract class CrudService<
 
 					this._filterDocuments();
 
-					if (options.callback) options.callback(doc);
+					if (options.callback) {
+						options.callback(doc);
+					}
 
 					if (options.alert) {
 						this._alert.show({
@@ -205,26 +255,28 @@ export abstract class CrudService<
 				} else {
 					doc.__created = false;
 
-					if (options.errCallback) options.errCallback(resp);
+					if (options.errCallback) {
+						options.errCallback(resp);
+					}
 				}
 
 				this._core.emit(`${this._config.name}_create`, doc);
 			},
-			(err: unknown) => {
+			error: (err: unknown) => {
 				doc.__created = false;
 
 				if (options.errCallback) options.errCallback(err);
-			}
-		);
+			},
+		});
 		return obs as Observable<Document>;
 	}
 
 	/**
 	 * Fetches a document from the API based on a query.
 	 *
-	 * @param query - The query object.
-	 * @param options - The CRUD options.
-	 * @returns An observable of the fetched document.
+	 * @param query - The query object used to filter documents.
+	 * @param options - Optional callback and error handling configuration.
+	 * @returns An observable that resolves with the fetched document.
 	 */
 	fetch(
 		query: object = {},
@@ -235,8 +287,8 @@ export abstract class CrudService<
 			query
 		);
 
-		obs.subscribe(
-			(resp: unknown) => {
+		obs.subscribe({
+			next: (resp: unknown) => {
 				if (resp) {
 					this.addDoc(resp as Document);
 
@@ -256,12 +308,12 @@ export abstract class CrudService<
 					}
 				}
 			},
-			(err: unknown) => {
+			error: (err: unknown) => {
 				if (options.errCallback) {
 					options.errCallback(err);
 				}
-			}
-		);
+			},
+		});
 		return obs as Observable<Document>;
 	}
 
@@ -269,7 +321,7 @@ export abstract class CrudService<
 	 * Updates a document after a specified delay.
 	 *
 	 * @param doc - The document to update.
-	 * @param options - The CRUD options.
+	 * @param options - Optional callback and error handling configuration.
 	 */
 	updateAfterWhile(doc: Document, options: CrudOptions<Document> = {}): void {
 		doc.__modified = true;
@@ -283,8 +335,8 @@ export abstract class CrudService<
 	 * Updates a document in the API.
 	 *
 	 * @param doc - The document to update.
-	 * @param options - The CRUD options.
-	 * @returns An observable of the updated document.
+	 * @param options - Optional callback and error handling configuration.
+	 * @returns An observable that resolves with the updated document.
 	 */
 	update(
 		doc: Document,
@@ -297,8 +349,8 @@ export abstract class CrudService<
 			doc
 		);
 
-		obs.subscribe(
-			(resp: unknown) => {
+		obs.subscribe({
+			next: (resp: unknown) => {
 				if (resp) {
 					doc.__modified = false;
 
@@ -308,23 +360,79 @@ export abstract class CrudService<
 						options.callback(doc);
 					}
 
-					if (options.alert)
+					if (options.alert) {
 						this._alert.show({
 							unique: `${this._config.name}update`,
 							text: options.alert,
 						});
+					}
 				} else {
-					if (options.errCallback) options.errCallback(resp);
+					if (options.errCallback) {
+						options.errCallback(resp);
+					}
 				}
 
 				this._core.emit(`${this._config.name}_update`, doc);
 			},
-			(err: unknown) => {
+			error: (err: unknown) => {
 				if (options.errCallback) {
 					options.errCallback(err);
 				}
-			}
+			},
+		});
+
+		return obs as Observable<Document>;
+	}
+
+	/**
+	 * Unique update a document field in the API.
+	 *
+	 * @param doc - The document to update.
+	 * @param options - Optional callback and error handling configuration.
+	 * @returns An observable that resolves with the updated document.
+	 */
+	unique(
+		doc: Document,
+		options: CrudOptions<Document> = {}
+	): Observable<Document> {
+		doc.__modified = true;
+
+		const obs = this._http.post(
+			`${this._url}/unique${options.name || ''}`,
+			doc
 		);
+
+		obs.subscribe({
+			next: (resp: unknown) => {
+				if (resp) {
+					doc.__modified = false;
+
+					(doc as any)[options.name as string] = resp;
+
+					if (options.callback) {
+						options.callback(doc);
+					}
+
+					if (options.alert) {
+						this._alert.show({
+							unique: `${this._config.name}unique`,
+							text: options.alert,
+						});
+					}
+				} else {
+					if (options.errCallback) {
+						options.errCallback(resp);
+					}
+				}
+
+				this._core.emit(`${this._config.name}_unique`, doc);
+			},
+			error: (err: unknown) => {
+				if (options.errCallback) {
+					options.errCallback(err);
+				}
+			},
+		});
 
 		return obs as Observable<Document>;
 	}
@@ -333,8 +441,8 @@ export abstract class CrudService<
 	 * Deletes a document from the API.
 	 *
 	 * @param doc - The document to delete.
-	 * @param options - The CRUD options.
-	 * @returns An observable of the deleted document.
+	 * @param options - Optional callback and error handling configuration.
+	 * @returns An observable that resolves with the deleted document.
 	 */
 	delete(
 		doc: Document,
@@ -345,8 +453,8 @@ export abstract class CrudService<
 			doc
 		);
 
-		obs.subscribe(
-			(resp: unknown) => {
+		obs.subscribe({
+			next: (resp: unknown) => {
 				if (resp) {
 					this._docs = this._docs.filter(
 						(d) => this._id(d) !== this._id(doc)
@@ -374,16 +482,25 @@ export abstract class CrudService<
 
 				this._core.emit(`${this._config.name}_delete`, doc);
 			},
-			(err: unknown) => {
+			error: (err: unknown) => {
 				if (options.errCallback) {
 					options.errCallback(err);
 				}
-			}
-		);
+			},
+		});
 
 		return obs as Observable<Document>;
 	}
 
+	/**
+	 * Filters documents based on specific conditions and stores the result in a provided object.
+	 *
+	 * @param storeObject - Object to store filtered documents.
+	 * @param field - The field to filter by or a function to extract the field.
+	 * @param valid - Optional function to check the validity of a document.
+	 * @param sort - Function to sort the filtered documents.
+	 * @returns A callback function that triggers the filtering process.
+	 */
 	filteredDocuments(
 		storeObject: Record<string, Document[]>,
 		field: string | ((doc: Document) => string) = 'author',
@@ -479,14 +596,6 @@ export abstract class CrudService<
 		return callback;
 	}
 
-	private _url = '/api/';
-
-	private _docs: Document[] = [];
-
-	private _perPage = 20;
-
-	private _filteredDocumentsCallbacks: (() => void)[] = [];
-
 	/**
 	 * Generates a unique ID for a document.
 	 *
@@ -499,6 +608,9 @@ export abstract class CrudService<
 		]?.toString() as string;
 	}
 
+	/**
+	 * Executes all registered filter document callbacks.
+	 */
 	private _filterDocuments(): void {
 		for (const callback of this._filteredDocumentsCallbacks) {
 			callback();
