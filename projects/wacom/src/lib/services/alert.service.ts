@@ -62,8 +62,10 @@ export class AlertService {
 		if (!opts) opts = {};
 		if (!opts['type']) opts['type'] = 'info';
 		for (let each in this.alert) {
-			if (each == 'class') opts[each] = opts[each] + ' ' + this.alert[each];
-			else if (typeof opts[each] == 'undefined') opts[each] = this.alert[each];
+			if (each == 'class')
+				opts[each] = opts[each] + ' ' + this.alert[each];
+			else if (typeof opts[each] == 'undefined')
+				opts[each] = this.alert[each];
 		}
 		if (this.shortcuts[opts.position])
 			opts.position = this.shortcuts[opts.position];
@@ -85,16 +87,20 @@ export class AlertService {
 			opts.component = this.alert.alerts[opts.component];
 			customElement = true;
 		} else {
-			opts.component = this.dom.appendById(AlertComponent, opts, opts.position);
+			opts.component = this.dom.appendById(
+				AlertComponent,
+				opts,
+				opts.position
+			);
 		}
 
-		if (
-			typeof opts.component === 'function'
-		) {
+		if (typeof opts.component === 'function') {
 			content = this.dom.appendComponent(
 				opts.component,
 				opts,
-				this._container.nativeElement.children[0].children[this.positionNumber[opts.position] || 0]
+				this._container.nativeElement.children[0].children[
+					this.positionNumber[opts.position] || 0
+				]
 				// component.nativeElement.children[0].children[0].children[0] as HTMLElement
 			);
 		}
