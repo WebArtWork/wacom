@@ -80,6 +80,8 @@ export abstract class CrudService<
 		this._store.getJson('docs_' + this._config.name, (docs) => {
 			if (Array.isArray(docs)) {
 				this._docs.push(...docs);
+
+				this._filterDocuments();
 			}
 		});
 	}
@@ -201,6 +203,10 @@ export abstract class CrudService<
 
 				if (options.callback) {
 					options.callback(resp as Document[]);
+				}
+
+				if (typeof config.page !== 'number') {
+					this._filterDocuments();
 				}
 			},
 			error: (err: unknown): void => {
@@ -456,8 +462,11 @@ export abstract class CrudService<
 		obs.subscribe({
 			next: (resp: unknown) => {
 				if (resp) {
-					this._docs = this._docs.filter(
-						(d) => this._id(d) !== this._id(doc)
+					this._docs.splice(
+						this._docs.findIndex(
+							(d) => this._id(d) !== this._id(doc)
+						),
+						1
 					);
 
 					this.setDocs();
