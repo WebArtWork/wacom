@@ -84,6 +84,14 @@ export abstract class CrudService<
 				this._filterDocuments();
 			}
 		});
+
+		this._core.on('wipe').subscribe((): void => {
+			this._docs.splice(0, this._docs.length);
+
+			this._filterDocuments();
+
+			this.setDocs();
+		});
 	}
 
 	/**
