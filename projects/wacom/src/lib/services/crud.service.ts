@@ -472,7 +472,7 @@ export abstract class CrudService<
 				if (resp) {
 					this._docs.splice(
 						this._docs.findIndex(
-							(d) => this._id(d) !== this._id(doc)
+							(d) => this._id(d) === this._id(doc)
 						),
 						1
 					);
