@@ -22,6 +22,7 @@ interface CrudConfig<Document> {
 interface GetConfig {
 	page?: number;
 	perPage?: number;
+	query?: string;
 }
 
 /**
@@ -197,11 +198,11 @@ export abstract class CrudService<
 		const url = `${this._url}/get${options.name || ''}`;
 
 		const params =
-			typeof config.page === 'number'
+			(typeof config.page === 'number'
 				? `?skip=${this._perPage * (config.page - 1)}&limit=${
 						this._perPage
 				  }`
-				: '';
+				: '') + (config.query || '');
 
 		const obs = this._http.get(`${url}${params}`);
 
