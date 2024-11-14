@@ -198,11 +198,13 @@ export abstract class CrudService<
 		const url = `${this._url}/get${options.name || ''}`;
 
 		const params =
+			(typeof config.page === 'number' || config.query ? '?' : '') +
+			(config.query || '') +
 			(typeof config.page === 'number'
-				? `?skip=${this._perPage * (config.page - 1)}&limit=${
+				? `&skip=${this._perPage * (config.page - 1)}&limit=${
 						this._perPage
 				  }`
-				: '') + (config.query || '');
+				: '');
 
 		const obs = this._http.get(`${url}${params}`);
 
