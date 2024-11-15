@@ -235,13 +235,18 @@ export abstract class CrudService<
 	 *
 	 * @param doc - The document to create.
 	 * @param options - Optional callback and error handling configuration.
-	 * @returns An observable that resolves with the created document, or void if already created.
+	 * @returns An observable that resolves with the created document, or emits an error if already created.
 	 */
 	create(
 		doc: Document,
 		options: CrudOptions<Document> = {}
-	): Observable<Document> | void {
-		if (doc.__created) return;
+	): Observable<Document> {
+		if (doc.__created) {
+			// Emit an error observable if the document is already created
+			return new Observable<Document>((observer) => {
+				observer.error(new Error("Document has already been created."));
+			});
+		}
 
 		doc.__created = true;
 
@@ -285,6 +290,7 @@ export abstract class CrudService<
 				if (options.errCallback) options.errCallback(err);
 			},
 		});
+
 		return obs as Observable<Document>;
 	}
 
@@ -331,20 +337,37 @@ export abstract class CrudService<
 				}
 			},
 		});
+
 		return obs as Observable<Document>;
 	}
 
 	/**
-	 * Updates a document after a specified delay.
+	 * Updates a document after a specified delay and returns an observable.
 	 *
 	 * @param doc - The document to update.
 	 * @param options - Optional callback and error handling configuration.
+	 * @returns An observable that emits the updated document.
 	 */
-	updateAfterWhile(doc: Document, options: CrudOptions<Document> = {}): void {
+	updateAfterWhile(
+		doc: Document,
+		options: CrudOptions<Document> = {}
+	): Observable<Document> {
 		doc.__modified = true;
 
-		this._core.afterWhile(this._id(doc), () => {
-			this.update(doc, options);
+		return new Observable<Document>((observer) => {
+			this._core.afterWhile(this._id(doc), () => {
+				this.update(doc, options).subscribe({
+					next: (updatedDoc) => {
+						observer.next(updatedDoc); // Emit the updated document
+					},
+					error: (err) => {
+						observer.error(err); // Forward the error
+					},
+					complete: () => {
+						observer.complete(); // Complete the observable
+					},
+				});
+			});
 		});
 	}
 
