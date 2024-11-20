@@ -35,16 +35,16 @@ export class CoreService {
 
 		if (isPlatformServer(this.platformId)) {
 			this.localStorage = {
-				getItem: () => { },
-				setItem: () => { },
-				removeItem: () => { },
-				clear: () => { },
+				getItem: () => {},
+				setItem: () => {},
+				removeItem: () => {},
+				clear: () => {},
 			};
 
 			this.document = {
-				querySelectorAll: () => { },
-				addEventListener: () => { },
-				removeEventListener: () => { },
+				querySelectorAll: () => {},
+				addEventListener: () => {},
+				removeEventListener: () => {},
 				documentElement: {},
 				body: {},
 			};
@@ -53,9 +53,9 @@ export class CoreService {
 				location: {
 					host: '',
 				},
-				addEventListener: () => { },
-				removeEventListener: () => { },
-				setTimeout: () => { },
+				addEventListener: () => {},
+				removeEventListener: () => {},
+				setTimeout: () => {},
 			};
 
 			this.navigator = {
@@ -219,7 +219,9 @@ export class CoreService {
 	 */
 	detectDevice(): void {
 		const userAgent =
-			this.navigator.userAgent || this.navigator.vendor || (this.window as any).opera;
+			this.navigator.userAgent ||
+			this.navigator.vendor ||
+			(this.window as any).opera;
 		if (/windows phone/i.test(userAgent)) {
 			this.device = 'Windows Phone';
 		} else if (/android/i.test(userAgent)) {
@@ -321,6 +323,7 @@ export class CoreService {
 		if (!this._signals[signal]) {
 			this._signals[signal] = new Subject<any>();
 		}
+
 		this._signals[signal].next(data);
 	}
 
@@ -334,6 +337,7 @@ export class CoreService {
 		if (!this._signals[signal]) {
 			this._signals[signal] = new Subject<any>();
 		}
+
 		return this._signals[signal].asObservable();
 	}
 
