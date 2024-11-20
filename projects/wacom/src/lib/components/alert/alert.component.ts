@@ -2,9 +2,10 @@ import { Component, ViewChild } from '@angular/core';
 import { CoreService } from '../../services/core.service';
 
 @Component({
-	selector: 'alert',
-	templateUrl: './alert.component.html',
-	styleUrls: ['./alert.component.scss'],
+    selector: 'alert',
+    templateUrl: './alert.component.html',
+    styleUrls: ['./alert.component.scss'],
+    standalone: false
 })
 export class AlertComponent {
 	@ViewChild('alert', { static: false }) alert: any;

@@ -7,7 +7,8 @@ import { CoreService } from '../../services/core.service';
     host: {
         'class': 'popup'
     },
-    styleUrls: ['./popup.component.sass']
+    styleUrls: ['./popup.component.sass'],
+    standalone: false
 })
 
 export class PopupComponent {

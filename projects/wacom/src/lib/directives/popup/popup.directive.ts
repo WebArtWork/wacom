@@ -15,6 +15,7 @@ export interface AdComponent {
 @Directive({
     selector: '[popup]',
     exportAs: 'popup',
+    standalone: false
 })
 
 export class PopupDirective {

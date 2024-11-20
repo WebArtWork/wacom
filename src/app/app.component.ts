@@ -2,9 +2,10 @@ import { Component } from '@angular/core';
 import { StoreService, ModalService, UiService, AlertService } from 'wacom';
 import { LocalComponent } from './modals/local/local.component';
 @Component({
-	selector: 'app-root',
-	templateUrl: './app.component.html',
-	styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: false
 })
 export class AppComponent {
 	public password = '';

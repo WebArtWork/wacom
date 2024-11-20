@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-	name: 'mongodate'
+    name: 'mongodate',
+    standalone: false
 })
 export class MongodatePipe implements PipeTransform {
 	transform(_id: any){

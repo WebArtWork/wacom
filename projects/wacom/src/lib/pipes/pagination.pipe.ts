@@ -1,8 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-	name: 'page',
-	pure: false
+    name: 'page',
+    pure: false,
+    standalone: false
 })
 export class PaginationPipe implements PipeTransform {
 	transform(arr: any, config:any, sort:any, search=''): any {
