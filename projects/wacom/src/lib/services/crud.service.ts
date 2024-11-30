@@ -238,7 +238,7 @@ export abstract class CrudService<
 	 * @returns An observable that resolves with the created document, or emits an error if already created.
 	 */
 	create(
-		doc: Document,
+		doc: Document = {} as Document,
 		options: CrudOptions<Document> = {}
 	): Observable<Document> {
 		if (doc.__created) {
