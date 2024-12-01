@@ -658,5 +658,7 @@ export abstract class CrudService<
 		for (const callback of this._filteredDocumentsCallbacks) {
 			callback();
 		}
+
+		this._core.complete(this._config.name + 'Loaded');
 	}
 }
