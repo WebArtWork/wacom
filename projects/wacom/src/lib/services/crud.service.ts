@@ -87,11 +87,9 @@ export abstract class CrudService<
 		});
 
 		this._core.on('wipe').subscribe((): void => {
-			this._docs.splice(0, this._docs.length);
+			this.clearDocs();
 
 			this._filterDocuments();
-
-			this.setDocs();
 		});
 	}
 
@@ -109,6 +107,17 @@ export abstract class CrudService<
 	 */
 	getDocs(): Document[] {
 		return this._docs;
+	}
+
+	/**
+	 * Clears the current list of documents.
+	 *
+	 * Empties the internal documents array and saves the updated state to local storage.
+	 */
+	clearDocs(): void {
+		this._docs.splice(0, this._docs.length);
+
+		this.setDocs();
 	}
 
 	/**
@@ -219,6 +228,8 @@ export abstract class CrudService<
 				if (typeof config.page !== 'number') {
 					this._filterDocuments();
 				}
+
+				this._core.emit(`${this._config.name}_get`, this._docs);
 			},
 			error: (err: unknown): void => {
 				if (options.errCallback) {
