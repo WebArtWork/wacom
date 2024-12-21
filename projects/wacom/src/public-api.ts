@@ -14,6 +14,7 @@ export * from './lib/guard/meta.guard';
 export * from './lib/components/alert/alert.component';
 export * from './lib/components/modal/modal.component';
 export * from './lib/components/loader/loader.component';
+export * from './lib/components/crud.component';
 /*
  *	Directives
  */
