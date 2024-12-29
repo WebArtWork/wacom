@@ -198,7 +198,9 @@ export abstract class CrudService<
 				this.fetch({ _id }).subscribe((_doc: Document) => {
 					this._fetchingId[_id] = false;
 
-					this._core.copy(_doc, doc);
+					if (_doc) {
+						this._core.copy(_doc, doc);
+					}
 				});
 			});
 		}
