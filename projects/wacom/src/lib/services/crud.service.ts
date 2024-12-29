@@ -150,6 +150,7 @@ export abstract class CrudService<
 		if (existingDoc) {
 			// Update the existing document
 			this._core.copy(doc, existingDoc);
+
 			this._core.copy(existingDoc, doc);
 		} else {
 			// Add new document
@@ -168,7 +169,7 @@ export abstract class CrudService<
 	new(doc: Document = {} as Document): Document {
 		return {
 			...doc,
-			_id: Date.now().toString(),
+			_id: doc._id || Date.now().toString(),
 			__created: false,
 			__modified: false,
 		} as Document;
@@ -181,7 +182,28 @@ export abstract class CrudService<
 	 * @returns The found document or a new document if not found.
 	 */
 	doc(_id: string): Document {
-		return this._docs.find((d) => this._id(d) === _id) || this.new();
+		const doc =
+			this._docs.find((d) => this._id(d) === _id) ||
+			this.new({
+				_id,
+			} as Document);
+
+		if (
+			!this._docs.find((d) => this._id(d) === _id) &&
+			!this._fetchingId[_id]
+		) {
+			this._fetchingId[_id] = true;
+
+			setTimeout(() => {
+				this.fetch({ _id }).subscribe((_doc: Document) => {
+					this._fetchingId[_id] = false;
+
+					this._core.copy(_doc, doc);
+				});
+			});
+		}
+
+		return doc;
 	}
 
 	/**
@@ -255,7 +277,7 @@ export abstract class CrudService<
 		if (doc.__created) {
 			// Emit an error observable if the document is already created
 			return new Observable<Document>((observer) => {
-				observer.error(new Error("Document has already been created."));
+				observer.error(new Error('Document has already been created.'));
 			});
 		}
 
@@ -672,4 +694,6 @@ export abstract class CrudService<
 
 		this._core.complete(this._config.name + 'Loaded');
 	}
+
+	private _fetchingId: Record<string, boolean> = {};
 }
