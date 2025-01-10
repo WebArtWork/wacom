@@ -1,0 +1,79 @@
+{
+	"root": true,
+	"ignorePatterns": ["projects/**/*"],
+	"overrides": [
+		{
+			"files": ["*.ts"],
+			"parserOptions": {
+				"project": ["./tsconfig.json", "./e2e/tsconfig.json"],
+				"createDefaultProgram": true
+			},
+			"extends": [
+				"plugin:@angular-eslint/recommended",
+				"plugin:@angular-eslint/template/process-inline-templates",
+				"eslint:recommended",
+				"plugin:@typescript-eslint/recommended",
+				"plugin:@typescript-eslint/recommended-requiring-type-checking",
+				"plugin:prettier/recommended"
+			],
+			"rules": {
+				"no-console": "warn",
+				"@typescript-eslint/explicit-function-return-type": "error",
+				"@typescript-eslint/no-unsafe-call": "off",
+				"@typescript-eslint/no-unsafe-member-access": "off",
+				"@typescript-eslint/unbound-method": "off",
+				"@typescript-eslint/no-unsafe-assignment": "off",
+				"@typescript-eslint/no-floating-promises": "off",
+				"@typescript-eslint/ban-ts-comment": "off",
+				"@typescript-eslint/await-thenable": "off",
+				"@typescript-eslint/no-namespace": "off",
+				"prettier/prettier": [
+					"error",
+					{
+						"printWidth": 140
+					}
+				],
+				"@typescript-eslint/naming-convention": [
+					"error",
+					{
+						"selector": "variable",
+						"format": ["camelCase", "UPPER_CASE"],
+						"leadingUnderscore": "allow"
+					}
+				],
+				"lines-between-class-members": "off",
+				"@typescript-eslint/lines-between-class-members": "error",
+				"padding-line-between-statements": "off",
+				"@typescript-eslint/padding-line-between-statements": [
+					"error",
+					{
+						"blankLine": "always",
+						"prev": "*",
+						"next": "*"
+					},
+					{
+						"blankLine": "never",
+						"prev": "import",
+						"next": "import"
+					},
+					{
+						"blankLine": "never",
+						"prev": ["case", "default"],
+						"next": "*"
+					}
+				],
+				"@typescript-eslint/explicit-member-accessibility": [
+					"error",
+					{
+						"accessibility": "no-public"
+					}
+				]
+			}
+		},
+		{
+			"files": ["*.html"],
+			"extends": ["plugin:@angular-eslint/template/recommended", "plugin:prettier/recommended"],
+			"rules": {}
+		}
+	]
+}
