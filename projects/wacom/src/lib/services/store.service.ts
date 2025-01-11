@@ -3,7 +3,7 @@ import { Injectable, Inject, Optional } from '@angular/core';
 import { CoreService } from './core.service';
 
 @Injectable({
-	providedIn: 'root'
+	providedIn: 'root',
 })
 export class StoreService {
 	private _prefix = '';
@@ -35,8 +35,8 @@ export class StoreService {
 	set(
 		key: string,
 		value: string,
-		callback: () => void = () => { },
-		errCallback: () => void = () => { }
+		callback: () => void = () => {},
+		errCallback: () => void = () => {}
 	): void {
 		key = this.applyPrefix(key);
 
@@ -59,10 +59,7 @@ export class StoreService {
 	 * @param value - The value to store.
 	 * @returns A promise that resolves to a boolean indicating success.
 	 */
-	async setAsync(
-		key: string,
-		value: string
-	): Promise<boolean> {
+	async setAsync(key: string, value: string): Promise<boolean> {
 		key = this.applyPrefix(key);
 
 		try {
@@ -87,8 +84,8 @@ export class StoreService {
 	 */
 	get(
 		key: string,
-		callback: (value: string) => void = () => { },
-		errCallback: () => void = () => { }
+		callback: (value: string) => void = () => {},
+		errCallback: () => void = () => {}
 	): void {
 		key = this.applyPrefix(key);
 
@@ -106,9 +103,7 @@ export class StoreService {
 	 * @param key - The storage key.
 	 * @returns A promise that resolves to the retrieved value.
 	 */
-	async getAsync(
-		key: string
-	): Promise<string> {
+	async getAsync(key: string): Promise<string> {
 		key = this.applyPrefix(key);
 
 		try {
@@ -134,8 +129,8 @@ export class StoreService {
 	setJson(
 		key: string,
 		value: any,
-		callback: () => void = () => { },
-		errCallback: () => void = () => { }
+		callback: () => void = () => {},
+		errCallback: () => void = () => {}
 	): void {
 		this.set(key, JSON.stringify(value), callback, errCallback);
 	}
@@ -147,10 +142,7 @@ export class StoreService {
 	 * @param value - The value to store.
 	 * @returns A promise that resolves to a boolean indicating success.
 	 */
-	async setJsonAsync(
-		key: string,
-		value: any
-	): Promise<boolean> {
+	async setJsonAsync(key: string, value: any): Promise<boolean> {
 		return this.setAsync(key, JSON.stringify(value));
 	}
 
@@ -163,17 +155,21 @@ export class StoreService {
 	 */
 	getJson(
 		key: string,
-		callback: (value: any) => void = () => { },
-		errCallback: () => void = () => { }
+		callback: (value: any) => void = () => {},
+		errCallback: () => void = () => {}
 	): void {
-		this.get(key, (value: string) => {
-			try {
-				const parsedValue = JSON.parse(value);
-				callback(parsedValue);
-			} catch (e) {
-				callback(null);
-			}
-		}, errCallback);
+		this.get(
+			key,
+			(value: string) => {
+				try {
+					const parsedValue = JSON.parse(value);
+					callback(parsedValue);
+				} catch (e) {
+					callback(null);
+				}
+			},
+			errCallback
+		);
 	}
 
 	/**
@@ -262,5 +258,30 @@ export class StoreService {
 			key = this._prefix + key;
 		}
 		return key;
+	}
+
+	/**
+	 * Checks if a value exists in storage.
+	 *
+	 * This function checks whether a value is present for the given key in the storage.
+	 * It uses the configured storage mechanism if available; otherwise, it defaults to using `localStorage`.
+	 *
+	 * @param key - The storage key to check.
+	 * @returns A promise that resolves to `true` if the value exists, otherwise `false`.
+	 *
+	 * @example
+	 * const store = new StoreService(config, core);
+	 *
+	 * // Set a value and check if it exists
+	 * await store.setAsync('exampleKey', 'exampleValue');
+	 * const exists = await store.has('exampleKey');
+	 * console.log(exists); // Output: true
+	 *
+	 * @notes
+	 * - This method internally uses `getAsync` to retrieve the value and checks if it is not null or empty.
+	 * - An empty string value will still return `true` as the key exists in storage.
+	 */
+	async has(key: string): Promise<boolean> {
+		return !!(await this.getAsync(key));
 	}
 }
