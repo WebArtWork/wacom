@@ -5,6 +5,7 @@ import { AlertService } from './alert.service';
 import { CoreService } from './core.service';
 import { CrudDocument } from '../interfaces/crud.interface';
 import { BaseService } from './base.service';
+import { inject } from '@angular/core';
 
 interface CrudOptions<Document> {
 	name?: string;
@@ -17,6 +18,7 @@ interface CrudConfig<Document> {
 	name: string;
 	_id?: string;
 	replace?: (doc: Document) => void;
+	unauthorized?: boolean;
 }
 
 interface GetConfig {
@@ -61,35 +63,48 @@ export abstract class CrudService<
 	 * Constructs a CRUD service instance.
 	 *
 	 * @param _config - Configuration options for the CRUD service.
-	 * @param _http - Service to handle HTTP requests.
-	 * @param _store - Service to manage local storage of documents.
-	 * @param _alert - Service to display alerts.
-	 * @param _core - Core service for utility functions.
+	 * @param __http - Service to handle HTTP requests.
+	 * @param __store - Service to manage local storage of documents.
+	 * @param __alert - Service to display alerts.
+	 * @param __core - Core service for utility functions.
 	 */
-	constructor(
-		private _config: CrudConfig<Document>,
-		private _http: HttpService,
-		private _store: StoreService,
-		private _alert: AlertService,
-		private _core: CoreService
-	) {
+	protected __http = inject(HttpService);
+
+	protected __store = inject(StoreService);
+
+	protected __alert = inject(AlertService);
+
+	protected __core = inject(CoreService);
+
+	constructor(private _config: CrudConfig<Document>) {
 		super();
 
 		this._url += this._config.name;
 
-		// Load documents from local storage.
-		this._store.getJson('docs_' + this._config.name, (docs) => {
+		if (this._config.unauthorized) {
+			this.restoreDocs();
+		} else if (localStorage.getItem('waw_user')) {
+			const user = JSON.parse(localStorage.getItem('waw_user') as string);
+
+			if (user._id === localStorage.getItem('waw_user_id')) {
+				this.restoreDocs();
+			}
+		}
+
+		this.__core.on('wipe').subscribe((): void => {
+			this.clearDocs();
+
+			this._filterDocuments();
+		});
+	}
+
+	restoreDocs(): void {
+		this.__store.getJson('docs_' + this._config.name, (docs) => {
 			if (Array.isArray(docs)) {
 				this._docs.push(...docs);
 
 				this._filterDocuments();
 			}
-		});
-
-		this._core.on('wipe').subscribe((): void => {
-			this.clearDocs();
-
-			this._filterDocuments();
 		});
 	}
 
@@ -97,7 +112,7 @@ export abstract class CrudService<
 	 * Saves the current set of documents to local storage.
 	 */
 	setDocs(): void {
-		this._store.setJson('docs_' + this._config.name, this._docs);
+		this.__store.setJson('docs_' + this._config.name, this._docs);
 	}
 
 	/**
@@ -149,9 +164,9 @@ export abstract class CrudService<
 
 		if (existingDoc) {
 			// Update the existing document
-			this._core.copy(doc, existingDoc);
+			this.__core.copy(doc, existingDoc);
 
-			this._core.copy(existingDoc, doc);
+			this.__core.copy(existingDoc, doc);
 		} else {
 			// Add new document
 			this._docs.push(doc);
@@ -199,7 +214,7 @@ export abstract class CrudService<
 					this._fetchingId[_id] = false;
 
 					if (_doc) {
-						this._core.copy(_doc, doc);
+						this.__core.copy(_doc, doc);
 					}
 				});
 			});
@@ -228,6 +243,12 @@ export abstract class CrudService<
 		config: GetConfig = {},
 		options: CrudOptions<Document> = {}
 	): Observable<Document[]> {
+		if (!this._config.unauthorized) {
+			const user = JSON.parse(localStorage.getItem('waw_user') as string);
+
+			localStorage.setItem('waw_user_id', user._id);
+		}
+
 		const url = `${this._url}/get${options.name || ''}`;
 
 		const params =
@@ -239,7 +260,7 @@ export abstract class CrudService<
 				  }`
 				: '');
 
-		const obs = this._http.get(`${url}${params}`);
+		const obs = this.__http.get(`${url}${params}`);
 
 		obs.subscribe({
 			next: (resp: unknown): void => {
@@ -253,7 +274,7 @@ export abstract class CrudService<
 					this._filterDocuments();
 				}
 
-				this._core.emit(`${this._config.name}_get`, this._docs);
+				this.__core.emit(`${this._config.name}_get`, this._docs);
 			},
 			error: (err: unknown): void => {
 				if (options.errCallback) {
@@ -285,7 +306,7 @@ export abstract class CrudService<
 
 		doc.__created = true;
 
-		const obs = this._http.post(
+		const obs = this.__http.post(
 			`${this._url}/create${options.name || ''}`,
 			doc
 		);
@@ -293,7 +314,7 @@ export abstract class CrudService<
 		obs.subscribe({
 			next: (resp: unknown) => {
 				if (resp) {
-					this._core.copy(resp, doc);
+					this.__core.copy(resp, doc);
 
 					this.addDoc(doc);
 
@@ -304,7 +325,7 @@ export abstract class CrudService<
 					}
 
 					if (options.alert) {
-						this._alert.show({
+						this.__alert.show({
 							unique: `${this._config.name}create`,
 							text: options.alert,
 						});
@@ -317,7 +338,7 @@ export abstract class CrudService<
 					}
 				}
 
-				this._core.emit(`${this._config.name}_create`, doc);
+				this.__core.emit(`${this._config.name}_create`, doc);
 			},
 			error: (err: unknown) => {
 				doc.__created = false;
@@ -340,7 +361,7 @@ export abstract class CrudService<
 		query: object = {},
 		options: CrudOptions<Document> = {}
 	): Observable<Document> {
-		const obs = this._http.post(
+		const obs = this.__http.post(
 			`${this._url}/fetch${options.name || ''}`,
 			query
 		);
@@ -355,7 +376,7 @@ export abstract class CrudService<
 					if (options.callback) options.callback(resp as Document);
 
 					if (options.alert) {
-						this._alert.show({
+						this.__alert.show({
 							unique: `${this._config.name}create`,
 							text: options.alert,
 						});
@@ -390,7 +411,7 @@ export abstract class CrudService<
 		doc.__modified = true;
 
 		return new Observable<Document>((observer) => {
-			this._core.afterWhile(this._id(doc), () => {
+			this.__core.afterWhile(this._id(doc), () => {
 				this.update(doc, options).subscribe({
 					next: (updatedDoc) => {
 						observer.next(updatedDoc); // Emit the updated document
@@ -419,7 +440,7 @@ export abstract class CrudService<
 	): Observable<Document> {
 		doc.__modified = true;
 
-		const obs = this._http.post(
+		const obs = this.__http.post(
 			`${this._url}/update${options.name || ''}`,
 			doc
 		);
@@ -429,14 +450,14 @@ export abstract class CrudService<
 				if (resp) {
 					doc.__modified = false;
 
-					this._core.copy(resp, doc);
+					this.__core.copy(resp, doc);
 
 					if (options.callback) {
 						options.callback(doc);
 					}
 
 					if (options.alert) {
-						this._alert.show({
+						this.__alert.show({
 							unique: `${this._config.name}update`,
 							text: options.alert,
 						});
@@ -447,7 +468,7 @@ export abstract class CrudService<
 					}
 				}
 
-				this._core.emit(`${this._config.name}_update`, doc);
+				this.__core.emit(`${this._config.name}_update`, doc);
 			},
 			error: (err: unknown) => {
 				if (options.errCallback) {
@@ -472,7 +493,7 @@ export abstract class CrudService<
 	): Observable<Document> {
 		doc.__modified = true;
 
-		const obs = this._http.post(
+		const obs = this.__http.post(
 			`${this._url}/unique${options.name || ''}`,
 			doc
 		);
@@ -489,7 +510,7 @@ export abstract class CrudService<
 					}
 
 					if (options.alert) {
-						this._alert.show({
+						this.__alert.show({
 							unique: `${this._config.name}unique`,
 							text: options.alert,
 						});
@@ -500,7 +521,7 @@ export abstract class CrudService<
 					}
 				}
 
-				this._core.emit(`${this._config.name}_unique`, doc);
+				this.__core.emit(`${this._config.name}_unique`, doc);
 			},
 			error: (err: unknown) => {
 				if (options.errCallback) {
@@ -523,7 +544,7 @@ export abstract class CrudService<
 		doc: Document,
 		options: CrudOptions<Document> = {}
 	): Observable<Document> {
-		const obs = this._http.post(
+		const obs = this.__http.post(
 			`${this._url}/delete${options.name || ''}`,
 			doc
 		);
@@ -547,7 +568,7 @@ export abstract class CrudService<
 					}
 
 					if (options.alert) {
-						this._alert.show({
+						this.__alert.show({
 							unique: `${this._config.name}delete`,
 							text: options.alert,
 						});
@@ -558,7 +579,7 @@ export abstract class CrudService<
 					}
 				}
 
-				this._core.emit(`${this._config.name}_delete`, doc);
+				this.__core.emit(`${this._config.name}_delete`, doc);
 			},
 			error: (err: unknown) => {
 				if (options.errCallback) {
@@ -694,7 +715,7 @@ export abstract class CrudService<
 			callback();
 		}
 
-		this._core.complete(this._config.name + 'Loaded');
+		this.__core.complete(this._config.name + 'Loaded');
 	}
 
 	private _fetchingId: Record<string, boolean> = {};
