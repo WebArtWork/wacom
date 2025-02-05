@@ -243,7 +243,7 @@ export abstract class CrudService<
 		config: GetConfig = {},
 		options: CrudOptions<Document> = {}
 	): Observable<Document[]> {
-		if (!this._config.unauthorized) {
+		if (!this._config.unauthorized && localStorage.getItem('waw_user')) {
 			const user = JSON.parse(localStorage.getItem('waw_user') as string);
 
 			localStorage.setItem('waw_user_id', user._id);
