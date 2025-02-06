@@ -450,6 +450,10 @@ export abstract class CrudService<
 				if (resp) {
 					doc.__modified = false;
 
+					const storedDoc = this.doc(doc._id);
+
+					this.__core.copy(resp, storedDoc);
+
 					this.__core.copy(resp, doc);
 
 					if (options.callback) {
