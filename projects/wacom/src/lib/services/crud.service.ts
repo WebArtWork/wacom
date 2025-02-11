@@ -86,7 +86,10 @@ export abstract class CrudService<
 		} else if (localStorage.getItem('waw_user')) {
 			const user = JSON.parse(localStorage.getItem('waw_user') as string);
 
-			if (user._id === localStorage.getItem('waw_user_id')) {
+			if (
+				user._id ===
+				localStorage.getItem(this._config.name + 'waw_user_id')
+			) {
 				this.restoreDocs();
 			}
 		}
@@ -246,7 +249,7 @@ export abstract class CrudService<
 		if (!this._config.unauthorized && localStorage.getItem('waw_user')) {
 			const user = JSON.parse(localStorage.getItem('waw_user') as string);
 
-			localStorage.setItem('waw_user_id', user._id);
+			localStorage.setItem(this._config.name + 'waw_user_id', user._id);
 		}
 
 		const url = `${this._url}/get${options.name || ''}`;

@@ -4,7 +4,7 @@ import {
 	ComponentFactoryResolver,
 	ComponentRef,
 	EmbeddedViewRef,
-	ApplicationRef
+	ApplicationRef,
 } from '@angular/core';
 import { CoreService } from './core.service';
 
@@ -19,7 +19,7 @@ export class DomService {
 		private appRef: ApplicationRef,
 		private injector: Injector,
 		private core: CoreService
-	) { }
+	) {}
 
 	/**
 	 * Appends a component to a specified element by ID.
@@ -29,7 +29,11 @@ export class DomService {
 	 * @param id - The ID of the element to append the component to.
 	 * @returns An object containing the native element and the component reference.
 	 */
-	appendById(component: any, options: any = {}, id: string): { nativeElement: HTMLElement, componentRef: ComponentRef<any> } {
+	appendById(
+		component: any,
+		options: any = {},
+		id: string
+	): { nativeElement: HTMLElement; componentRef: ComponentRef<any> } {
 		const componentRef = this.componentFactoryResolver
 			.resolveComponentFactory(component)
 			.create(this.injector);
@@ -60,7 +64,7 @@ export class DomService {
 		component: any,
 		options: any = {},
 		element: HTMLElement = this.core.document.body
-	): { nativeElement: HTMLElement, componentRef: ComponentRef<any> } | void {
+	): { nativeElement: HTMLElement; componentRef: ComponentRef<any> } | void {
 		if (options.providedIn) {
 			if (this.providedIn[options.providedIn]) {
 				return;
@@ -109,7 +113,10 @@ export class DomService {
 	 * @param options - The options to project into the component.
 	 * @returns The component reference with the projected inputs.
 	 */
-	private projectComponentInputs(component: ComponentRef<any>, options: any): ComponentRef<any> {
+	private projectComponentInputs(
+		component: ComponentRef<any>,
+		options: any
+	): ComponentRef<any> {
 		if (options) {
 			const props = Object.getOwnPropertyNames(options);
 			for (const prop of props) {

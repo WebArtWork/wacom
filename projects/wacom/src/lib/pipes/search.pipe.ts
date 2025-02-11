@@ -1,17 +1,24 @@
 import { Pipe, PipeTransform } from '@angular/core';
 /*
-*	Author: Honchar Denys
-*	Search for any content in any type of given documents
-*	Always returning an array, even if nothing is provided
-*/
+ *	Author: Honchar Denys
+ *	Search for any content in any type of given documents
+ *	Always returning an array, even if nothing is provided
+ */
 @Pipe({
-    name: 'search',
-    standalone: false
+	name: 'search',
+	standalone: false,
 })
 export class SearchPipe implements PipeTransform {
 	private c = 0;
 	// transform(given: any, search?: any, fields?: any, l?: any, i?: any, reload?: any): any {
-	transform(given: any, s?: any, f?: any, l?: any, i?: any, reload?: any): any {
+	transform(
+		given: any,
+		s?: any,
+		f?: any,
+		l?: any,
+		i?: any,
+		reload?: any
+	): any {
 		// given stands for the provided array with docs
 		// s stands for search
 		// f stands for fields
@@ -29,7 +36,8 @@ export class SearchPipe implements PipeTransform {
 			if (l && Array.isArray(given)) return given.slice(0, l);
 			else return given || [];
 		}
-		let _arr: any = [], _check: any = {};
+		let _arr: any = [],
+			_check: any = {};
 		if (!Array.isArray(s) && typeof s == 'object') {
 			let _s = [];
 			for (let key in s) {
@@ -42,7 +50,12 @@ export class SearchPipe implements PipeTransform {
 		}
 		if (!f) f = ['name'];
 		if (typeof f == 'string') f = f.split(' ');
-		let sub_test = function (obj: any, _f: any, initObj: any, check: any): any {
+		let sub_test = function (
+			obj: any,
+			_f: any,
+			initObj: any,
+			check: any
+		): any {
 			if (!obj) return;
 			if (_f.indexOf('.') > -1) {
 				let sub = _f.split('.');
@@ -58,10 +71,19 @@ export class SearchPipe implements PipeTransform {
 			}
 			for (let j = 0; j < s.length; j++) {
 				let b = false;
-				if (obj[_f] && (typeof obj[_f] == 'string' || typeof obj[_f] == 'number') &&
+				if (
+					obj[_f] &&
+					(typeof obj[_f] == 'string' ||
+						typeof obj[_f] == 'number') &&
 					typeof s[j] == 'string' &&
-					(obj[_f].toString().toLowerCase().indexOf(s[j].toLowerCase()) > -1 ||
-						s[j].toLowerCase().indexOf(obj[_f].toString().toLowerCase()) > -1)) {
+					(obj[_f]
+						.toString()
+						.toLowerCase()
+						.indexOf(s[j].toLowerCase()) > -1 ||
+						s[j]
+							.toLowerCase()
+							.indexOf(obj[_f].toString().toLowerCase()) > -1)
+				) {
 					if (!_check[check]) _arr.push(initObj);
 					_check[check] = true;
 					b = true;
@@ -69,12 +91,12 @@ export class SearchPipe implements PipeTransform {
 				}
 				if (b) break;
 			}
-		}
+		};
 		let test = function (obj: any, check: any) {
 			for (let i = 0; i < f.length; i++) {
 				sub_test(obj, f[i], obj, check);
 			}
-		}
+		};
 		if (Array.isArray(given)) {
 			for (let i = 0; i < given.length; i++) {
 				test(given[i], i);

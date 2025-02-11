@@ -2,10 +2,10 @@ import { InjectionToken } from '@angular/core';
 
 export interface Loader {
 	onClose?: any;
-	loaders?:object;
+	loaders?: object;
 	component?: any;
 	append?: any;
-	text?:string;
+	text?: string;
 	class?: string;
 	progress?: boolean;
 	timeout?: number;
@@ -19,4 +19,4 @@ export const DEFAULT_Alert: Loader = {
 	class: '',
 	progress: true,
 	timeout: 5000,
-}
+};

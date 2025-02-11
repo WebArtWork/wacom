@@ -41,22 +41,36 @@ export class UiService {
 	 */
 	public valid(value: any, kind = 'email', extra = 0): boolean {
 		const validators: { [key: string]: (value: any) => boolean } = {
-			email: (value) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,10})+$/.test(value || ''),
+			email: (value) =>
+				/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,10})+$/.test(
+					value || ''
+				),
 			text: (value) => typeof value === 'string',
 			array: (value) => Array.isArray(value),
-			object: (value) => typeof value === 'object' && !Array.isArray(value) && value !== null,
+			object: (value) =>
+				typeof value === 'object' &&
+				!Array.isArray(value) &&
+				value !== null,
 			number: (value) => typeof value === 'number',
 			password: (value) => {
 				if (!value) return false;
 				switch (extra) {
 					case 1:
-						return /^((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9]))/.test(value || '');
+						return /^((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9]))/.test(
+							value || ''
+						);
 					case 2:
-						return /^(((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,})/.test(value || '');
+						return /^(((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,})/.test(
+							value || ''
+						);
 					case 3:
-						return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]))(?=.{8,})/.test(value || '');
+						return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]))(?=.{8,})/.test(
+							value || ''
+						);
 					case 4:
-						return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%&!-_]))(?=.{8,})/.test(value || '');
+						return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%&!-_]))(?=.{8,})/.test(
+							value || ''
+						);
 					default:
 						return !!value;
 				}
@@ -87,7 +101,10 @@ export class UiService {
 	 * Saves the CSS variables to local storage.
 	 */
 	private save(): void {
-		this.core.localStorage.setItem('css_variables', JSON.stringify(this.variables));
+		this.core.localStorage.setItem(
+			'css_variables',
+			JSON.stringify(this.variables)
+		);
 	}
 
 	/**
@@ -178,10 +195,13 @@ export class UiService {
 	 * @returns A random text string.
 	 */
 	public text(length = 10): string {
-		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		const characters =
+			'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		let result = '';
 		for (let i = 0; i < length; i++) {
-			result += characters.charAt(Math.floor(Math.random() * characters.length));
+			result += characters.charAt(
+				Math.floor(Math.random() * characters.length)
+			);
 		}
 		return result;
 	}

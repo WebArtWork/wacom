@@ -2,14 +2,20 @@ import { Injectable } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 @Injectable({
-	providedIn: 'root'
+	providedIn: 'root',
 })
 export class TimeService {
 	private weekDays = [
-		'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+		'Sunday',
+		'Monday',
+		'Tuesday',
+		'Wednesday',
+		'Thursday',
+		'Friday',
+		'Saturday',
 	];
 
-	constructor(private datePipe: DatePipe) { }
+	constructor(private datePipe: DatePipe) {}
 
 	/**
 	 * Returns the name of the day of the week for a given date.
@@ -20,7 +26,9 @@ export class TimeService {
 	 */
 	getDayName(date: Date, format: 'short' | 'long' = 'long'): string {
 		const dayIndex = date.getDay();
-		return format === 'short' ? this.weekDays[dayIndex].substring(0, 3) : this.weekDays[dayIndex];
+		return format === 'short'
+			? this.weekDays[dayIndex].substring(0, 3)
+			: this.weekDays[dayIndex];
 	}
 
 	/**
@@ -31,7 +39,11 @@ export class TimeService {
 	 * @param timezone - The timezone to use for formatting.
 	 * @returns The formatted date string.
 	 */
-	formatDate(date: Date, format: string = 'mediumDate', timezone: string = 'UTC'): string {
+	formatDate(
+		date: Date,
+		format: string = 'mediumDate',
+		timezone: string = 'UTC'
+	): string {
 		return this.datePipe.transform(date, format, timezone) || '';
 	}
 
@@ -191,7 +203,9 @@ export class TimeService {
 		tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
 		const yearStart = new Date(tempDate.getFullYear(), 0, 1);
 		// Calculate full weeks to nearest Thursday
-		return Math.ceil((((tempDate.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+		return Math.ceil(
+			((tempDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7
+		);
 	}
 
 	/**

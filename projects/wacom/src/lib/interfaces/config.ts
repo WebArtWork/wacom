@@ -9,11 +9,11 @@ export interface Config {
 		defaults?: {
 			title?: string;
 			titleSuffix?: string;
-		} & { [key: string]: string | undefined; };
+		} & { [key: string]: string | undefined };
 	};
 	alert?: {
-		alerts?:object;
-		text?:string;
+		alerts?: object;
+		text?: string;
 		type?: string;
 		icon?: string;
 		class?: string;
@@ -28,8 +28,8 @@ export interface Config {
 		size?: any;
 		timeout?: any;
 		timestart?: any;
-		class?:string;
-		modals?:object;
+		class?: string;
+		modals?: object;
 		position?: string;
 		closable?: boolean;
 		unique?: string;
@@ -44,7 +44,7 @@ export interface Config {
 	http?: {
 		headers?: any;
 		url?: string;
-	},
+	};
 	store?: {
 		prefix?: string;
 		set?: (
@@ -52,36 +52,33 @@ export interface Config {
 			value: any,
 			cb?: () => void,
 			errCb?: () => void
-		) => Promise<boolean>,
+		) => Promise<boolean>;
 		get?: (
 			hold: any,
 			cb?: (value: string) => void,
 			errCb?: () => void
-		) => Promise<string>,
+		) => Promise<string>;
 		remove?: (
 			hold: any,
 			cb?: () => void,
 			errCb?: () => void
-		) => Promise<boolean>,
-		clear?: (
-			cb?: () => void,
-			errCb?: () => void
-		) => Promise<boolean>
-	}
+		) => Promise<boolean>;
+		clear?: (cb?: () => void, errCb?: () => void) => Promise<boolean>;
+	};
 }
 export const CONFIG_TOKEN = new InjectionToken<Config>('config');
 export const DEFAULT_CONFIG: Config = {
 	meta: {
 		useTitleSuffix: false,
 		warnMissingGuard: true,
-		defaults: {}
+		defaults: {},
 	},
 	socket: false,
 	http: {
 		url: '',
-		headers: {}
+		headers: {},
 	},
 	store: {
-		prefix: ''
-	}
-}
+		prefix: '',
+	},
+};

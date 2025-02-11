@@ -3,6 +3,7 @@
 Service for Alerts
 
 ## Usage
+
 ```javascript
 import { AlertService } from 'wacom';
 ...
@@ -14,6 +15,7 @@ constructor(public alert: AlertService){
 	})
 }
 ```
+
 ## Functions
 
 ### show(options)
@@ -21,6 +23,7 @@ constructor(public alert: AlertService){
 Show alert with options
 
 ### options
+
 ```
 text - string
 type - string // ['info', 'success', 'error', 'warning', 'question']
@@ -30,6 +33,7 @@ timeout - number
 close - boolean
 buttons - array // [{text, callback}]
 ```
+
 ### desrtroy()
 
 Destroy all alerts

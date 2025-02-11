@@ -2,10 +2,10 @@ import { InjectionToken } from '@angular/core';
 
 export interface Alert {
 	onClose?: any;
-	alerts?:object;
+	alerts?: object;
 	component?: any;
-	text?:string;
-	icon?:string;
+	text?: string;
+	icon?: string;
 	type?: string;
 	class?: string;
 	unique?: string;
@@ -26,5 +26,5 @@ export const DEFAULT_Alert: Alert = {
 	position: 'bottomRight',
 	timeout: 5000,
 	closable: true,
-	buttons: []
-}
+	buttons: [],
+};

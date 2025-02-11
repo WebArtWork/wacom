@@ -1,4 +1,3 @@
-
 /**
  * BaseComponent is an abstract class that provides basic functionality for managing the current timestamp.
  */

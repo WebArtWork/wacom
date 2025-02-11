@@ -1,7 +1,10 @@
 /* initialize */
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from './interfaces/config';
 import { NgModule, ModuleWithProviders } from '@angular/core';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+	provideHttpClient,
+	withInterceptorsFromDi,
+} from '@angular/common/http';
 import { MetaService } from './services/meta.service';
 import { MetaGuard } from './guard/meta.guard';
 import { CommonModule } from '@angular/common';
@@ -33,31 +36,32 @@ import { LoaderComponent } from './components/loader/loader.component';
 import { FilesComponent } from './components/files/files.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { AlertComponent } from './components/alert/alert.component';
-const LOCAL_COMPONENTS = [
-	WrapperComponent,
-	FilesComponent
-];
-const COMPONENTS = [
-	LoaderComponent,
-	ModalComponent,
-	AlertComponent
-];
+const LOCAL_COMPONENTS = [WrapperComponent, FilesComponent];
+const COMPONENTS = [LoaderComponent, ModalComponent, AlertComponent];
 
-@NgModule({ declarations: [...LOCAL_COMPONENTS, ...PIPES, ...COMPONENTS, ...DIRECTIVES],
-    exports: [...PIPES, ...COMPONENTS, ...DIRECTIVES], imports: [CommonModule, FormsModule], providers: [
-        { provide: CONFIG_TOKEN, useValue: DEFAULT_CONFIG },
-        MetaGuard,
-        MetaService,
-        provideHttpClient(withInterceptorsFromDi())
-    ] })
+@NgModule({
+	declarations: [...LOCAL_COMPONENTS, ...PIPES, ...COMPONENTS, ...DIRECTIVES],
+	exports: [...PIPES, ...COMPONENTS, ...DIRECTIVES],
+	imports: [CommonModule, FormsModule],
+	providers: [
+		{ provide: CONFIG_TOKEN, useValue: DEFAULT_CONFIG },
+		MetaGuard,
+		MetaService,
+		provideHttpClient(withInterceptorsFromDi()),
+	],
+})
 export class WacomModule {
-	static forRoot(config: Config = DEFAULT_CONFIG): ModuleWithProviders<WacomModule> {
+	static forRoot(
+		config: Config = DEFAULT_CONFIG
+	): ModuleWithProviders<WacomModule> {
 		return {
 			ngModule: WacomModule,
-			providers: [{
-				provide: CONFIG_TOKEN,
-				useValue: config
-			}]
-		}
+			providers: [
+				{
+					provide: CONFIG_TOKEN,
+					useValue: config,
+				},
+			],
+		};
 	}
 }

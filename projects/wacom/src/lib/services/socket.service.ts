@@ -4,7 +4,7 @@ import { CoreService } from './core.service';
 import * as io from 'socket.io-client';
 
 @Injectable({
-	providedIn: 'root'
+	providedIn: 'root',
 })
 export class SocketService {
 	private _url = '';
@@ -65,7 +65,7 @@ export class SocketService {
 	 * @param to - The event to subscribe to.
 	 * @param cb - The callback function to execute when the event is received.
 	 */
-	on(to: string, cb: (message: any) => void = () => { }): void {
+	on(to: string, cb: (message: any) => void = () => {}): void {
 		if (!this._config.socket) {
 			return;
 		}

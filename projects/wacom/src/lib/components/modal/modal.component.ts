@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-    selector: 'lib-modal',
-    templateUrl: './modal.component.html',
-    styleUrls: ['./modal.component.scss'],
-    standalone: false
+	selector: 'lib-modal',
+	templateUrl: './modal.component.html',
+	styleUrls: ['./modal.component.scss'],
+	standalone: false,
 })
 export class ModalComponent implements OnInit {
 	class: string = '';
@@ -41,7 +41,10 @@ export class ModalComponent implements OnInit {
 	}
 
 	ngOnDestroy(): void {
-		window.removeEventListener('popstate', this.popStateListener.bind(this));
+		window.removeEventListener(
+			'popstate',
+			this.popStateListener.bind(this)
+		);
 	}
 
 	popStateListener(e: Event) {

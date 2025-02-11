@@ -10,8 +10,8 @@ export interface Modal {
 	size?: any;
 	timeout?: any;
 	timestart?: any;
-	class?:string;
-	modals?:object;
+	class?: string;
+	modals?: object;
 	position?: string;
 	closable?: boolean;
 	unique?: string;
@@ -24,5 +24,5 @@ export const DEFAULT_Modal: Modal = {
 	class: '',
 	modals: {},
 	position: 'tc',
-	closable: true
-}
+	closable: true,
+};
