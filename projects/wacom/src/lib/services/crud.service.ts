@@ -6,6 +6,7 @@ import { CoreService } from './core.service';
 import { CrudDocument } from '../interfaces/crud.interface';
 import { BaseService } from './base.service';
 import { inject } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 interface CrudOptions<Document> {
 	name?: string;
@@ -39,6 +40,8 @@ interface GetConfig {
 export abstract class CrudService<
 	Document extends CrudDocument
 > extends BaseService {
+	readonly appId = (environment as unknown as { appId: string }).appId;
+
 	/**
 	 * URL for the API.
 	 */
@@ -305,6 +308,10 @@ export abstract class CrudService<
 			return new Observable<Document>((observer) => {
 				observer.error(new Error('Document has already been created.'));
 			});
+		}
+
+		if (this.appId) {
+			doc.appId = this.appId;
 		}
 
 		doc.__created = true;
