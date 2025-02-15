@@ -6,7 +6,6 @@ import { CoreService } from './core.service';
 import { CrudDocument } from '../interfaces/crud.interface';
 import { BaseService } from './base.service';
 import { inject } from '@angular/core';
-import { environment } from 'src/environments/environment';
 
 interface CrudOptions<Document> {
 	name?: string;
@@ -20,6 +19,7 @@ interface CrudConfig<Document> {
 	_id?: string;
 	replace?: (doc: Document) => void;
 	unauthorized?: boolean;
+	appId?: string;
 }
 
 interface GetConfig {
@@ -40,8 +40,6 @@ interface GetConfig {
 export abstract class CrudService<
 	Document extends CrudDocument
 > extends BaseService {
-	readonly appId = (environment as unknown as { appId: string }).appId;
-
 	/**
 	 * URL for the API.
 	 */
@@ -310,8 +308,8 @@ export abstract class CrudService<
 			});
 		}
 
-		if (this.appId) {
-			doc.appId = this.appId;
+		if (this._config.appId) {
+			doc.appId = this._config.appId;
 		}
 
 		doc.__created = true;
