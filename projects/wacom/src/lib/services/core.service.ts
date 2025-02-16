@@ -1,6 +1,7 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 import { Subject, Observable } from 'rxjs';
+import { Selectitem } from '../interfaces/select.item.interface';
 
 // Add capitalize method to String prototype if it doesn't already exist
 if (!String.prototype.capitalize) {
@@ -450,5 +451,21 @@ export class CoreService {
 	// Linking management
 	linkCollections: string[] = [];
 	linkRealCollectionName: Record<string, string> = {};
-	linkIds: Record<string, { _id: string; name: string }> = {};
+	linkIds: Record<string, Selectitem[]> = {};
+
+	addLink(name: string, reset: () => Selectitem[], realName = ''): void {
+		this.linkCollections.push(name);
+
+		this.linkRealCollectionName[name] = realName || name;
+
+		this.onComplete(name + 'Loaded').then(() => {
+			this.linkIds[name] = reset();
+		});
+
+		this.on(name + '_changed').subscribe(() => {
+			this.linkIds[name].splice(0, this.linkIds[name].length);
+
+			this.linkIds[name].push(...reset());
+		});
+	}
 }
