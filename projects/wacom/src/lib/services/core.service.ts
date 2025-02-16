@@ -446,4 +446,9 @@ export class CoreService {
 	locked(which: string): boolean {
 		return !!this._locked[which];
 	}
+
+	// Linking management
+	linkCollections: string[] = [];
+	linkRealCollectionName: Record<string, string> = {};
+	linkIds: Record<string, { _id: string; name: string }> = {};
 }

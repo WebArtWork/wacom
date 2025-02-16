@@ -347,6 +347,10 @@ export abstract class CrudService<
 				}
 
 				this.__core.emit(`${this._config.name}_create`, doc);
+
+				this.__core.emit(`${this._config.name}_list`, doc);
+
+				this.__core.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
 				doc.__created = false;
@@ -375,13 +379,13 @@ export abstract class CrudService<
 		);
 
 		obs.subscribe({
-			next: (resp: unknown) => {
-				if (resp) {
-					this.addDoc(resp as Document);
+			next: (doc: unknown) => {
+				if (doc) {
+					this.addDoc(doc as Document);
 
 					this._filterDocuments();
 
-					if (options.callback) options.callback(resp as Document);
+					if (options.callback) options.callback(doc as Document);
 
 					if (options.alert) {
 						this.__alert.show({
@@ -389,9 +393,11 @@ export abstract class CrudService<
 							text: options.alert,
 						});
 					}
+
+					this.__core.emit(`${this._config.name}_changed`, doc);
 				} else {
 					if (options.errCallback) {
-						options.errCallback(resp as Document);
+						options.errCallback(doc as Document);
 					}
 				}
 			},
@@ -481,6 +487,8 @@ export abstract class CrudService<
 				}
 
 				this.__core.emit(`${this._config.name}_update`, doc);
+
+				this.__core.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
 				if (options.errCallback) {
@@ -534,6 +542,8 @@ export abstract class CrudService<
 				}
 
 				this.__core.emit(`${this._config.name}_unique`, doc);
+
+				this.__core.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
 				if (options.errCallback) {
@@ -592,6 +602,10 @@ export abstract class CrudService<
 				}
 
 				this.__core.emit(`${this._config.name}_delete`, doc);
+
+				this.__core.emit(`${this._config.name}_list`, doc);
+
+				this.__core.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
 				if (options.errCallback) {
@@ -726,6 +740,8 @@ export abstract class CrudService<
 		for (const callback of this._filteredDocumentsCallbacks) {
 			callback();
 		}
+
+		this.__core.emit(`${this._config.name}_filtered`);
 
 		this.__core.complete(this._config.name + 'Loaded');
 	}
