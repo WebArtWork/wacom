@@ -276,6 +276,8 @@ export abstract class CrudService<
 
 				if (typeof config.page !== 'number') {
 					this._filterDocuments();
+
+					this.__core.complete(this._config.name + '_loaded');
 				}
 
 				this.__core.emit(`${this._config.name}_get`, this._docs);
@@ -742,8 +744,6 @@ export abstract class CrudService<
 		}
 
 		this.__core.emit(`${this._config.name}_filtered`);
-
-		this.__core.complete(this._config.name + 'Loaded');
 	}
 
 	private _fetchingId: Record<string, boolean> = {};
