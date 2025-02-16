@@ -458,11 +458,11 @@ export class CoreService {
 
 		this.linkRealCollectionName[name] = realName || name;
 
-		this.onComplete(name + 'Loaded').then(() => {
+		this.onComplete(name.toLowerCase() + 'Loaded').then(() => {
 			this.linkIds[name] = reset();
 		});
 
-		this.on(name + '_changed').subscribe(() => {
+		this.on(name.toLowerCase() + '_changed').subscribe(() => {
 			this.linkIds[name].splice(0, this.linkIds[name].length);
 
 			this.linkIds[name].push(...reset());
