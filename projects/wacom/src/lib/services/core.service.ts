@@ -459,22 +459,10 @@ export class CoreService {
 		this.linkRealCollectionName[name] = realName || name;
 
 		this.onComplete(name.toLowerCase() + '_loaded').then(() => {
-			console.log(name.toLowerCase() + '_loaded');
-
 			this.linkIds[name] = reset();
 		});
 
-		this.on(name.toLowerCase() + '_get').subscribe(() => {
-			console.log(name.toLowerCase() + '_get');
-
-			this.linkIds[name].splice(0, this.linkIds[name].length);
-
-			this.linkIds[name].push(...reset());
-		});
-
 		this.on(name.toLowerCase() + '_changed').subscribe(() => {
-			console.log(name.toLowerCase() + '_changed');
-
 			this.linkIds[name].splice(0, this.linkIds[name].length);
 
 			this.linkIds[name].push(...reset());
