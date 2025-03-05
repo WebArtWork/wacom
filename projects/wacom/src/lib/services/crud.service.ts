@@ -268,6 +268,10 @@ export abstract class CrudService<
 
 		obs.subscribe({
 			next: (resp: unknown): void => {
+				if (typeof config.page !== 'number') {
+					this.clearDocs();
+				}
+
 				(resp as Document[]).forEach((doc) => this.addDoc(doc));
 
 				if (options.callback) {
