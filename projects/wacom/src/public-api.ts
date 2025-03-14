@@ -29,6 +29,7 @@ export * from './lib/pipes/pagination.pipe';
 export * from './lib/pipes/safe.pipe';
 export * from './lib/pipes/search.pipe';
 export * from './lib/pipes/splice.pipe';
+export * from './lib/pipes/split.pipe';
 /*
  *	Services
  */
