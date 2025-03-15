@@ -20,18 +20,20 @@ declare global {
 	}
 }
 
-declare var cordova: any;
-
 @Injectable({
 	providedIn: 'root',
 })
 export class CoreService {
+	deviceID = localStorage.getItem('deviceID') || crypto.randomUUID();
+
 	ssr = false;
 	localStorage: any; // = localStorage;
 	navigator: any; // = navigator;
 	document: any; // = document;
 	window: any; // = window;
 	constructor(@Inject(PLATFORM_ID) private platformId: boolean) {
+		localStorage.setItem('deviceID', this.deviceID);
+
 		this.ssr = isPlatformServer(this.platformId);
 
 		if (isPlatformServer(this.platformId)) {
