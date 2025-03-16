@@ -77,10 +77,14 @@ export abstract class CrudService<
 
 	protected __core = inject(CoreService);
 
+	loaded: Promise<void>;
+
 	constructor(private _config: CrudConfig<Document>) {
 		super();
 
 		this._url += this._config.name;
+
+		this.loaded = this.__core.onComplete(this._config.name + '_loaded');
 
 		if (this._config.unauthorized) {
 			this.restoreDocs();

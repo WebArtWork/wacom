@@ -380,6 +380,7 @@ export class CoreService {
 		if (this._completed[task]) {
 			return Promise.resolve();
 		}
+
 		return new Promise((resolve) => {
 			if (!this._completeResolvers[task]) {
 				this._completeResolvers[task] = [];
