@@ -41,6 +41,7 @@ export interface Config {
 		loaders?: object;
 	};
 	socket?: any;
+	io?: any;
 	http?: {
 		headers?: any;
 		url?: string;

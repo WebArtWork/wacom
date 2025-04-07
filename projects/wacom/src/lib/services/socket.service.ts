@@ -1,22 +1,29 @@
 import { Injectable, Inject, Optional } from '@angular/core';
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { CoreService } from './core.service';
-import * as io from 'socket.io-client';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class SocketService {
 	private _url = '';
+
 	private _io: any;
+
 	private _connected = false;
+
 	private _opts: any = {};
 
 	constructor(
 		@Inject(CONFIG_TOKEN) @Optional() private _config: Config,
 		private _core: CoreService
 	) {
+		if (!this._config.io) {
+			return;
+		}
+
 		this._url = this._core.window.location.origin.replace('4200', '8080');
+
 		if (!this._config) this._config = DEFAULT_CONFIG;
 
 		if (typeof this._config.socket === 'object') {
@@ -40,9 +47,11 @@ export class SocketService {
 	 */
 	setUrl(url: string): void {
 		this._url = url;
+
 		if (!this._config.socket) {
 			this._config.socket = true;
 		}
+
 		this.load();
 	}
 
@@ -50,9 +59,13 @@ export class SocketService {
 	 * Loads and initializes the WebSocket connection.
 	 */
 	private load(): void {
-		if (io) {
-			const ioFunc = (io as any).default ? (io as any).default : io;
+		if (this._config.io) {
+			const ioFunc = this._config.io.default
+				? this._config.io.default
+				: this._config.io;
+
 			this._io = ioFunc(this._url, this._opts);
+
 			this._io.on('connect', () => {
 				this._connected = true;
 				this._core.complete('socket');
