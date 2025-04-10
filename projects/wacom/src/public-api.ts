@@ -51,6 +51,7 @@ export * from './lib/services/file.service';
 export * from './lib/services/ui.service';
 export * from './lib/services/core.service';
 export * from './lib/services/time.service';
+export * from './lib/services/rtc.service';
 /*
  *	Initial
  *
