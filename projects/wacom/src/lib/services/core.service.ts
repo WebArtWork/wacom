@@ -403,6 +403,19 @@ export class CoreService {
 		return this._completed[task];
 	}
 
+	/**
+	 * Clears the completed state for a specific task.
+	 *
+	 * This removes the task from the internal `_completed` store,
+	 * allowing it to be awaited again in the future if needed.
+	 * It does not affect pending resolvers or trigger any callbacks.
+	 *
+	 * @param task - The task identifier to clear from completed state.
+	 */
+	clearCompleted(task: string) {
+		delete this._completed[task];
+	}
+
 	// Locking management
 	private _locked: Record<string, boolean> = {};
 	private _unlockResolvers: Record<string, (() => void)[]> = {};
@@ -413,6 +426,7 @@ export class CoreService {
 	 */
 	lock(which: string): void {
 		this._locked[which] = true;
+
 		if (!this._unlockResolvers[which]) {
 			this._unlockResolvers[which] = [];
 		}
@@ -424,8 +438,10 @@ export class CoreService {
 	 */
 	unlock(which: string): void {
 		this._locked[which] = false;
+
 		if (this._unlockResolvers[which]) {
 			this._unlockResolvers[which].forEach((resolve) => resolve());
+
 			this._unlockResolvers[which] = [];
 		}
 	}
@@ -439,10 +455,12 @@ export class CoreService {
 		if (!this._locked[which]) {
 			return Promise.resolve();
 		}
+
 		return new Promise((resolve) => {
 			if (!this._unlockResolvers[which]) {
 				this._unlockResolvers[which] = [];
 			}
+
 			this._unlockResolvers[which].push(resolve);
 		});
 	}
