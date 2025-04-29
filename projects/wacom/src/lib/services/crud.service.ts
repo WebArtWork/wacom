@@ -77,7 +77,7 @@ export abstract class CrudService<
 
 	protected __core = inject(CoreService);
 
-	loaded: Promise<void>;
+	loaded: Promise<unknown>;
 
 	constructor(private _config: CrudConfig<Document>) {
 		super();

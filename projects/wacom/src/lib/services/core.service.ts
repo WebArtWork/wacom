@@ -356,17 +356,21 @@ export class CoreService {
 	}
 
 	// Await management
-	private _completed: Record<string, boolean> = {};
-	private _completeResolvers: Record<string, (() => void)[]> = {};
+	private _completed: Record<string, unknown> = {};
+	private _completeResolvers: Record<string, ((doc: unknown) => void)[]> = {};
 
 	/**
 	 * Marks a task as complete.
 	 * @param task - The task to mark as complete, identified by a string.
 	 */
-	complete(task: string): void {
-		this._completed[task] = true;
+	complete(task: string, document: unknown = true): void {
+		this._completed[task] = document;
+
 		if (this._completeResolvers[task]) {
-			this._completeResolvers[task].forEach((resolve) => resolve());
+			this._completeResolvers[task].forEach((resolve) =>
+				resolve(document)
+			);
+
 			this._completeResolvers[task] = [];
 		}
 	}
@@ -376,15 +380,16 @@ export class CoreService {
 	 * @param task - The task to watch for completion, identified by a string.
 	 * @returns A Promise that resolves when the task is complete.
 	 */
-	onComplete(task: string): Promise<void> {
+	onComplete(task: string): Promise<unknown> {
 		if (this._completed[task]) {
-			return Promise.resolve();
+			return Promise.resolve(this._completed[task]);
 		}
 
 		return new Promise((resolve) => {
 			if (!this._completeResolvers[task]) {
 				this._completeResolvers[task] = [];
 			}
+
 			this._completeResolvers[task].push(resolve);
 		});
 	}
@@ -394,8 +399,8 @@ export class CoreService {
 	 * @param task - The task to check, identified by a string.
 	 * @returns True if the task is completed, false otherwise.
 	 */
-	completed(task: string): boolean {
-		return !!this._completed[task];
+	completed(task: string): unknown {
+		return this._completed[task];
 	}
 
 	// Locking management
