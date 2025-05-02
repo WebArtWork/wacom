@@ -24,7 +24,11 @@ declare global {
 	providedIn: 'root',
 })
 export class CoreService {
-	deviceID = localStorage.getItem('deviceID') || crypto.randomUUID();
+	deviceID =
+		localStorage.getItem('deviceID') ||
+		(typeof crypto.randomUUID === 'function'
+			? crypto.randomUUID()
+			: this.uuidv4());
 
 	ssr = false;
 	localStorage: any; // = localStorage;
@@ -76,6 +80,17 @@ export class CoreService {
 		}
 
 		this.detectDevice();
+	}
+
+	uuidv4(): string {
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+			/[xy]/g,
+			(c: string) => {
+				const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16;
+				const v = c === 'x' ? r : (r & 0x3) | 0x8;
+				return v.toString(16);
+			}
+		);
 	}
 
 	/**
