@@ -26,9 +26,9 @@ declare global {
 export class CoreService {
 	deviceID =
 		localStorage.getItem('deviceID') ||
-		(typeof crypto.randomUUID === 'function'
+		(typeof crypto?.randomUUID === 'function'
 			? crypto.randomUUID()
-			: this.uuidv4());
+			: this.UUID());
 
 	ssr = false;
 	localStorage: any; // = localStorage;
@@ -82,11 +82,28 @@ export class CoreService {
 		this.detectDevice();
 	}
 
-	uuidv4(): string {
+	/**
+	 * Generates a UUID (Universally Unique Identifier) version 4.
+	 *
+	 * This implementation uses `Math.random()` to generate random values,
+	 * making it suitable for general-purpose identifiers, but **not** for
+	 * cryptographic or security-sensitive use cases.
+	 *
+	 * The format follows the UUID v4 standard: `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`
+	 * where:
+	 * - `x` is a random hexadecimal digit (0–f)
+	 * - `4` indicates UUID version 4
+	 * - `y` is one of 8, 9, A, or B
+	 *
+	 * Example: `f47ac10b-58cc-4372-a567-0e02b2c3d479`
+	 *
+	 * @returns A string containing a UUID v4.
+	 */
+	UUID(): string {
 		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
 			/[xy]/g,
 			(c: string) => {
-				const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16;
+				const r = (Math.random() * 16) | 0;
 				const v = c === 'x' ? r : (r & 0x3) | 0x8;
 				return v.toString(16);
 			}
