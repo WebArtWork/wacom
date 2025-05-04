@@ -2,6 +2,16 @@ import { Injectable, Inject, Optional } from '@angular/core';
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { CoreService } from './core.service';
 
+/* app.module.ts
+import * as io from 'socket.io-client';
+WacomModule.forRoot({
+	socket: {
+		url: environment.url,
+		io
+	}
+)
+ */
+
 @Injectable({
 	providedIn: 'root',
 })
