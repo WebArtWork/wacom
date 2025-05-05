@@ -285,7 +285,10 @@ export abstract class CrudService<
 				if (typeof config.page !== 'number') {
 					this._filterDocuments();
 
-					this.__core.complete(this._config.name + '_loaded');
+					this.__core.complete(
+						this._config.name + '_loaded',
+						this._docs
+					);
 				}
 
 				this.__core.emit(`${this._config.name}_get`, this._docs);
