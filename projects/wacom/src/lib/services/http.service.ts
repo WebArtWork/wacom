@@ -5,7 +5,7 @@ import {
 	HttpErrorResponse,
 	HttpHeaders,
 } from '@angular/common/http';
-import { EMPTY, Observable, of, ReplaySubject } from 'rxjs';
+import { EMPTY, Observable, ReplaySubject } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
 import { StoreService } from './store.service';
 
@@ -194,17 +194,13 @@ export class HttpService {
 						);
 					})(error);
 
-					return of(null);
+					responseSubject.error(error);
 
-					// responseSubject.error(error);
-
-					// return EMPTY;
+					return EMPTY;
 				})
 			)
 			.subscribe({
 				next: (resp: unknown) => {
-					if (resp === null) return; // failed case
-
 					if (
 						opts.acceptance &&
 						typeof opts.acceptance === 'function'
