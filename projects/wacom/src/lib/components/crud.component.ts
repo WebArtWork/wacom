@@ -1,124 +1,218 @@
-import { CrudDocument } from '../interfaces/crud.interface';
+import { firstValueFrom } from 'rxjs';
+import {
+	CrudDocument,
+	CrudServiceInterface,
+} from '../interfaces/crud.interface';
 import { CoreService } from '../services/core.service';
-import { CrudService } from '../services/crud.service';
-import { BaseComponent } from './base.component';
+import { inject } from '@angular/core';
 
 /**
- * Form interface defines the structure for a form that handles document operations.
- * It includes a method `modalDocs` that processes an array of documents and returns a promise.
+ * Interface representing the shape of a form service used by the CrudComponent.
+ * The consuming app must provide a service that implements this structure.
  */
-interface Form {
-	/**
-	 * Processes an array of documents and returns a promise with processed documents.
-	 *
-	 * @param docs The documents to be processed.
-	 * @returns A promise that resolves with the processed documents.
-	 */
-	modalDocs<Document>(docs: Document[]): Promise<Document[]>;
+interface FormServiceInterface {
+	getForm: (name: string, components: any[]) => any;
+	modal: <T>(form: any, options?: any, doc?: T) => Promise<T>;
+	modalDocs: <T>(docs: T[]) => Promise<T[]>;
+	modalUnique: <T>(collection: string, key: string, doc: T) => void;
+	alert?: {
+		question: (config: {
+			text: string;
+			buttons: { text: string; callback?: () => void }[];
+		}) => void;
+	};
 }
 
 /**
- * CrudComponent is an abstract class that extends BaseComponent and provides CRUD functionality for managing documents.
- * It interacts with a CrudService to create, read, update, or delete documents.
+ * Abstract reusable base class for CRUD list views.
+ * It encapsulates pagination, modals, and document handling logic.
  *
- * @template Service - The service class that extends CrudService for managing documents.
- * @template Document - The type of the document that the component works with.
+ * @template Service - A service implementing CrudServiceInterface for a specific document type
+ * @template Document - The data model extending CrudDocument
  */
 export abstract class CrudComponent<
-	Service extends CrudService<Document>,
+	Service extends CrudServiceInterface<Document>,
 	Document extends CrudDocument
-> extends BaseComponent {
-	/**
-	 * A getter that returns the list of documents by calling `getDocs()` from the service.
-	 *
-	 * @returns An array of documents.
-	 */
-	get rows(): Document[] {
-		return this.__service.getDocs();
-	}
+> {
+	/** Service responsible for data fetching, creating, updating, deleting */
+	protected service: Service;
+
+	/** The array of documents currently loaded and shown */
+	protected documents: Document[] = [];
+
+	/** The reactive form instance generated from the provided config */
+	protected form: any;
+
+	/** Current pagination page */
+	protected page = 1;
+
+	/** CoreService handles timing and copying helpers */
+	private __core = inject(CoreService);
+
+	/** Internal reference to form service matching FormServiceInterface */
+	private __form: FormServiceInterface;
 
 	/**
-	 * Columns to be displayed for the document list, defaulting to 'name' and 'description'.
-	 */
-	columns = ['name', 'description'];
-
-	/**
-	 * Constructor for initializing the CrudComponent.
+	 * Constructor
 	 *
-	 * @param __service The service instance for interacting with the document data (e.g., CRUD operations).
-	 * @param __core The core service providing utility methods.
-	 * @param __form The form interface used for handling document processing.
+	 * @param formConfig - Object describing form title and its component structure
+	 * @param formService - Any service that conforms to FormServiceInterface (usually casted)
+	 * @param translate - An object providing a translate() method for i18n
+	 * @param service - CRUD service implementing get/create/update/delete
 	 */
 	constructor(
-		private __service: Service,
-		private __core: CoreService,
-		private __form: unknown
+		formConfig: { title: string; components: any[] },
+		protected formService: unknown,
+		protected translate: { translate: (key: string) => string },
+		service: Service
 	) {
-		super();
+		this.service = service;
+		this.__form = formService as FormServiceInterface;
+		this.form = this.__form.getForm(
+			formConfig.title,
+			formConfig.components
+		);
 	}
 
 	/**
-	 * Performs bulk management of documents by creating, updating, or deleting them.
-	 *
-	 * If `create` is true, it creates new documents. If false, it compares documents
-	 * and deletes or updates them accordingly.
-	 *
-	 * @param create If true, new documents will be created; otherwise, updates or deletions will be performed.
-	 * @returns A function that handles bulk document operations.
+	 * Loads documents for a given page.
 	 */
-	bulkManagement(create = true): () => void {
-		return (): void => {
-			// Call the modalDocs method from the __form interface to process the documents.
-			(this.__form as Form)
-				.modalDocs<Document>(create ? [] : this.rows)
-				.then((docs: Document[]) => {
-					if (create) {
-						// Create new documents
-						for (const doc of docs) {
-							this.preCreate(doc); // Prepare document for creation
+	setDocuments(page = this.page): void {
+		this.page = page;
+		this.__core.afterWhile(
+			this,
+			() => {
+				this.service.get({ page }).subscribe((docs: Document[]) => {
+					this.documents.splice(0, this.documents.length);
+					this.documents.push(...docs);
+				});
+			},
+			250
+		);
+	}
 
-							this.__service.create(doc); // Call the service to create the document
+	/**
+	 * Clears temporary metadata before document creation.
+	 */
+	protected preCreate(doc: Document): void {
+		delete doc.__created;
+	}
+
+	/**
+	 * Handles bulk creation and updating of documents.
+	 * In creation mode, adds new documents.
+	 * In update mode, syncs changes and deletes removed entries.
+	 */
+	protected bulkManagement(create = true): () => void {
+		return (): void => {
+			this.__form
+				.modalDocs<Document>(create ? [] : this.documents)
+				.then(async (docs: Document[]) => {
+					if (create) {
+						for (const doc of docs) {
+							this.preCreate(doc);
+							await firstValueFrom(this.service.create(doc));
 						}
 					} else {
-						// Delete documents that are no longer present
-						for (const doc of this.rows) {
-							if (
-								!docs.find(
-									(localDoc) => localDoc._id === doc._id
-								)
-							) {
-								this.__service.delete(doc); // Delete document from the service
+						for (const document of this.documents) {
+							if (!docs.find((d) => d._id === document._id)) {
+								await firstValueFrom(
+									this.service.delete(document)
+								);
 							}
 						}
-
-						// Update existing documents or create new ones if not found
 						for (const doc of docs) {
-							const localDoc = this.rows.find(
-								(localDoc) => localDoc._id === doc._id
+							const local = this.documents.find(
+								(d) => d._id === doc._id
 							);
-
-							if (localDoc) {
-								// Update the document if it exists locally
-								this.__core.copy(doc, localDoc);
-
-								this.__service.update(localDoc); // Call the service to update the document
+							if (local) {
+								this.__core.copy(doc, local);
+								await firstValueFrom(
+									this.service.update(local)
+								);
 							} else {
-								this.preCreate(doc); // Prepare document for creation
-
-								this.__service.create(doc); // Call the service to create the new document
+								this.preCreate(doc);
+								await firstValueFrom(this.service.create(doc));
 							}
 						}
 					}
+					this.setDocuments();
 				});
 		};
 	}
 
 	/**
-	 * Prepares a document before creation by deleting the `__created` property.
-	 *
-	 * @param doc The document to be prepared for creation.
+	 * Configuration object used by the UI for rendering table and handling actions.
 	 */
-	preCreate(doc: Document): void {
-		delete doc.__created;
+	get config() {
+		return {
+			paginate: this.setDocuments.bind(this),
+			perPage: 20,
+			setPerPage: this.service.setPerPage?.bind(this.service),
+			allDocs: false,
+
+			create: (): void => {
+				this.__form.modal<Document>(this.form, {
+					label: 'Create',
+					click: async (created: unknown, close: () => void) => {
+						close();
+						this.preCreate(created as Document);
+						await firstValueFrom(
+							this.service.create(created as Document)
+						);
+						this.setDocuments();
+					},
+				});
+			},
+
+			update: (doc: Document): void => {
+				this.__form
+					.modal<Document>(this.form, [], doc)
+					.then((updated: Document) => {
+						this.__core.copy(updated, doc);
+						this.service.update(doc);
+					});
+			},
+
+			delete: (doc: Document): void => {
+				this.__form.alert?.question({
+					text: this.translate.translate(
+						'Common.Are you sure you want to delete this bird?'
+					),
+					buttons: [
+						{ text: this.translate.translate('Common.No') },
+						{
+							text: this.translate.translate('Common.Yes'),
+							callback: async (): Promise<void> => {
+								await firstValueFrom(this.service.delete(doc));
+								this.setDocuments();
+							},
+						},
+					],
+				});
+			},
+
+			buttons: [
+				{
+					icon: 'cloud_download',
+					click: (doc: Document): void => {
+						this.__form.modalUnique<Document>('bird', 'url', doc);
+					},
+				},
+			],
+
+			headerButtons: [
+				{
+					icon: 'playlist_add',
+					click: this.bulkManagement(),
+					class: 'playlist',
+				},
+				{
+					icon: 'edit_note',
+					click: this.bulkManagement(false),
+					class: 'edit',
+				},
+			],
+		};
 	}
 }

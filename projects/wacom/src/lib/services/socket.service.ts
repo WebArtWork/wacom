@@ -5,10 +5,7 @@ import { CoreService } from './core.service';
 /* app.module.ts
 import * as io from 'socket.io-client';
 WacomModule.forRoot({
-	socket: {
-		url: environment.url,
-		io
-	}
+	io
 )
  */
 
