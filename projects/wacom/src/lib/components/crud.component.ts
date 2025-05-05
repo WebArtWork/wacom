@@ -67,7 +67,9 @@ export abstract class CrudComponent<
 		service: Service
 	) {
 		this.service = service;
+
 		this.__form = formService as FormServiceInterface;
+
 		this.form = this.__form.getForm(
 			formConfig.title,
 			formConfig.components
@@ -77,13 +79,15 @@ export abstract class CrudComponent<
 	/**
 	 * Loads documents for a given page.
 	 */
-	setDocuments(page = this.page): void {
+	protected setDocuments(page = this.page): void {
 		this.page = page;
+
 		this.__core.afterWhile(
 			this,
 			() => {
 				this.service.get({ page }).subscribe((docs: Document[]) => {
 					this.documents.splice(0, this.documents.length);
+
 					this.documents.push(...docs);
 				});
 			},
@@ -144,7 +148,7 @@ export abstract class CrudComponent<
 	/**
 	 * Configuration object used by the UI for rendering table and handling actions.
 	 */
-	get config() {
+	protected getConfig() {
 		return {
 			paginate: this.setDocuments.bind(this),
 			perPage: 20,
