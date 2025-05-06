@@ -1,17 +1,17 @@
 import { firstValueFrom } from 'rxjs';
+import { inject } from '@angular/core';
 import {
 	CrudDocument,
 	CrudServiceInterface,
 } from '../interfaces/crud.interface';
 import { CoreService } from '../services/core.service';
-import { inject } from '@angular/core';
 
 /**
  * Interface representing the shape of a form service used by the CrudComponent.
  * The consuming app must provide a service that implements this structure.
  */
-interface FormServiceInterface {
-	getForm: (name: string, components: any[]) => any;
+interface FormServiceInterface<FormInterface> {
+	getForm: (formId: number, form: FormInterface) => any;
 	modal: <T>(form: any, options?: any, doc?: T) => Promise<T>;
 	modalDocs: <T>(docs: T[]) => Promise<T[]>;
 	modalUnique: <T>(collection: string, key: string, doc: T) => void;
@@ -32,7 +32,8 @@ interface FormServiceInterface {
  */
 export abstract class CrudComponent<
 	Service extends CrudServiceInterface<Document>,
-	Document extends CrudDocument
+	Document extends CrudDocument,
+	FormInterface
 > {
 	/** Service responsible for data fetching, creating, updating, deleting */
 	protected service: Service;
@@ -50,7 +51,7 @@ export abstract class CrudComponent<
 	private __core = inject(CoreService);
 
 	/** Internal reference to form service matching FormServiceInterface */
-	private __form: FormServiceInterface;
+	private __form: FormServiceInterface<FormInterface>;
 
 	/**
 	 * Constructor
@@ -61,18 +62,20 @@ export abstract class CrudComponent<
 	 * @param service - CRUD service implementing get/create/update/delete
 	 */
 	constructor(
-		formConfig: { title: string; components: any[] },
+		formConfig: unknown,
 		protected formService: unknown,
 		protected translate: { translate: (key: string) => string },
 		service: Service
 	) {
 		this.service = service;
 
-		this.__form = formService as FormServiceInterface;
+		this.__form = formService as FormServiceInterface<FormInterface>;
+
+		const form = formConfig as FormInterface;
 
 		this.form = this.__form.getForm(
-			formConfig.title,
-			formConfig.components
+			(formConfig as { formId: number }).formId,
+			form
 		);
 	}
 
