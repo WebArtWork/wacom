@@ -272,6 +272,8 @@ export abstract class CrudService<
 
 		obs.subscribe({
 			next: (resp: unknown): void => {
+				resp = resp || [];
+
 				if (typeof config.page !== 'number') {
 					this.clearDocs();
 				}
