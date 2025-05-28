@@ -3,6 +3,7 @@
  */
 export * from './lib/interfaces/config';
 export * from './lib/interfaces/alert.interface';
+export * from './lib/interfaces/modal.interface';
 export * from './lib/interfaces/crud.interface';
 /*
  *	Guard
