@@ -1,5 +1,11 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformServer } from '@angular/common';
+import {
+	Injectable,
+	Inject,
+	PLATFORM_ID,
+	Signal,
+	WritableSignal,
+	signal,
+} from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { Selectitem } from '../interfaces/select.item.interface';
 
@@ -30,54 +36,8 @@ export class CoreService {
 			? crypto.randomUUID()
 			: this.UUID());
 
-	ssr = false;
-	localStorage: any; // = localStorage;
-	navigator: any; // = navigator;
-	document: any; // = document;
-	window: any; // = window;
 	constructor(@Inject(PLATFORM_ID) private platformId: boolean) {
 		localStorage.setItem('deviceID', this.deviceID);
-
-		this.ssr = isPlatformServer(this.platformId);
-
-		if (isPlatformServer(this.platformId)) {
-			this.localStorage = {
-				getItem: () => {},
-				setItem: () => {},
-				removeItem: () => {},
-				clear: () => {},
-			};
-
-			this.document = {
-				querySelectorAll: () => {},
-				addEventListener: () => {},
-				removeEventListener: () => {},
-				documentElement: {},
-				body: {},
-			};
-
-			this.window = {
-				location: {
-					host: '',
-				},
-				addEventListener: () => {},
-				removeEventListener: () => {},
-				setTimeout: () => {},
-			};
-
-			this.navigator = {
-				userAgent: '',
-				platform: '',
-			};
-		} else {
-			this.localStorage = localStorage;
-
-			this.document = document;
-
-			this.window = window;
-
-			this.navigator = navigator;
-		}
 
 		this.detectDevice();
 	}
@@ -205,11 +165,11 @@ export class CoreService {
 		if (typeof cb === 'function' && typeof time === 'number') {
 			if (typeof doc === 'string') {
 				clearTimeout(this._afterWhile[doc]);
-				this._afterWhile[doc] = this.window.setTimeout(cb, time);
+				this._afterWhile[doc] = window.setTimeout(cb, time);
 			} else if (typeof doc === 'object') {
 				clearTimeout((doc as { __afterWhile: number }).__afterWhile);
 				(doc as { __afterWhile: number }).__afterWhile =
-					this.window.setTimeout(cb, time);
+					window.setTimeout(cb, time);
 			} else {
 				console.warn('badly configured after while');
 			}
@@ -248,22 +208,20 @@ export class CoreService {
 	}
 
 	// Device management
-	device: string = '';
+	device = '';
 	/**
 	 * Detects the device type based on the user agent.
 	 */
 	detectDevice(): void {
 		const userAgent =
-			this.navigator.userAgent ||
-			this.navigator.vendor ||
-			(this.window as any).opera;
+			navigator.userAgent || navigator.vendor || (window as any).opera;
 		if (/windows phone/i.test(userAgent)) {
 			this.device = 'Windows Phone';
 		} else if (/android/i.test(userAgent)) {
 			this.device = 'Android';
 		} else if (
 			/iPad|iPhone|iPod/.test(userAgent) &&
-			!(this.window as any).MSStream
+			!(window as any).MSStream
 		) {
 			this.device = 'iOS';
 		} else {
@@ -317,16 +275,22 @@ export class CoreService {
 
 	// Version management
 	version = '1.0.0';
+
 	appVersion = '';
+
 	dateVersion = '';
+
 	/**
 	 * Sets the combined version string based on appVersion and dateVersion.
 	 */
 	setVersion(): void {
 		this.version = this.appVersion || '';
+
 		this.version += this.version && this.dateVersion ? ' ' : '';
+
 		this.version += this.dateVersion || '';
 	}
+
 	/**
 	 * Sets the app version and updates the combined version string.
 	 *
@@ -334,8 +298,10 @@ export class CoreService {
 	 */
 	setAppVersion(appVersion: string): void {
 		this.appVersion = appVersion;
+
 		this.setVersion();
 	}
+
 	/**
 	 * Sets the date version and updates the combined version string.
 	 *
@@ -343,6 +309,7 @@ export class CoreService {
 	 */
 	setDateVersion(dateVersion: string): void {
 		this.dateVersion = dateVersion;
+
 		this.setVersion();
 	}
 
@@ -389,6 +356,7 @@ export class CoreService {
 
 	// Await management
 	private _completed: Record<string, unknown> = {};
+
 	private _completeResolvers: Record<string, ((doc: unknown) => void)[]> = {};
 
 	/**
@@ -525,5 +493,102 @@ export class CoreService {
 
 			this.linkIds[name].push(...reset());
 		});
+	}
+
+	// Angular Signals
+	/**
+	 * Converts an array of objects to an array of Angular signals.
+	 * @template Document
+	 * @param {Document[]} arr - Array of objects to convert.
+	 * @returns {Signal<Document>[]} Array of signals wrapping each object.
+	 */
+	toSignalsArray<Document>(arr: Document[]): Signal<Document>[] {
+		return arr.map((obj) => signal(obj));
+	}
+
+	/**
+	 * Returns a generic trackBy function for *ngFor, tracking by the specified object field.
+	 * @template Document
+	 * @param {string} field - The object field to use for tracking (e.g., '_id').
+	 * @returns {(index: number, sig: Signal<Document>) => unknown} TrackBy function for Angular.
+	 */
+	trackBySignalField<Document extends Record<string, unknown>>(
+		field: string
+	) {
+		return (_: number, sig: Signal<Document>) => sig()[field];
+	}
+
+	/**
+	 * Finds the first signal in the array whose object's field matches the provided value.
+	 * @template Document
+	 * @param {Signal<Document>[]} signals - Array of signals to search.
+	 * @param {unknown} value - The value to match.
+	 * @param {string} [field='_id'] - The object field to match against.
+	 * @returns {Signal<Document> | undefined} The found signal or undefined if not found.
+	 */
+	findSignalByField<Document extends Record<string, unknown>>(
+		signals: Signal<Document>[],
+		value: unknown,
+		field = '_id'
+	): Signal<Document> | undefined {
+		return signals.find(
+			(sig) => sig()[field] === value
+		) as Signal<Document>;
+	}
+
+	/**
+	 * Updates the first writable signal in the array whose object's field matches the provided value.
+	 * @template Document
+	 * @param {WritableSignal<Document>[]} signals - Array of writable signals to search.
+	 * @param {unknown} value - The value to match.
+	 * @param {(val: Document) => Document} updater - Function to produce the updated object.
+	 * @param {string} field - The object field to match against.
+	 * @returns {void}
+	 */
+	updateSignalByField<Document extends Record<string, unknown>>(
+		signals: WritableSignal<Document>[],
+		value: unknown,
+		updater: (val: Document) => Document,
+		field: string
+	): void {
+		const sig = this.findSignalByField<Document>(
+			signals,
+			value,
+			field
+		) as WritableSignal<Document>;
+
+		if (sig) sig.update(updater);
+	}
+
+	/**
+	 * Adds a new object as a writable signal to the signals array.
+	 * @template Document
+	 * @param {WritableSignal<Document>[]} signals - The signals array to modify.
+	 * @param {Document} item - The object to wrap and push as a writable signal.
+	 * @returns {void}
+	 */
+	pushSignal<Document>(
+		signals: WritableSignal<Document>[],
+		item: Document
+	): void {
+		signals.push(signal(item));
+	}
+
+	/**
+	 * Removes the first signal from the array whose object's field matches the provided value.
+	 * @template Document
+	 * @param {WritableSignal<Document>[]} signals - The signals array to modify.
+	 * @param {unknown} value - The value to match.
+	 * @param {string} [field='_id'] - The object field to match against.
+	 * @returns {void}
+	 */
+	removeSignalByField<Document extends Record<string, unknown>>(
+		signals: WritableSignal<Document>[],
+		value: unknown,
+		field: string = '_id'
+	): void {
+		const idx = signals.findIndex((sig) => sig()[field] === value);
+
+		if (idx > -1) signals.splice(idx, 1);
 	}
 }

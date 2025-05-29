@@ -2,7 +2,6 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { Router, Route } from '@angular/router';
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
-import { CoreService } from './core.service';
 
 const isDefined = (val: any) => typeof val !== 'undefined';
 
@@ -15,7 +14,6 @@ export class MetaService {
 	constructor(
 		private router: Router,
 		private meta: Meta,
-		private core: CoreService,
 		private titleService: Title,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config
 	) {
@@ -63,11 +61,10 @@ export class MetaService {
 	 */
 	setLink(links: { [key: string]: string }): MetaService {
 		Object.keys(links).forEach((rel) => {
-			let link: HTMLLinkElement =
-				this.core.document.createElement('link');
+			let link: HTMLLinkElement = document.createElement('link');
 			link.setAttribute('rel', rel);
 			link.setAttribute('href', links[rel]);
-			this.core.document.head.appendChild(link);
+			document.head.appendChild(link);
 		});
 		return this;
 	}

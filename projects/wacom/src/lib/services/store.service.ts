@@ -44,7 +44,7 @@ export class StoreService {
 			this.config.store.set(key, value, callback, errCallback);
 		} else {
 			try {
-				this.core.localStorage.setItem(key, value);
+				localStorage.setItem(key, value);
 				callback();
 			} catch (e) {
 				errCallback();
@@ -66,7 +66,7 @@ export class StoreService {
 			if (this.config.store?.set) {
 				await this.config.store.set(key, value);
 			} else {
-				this.core.localStorage.setItem(key, value);
+				localStorage.setItem(key, value);
 			}
 			return true;
 		} catch (err) {
@@ -92,7 +92,7 @@ export class StoreService {
 		if (this.config.store?.get) {
 			this.config.store.get(key, callback, errCallback);
 		} else {
-			const value = this.core.localStorage.getItem(key) || '';
+			const value = localStorage.getItem(key) || '';
 			callback(value);
 		}
 	}
@@ -110,7 +110,7 @@ export class StoreService {
 			if (this.config.store?.get) {
 				return await this.config.store.get(key);
 			} else {
-				return this.core.localStorage.getItem(key) || '';
+				return localStorage.getItem(key) || '';
 			}
 		} catch (err) {
 			console.error(err);
@@ -207,7 +207,7 @@ export class StoreService {
 			if (this.config.store?.remove) {
 				await this.config.store.remove(key, callback, errCallback);
 			} else {
-				this.core.localStorage.removeItem(key);
+				localStorage.removeItem(key);
 			}
 			callback?.();
 			return true;
@@ -233,7 +233,7 @@ export class StoreService {
 			if (this.config.store?.clear) {
 				await this.config.store.clear();
 			} else {
-				this.core.localStorage.clear();
+				localStorage.clear();
 			}
 			callback?.();
 			return true;

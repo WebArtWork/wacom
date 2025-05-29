@@ -1,6 +1,5 @@
 import { Injectable, Inject, Optional } from '@angular/core';
 import { DomService } from './dom.service';
-import { CoreService } from './core.service';
 import { ModalComponent } from '../components/modal/modal.component';
 import { CONFIG_TOKEN, Config } from '../interfaces/config';
 import { Modal } from '../interfaces/modal.interface';
@@ -11,7 +10,6 @@ export class ModalService {
 	private _modal: any;
 	constructor(
 		private dom: DomService,
-		private core: CoreService,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config
 	) {
 		if (!this.config) this.config = {};
@@ -49,7 +47,7 @@ export class ModalService {
 		}
 		opts.id = Math.floor(Math.random() * Date.now()) + Date.now();
 		this.opened[opts.id] = opts;
-		this.core.document.body.classList.add('modalOpened');
+		document.body.classList.add('modalOpened');
 		let component: any;
 		let content: any;
 		opts.close = () => {
@@ -58,7 +56,7 @@ export class ModalService {
 			if (typeof opts.onClose == 'function') opts.onClose();
 			delete this.opened[opts.id];
 			if (!Object.keys(this.opened).length) {
-				this.core.document.body.classList.remove('modalOpened');
+				document.body.classList.remove('modalOpened');
 			}
 		};
 		if (typeof opts.timeout == 'number' && opts.timeout > 0) {
@@ -121,6 +119,6 @@ export class ModalService {
 		for (let each in this.opened) {
 			this.opened[each].close();
 		}
-		this.core.document.body.classList.remove('modalOpened');
+		document.body.classList.remove('modalOpened');
 	}
 }

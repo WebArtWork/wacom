@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { CoreService } from './core.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -14,7 +13,7 @@ export class HashService {
 	public hash: { [key: string]: string } = {};
 	private done: boolean = false;
 
-	constructor(private core: CoreService) {
+	constructor() {
 		this.initialize();
 	}
 
@@ -22,7 +21,7 @@ export class HashService {
 	 * Initializes the hash service by loading the current hash from the URL.
 	 */
 	private initialize(): void {
-		if (!this.core.window.location.hash) {
+		if (!window.location.hash) {
 			this.done = true;
 			return;
 		}
@@ -35,7 +34,7 @@ export class HashService {
 	 */
 	private load(): void {
 		this.hash = {};
-		const hashArray = this.core.window.location.hash
+		const hashArray = window.location.hash
 			.replace('#!#', '')
 			.replace('#', '')
 			.split('&');
@@ -83,7 +82,7 @@ export class HashService {
 		const hash = Object.entries(this.hash)
 			.map(([key, value]) => `${key}=${value}`)
 			.join('&');
-		this.core.window.location.hash = hash;
+		window.location.hash = hash;
 	}
 
 	/**

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { CoreService } from './core.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -10,8 +9,8 @@ export class UiService {
 	// global variable use for design purposes
 	var: Record<string, unknown> = {};
 
-	constructor(private core: CoreService) {
-		const storedVariables = this.core.localStorage.getItem('css_variables');
+	constructor() {
+		const storedVariables = localStorage.getItem('css_variables');
 		this.variables = storedVariables ? JSON.parse(storedVariables) : {};
 		for (const key in this.variables) {
 			this.setProperty(key, this.variables[key]);
@@ -101,10 +100,7 @@ export class UiService {
 	 * Saves the CSS variables to local storage.
 	 */
 	private save(): void {
-		this.core.localStorage.setItem(
-			'css_variables',
-			JSON.stringify(this.variables)
-		);
+		localStorage.setItem('css_variables', JSON.stringify(this.variables));
 	}
 
 	/**
@@ -114,7 +110,7 @@ export class UiService {
 	 * @param value - The CSS variable value.
 	 */
 	private setProperty(key: string, value: string): void {
-		this.core.document.documentElement.style.setProperty(key, value);
+		document.documentElement.style.setProperty(key, value);
 	}
 
 	/**
@@ -127,7 +123,7 @@ export class UiService {
 		if (typeof opts === 'string') {
 			opts = opts === 'local' ? { local: true } : { host: opts };
 		}
-		if (opts.host && this.core.window.location.host !== opts.host) return;
+		if (opts.host && window.location.host !== opts.host) return;
 		for (const key in variables) {
 			if (opts.local) {
 				this.variables[key] = variables[key];

@@ -29,7 +29,7 @@ export class SocketService {
 			return;
 		}
 
-		this._url = this._core.window.location.origin.replace('4200', '8080');
+		this._url = window.location.origin.replace('4200', '8080');
 
 		if (!this._config) this._config = DEFAULT_CONFIG;
 

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpService } from './http.service';
 import { DomService } from './dom.service';
-import { CoreService } from './core.service';
 import { FilesComponent } from '../components/files/files.component';
 
 interface FileOptions {
@@ -31,11 +30,7 @@ export class FileService {
 	private added: Record<string, FileOptions> = {};
 	private files: FileOptions[] = [];
 
-	constructor(
-		private dom: DomService,
-		private core: CoreService,
-		private http: HttpService
-	) {
+	constructor(private dom: DomService, private http: HttpService) {
 		this.dom.appendComponent(FilesComponent, {
 			fs: this,
 		});
@@ -46,7 +41,7 @@ export class FileService {
 	 *
 	 * @param opts - The file options.
 	 */
-	public add(opts: FileOptions | string): void | (() => void) {
+	add(opts: FileOptions | string): void | (() => void) {
 		if (typeof opts === 'string') {
 			opts = { id: opts };
 		}
@@ -82,7 +77,7 @@ export class FileService {
 	 * @param event - The input change event.
 	 * @param info - The file options.
 	 */
-	public change(event: Event, info: FileOptions): void {
+	change(event: Event, info: FileOptions): void {
 		const input = event.target as HTMLInputElement;
 		if (!input.files) return;
 
@@ -124,7 +119,7 @@ export class FileService {
 	 * @param opts - Additional options.
 	 * @param cb - The callback function.
 	 */
-	public remove(
+	remove(
 		part: string,
 		url: string,
 		opts: any = {},
@@ -151,7 +146,7 @@ export class FileService {
 	 * @param files - The files to upload.
 	 * @param cb - The callback function.
 	 */
-	public uploadFiles(
+	uploadFiles(
 		info: FileOptions,
 		files: File[],
 		cb: (resp: any) => void = () => {}
@@ -205,7 +200,7 @@ export class FileService {
 	 * @param info - The file options.
 	 * @param cb - The callback function.
 	 */
-	public image(
+	image(
 		info: FileOptions,
 		cb: (resp: any) => void = () => {}
 	): void | (() => void) {
@@ -284,7 +279,7 @@ export class FileService {
 	 * @param info - The file options.
 	 */
 	// private process(file: File, info: FileOptions): void {
-	private process(file: File, info: any): void {
+	process(file: File, info: any): void {
 		if (!file.type.startsWith('image/')) {
 			info.cb?.(false, file);
 			if (info.multiple_cb) {
@@ -310,8 +305,8 @@ export class FileService {
 				);
 			}
 
-			const canvas = this.core.document.createElement('canvas');
-			const img = this.core.document.createElement('img');
+			const canvas = document.createElement('canvas');
+			const img = document.createElement('img');
 			img.onload = () => {
 				if (
 					img.width <= info.resize.width &&
@@ -338,7 +333,7 @@ export class FileService {
 				canvas.width = width;
 				canvas.height = height;
 				const context = canvas.getContext('2d');
-				context.drawImage(img, 0, 0, width, height);
+				context?.drawImage(img, 0, 0, width, height);
 				const dataUrl = canvas.toDataURL('image/jpeg', 1);
 				this.update(dataUrl, info, file);
 			};

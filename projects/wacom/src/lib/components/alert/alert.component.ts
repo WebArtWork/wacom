@@ -1,5 +1,4 @@
 import { Component, ViewChild } from '@angular/core';
-import { CoreService } from '../../services/core.service';
 
 @Component({
 	selector: 'alert',
@@ -21,18 +20,22 @@ export class AlertComponent {
 	closable: any = true;
 	buttons: any = []; /*[{text, callback}]*/
 
-	constructor(public core: CoreService) {
+	constructor() {
 		setTimeout(() => {
 			if (this.timeout) {
 				let remaining = JSON.parse(JSON.stringify(this.timeout));
+
 				let timer = setTimeout(() => {
 					this.remove();
 				}, remaining);
+
 				let start = new Date();
+
 				this.alert.nativeElement.addEventListener(
 					'mouseenter',
 					() => {
 						clearTimeout(timer);
+
 						remaining -= new Date().getTime() - start.getTime();
 					},
 					false
@@ -41,8 +44,10 @@ export class AlertComponent {
 					'mouseleave',
 					() => {
 						start = new Date();
+
 						clearTimeout(timer);
-						timer = core.window.setTimeout(() => {
+
+						timer = window.setTimeout(() => {
 							this.remove();
 						}, remaining);
 					},

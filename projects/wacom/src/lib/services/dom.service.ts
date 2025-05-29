@@ -6,7 +6,6 @@ import {
 	EmbeddedViewRef,
 	ApplicationRef,
 } from '@angular/core';
-import { CoreService } from './core.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -17,8 +16,7 @@ export class DomService {
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
 		private appRef: ApplicationRef,
-		private injector: Injector,
-		private core: CoreService
+		private injector: Injector
 	) {}
 
 	/**
@@ -42,7 +40,7 @@ export class DomService {
 		this.appRef.attachView(componentRef.hostView);
 		const domElem = (componentRef.hostView as EmbeddedViewRef<any>)
 			.rootNodes[0] as HTMLElement;
-		const element = this.core.document.getElementById(id);
+		const element = document.getElementById(id);
 		if (element && typeof element.appendChild === 'function') {
 			element.appendChild(domElem);
 		}
@@ -63,7 +61,7 @@ export class DomService {
 	appendComponent(
 		component: any,
 		options: any = {},
-		element: HTMLElement = this.core.document.body
+		element: HTMLElement = document.body
 	): { nativeElement: HTMLElement; componentRef: ComponentRef<any> } | void {
 		if (options.providedIn) {
 			if (this.providedIn[options.providedIn]) {

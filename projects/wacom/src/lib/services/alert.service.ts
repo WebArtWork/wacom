@@ -3,7 +3,6 @@ import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 import { AlertComponent } from '../components/alert/alert.component';
 import { WrapperComponent } from '../components/alert/wrapper/wrapper.component';
 import { DomService } from './dom.service';
-import { CoreService } from './core.service';
 import { Alert, DEFAULT_Alert } from '../interfaces/alert.interface';
 
 @Injectable({
@@ -14,7 +13,6 @@ export class AlertService {
 	private _container: any;
 	constructor(
 		private dom: DomService,
-		private core: CoreService,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config
 	) {
 		if (!this.config) this.config = DEFAULT_CONFIG;
@@ -122,36 +120,49 @@ export class AlertService {
 
 		return opts.component.nativeElement;
 	}
+
 	open(opts: Alert) {
 		this.show(opts);
 	}
+
 	info(opts: Alert) {
 		opts['type'] = 'info';
 		this.show(opts);
 	}
+
 	success(opts: Alert) {
 		opts['type'] = 'success';
 		this.show(opts);
 	}
+
 	warning(opts: Alert) {
 		opts['type'] = 'warning';
 		this.show(opts);
 	}
+
 	error(opts: Alert) {
 		opts['type'] = 'error';
 		this.show(opts);
 	}
+
 	question(opts: Alert) {
 		opts['type'] = 'question';
 		this.show(opts);
 	}
+
 	destroy() {
-		this.core.document.getElementById('bottomRight').innerHTML = '';
-		this.core.document.getElementById('bottomLeft').innerHTML = '';
-		this.core.document.getElementById('bottomCenter').innerHTML = '';
-		this.core.document.getElementById('topRight').innerHTML = '';
-		this.core.document.getElementById('topLeft').innerHTML = '';
-		this.core.document.getElementById('topCenter').innerHTML = '';
-		this.core.document.getElementById('center').innerHTML = '';
+		[
+			'bottomRight',
+			'bottomLeft',
+			'bottomCenter',
+			'topRight',
+			'topLeft',
+			'topCenter',
+			'center',
+		].forEach((id) => {
+			const el = document.getElementById(id);
+
+			if (el) el.innerHTML = '';
+		});
 	}
 }
