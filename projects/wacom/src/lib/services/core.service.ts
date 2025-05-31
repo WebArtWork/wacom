@@ -497,13 +497,71 @@ export class CoreService {
 
 	// Angular Signals
 	/**
-	 * Converts an array of objects to an array of Angular signals.
-	 * @template Document
-	 * @param {Document[]} arr - Array of objects to convert.
-	 * @returns {Signal<Document>[]} Array of signals wrapping each object.
+	 * Converts an array of objects into an array of Angular signals.
+	 * Optionally wraps specific fields of each object as individual signals.
+	 *
+	 * @template Document - The type of each object in the array.
+	 * @param {Document[]} arr - Array of plain objects to convert into signals.
+	 * @param {Record<string, (doc: Document) => unknown>} [updatableFields={}] -
+	 *        Optional map where keys are field names and values are functions that extract the initial value
+	 *        from the object. These fields will be turned into separate signals.
+	 *
+	 * @returns {Signal<Document>[]} An array where each item is a signal-wrapped object,
+	 *          optionally with individual fields also wrapped in signals.
+	 *
+	 * @example
+	 * toSignalsArray(users, {
+	 *   name: (u) => u.name,
+	 *   score: (u) => u.score,
+	 * });
 	 */
-	toSignalsArray<Document>(arr: Document[]): Signal<Document>[] {
-		return arr.map((obj) => signal(obj));
+	toSignalsArray<Document>(
+		arr: Document[],
+		updatableFields: Record<string, (doc: Document) => unknown> = {}
+	): Signal<Document>[] {
+		return arr.map((obj) => {
+			if (Object.keys(updatableFields).length) {
+				const signalFields: Record<string, Signal<unknown>> = {};
+
+				for (const key in updatableFields) {
+					signalFields[key] = signal(updatableFields[key](obj));
+				}
+
+				return signal({ ...obj, ...signalFields });
+			} else {
+				return signal(obj);
+			}
+		}) as Signal<Document>[];
+	}
+
+	/**
+	 * Adds a new object to the signals array.
+	 * Optionally wraps specific fields of the object as individual signals before wrapping the whole object.
+	 *
+	 * @template Document - The type of the object being added.
+	 * @param {WritableSignal<Document>[]} signals - The signals array to append to.
+	 * @param {Document} item - The object to wrap and push as a writable signal.
+	 * @param {Record<string, (doc: Document) => unknown>} [updatableFields={}] -
+	 *        Optional map of fields to be wrapped as signals within the object.
+	 *
+	 * @returns {void}
+	 */
+	pushSignal<Document>(
+		signals: WritableSignal<Document>[],
+		item: Document,
+		updatableFields: Record<string, (doc: Document) => unknown> = {}
+	): void {
+		if (Object.keys(updatableFields).length) {
+			const fieldSignals: Record<string, Signal<unknown>> = {};
+
+			for (const key in updatableFields) {
+				fieldSignals[key] = signal(updatableFields[key](item));
+			}
+
+			signals.push(signal({ ...item, ...fieldSignals }));
+		} else {
+			signals.push(signal(item));
+		}
 	}
 
 	/**
@@ -558,20 +616,6 @@ export class CoreService {
 		) as WritableSignal<Document>;
 
 		if (sig) sig.update(updater);
-	}
-
-	/**
-	 * Adds a new object as a writable signal to the signals array.
-	 * @template Document
-	 * @param {WritableSignal<Document>[]} signals - The signals array to modify.
-	 * @param {Document} item - The object to wrap and push as a writable signal.
-	 * @returns {void}
-	 */
-	pushSignal<Document>(
-		signals: WritableSignal<Document>[],
-		item: Document
-	): void {
-		signals.push(signal(item));
 	}
 
 	/**
