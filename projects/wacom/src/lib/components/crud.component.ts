@@ -106,6 +106,27 @@ export abstract class CrudComponent<
 	}
 
 	/**
+	 * Funciton which controls whether the create functionality is available.
+	 */
+	protected allowCreate(): boolean {
+		return true;
+	}
+
+	/**
+	 * Funciton which controls whether the update and delete functionality is available.
+	 */
+	protected allowMutate(): boolean {
+		return true;
+	}
+
+	/**
+	 * Funciton which controls whether the unique url functionality is available.
+	 */
+	protected allowUrl(): boolean {
+		return true;
+	}
+
+	/**
 	 * Handles bulk creation and updating of documents.
 	 * In creation mode, adds new documents.
 	 * In update mode, syncs changes and deletes removed entries.
@@ -158,67 +179,90 @@ export abstract class CrudComponent<
 			setPerPage: this.service.setPerPage?.bind(this.service),
 			allDocs: false,
 
-			create: (): void => {
-				this.__form.modal<Document>(this.form, {
-					label: 'Create',
-					click: async (created: unknown, close: () => void) => {
-						close();
-						this.preCreate(created as Document);
-						await firstValueFrom(
-							this.service.create(created as Document)
-						);
-						this.setDocuments();
-					},
-				});
-			},
-
-			update: (doc: Document): void => {
-				this.__form
-					.modal<Document>(this.form, [], doc)
-					.then((updated: Document) => {
-						this.__core.copy(updated, doc);
-						this.service.update(doc);
-					});
-			},
-
-			delete: (doc: Document): void => {
-				this.__form.alert?.question({
-					text: this.translate.translate(
-						'Common.Are you sure you want to delete this bird?'
-					),
-					buttons: [
-						{ text: this.translate.translate('Common.No') },
-						{
-							text: this.translate.translate('Common.Yes'),
-							callback: async (): Promise<void> => {
-								await firstValueFrom(this.service.delete(doc));
+			create: this.allowCreate()
+				? (): void => {
+						this.__form.modal<Document>(this.form, {
+							label: 'Create',
+							click: async (
+								created: unknown,
+								close: () => void
+							) => {
+								close();
+								this.preCreate(created as Document);
+								await firstValueFrom(
+									this.service.create(created as Document)
+								);
 								this.setDocuments();
 							},
-						},
-					],
-				});
-			},
+						});
+				  }
+				: null,
+
+			update: this.allowMutate()
+				? (doc: Document): void => {
+						this.__form
+							.modal<Document>(this.form, [], doc)
+							.then((updated: Document) => {
+								this.__core.copy(updated, doc);
+								this.service.update(doc);
+							});
+				  }
+				: null,
+
+			delete: this.allowMutate()
+				? (doc: Document): void => {
+						this.__form.alert?.question({
+							text: this.translate.translate(
+								'Common.Are you sure you want to delete this bird?'
+							),
+							buttons: [
+								{ text: this.translate.translate('Common.No') },
+								{
+									text: this.translate.translate(
+										'Common.Yes'
+									),
+									callback: async (): Promise<void> => {
+										await firstValueFrom(
+											this.service.delete(doc)
+										);
+										this.setDocuments();
+									},
+								},
+							],
+						});
+				  }
+				: null,
 
 			buttons: [
-				{
-					icon: 'cloud_download',
-					click: (doc: Document): void => {
-						this.__form.modalUnique<Document>('bird', 'url', doc);
-					},
-				},
+				this.allowUrl()
+					? {
+							icon: 'cloud_download',
+							click: (doc: Document): void => {
+								this.__form.modalUnique<Document>(
+									'bird',
+									'url',
+									doc
+								);
+							},
+					  }
+					: null,
 			],
 
 			headerButtons: [
-				{
-					icon: 'playlist_add',
-					click: this.bulkManagement(),
-					class: 'playlist',
-				},
-				{
-					icon: 'edit_note',
-					click: this.bulkManagement(false),
-					class: 'edit',
-				},
+				this.allowCreate()
+					? {
+							icon: 'playlist_add',
+							click: this.bulkManagement(),
+							class: 'playlist',
+					  }
+					: null,
+				this.allowMutate()
+					? {
+							icon: 'edit_note',
+							click: this.bulkManagement(false),
+							class: 'edit',
+					  }
+					: null,
 			],
 		};
 	}
