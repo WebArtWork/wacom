@@ -15,6 +15,7 @@ interface CrudOptions<Document> {
 }
 
 interface CrudConfig<Document> {
+	signalFields?: Record<string, (doc: Document) => unknown>;
 	name: string;
 	_id?: string;
 	replace?: (doc: Document) => void;
@@ -81,6 +82,8 @@ export abstract class CrudService<
 
 	constructor(private _config: CrudConfig<Document>) {
 		super();
+
+		this._config.signalFields = this._config.signalFields || {};
 
 		this._url += this._config.name;
 

@@ -495,7 +495,7 @@ export class CoreService {
 		});
 	}
 
-	// Angular Signals
+	// Angular Signals //
 	/**
 	 * Converts a plain object into a signal-wrapped object.
 	 * Optionally wraps specific fields of the object as individual signals,
@@ -503,7 +503,7 @@ export class CoreService {
 	 *
 	 * @template Document - The type of the object being wrapped.
 	 * @param {Document} document - The plain object to wrap into a signal.
-	 * @param {Record<string, (doc: Document) => unknown>} [updatableFields={}] -
+	 * @param {Record<string, (doc: Document) => unknown>} [signalFields={}] -
 	 *        Optional map where each key is a field name and the value is a function
 	 *        to extract the initial value for that field. These fields will be wrapped
 	 *        as separate signals and embedded in the returned object.
@@ -519,16 +519,16 @@ export class CoreService {
 	 */
 	toSignal<Document>(
 		document: Document,
-		updatableFields: Record<string, (doc: Document) => unknown> = {}
+		signalFields: Record<string, (doc: Document) => unknown> = {}
 	): Signal<Document> {
-		if (Object.keys(updatableFields).length) {
-			const signalFields: Record<string, Signal<unknown>> = {};
+		if (Object.keys(signalFields).length) {
+			const fields: Record<string, Signal<unknown>> = {};
 
-			for (const key in updatableFields) {
-				signalFields[key] = signal(updatableFields[key](document));
+			for (const key in signalFields) {
+				fields[key] = signal(signalFields[key](document));
 			}
 
-			return signal({ ...document, ...signalFields });
+			return signal({ ...document, ...fields });
 		} else {
 			return signal(document);
 		}
@@ -540,7 +540,7 @@ export class CoreService {
 	 *
 	 * @template Document - The type of each object in the array.
 	 * @param {Document[]} arr - Array of plain objects to convert into signals.
-	 * @param {Record<string, (doc: Document) => unknown>} [updatableFields={}] -
+	 * @param {Record<string, (doc: Document) => unknown>} [signalFields={}] -
 	 *        Optional map where keys are field names and values are functions that extract the initial value
 	 *        from the object. These fields will be turned into separate signals.
 	 *
@@ -555,9 +555,9 @@ export class CoreService {
 	 */
 	toSignalsArray<Document>(
 		arr: Document[],
-		updatableFields: Record<string, (doc: Document) => unknown> = {}
+		signalFields: Record<string, (doc: Document) => unknown> = {}
 	): Signal<Document>[] {
-		return arr.map((obj) => this.toSignal(obj, updatableFields));
+		return arr.map((obj) => this.toSignal(obj, signalFields));
 	}
 
 	/**
@@ -567,7 +567,7 @@ export class CoreService {
 	 * @template Document - The type of the object being added.
 	 * @param {Signal<Document>[]} signals - The signals array to append to.
 	 * @param {Document} item - The object to wrap and push as a signal.
-	 * @param {Record<string, (doc: Document) => unknown>} [updatableFields={}] -
+	 * @param {Record<string, (doc: Document) => unknown>} [signalFields={}] -
 	 *        Optional map of fields to be wrapped as signals within the object.
 	 *
 	 * @returns {void}
@@ -575,9 +575,27 @@ export class CoreService {
 	pushSignal<Document>(
 		signals: Signal<Document>[],
 		item: Document,
-		updatableFields: Record<string, (doc: Document) => unknown> = {}
+		signalFields: Record<string, (doc: Document) => unknown> = {}
 	): void {
-		signals.push(this.toSignal(item, updatableFields));
+		signals.push(this.toSignal(item, signalFields));
+	}
+
+	/**
+	 * Removes the first signal from the array whose object's field matches the provided value.
+	 * @template Document
+	 * @param {WritableSignal<Document>[]} signals - The signals array to modify.
+	 * @param {unknown} value - The value to match.
+	 * @param {string} [field='_id'] - The object field to match against.
+	 * @returns {void}
+	 */
+	removeSignalByField<Document extends Record<string, unknown>>(
+		signals: WritableSignal<Document>[],
+		value: unknown,
+		field: string = '_id'
+	): void {
+		const idx = signals.findIndex((sig) => sig()[field] === value);
+
+		if (idx > -1) signals.splice(idx, 1);
 	}
 
 	/**
@@ -632,23 +650,5 @@ export class CoreService {
 		) as WritableSignal<Document>;
 
 		if (sig) sig.update(updater);
-	}
-
-	/**
-	 * Removes the first signal from the array whose object's field matches the provided value.
-	 * @template Document
-	 * @param {WritableSignal<Document>[]} signals - The signals array to modify.
-	 * @param {unknown} value - The value to match.
-	 * @param {string} [field='_id'] - The object field to match against.
-	 * @returns {void}
-	 */
-	removeSignalByField<Document extends Record<string, unknown>>(
-		signals: WritableSignal<Document>[],
-		value: unknown,
-		field: string = '_id'
-	): void {
-		const idx = signals.findIndex((sig) => sig()[field] === value);
-
-		if (idx > -1) signals.splice(idx, 1);
 	}
 }
