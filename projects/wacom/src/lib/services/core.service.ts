@@ -497,6 +497,44 @@ export class CoreService {
 
 	// Angular Signals
 	/**
+	 * Converts a plain object into a signal-wrapped object.
+	 * Optionally wraps specific fields of the object as individual signals,
+	 * and merges them into the returned signal for fine-grained reactivity.
+	 *
+	 * @template Document - The type of the object being wrapped.
+	 * @param {Document} document - The plain object to wrap into a signal.
+	 * @param {Record<string, (doc: Document) => unknown>} [updatableFields={}] -
+	 *        Optional map where each key is a field name and the value is a function
+	 *        to extract the initial value for that field. These fields will be wrapped
+	 *        as separate signals and embedded in the returned object.
+	 *
+	 * @returns {Signal<Document>} A signal-wrapped object, possibly containing
+	 *          nested field signals for more granular control.
+	 *
+	 * @example
+	 * const user = { _id: '1', name: 'Alice', score: 42 };
+	 * const sig = toSignal(user, { score: (u) => u.score });
+	 * console.log(sig().name); // 'Alice'
+	 * console.log(sig().score()); // 42 — field is now a signal
+	 */
+	toSignal<Document>(
+		document: Document,
+		updatableFields: Record<string, (doc: Document) => unknown> = {}
+	): Signal<Document> {
+		if (Object.keys(updatableFields).length) {
+			const signalFields: Record<string, Signal<unknown>> = {};
+
+			for (const key in updatableFields) {
+				signalFields[key] = signal(updatableFields[key](document));
+			}
+
+			return signal({ ...document, ...signalFields });
+		} else {
+			return signal(document);
+		}
+	}
+
+	/**
 	 * Converts an array of objects into an array of Angular signals.
 	 * Optionally wraps specific fields of each object as individual signals.
 	 *
@@ -519,19 +557,7 @@ export class CoreService {
 		arr: Document[],
 		updatableFields: Record<string, (doc: Document) => unknown> = {}
 	): Signal<Document>[] {
-		return arr.map((obj) => {
-			if (Object.keys(updatableFields).length) {
-				const signalFields: Record<string, Signal<unknown>> = {};
-
-				for (const key in updatableFields) {
-					signalFields[key] = signal(updatableFields[key](obj));
-				}
-
-				return signal({ ...obj, ...signalFields });
-			} else {
-				return signal(obj);
-			}
-		}) as Signal<Document>[];
+		return arr.map((obj) => this.toSignal(obj, updatableFields));
 	}
 
 	/**
@@ -539,29 +565,19 @@ export class CoreService {
 	 * Optionally wraps specific fields of the object as individual signals before wrapping the whole object.
 	 *
 	 * @template Document - The type of the object being added.
-	 * @param {WritableSignal<Document>[]} signals - The signals array to append to.
-	 * @param {Document} item - The object to wrap and push as a writable signal.
+	 * @param {Signal<Document>[]} signals - The signals array to append to.
+	 * @param {Document} item - The object to wrap and push as a signal.
 	 * @param {Record<string, (doc: Document) => unknown>} [updatableFields={}] -
 	 *        Optional map of fields to be wrapped as signals within the object.
 	 *
 	 * @returns {void}
 	 */
 	pushSignal<Document>(
-		signals: WritableSignal<Document>[],
+		signals: Signal<Document>[],
 		item: Document,
 		updatableFields: Record<string, (doc: Document) => unknown> = {}
 	): void {
-		if (Object.keys(updatableFields).length) {
-			const fieldSignals: Record<string, Signal<unknown>> = {};
-
-			for (const key in updatableFields) {
-				fieldSignals[key] = signal(updatableFields[key](item));
-			}
-
-			signals.push(signal({ ...item, ...fieldSignals }));
-		} else {
-			signals.push(signal(item));
-		}
+		signals.push(this.toSignal(item, updatableFields));
 	}
 
 	/**
