@@ -6,6 +6,27 @@ import {
 } from '../interfaces/crud.interface';
 import { CoreService } from '../services/core.service';
 
+interface TableConfig<Document> {
+	paginate: (page?: number) => void;
+	perPage: number;
+	setPerPage: ((count: number) => void) | undefined;
+	allDocs: boolean;
+	create: (() => void) | null;
+	update: ((doc: Document) => void) | null;
+	delete: ((doc: Document) => void) | null;
+	buttons: ({
+		icon?: string;
+		click?: (doc: Document) => void;
+		hrefFunc?: (doc: Document) => string;
+	} | null)[];
+	headerButtons: ({
+		icon?: string;
+		click?: () => void;
+		hrefFunc?: (doc: Document) => string;
+		class?: string;
+	} | null)[];
+}
+
 /**
  * Interface representing the shape of a form service used by the CrudComponent.
  * The consuming app must provide a service that implements this structure.
@@ -172,7 +193,7 @@ export abstract class CrudComponent<
 	/**
 	 * Configuration object used by the UI for rendering table and handling actions.
 	 */
-	protected getConfig() {
+	protected getConfig(): TableConfig<Document> {
 		return {
 			paginate: this.setDocuments.bind(this),
 			perPage: 20,
