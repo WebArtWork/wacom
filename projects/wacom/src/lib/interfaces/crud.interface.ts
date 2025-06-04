@@ -5,8 +5,15 @@ export interface CrudDocument {
 	__modified?: boolean;
 }
 
+export interface CrudOptions<Document> {
+	name?: string;
+	alert?: string;
+	callback?: (resp: Document | Document[]) => void;
+	errCallback?: (resp: unknown) => void;
+}
+
 export interface CrudServiceInterface<Document> {
-	get: (params: { page: number }) => any;
+	get: (params: { page: number }, options: CrudOptions<Document>) => any;
 	create: (doc: Document) => any;
 	update: (doc: Document) => any;
 	delete: (doc: Document) => any;

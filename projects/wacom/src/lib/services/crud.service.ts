@@ -3,16 +3,9 @@ import { HttpService } from './http.service';
 import { StoreService } from './store.service';
 import { AlertService } from './alert.service';
 import { CoreService } from './core.service';
-import { CrudDocument } from '../interfaces/crud.interface';
+import { CrudDocument, CrudOptions } from '../interfaces/crud.interface';
 import { BaseService } from './base.service';
 import { inject } from '@angular/core';
-
-interface CrudOptions<Document> {
-	name?: string;
-	alert?: string;
-	callback?: (resp: Document | Document[]) => void;
-	errCallback?: (resp: unknown) => void;
-}
 
 interface CrudConfig<Document> {
 	signalFields?: Record<string, (doc: Document) => unknown>;

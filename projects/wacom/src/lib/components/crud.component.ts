@@ -2,6 +2,7 @@ import { firstValueFrom } from 'rxjs';
 import { inject } from '@angular/core';
 import {
 	CrudDocument,
+	CrudOptions,
 	CrudServiceInterface,
 } from '../interfaces/crud.interface';
 import { CoreService } from '../services/core.service';
@@ -109,11 +110,13 @@ export abstract class CrudComponent<
 		this.__core.afterWhile(
 			this,
 			() => {
-				this.service.get({ page }).subscribe((docs: Document[]) => {
-					this.documents.splice(0, this.documents.length);
+				this.service
+					.get({ page }, this.getOptions())
+					.subscribe((docs: Document[]) => {
+						this.documents.splice(0, this.documents.length);
 
-					this.documents.push(...docs);
-				});
+						this.documents.push(...docs);
+					});
 			},
 			250
 		);
@@ -145,6 +148,13 @@ export abstract class CrudComponent<
 	 */
 	protected allowUrl(): boolean {
 		return true;
+	}
+
+	/**
+	 * Funciton which prepare get crud options.
+	 */
+	protected getOptions(): CrudOptions<Document> {
+		return {} as CrudOptions<Document>;
 	}
 
 	/**
