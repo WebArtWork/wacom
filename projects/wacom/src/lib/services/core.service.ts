@@ -376,22 +376,83 @@ export class CoreService {
 	}
 
 	/**
-	 * Returns a Promise that resolves when the specified task is complete.
-	 * @param task - The task to watch for completion, identified by a string.
-	 * @returns A Promise that resolves when the task is complete.
+	 * Waits for one or more tasks to be marked as complete.
+	 *
+	 * @param {string | string[]} tasks - The task or array of tasks to wait for.
+	 * @returns {Promise<unknown>} A promise that resolves when all specified tasks are complete.
+	 * - If a single task is provided, resolves with its completion result.
+	 * - If multiple tasks are provided, resolves with an array of results in the same order.
+	 *
+	 * @remarks
+	 * If any task is not yet completed, a resolver is attached. The developer is responsible for managing
+	 * resolver cleanup if needed. Resolvers remain after resolution and are not removed automatically.
 	 */
-	onComplete(task: string): Promise<unknown> {
-		if (this._completed[task]) {
-			return Promise.resolve(this._completed[task]);
+	onComplete(tasks: string | string[]): Promise<unknown> {
+		if (typeof tasks === 'string') {
+			tasks = [tasks];
+		}
+
+		if (this._isCompleted(tasks)) {
+			return Promise.resolve(
+				tasks.length > 1
+					? tasks.map((task) => this._completed[task])
+					: this._completed[tasks[0]]
+			);
 		}
 
 		return new Promise((resolve) => {
-			if (!this._completeResolvers[task]) {
-				this._completeResolvers[task] = [];
-			}
+			for (const task of tasks) {
+				if (!this._completeResolvers[task]) {
+					this._completeResolvers[task] = [];
+				}
 
-			this._completeResolvers[task].push(resolve);
+				this._completeResolvers[task].push(
+					this._allCompleted(tasks, resolve)
+				);
+			}
 		});
+	}
+
+	/**
+	 * Returns a resolver function that checks if all given tasks are completed,
+	 * and if so, calls the provided resolve function with their results.
+	 *
+	 * @param {string[]} tasks - The list of task names to monitor for completion.
+	 * @param {(value: unknown) => void} resolve - The resolver function to call once all tasks are complete.
+	 * @returns {(doc: unknown) => void} A function that can be registered as a resolver for each task.
+	 *
+	 * @remarks
+	 * This function does not manage or clean up resolvers. It assumes the developer handles any potential duplicates or memory concerns.
+	 */
+	private _allCompleted(
+		tasks: string[],
+		resolve: (value: unknown) => void
+	): (doc: unknown) => void {
+		return (doc: unknown) => {
+			if (this._isCompleted(tasks)) {
+				resolve(
+					tasks.length > 1
+						? tasks.map((task) => this._completed[task])
+						: this._completed[tasks[0]]
+				);
+			}
+		};
+	}
+
+	/**
+	 * Checks whether all specified tasks have been marked as completed.
+	 *
+	 * @param {string[]} tasks - The array of task names to check.
+	 * @returns {boolean} `true` if all tasks are completed, otherwise `false`.
+	 */
+	private _isCompleted(tasks: string[]): boolean {
+		for (const task of tasks) {
+			if (!this._completed[task]) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
