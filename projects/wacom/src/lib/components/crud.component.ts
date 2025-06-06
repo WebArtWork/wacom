@@ -9,10 +9,10 @@ import { CoreService } from '../services/core.service';
 import { AlertService } from '../services/alert.service';
 
 interface TableConfig<Document> {
-	paginate: (page?: number) => void;
-	perPage: number;
-	setPerPage: ((count: number) => void) | undefined;
-	allDocs: boolean;
+	paginate?: (page?: number) => void;
+	perPage?: number;
+	setPerPage?: ((count: number) => void) | undefined;
+	allDocs?: boolean;
 	create: (() => void) | null;
 	update: ((doc: Document) => void) | null;
 	delete: ((doc: Document) => void) | null;
@@ -34,7 +34,7 @@ interface TableConfig<Document> {
  * The consuming app must provide a service that implements this structure.
  */
 interface FormServiceInterface<FormInterface> {
-	getForm: (formId: number, form: FormInterface) => any;
+	prepareForm: (form: FormInterface) => any;
 	modal: <T>(form: any, options?: any, doc?: T) => Promise<T>;
 	modalDocs: <T>(docs: T[]) => Promise<T[]>;
 	modalUnique: <T>(collection: string, key: string, doc: T) => void;
@@ -99,31 +99,32 @@ export abstract class CrudComponent<
 
 		const form = formConfig as FormInterface;
 
-		this.form = this.__form.getForm(
-			(formConfig as { formId: number }).formId,
-			form
-		);
+		this.form = this.__form.prepareForm(form);
 	}
 
 	/**
 	 * Loads documents for a given page.
 	 */
 	protected setDocuments(page = this.page): void {
-		this.page = page;
+		if (this.configType === 'server') {
+			this.page = page;
 
-		this.__core.afterWhile(
-			this,
-			() => {
-				this.service
-					.get({ page }, this.getOptions())
-					.subscribe((docs: Document[]) => {
-						this.documents.splice(0, this.documents.length);
+			this.__core.afterWhile(
+				this,
+				() => {
+					this.service
+						.get({ page }, this.getOptions())
+						.subscribe((docs: Document[]) => {
+							this.documents.splice(0, this.documents.length);
 
-						this.documents.push(...docs);
-					});
-			},
-			250
-		);
+							this.documents.push(...docs);
+						});
+				},
+				250
+			);
+		} else {
+			this.documents = this.service.getDocs();
+		}
 	}
 
 	protected updatableFields = ['_id', 'name', 'description', 'data'];
@@ -224,16 +225,13 @@ export abstract class CrudComponent<
 		};
 	}
 
+	protected configType: 'server' | 'local' = 'server';
+
 	/**
 	 * Configuration object used by the UI for rendering table and handling actions.
 	 */
 	protected getConfig(): TableConfig<Document> {
-		return {
-			paginate: this.setDocuments.bind(this),
-			perPage: 20,
-			setPerPage: this.service.setPerPage?.bind(this.service),
-			allDocs: false,
-
+		const config = {
 			create: this.allowCreate()
 				? (): void => {
 						this.__form.modal<Document>(this.form, {
@@ -324,5 +322,15 @@ export abstract class CrudComponent<
 					: null,
 			],
 		};
+
+		return this.configType === 'server'
+			? {
+					...config,
+					paginate: this.setDocuments.bind(this),
+					perPage: 20,
+					setPerPage: this.service.setPerPage?.bind(this.service),
+					allDocs: false,
+			  }
+			: config;
 	}
 }
