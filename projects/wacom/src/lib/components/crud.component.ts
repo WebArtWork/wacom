@@ -6,6 +6,7 @@ import {
 	CrudServiceInterface,
 } from '../interfaces/crud.interface';
 import { CoreService } from '../services/core.service';
+import { AlertService } from '../services/alert.service';
 
 interface TableConfig<Document> {
 	paginate: (page?: number) => void;
@@ -71,6 +72,9 @@ export abstract class CrudComponent<
 
 	/** CoreService handles timing and copying helpers */
 	private __core = inject(CoreService);
+
+	/** AlertService handles alerts */
+	private __alert = inject(AlertService);
 
 	/** Internal reference to form service matching FormServiceInterface */
 	private __form: FormServiceInterface<FormInterface>;
@@ -242,7 +246,7 @@ export abstract class CrudComponent<
 
 			delete: this.allowMutate()
 				? (doc: Document): void => {
-						this.__form.alert?.question({
+						this.__alert.question({
 							text: this.translate.translate(
 								'Common.Are you sure you want to delete this bird?'
 							),
