@@ -126,6 +126,8 @@ export abstract class CrudComponent<
 		);
 	}
 
+	protected updatableFields = ['_id', 'name', 'description', 'data'];
+
 	/**
 	 * Clears temporary metadata before document creation.
 	 */
@@ -169,11 +171,24 @@ export abstract class CrudComponent<
 	protected bulkManagement(create = true): () => void {
 		return (): void => {
 			this.__form
-				.modalDocs<Document>(create ? [] : this.documents)
+				.modalDocs<Document>(
+					create
+						? []
+						: this.documents.map(
+								(obj: any) =>
+									Object.fromEntries(
+										this.updatableFields.map((key) => [
+											key,
+											obj[key],
+										])
+									) as Document
+						  )
+				)
 				.then(async (docs: Document[]) => {
 					if (create) {
 						for (const doc of docs) {
 							this.preCreate(doc);
+
 							await firstValueFrom(this.service.create(doc));
 						}
 					} else {
@@ -184,21 +199,26 @@ export abstract class CrudComponent<
 								);
 							}
 						}
+
 						for (const doc of docs) {
 							const local = this.documents.find(
 								(d) => d._id === doc._id
 							);
+
 							if (local) {
 								this.__core.copy(doc, local);
+
 								await firstValueFrom(
 									this.service.update(local)
 								);
 							} else {
 								this.preCreate(doc);
+
 								await firstValueFrom(this.service.create(doc));
 							}
 						}
 					}
+
 					this.setDocuments();
 				});
 		};
@@ -224,9 +244,11 @@ export abstract class CrudComponent<
 							) => {
 								close();
 								this.preCreate(created as Document);
+
 								await firstValueFrom(
 									this.service.create(created as Document)
 								);
+
 								this.setDocuments();
 							},
 						});
@@ -239,6 +261,7 @@ export abstract class CrudComponent<
 							.modal<Document>(this.form, [], doc)
 							.then((updated: Document) => {
 								this.__core.copy(updated, doc);
+
 								this.service.update(doc);
 							});
 				  }
@@ -260,6 +283,7 @@ export abstract class CrudComponent<
 										await firstValueFrom(
 											this.service.delete(doc)
 										);
+
 										this.setDocuments();
 									},
 								},
