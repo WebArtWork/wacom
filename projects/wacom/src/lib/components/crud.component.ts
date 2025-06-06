@@ -321,6 +321,7 @@ export abstract class CrudComponent<
 					  }
 					: null,
 			],
+			allDocs: true,
 		};
 
 		return this.configType === 'server'
