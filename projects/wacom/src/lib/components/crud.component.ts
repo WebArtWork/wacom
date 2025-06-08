@@ -157,6 +157,10 @@ export abstract class CrudComponent<
 		return true;
 	}
 
+	protected allowSort(): boolean {
+		return false;
+	}
+
 	/**
 	 * Funciton which prepare get crud options.
 	 */
@@ -300,6 +304,34 @@ export abstract class CrudComponent<
 									'url',
 									doc
 								);
+							},
+					  }
+					: null,
+				this.allowSort()
+					? {
+							icon: 'arrow_upward',
+							click: (doc: Document): void => {
+								const index = this.documents.findIndex(
+									(d) => d._id === doc._id
+								);
+
+								if (index) {
+									this.documents.splice(index, 1);
+
+									this.documents.splice(index - 1, 0, doc);
+								}
+
+								for (
+									let i = 0;
+									i < this.documents.length;
+									i++
+								) {
+									if (this.documents[i].order !== i) {
+										this.documents[i].order = i;
+
+										this.service.update(this.documents[i]);
+									}
+								}
 							},
 					  }
 					: null,

@@ -1,6 +1,7 @@
 export interface CrudDocument {
 	_id: string;
 	appId?: string;
+	order?: number;
 	__created?: boolean;
 	__modified?: boolean;
 }
