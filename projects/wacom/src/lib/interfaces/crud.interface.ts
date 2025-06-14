@@ -21,3 +21,24 @@ export interface CrudServiceInterface<Document> {
 	delete: (doc: Document) => any;
 	setPerPage?: (count: number) => void;
 }
+
+export interface TableConfig<Document> {
+	paginate?: (page?: number) => void;
+	perPage?: number;
+	setPerPage?: ((count: number) => void) | undefined;
+	allDocs?: boolean;
+	create: (() => void) | null;
+	update: ((doc: Document) => void) | null;
+	delete: ((doc: Document) => void) | null;
+	buttons: ({
+		icon?: string;
+		click?: (doc: Document) => void;
+		hrefFunc?: (doc: Document) => string;
+	} | null)[];
+	headerButtons: ({
+		icon?: string;
+		click?: () => void;
+		hrefFunc?: (doc: Document) => string;
+		class?: string;
+	} | null)[];
+}

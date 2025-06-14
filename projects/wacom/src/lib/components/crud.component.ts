@@ -1,33 +1,13 @@
-import { firstValueFrom } from 'rxjs';
 import { inject } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import {
 	CrudDocument,
 	CrudOptions,
 	CrudServiceInterface,
+	TableConfig,
 } from '../interfaces/crud.interface';
-import { CoreService } from '../services/core.service';
 import { AlertService } from '../services/alert.service';
-
-interface TableConfig<Document> {
-	paginate?: (page?: number) => void;
-	perPage?: number;
-	setPerPage?: ((count: number) => void) | undefined;
-	allDocs?: boolean;
-	create: (() => void) | null;
-	update: ((doc: Document) => void) | null;
-	delete: ((doc: Document) => void) | null;
-	buttons: ({
-		icon?: string;
-		click?: (doc: Document) => void;
-		hrefFunc?: (doc: Document) => string;
-	} | null)[];
-	headerButtons: ({
-		icon?: string;
-		click?: () => void;
-		hrefFunc?: (doc: Document) => string;
-		class?: string;
-	} | null)[];
-}
+import { CoreService } from '../services/core.service';
 
 /**
  * Interface representing the shape of a form service used by the CrudComponent.
