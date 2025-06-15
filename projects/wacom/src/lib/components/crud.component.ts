@@ -71,7 +71,8 @@ export abstract class CrudComponent<
 		formConfig: unknown,
 		protected formService: unknown,
 		protected translate: { translate: (key: string) => string },
-		service: Service
+		service: Service,
+		module = ''
 	) {
 		this.service = service;
 
@@ -80,6 +81,8 @@ export abstract class CrudComponent<
 		const form = formConfig as FormInterface;
 
 		this.form = this.__form.prepareForm(form);
+
+		this._module = module;
 	}
 
 	/**
@@ -253,7 +256,9 @@ export abstract class CrudComponent<
 				? (doc: Document): void => {
 						this.__alert.question({
 							text: this.translate.translate(
-								'Common.Are you sure you want to delete this bird?'
+								`Common.Are you sure you want to delete this${
+									this._module ? ' ' + this._module : ''
+								}?`
 							),
 							buttons: [
 								{ text: this.translate.translate('Common.No') },
@@ -275,12 +280,12 @@ export abstract class CrudComponent<
 				: null,
 
 			buttons: [
-				this.allowUrl()
+				this.allowUrl() && this._module
 					? {
 							icon: 'cloud_download',
 							click: (doc: Document): void => {
 								this.__form.modalUnique<Document>(
-									'bird',
+									this._module,
 									'url',
 									doc
 								);
@@ -346,4 +351,6 @@ export abstract class CrudComponent<
 			  }
 			: config;
 	}
+
+	private _module = '';
 }
