@@ -229,6 +229,8 @@ export abstract class CrudComponent<
 
 	protected configType: 'server' | 'local' = 'server';
 
+	protected perPage = 20;
+
 	/**
 	 * Configuration object used by the UI for rendering table and handling actions.
 	 */
@@ -364,7 +366,7 @@ export abstract class CrudComponent<
 			? {
 					...config,
 					paginate: this.setDocuments.bind(this),
-					perPage: 20,
+					perPage: this.perPage,
 					setPerPage: this.service.setPerPage?.bind(this.service),
 					allDocs: false,
 			  }
