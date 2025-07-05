@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { ChangeDetectorRef, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import {
 	CrudDocument,
@@ -56,6 +56,9 @@ export abstract class CrudComponent<
 	/** AlertService handles alerts */
 	private __alert = inject(AlertService);
 
+	/** ChangeDetectorRef handles on push strategy */
+	private __cdr = inject(ChangeDetectorRef);
+
 	/** Internal reference to form service matching FormServiceInterface */
 	private __form: FormServiceInterface<FormInterface>;
 
@@ -104,6 +107,8 @@ export abstract class CrudComponent<
 								this.documents.push(...docs);
 
 								resolve();
+
+								this.__cdr.markForCheck();
 							});
 					},
 					250
@@ -113,6 +118,8 @@ export abstract class CrudComponent<
 
 				this.service.loaded.then(() => {
 					resolve();
+
+					this.__cdr.markForCheck();
 				});
 			}
 		});
@@ -256,6 +263,8 @@ export abstract class CrudComponent<
 								this.__core.copy(updated, doc);
 
 								this.service.update(doc);
+
+								this.__cdr.markForCheck();
 							});
 				  }
 				: null,
@@ -325,6 +334,8 @@ export abstract class CrudComponent<
 										this.service.update(this.documents[i]);
 									}
 								}
+
+								this.__cdr.markForCheck();
 							},
 					  }
 					: null,
