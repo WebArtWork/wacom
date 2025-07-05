@@ -88,26 +88,34 @@ export abstract class CrudComponent<
 	/**
 	 * Loads documents for a given page.
 	 */
-	protected setDocuments(page = this.page): void {
-		if (this.configType === 'server') {
-			this.page = page;
+	protected setDocuments(page = this.page): Promise<void> {
+		return new Promise((resolve) => {
+			if (this.configType === 'server') {
+				this.page = page;
 
-			this.__core.afterWhile(
-				this,
-				() => {
-					this.service
-						.get({ page }, this.getOptions())
-						.subscribe((docs: Document[]) => {
-							this.documents.splice(0, this.documents.length);
+				this.__core.afterWhile(
+					this,
+					() => {
+						this.service
+							.get({ page }, this.getOptions())
+							.subscribe((docs: Document[]) => {
+								this.documents.splice(0, this.documents.length);
 
-							this.documents.push(...docs);
-						});
-				},
-				250
-			);
-		} else {
-			this.documents = this.service.getDocs();
-		}
+								this.documents.push(...docs);
+
+								resolve();
+							});
+					},
+					250
+				);
+			} else {
+				this.documents = this.service.getDocs();
+
+				this.service.loaded.then(() => {
+					resolve();
+				});
+			}
+		});
 	}
 
 	protected updatableFields = ['_id', 'name', 'description', 'data'];

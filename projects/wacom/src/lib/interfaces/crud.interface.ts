@@ -20,6 +20,7 @@ export interface CrudServiceInterface<Document> {
 	update: (doc: Document) => any;
 	delete: (doc: Document) => any;
 	setPerPage?: (count: number) => void;
+	loaded: Promise<unknown>;
 }
 
 export interface TableConfig<Document> {
