@@ -1,4 +1,10 @@
-import { ChangeDetectorRef, inject } from '@angular/core';
+import {
+	ChangeDetectorRef,
+	inject,
+	Signal,
+	signal,
+	WritableSignal,
+} from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import {
 	CrudDocument,
@@ -42,7 +48,7 @@ export abstract class CrudComponent<
 	protected service: Service;
 
 	/** The array of documents currently loaded and shown */
-	protected documents: Document[] = [];
+	protected documents = signal<Signal<Document>[]>([]);
 
 	/** The reactive form instance generated from the provided config */
 	protected form: any;
@@ -102,9 +108,9 @@ export abstract class CrudComponent<
 						this.service
 							.get({ page }, this.getOptions())
 							.subscribe((docs: Document[]) => {
-								this.documents.splice(0, this.documents.length);
-
-								this.documents.push(...docs);
+								this.documents.update(() =>
+									this.__core.toSignalsArray(docs)
+								);
 
 								resolve();
 
@@ -114,7 +120,9 @@ export abstract class CrudComponent<
 					250
 				);
 			} else {
-				this.documents = this.service.getDocs();
+				this.documents.update(() =>
+					this.__core.toSignalsArray(this.service.getDocs())
+				);
 
 				this.service.loaded.then(() => {
 					resolve();
@@ -177,12 +185,12 @@ export abstract class CrudComponent<
 				.modalDocs<Document>(
 					create
 						? []
-						: this.documents.map(
+						: this.documents().map(
 								(obj: any) =>
 									Object.fromEntries(
 										this.updatableFields.map((key) => [
 											key,
-											obj[key],
+											obj()[key],
 										])
 									) as Document
 						  )
@@ -195,24 +203,30 @@ export abstract class CrudComponent<
 							await firstValueFrom(this.service.create(doc));
 						}
 					} else {
-						for (const document of this.documents) {
-							if (!docs.find((d) => d._id === document._id)) {
+						for (const document of this.documents()) {
+							if (!docs.find((d) => d._id === document()._id)) {
 								await firstValueFrom(
-									this.service.delete(document)
+									this.service.delete(document())
 								);
 							}
 						}
 
 						for (const doc of docs) {
-							const local = this.documents.find(
-								(d) => d._id === doc._id
+							const local = this.documents().find(
+								(document) => document()._id === doc._id
 							);
 
 							if (local) {
-								this.__core.copy(doc, local);
+								(local as WritableSignal<Document>).update(
+									(document) => {
+										this.__core.copy(doc, document);
+
+										return document;
+									}
+								);
 
 								await firstValueFrom(
-									this.service.update(local)
+									this.service.update(local())
 								);
 							} else {
 								this.preCreate(doc);
@@ -315,25 +329,35 @@ export abstract class CrudComponent<
 					? {
 							icon: 'arrow_upward',
 							click: (doc: Document): void => {
-								const index = this.documents.findIndex(
-									(d) => d._id === doc._id
+								const index = this.documents().findIndex(
+									(document) => document()._id === doc._id
 								);
 
 								if (index) {
-									this.documents.splice(index, 1);
+									this.documents.update((documents) => {
+										documents.splice(index, 1);
 
-									this.documents.splice(index - 1, 0, doc);
+										documents.splice(
+											index - 1,
+											0,
+											this.__core.toSignal(doc)
+										);
+
+										return documents;
+									});
 								}
 
 								for (
 									let i = 0;
-									i < this.documents.length;
+									i < this.documents().length;
 									i++
 								) {
-									if (this.documents[i].order !== i) {
-										this.documents[i].order = i;
+									if (this.documents()[i]().order !== i) {
+										this.documents()[i]().order = i;
 
-										this.service.update(this.documents[i]);
+										this.service.update(
+											this.documents()[i]()
+										);
 									}
 								}
 
