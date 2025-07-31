@@ -1,9 +1,4 @@
-<div
-	[hidden]="!showModal"
-	class="modal"
-	[ngClass]="class + ' ' + size"
-	(click)="onClickOutside()"
->
+<div [ngClass]="class + ' ' + size" (click)="onClickOutside()" class="modal">
 	<!--  (click)="$event.stopPropagation()" -->
 	<!-- <div class="modal-content" (mousedown)="allowClose = false"> -->
 	<div class="modal-content" (click)="$event.stopPropagation()">

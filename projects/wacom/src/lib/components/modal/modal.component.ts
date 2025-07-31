@@ -14,7 +14,6 @@ export class ModalComponent implements OnInit {
 	onOpen: any;
 	timestart: any;
 	timeout: any;
-	showModal = false;
 	allowClose = true;
 	onClickOutside: any;
 	ngOnInit() {
@@ -32,12 +31,6 @@ export class ModalComponent implements OnInit {
 		if (typeof this.onOpen == 'function') this.onOpen();
 
 		window.addEventListener('popstate', this.popStateListener.bind(this));
-	}
-
-	ngAfterViewInit() {
-		setTimeout(() => {
-			this.showModal = true;
-		}, this.timestart || 0);
 	}
 
 	ngOnDestroy(): void {
