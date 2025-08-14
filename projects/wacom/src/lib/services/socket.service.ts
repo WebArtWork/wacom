@@ -18,32 +18,36 @@ export class SocketService {
 
 	private _opts: any = {};
 
-	constructor(
-		@Inject(CONFIG_TOKEN) @Optional() private _config: Config,
-		private _core: CoreService
-	) {
-		if (!this._config.io) {
-			return;
-		}
+        constructor(
+                @Inject(CONFIG_TOKEN) @Optional() private _config: Config,
+                private _core: CoreService
+        ) {
+                this._config = { ...DEFAULT_CONFIG, ...(this._config || {}) };
 
-		this._url = window.location.origin.replace('4200', '8080');
+                if (!this._config.io) {
+                        return;
+                }
 
-		if (!this._config) this._config = DEFAULT_CONFIG;
+                const url = new URL(window.location.origin);
 
-		if (typeof this._config.socket === 'object') {
-			if (this._config.socket.url) {
-				this._url = this._config.socket.url;
-			}
+                if (typeof this._config.socket === 'object') {
+                        if (this._config.socket.port) {
+                                url.port = this._config.socket.port;
+                        }
 
-			if (this._config.socket.opts) {
-				this._opts = this._config.socket.opts;
-			}
-		}
+                        if (this._config.socket.opts) {
+                                this._opts = this._config.socket.opts;
+                        }
 
-		if (this._config.socket) {
-			this.load();
-		}
-	}
+                        this._url = this._config.socket.url ?? url.origin;
+                } else {
+                        this._url = url.origin;
+                }
+
+                if (this._config.socket) {
+                        this.load();
+                }
+        }
 
 	/**
 	 * Sets the URL for the WebSocket connection and reloads the socket.
