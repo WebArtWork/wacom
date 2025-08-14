@@ -1194,7 +1194,7 @@ metaService.setDefaults({ title: 'Default Title', description: 'Default Descript
 
 #### `setTitle(title?: string, titleSuffix?: string): MetaService`
 
-Sets the title and optional title suffix.
+Sets the title and optional title suffix, updating the `title`, `og:title`, and `twitter:title` meta tags.
 
 **Parameters**:
 
