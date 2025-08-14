@@ -171,16 +171,52 @@ export class TimeService {
 	 * @param years - The number of years to subtract.
 	 * @returns The new date with the subtracted years.
 	 */
-	subtractYears(date: Date, years: number): Date {
-		return this.addYears(date, -years);
-	}
+        subtractYears(date: Date, years: number): Date {
+                return this.addYears(date, -years);
+        }
 
-	/**
-	 * Checks if two dates are on the same day.
-	 *
-	 * @param date1 - The first date.
-	 * @param date2 - The second date.
-	 * @returns True if the dates are on the same day, false otherwise.
+        /**
+         * Calculates the difference in days between two dates.
+         *
+         * @param date1 - The earlier date.
+         * @param date2 - The later date.
+         * @returns The number of days between the two dates.
+         */
+        differenceInDays(date1: Date, date2: Date): number {
+                const diff = date2.getTime() - date1.getTime();
+                return diff / (1000 * 60 * 60 * 24);
+        }
+
+        /**
+         * Calculates the difference in hours between two dates.
+         *
+         * @param date1 - The earlier date.
+         * @param date2 - The later date.
+         * @returns The number of hours between the two dates.
+         */
+        differenceInHours(date1: Date, date2: Date): number {
+                const diff = date2.getTime() - date1.getTime();
+                return diff / (1000 * 60 * 60);
+        }
+
+        /**
+         * Calculates the difference in minutes between two dates.
+         *
+         * @param date1 - The earlier date.
+         * @param date2 - The later date.
+         * @returns The number of minutes between the two dates.
+         */
+        differenceInMinutes(date1: Date, date2: Date): number {
+                const diff = date2.getTime() - date1.getTime();
+                return diff / (1000 * 60);
+        }
+
+        /**
+         * Checks if two dates are on the same day.
+         *
+         * @param date1 - The first date.
+         * @param date2 - The second date.
+         * @returns True if the dates are on the same day, false otherwise.
 	 */
 	isSameDay(date1: Date, date2: Date): boolean {
 		return (
