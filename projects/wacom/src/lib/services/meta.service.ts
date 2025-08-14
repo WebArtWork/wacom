@@ -142,26 +142,28 @@ export class MetaService {
 		const hasDefaultMeta = !!Object.keys(this._meta.defaults).length;
 		const hasMetaGuardInArr = (it: any) =>
 			it && it.IDENTIFIER === 'MetaGuard';
-		let hasShownWarnings = false;
-		this.router.config.forEach((route: Route) => {
-			const hasRouteMeta = route.data && route.data['meta'];
-			const showWarning =
-				!isDefined(route.redirectTo) &&
-				(hasDefaultMeta || hasRouteMeta) &&
-				!(route.canActivate || []).some(hasMetaGuardInArr);
-			if (showWarning) {
-				console.warn(
-					`Route with path "${route.path}" has ${
-						hasRouteMeta ? '' : 'default '
-					}meta tags, but does not use MetaGuard. Please add MetaGuard to the canActivate array in your route configuration`
-				);
-				hasShownWarnings = true;
-			}
-		});
-		if (hasShownWarnings) {
-			console.warn(
-				`To disable these warnings, set metaConfig.warnMissingGuard: false in your MetaConfig passed to MetaModule.forRoot()`
-			);
-		}
+                let hasShownWarnings = false;
+                const checkRoute = (route: Route) => {
+                        const hasRouteMeta = route.data && route.data['meta'];
+                        const showWarning =
+                                !isDefined(route.redirectTo) &&
+                                (hasDefaultMeta || hasRouteMeta) &&
+                                !(route.canActivate || []).some(hasMetaGuardInArr);
+                        if (showWarning) {
+                                console.warn(
+                                        `Route with path "${route.path}" has ${
+                                                hasRouteMeta ? '' : 'default '
+                                        }meta tags, but does not use MetaGuard. Please add MetaGuard to the canActivate array in your route configuration`
+                                );
+                                hasShownWarnings = true;
+                        }
+                        (route.children || []).forEach(checkRoute);
+                };
+                this.router.config.forEach(checkRoute);
+                if (hasShownWarnings) {
+                        console.warn(
+                                `To disable these warnings, set metaConfig.warnMissingGuard: false in your MetaConfig passed to MetaModule.forRoot()`
+                        );
+                }
 	}
 }
