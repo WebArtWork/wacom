@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
     selector: 'app-core',
     templateUrl: './core.component.html',
     styleUrls: ['./core.component.scss'],
-    standalone: false
+    standalone: true
 })
 export class CoreComponent {
 	public value:any = 'Ace Editor';
