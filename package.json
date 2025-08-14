@@ -20,14 +20,14 @@
 		"@types/socket.io-client": "3.0.0",
 		"ngx-ace-wrapper": "11.0.1",
 		"rxjs": "7.8.2",
-		"tslib": "2.3.0",
+		"tslib": "^2.6.2",
 		"zone.js": "~0.15.0"
 	},
 	"devDependencies": {
 		"@angular/build": "20.1.6",
 		"@angular/cli": "20.1.6",
 		"@angular/compiler-cli": "20.1.7",
-		"@types/node": "12.11.1",
+		"@types/node": "^18.19.0",
 		"ng-packagr": "20.0.0",
 		"typescript": "~5.8.3"
 	}
