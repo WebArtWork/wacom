@@ -2,7 +2,11 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { AlertComponent } from '../components/alert/alert.component';
 import { WrapperComponent } from '../components/alert/wrapper/wrapper.component';
 import { Alert, DEFAULT_Alert } from '../interfaces/alert.interface';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
+import {
+	CONFIG_TOKEN,
+	Config,
+	DEFAULT_CONFIG,
+} from '../interfaces/config.interface';
 import { DomService } from './dom.service';
 
 @Injectable({

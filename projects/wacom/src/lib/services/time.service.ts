@@ -52,15 +52,23 @@ export class TimeService {
 	 * @param format - The format in which to return the month name. Default is 'long'.
 	 * @returns The name of the month.
 	 */
-	getMonthName(monthIndex: number, format: 'short' | 'long' = 'long'): string {
-		if (!Number.isInteger(monthIndex) || monthIndex < 0 || monthIndex > 11) {
-		        throw new RangeError('monthIndex must be an integer between 0 and 11');
+	getMonthName(
+		monthIndex: number,
+		format: 'short' | 'long' = 'long'
+	): string {
+		if (
+			!Number.isInteger(monthIndex) ||
+			monthIndex < 0 ||
+			monthIndex > 11
+		) {
+			throw new RangeError(
+				'monthIndex must be an integer between 0 and 11'
+			);
 		}
 		return format === 'short'
-		        ? this.monthNames[monthIndex].substring(0, 3)
-		        : this.monthNames[monthIndex];
+			? this.monthNames[monthIndex].substring(0, 3)
+			: this.monthNames[monthIndex];
 	}
-
 
 	/**
 	 * Formats a date according to the specified format and timezone.
@@ -136,7 +144,7 @@ export class TimeService {
 		newDate.setDate(newDate.getDate() - diff);
 		return newDate;
 	}
-		
+
 	/**
 	 * Returns the end of the week for a given date.
 	 *
@@ -153,7 +161,7 @@ export class TimeService {
 		const end = this.addDays(start, 6);
 		return this.endOfDay(end);
 	}
-		
+
 	/**
 	 * Returns the start of the month for a given date.
 	 *
@@ -169,7 +177,7 @@ export class TimeService {
 		newDate.setDate(1);
 		return newDate;
 	}
-		
+
 	/**
 	 * Returns the end of the month for a given date.
 	 *
@@ -187,7 +195,7 @@ export class TimeService {
 		end.setDate(0);
 		return this.endOfDay(end);
 	}
-		
+
 	/**
 	 * Returns the start of the year for a given date.
 	 *
@@ -203,7 +211,7 @@ export class TimeService {
 		newDate.setMonth(0, 1);
 		return newDate;
 	}
-		
+
 	/**
 	 * Returns the end of the year for a given date.
 	 *
@@ -280,6 +288,45 @@ export class TimeService {
 	}
 
 	/**
+	 * Adds a specified number of hours to a date.
+	 *
+	 * @param date - The date to which to add hours.
+	 * @param hours - The number of hours to add.
+	 * @returns The new date with the added hours.
+	 */
+	addHours(date: Date, hours: number): Date {
+		const newDate = new Date(date);
+		newDate.setHours(newDate.getHours() + hours);
+		return newDate;
+	}
+
+	/**
+	 * Adds a specified number of minutes to a date.
+	 *
+	 * @param date - The date to which to add minutes.
+	 * @param minutes - The number of minutes to add.
+	 * @returns The new date with the added minutes.
+	 */
+	addMinutes(date: Date, minutes: number): Date {
+		const newDate = new Date(date);
+		newDate.setMinutes(newDate.getMinutes() + minutes);
+		return newDate;
+	}
+
+	/**
+	 * Adds a specified number of seconds to a date.
+	 *
+	 * @param date - The date to which to add seconds.
+	 * @param seconds - The number of seconds to add.
+	 * @returns The new date with the added seconds.
+	 */
+	addSeconds(date: Date, seconds: number): Date {
+		const newDate = new Date(date);
+		newDate.setSeconds(newDate.getSeconds() + seconds);
+		return newDate;
+	}
+
+	/**
 	 * Subtracts a specified number of days from a date.
 	 *
 	 * @param date - The date from which to subtract days.
@@ -308,52 +355,85 @@ export class TimeService {
 	 * @param years - The number of years to subtract.
 	 * @returns The new date with the subtracted years.
 	 */
-        subtractYears(date: Date, years: number): Date {
-                return this.addYears(date, -years);
-        }
+	subtractYears(date: Date, years: number): Date {
+		return this.addYears(date, -years);
+	}
 
-        /**
-         * Calculates the difference in days between two dates.
-         *
-         * @param date1 - The earlier date.
-         * @param date2 - The later date.
-         * @returns The number of days between the two dates.
-         */
-        differenceInDays(date1: Date, date2: Date): number {
-                const diff = date2.getTime() - date1.getTime();
-                return diff / (1000 * 60 * 60 * 24);
-        }
+	/**
+	 * Subtracts a specified number of hours from a date.
+	 *
+	 * @param date - The date from which to subtract hours.
+	 * @param hours - The number of hours to subtract.
+	 * @returns The new date with the subtracted hours.
+	 */
+	subtractHours(date: Date, hours: number): Date {
+		return this.addHours(date, -hours);
+	}
 
-        /**
-         * Calculates the difference in hours between two dates.
-         *
-         * @param date1 - The earlier date.
-         * @param date2 - The later date.
-         * @returns The number of hours between the two dates.
-         */
-        differenceInHours(date1: Date, date2: Date): number {
-                const diff = date2.getTime() - date1.getTime();
-                return diff / (1000 * 60 * 60);
-        }
+	/**
+	 * Subtracts a specified number of minutes from a date.
+	 *
+	 * @param date - The date from which to subtract minutes.
+	 * @param minutes - The number of minutes to subtract.
+	 * @returns The new date with the subtracted minutes.
+	 */
+	subtractMinutes(date: Date, minutes: number): Date {
+		return this.addMinutes(date, -minutes);
+	}
 
-        /**
-         * Calculates the difference in minutes between two dates.
-         *
-         * @param date1 - The earlier date.
-         * @param date2 - The later date.
-         * @returns The number of minutes between the two dates.
-         */
-        differenceInMinutes(date1: Date, date2: Date): number {
-                const diff = date2.getTime() - date1.getTime();
-                return diff / (1000 * 60);
-        }
+	/**
+	 * Subtracts a specified number of seconds from a date.
+	 *
+	 * @param date - The date from which to subtract seconds.
+	 * @param seconds - The number of seconds to subtract.
+	 * @returns The new date with the subtracted seconds.
+	 */
+	subtractSeconds(date: Date, seconds: number): Date {
+		return this.addSeconds(date, -seconds);
+	}
 
-        /**
-         * Checks if two dates are on the same day.
-         *
-         * @param date1 - The first date.
-         * @param date2 - The second date.
-         * @returns True if the dates are on the same day, false otherwise.
+	/**
+	 * Calculates the difference in days between two dates.
+	 *
+	 * @param date1 - The earlier date.
+	 * @param date2 - The later date.
+	 * @returns The number of days between the two dates.
+	 */
+	differenceInDays(date1: Date, date2: Date): number {
+		const diff = date2.getTime() - date1.getTime();
+		return diff / (1000 * 60 * 60 * 24);
+	}
+
+	/**
+	 * Calculates the difference in hours between two dates.
+	 *
+	 * @param date1 - The earlier date.
+	 * @param date2 - The later date.
+	 * @returns The number of hours between the two dates.
+	 */
+	differenceInHours(date1: Date, date2: Date): number {
+		const diff = date2.getTime() - date1.getTime();
+		return diff / (1000 * 60 * 60);
+	}
+
+	/**
+	 * Calculates the difference in minutes between two dates.
+	 *
+	 * @param date1 - The earlier date.
+	 * @param date2 - The later date.
+	 * @returns The number of minutes between the two dates.
+	 */
+	differenceInMinutes(date1: Date, date2: Date): number {
+		const diff = date2.getTime() - date1.getTime();
+		return diff / (1000 * 60);
+	}
+
+	/**
+	 * Checks if two dates are on the same day.
+	 *
+	 * @param date1 - The first date.
+	 * @param date2 - The second date.
+	 * @returns True if the dates are on the same day, false otherwise.
 	 */
 	isSameDay(date1: Date, date2: Date): boolean {
 		return (

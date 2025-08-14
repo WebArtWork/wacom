@@ -6,7 +6,7 @@ import {
 import { Inject, Injectable, Optional } from '@angular/core';
 import { EMPTY, Observable, ReplaySubject } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
-import { CONFIG_TOKEN, Config } from '../interfaces/config';
+import { CONFIG_TOKEN, Config } from '../interfaces/config.interface';
 import { StoreService } from './store.service';
 
 @Injectable({

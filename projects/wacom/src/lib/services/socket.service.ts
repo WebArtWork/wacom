@@ -1,5 +1,9 @@
 import { Inject, Injectable, Optional } from '@angular/core';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
+import {
+	CONFIG_TOKEN,
+	Config,
+	DEFAULT_CONFIG,
+} from '../interfaces/config.interface';
 import { CoreService } from './core.service';
 
 /* app.module.ts

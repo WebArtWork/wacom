@@ -1,6 +1,6 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { ModalComponent } from '../components/modal/modal.component';
-import { CONFIG_TOKEN, Config } from '../interfaces/config';
+import { CONFIG_TOKEN, Config } from '../interfaces/config.interface';
 import { Modal } from '../interfaces/modal.interface';
 import { DomService } from './dom.service';
 @Injectable({
@@ -14,7 +14,6 @@ export class ModalService {
 	) {
 		if (!this.config) this.config = {};
 		if (!this.config.modal) this.config.modal = {};
-		if (!this.config.modal.modals) this.config.modal.modals = {};
 		this._modal = config.modal;
 	}
 

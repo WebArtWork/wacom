@@ -1,6 +1,10 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
+import {
+	CONFIG_TOKEN,
+	Config,
+	DEFAULT_CONFIG,
+} from '../interfaces/config.interface';
 import { MetaService } from '../services/meta.service';
 
 @Injectable({ providedIn: 'root' })

@@ -1,5 +1,9 @@
 import { Inject, Injectable, Optional } from '@angular/core';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
+import {
+	CONFIG_TOKEN,
+	Config,
+	DEFAULT_CONFIG,
+} from '../interfaces/config.interface';
 
 @Injectable({
 	providedIn: 'root',
@@ -7,11 +11,9 @@ import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 export class StoreService {
 	private _prefix = '';
 
-        constructor(
-                @Inject(CONFIG_TOKEN) @Optional() private config: Config
-        ) {
-                this.config = this.config || DEFAULT_CONFIG;
-        }
+	constructor(@Inject(CONFIG_TOKEN) @Optional() private config: Config) {
+		this.config = this.config || DEFAULT_CONFIG;
+	}
 
 	/**
 	 * Sets the prefix for storage keys.
@@ -95,27 +97,27 @@ export class StoreService {
 		}
 	}
 
-        /**
-         * Gets a value from storage asynchronously.
-         *
-         * @param key - The storage key.
-         * @returns A promise that resolves to the retrieved value or `null` if the key is missing.
-         */
-        async getAsync(key: string): Promise<string | null> {
-                key = this.applyPrefix(key);
+	/**
+	 * Gets a value from storage asynchronously.
+	 *
+	 * @param key - The storage key.
+	 * @returns A promise that resolves to the retrieved value or `null` if the key is missing.
+	 */
+	async getAsync(key: string): Promise<string | null> {
+		key = this.applyPrefix(key);
 
-                try {
-                        if (this.config.store?.get) {
-                                const value = await this.config.store.get(key);
-                                return value ?? null;
-                        } else {
-                                return localStorage.getItem(key);
-                        }
-                } catch (err) {
-                        console.error(err);
-                        return null;
-                }
-        }
+		try {
+			if (this.config.store?.get) {
+				const value = await this.config.store.get(key);
+				return value ?? null;
+			} else {
+				return localStorage.getItem(key);
+			}
+		} catch (err) {
+			console.error(err);
+			return null;
+		}
+	}
 
 	/**
 	 * Sets a JSON value in storage.
@@ -177,18 +179,18 @@ export class StoreService {
 	 * @param key - The storage key.
 	 * @returns A promise that resolves to the retrieved value.
 	 */
-        async getJsonAsync<T = any>(key: string): Promise<T | null> {
-                const value = await this.getAsync(key);
-                if (value === null) {
-                        return null;
-                }
-                try {
-                        return JSON.parse(value);
-                } catch (err) {
-                        console.error(err);
-                        return null;
-                }
-        }
+	async getJsonAsync<T = any>(key: string): Promise<T | null> {
+		const value = await this.getAsync(key);
+		if (value === null) {
+			return null;
+		}
+		try {
+			return JSON.parse(value);
+		} catch (err) {
+			console.error(err);
+			return null;
+		}
+	}
 
 	/**
 	 * Removes a value from storage.
@@ -262,28 +264,28 @@ export class StoreService {
 		return key;
 	}
 
-        /**
-         * Checks if a value exists in storage.
-         *
-         * This function checks whether a value is present for the given key in the storage.
-         * It uses the configured storage mechanism if available; otherwise, it defaults to using `localStorage`.
-         *
-         * @param key - The storage key to check.
-         * @returns A promise that resolves to `true` if the value exists, otherwise `false`.
-         *
-         * @example
-         * const store = new StoreService(config, core);
-         *
-         * // Set a value and check if it exists
-         * await store.setAsync('exampleKey', 'exampleValue');
-         * const exists = await store.has('exampleKey');
-         * console.log(exists); // Output: true
-         *
-         * @notes
-         * - This method internally uses `getAsync` and checks only for `null`.
-         * - An empty string value will still return `true` as the key exists in storage.
-         */
-        async has(key: string): Promise<boolean> {
-                return (await this.getAsync(key)) !== null;
-        }
+	/**
+	 * Checks if a value exists in storage.
+	 *
+	 * This function checks whether a value is present for the given key in the storage.
+	 * It uses the configured storage mechanism if available; otherwise, it defaults to using `localStorage`.
+	 *
+	 * @param key - The storage key to check.
+	 * @returns A promise that resolves to `true` if the value exists, otherwise `false`.
+	 *
+	 * @example
+	 * const store = new StoreService(config, core);
+	 *
+	 * // Set a value and check if it exists
+	 * await store.setAsync('exampleKey', 'exampleValue');
+	 * const exists = await store.has('exampleKey');
+	 * console.log(exists); // Output: true
+	 *
+	 * @notes
+	 * - This method internally uses `getAsync` and checks only for `null`.
+	 * - An empty string value will still return `true` as the key exists in storage.
+	 */
+	async has(key: string): Promise<boolean> {
+		return (await this.getAsync(key)) !== null;
+	}
 }

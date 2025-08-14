@@ -6,7 +6,11 @@ import {
 } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from './interfaces/config';
+import {
+	CONFIG_TOKEN,
+	Config,
+	DEFAULT_CONFIG,
+} from './interfaces/config.interface';
 
 /* directives */
 import { ClickOutsideDirective } from './directives/click-outside.directive';

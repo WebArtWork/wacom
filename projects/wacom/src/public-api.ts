@@ -2,7 +2,7 @@
  *	Interfaces
  */
 export * from './lib/interfaces/alert.interface';
-export * from './lib/interfaces/config';
+export * from './lib/interfaces/config.interface';
 export * from './lib/interfaces/crud.interface';
 export * from './lib/interfaces/modal.interface';
 /*
@@ -58,8 +58,8 @@ export * from './lib/services/ui.service';
  *
  *	make different kind of modules, one which import all, other for piece by piece
  */
-export * from './lib/wacom.module';
 export * from './lib/provide-wacom';
+export * from './lib/wacom.module';
 /*
  *	End of Support
  */

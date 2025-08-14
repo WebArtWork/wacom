@@ -1,7 +1,5 @@
 import { InjectionToken } from '@angular/core';
-export interface Any {
-	[key: string]: string;
-}
+
 export interface Config {
 	meta?: {
 		useTitleSuffix?: boolean;
@@ -12,7 +10,6 @@ export interface Config {
 		} & { [key: string]: string | undefined };
 	};
 	alert?: {
-		alerts?: object;
 		text?: string;
 		type?: string;
 		icon?: string;
@@ -29,16 +26,9 @@ export interface Config {
 		timeout?: any;
 		timestart?: any;
 		class?: string;
-		modals?: object;
 		position?: string;
 		closable?: boolean;
 		unique?: string;
-	};
-	popup?: {
-		popups?: object;
-	};
-	loader?: {
-		loaders?: object;
 	};
 	socket?: any;
 	io?: any;

@@ -1,6 +1,6 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { LoaderComponent } from '../components/loader/loader.component';
-import { CONFIG_TOKEN, Config } from '../interfaces/config';
+import { CONFIG_TOKEN, Config } from '../interfaces/config.interface';
 import { DomService } from './dom.service';
 
 @Injectable({
