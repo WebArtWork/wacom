@@ -12,6 +12,18 @@ Module which has common services and components which can be used on all project
 $ npm i --save wacom
 ```
 
+## Usage
+
+```typescript
+import { provideWacom } from 'wacom';
+
+export const appConfig = {
+	providers: [provideWacom()]
+};
+```
+
+`WacomModule` is still available for older applications but will be deprecated in future versions. Use `provideWacom` to configure the library when working with standalone APIs.
+
 ## Services
 
 | Name                                                               |                             Description                             |

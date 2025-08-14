@@ -59,6 +59,7 @@ export * from './lib/services/ui.service';
  *	make different kind of modules, one which import all, other for piece by piece
  */
 export * from './lib/wacom.module';
+export * from './lib/provide-wacom';
 /*
  *	End of Support
  */
