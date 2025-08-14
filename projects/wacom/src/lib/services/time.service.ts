@@ -15,6 +15,21 @@ export class TimeService {
 		'Saturday',
 	];
 
+	private monthNames = [
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December',
+	];
+
 	constructor(private datePipe: DatePipe) {}
 
 	/**
@@ -30,6 +45,22 @@ export class TimeService {
 			? this.weekDays[dayIndex].substring(0, 3)
 			: this.weekDays[dayIndex];
 	}
+	/**
+	 * Returns the name of the month for a given index.
+	 *
+	 * @param monthIndex - The month index (0-11).
+	 * @param format - The format in which to return the month name. Default is 'long'.
+	 * @returns The name of the month.
+	 */
+	getMonthName(monthIndex: number, format: 'short' | 'long' = 'long'): string {
+		if (!Number.isInteger(monthIndex) || monthIndex < 0 || monthIndex > 11) {
+		        throw new RangeError('monthIndex must be an integer between 0 and 11');
+		}
+		return format === 'short'
+		        ? this.monthNames[monthIndex].substring(0, 3)
+		        : this.monthNames[monthIndex];
+	}
+
 
 	/**
 	 * Formats a date according to the specified format and timezone.
