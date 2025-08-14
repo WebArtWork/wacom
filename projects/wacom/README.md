@@ -1962,6 +1962,26 @@ const dayName = timeService.getDayName(new Date(), 'short');
 console.log(dayName); // Output: 'Mon'
 ```
 
+#### `getMonthName(monthIndex: number, format: 'short' | 'long' = 'long'): string`
+
+Returns the name of the month for a given index.
+
+**Parameters**:
+
+-   `monthIndex` (number): The month index (0-11).
+-   `format` ('short' | 'long'): The format in which to return the month name. Default is 'long'.
+
+**Returns**:
+
+-   The name of the month.
+
+**Example**:
+
+```Typescript
+const monthName = timeService.getMonthName(0, 'short');
+console.log(monthName); // Output: 'Jan'
+```
+
 #### `formatDate(date: Date, format: string = 'mediumDate', timezone: string = 'UTC'): string`
 
 Formats a date according to the specified format and timezone.
