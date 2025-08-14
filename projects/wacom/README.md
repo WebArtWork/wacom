@@ -905,7 +905,7 @@ Gets a value from storage.
 storeService.get('key', value => console.log(value), () => console.log('Error'));
 ```
 
-#### `getAsync(key: string): Promise<string>`
+#### `getAsync(key: string): Promise<string | null>`
 
 Gets a value from storage asynchronously.
 
@@ -915,7 +915,7 @@ Gets a value from storage asynchronously.
 
 **Returns**:
 
--   `Promise<string>`: A promise that resolves to the retrieved value.
+-   `Promise<string | null>`: A promise that resolves to the retrieved value or `null` if the key is missing.
 
 **Example**:
 
