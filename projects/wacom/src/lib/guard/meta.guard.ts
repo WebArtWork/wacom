@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { MetaService } from '../services/meta.service';
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class MetaGuard {
 	public static IDENTIFIER = 'MetaGuard';
 	private _meta: any;

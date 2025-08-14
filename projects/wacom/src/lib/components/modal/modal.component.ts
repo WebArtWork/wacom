@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
 	selector: 'lib-modal',
-	templateUrl: './modal.component.html',
-	styleUrls: ['./modal.component.scss'],
-	standalone: false,
+        templateUrl: './modal.component.html',
+        styleUrls: ['./modal.component.scss'],
+        standalone: true,
+        imports: [CommonModule],
 })
 export class ModalComponent implements OnInit {
 	class: string = '';

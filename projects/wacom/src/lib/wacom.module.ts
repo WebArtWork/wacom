@@ -22,12 +22,12 @@ import { SearchPipe } from './pipes/search.pipe';
 import { MongodatePipe } from './pipes/mongodate.pipe';
 import { PaginationPipe } from './pipes/pagination.pipe';
 const PIPES = [
-	ArrPipe,
-	SafePipe,
-	SplicePipe,
-	SearchPipe,
-	MongodatePipe,
-	PaginationPipe,
+        ArrPipe,
+        SafePipe,
+        SplicePipe,
+        SearchPipe,
+        MongodatePipe,
+        PaginationPipe,
 ];
 
 /* components */
@@ -40,15 +40,19 @@ const LOCAL_COMPONENTS = [WrapperComponent, FilesComponent];
 const COMPONENTS = [LoaderComponent, ModalComponent, AlertComponent];
 
 @NgModule({
-	declarations: [...LOCAL_COMPONENTS, ...PIPES, ...COMPONENTS, ...DIRECTIVES],
-	exports: [...PIPES, ...COMPONENTS, ...DIRECTIVES],
-	imports: [CommonModule, FormsModule],
-	providers: [
-		{ provide: CONFIG_TOKEN, useValue: DEFAULT_CONFIG },
-		MetaGuard,
-		MetaService,
-		provideHttpClient(withInterceptorsFromDi()),
-	],
+        imports: [
+                CommonModule,
+                FormsModule,
+                ...LOCAL_COMPONENTS,
+                ...PIPES,
+                ...COMPONENTS,
+                ...DIRECTIVES,
+        ],
+        exports: [...PIPES, ...COMPONENTS, ...DIRECTIVES],
+        providers: [
+                { provide: CONFIG_TOKEN, useValue: DEFAULT_CONFIG },
+                provideHttpClient(withInterceptorsFromDi()),
+        ],
 })
 export class WacomModule {
 	static forRoot(

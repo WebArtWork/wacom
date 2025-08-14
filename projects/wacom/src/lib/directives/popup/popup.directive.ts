@@ -29,9 +29,9 @@ export interface AdComponent {
 }
 
 @Directive({
-	selector: '[popup]',
-	exportAs: 'popup',
-	standalone: false,
+        selector: '[popup]',
+        exportAs: 'popup',
+        standalone: true,
 })
 export class PopupDirective {
 	hideTimeoutId: number;

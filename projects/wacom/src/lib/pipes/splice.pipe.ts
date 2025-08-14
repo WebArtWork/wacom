@@ -1,8 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-	name: 'splice',
-	standalone: false,
+        name: 'splice',
+        standalone: true,
 })
 export class SplicePipe implements PipeTransform {
 	transform(from: any, which: any, refresh?: number): any {

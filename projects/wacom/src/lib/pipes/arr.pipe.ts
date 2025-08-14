@@ -1,8 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-	name: 'arr',
-	standalone: false,
+        name: 'arr',
+        standalone: true,
 })
 export class ArrPipe implements PipeTransform {
 	transform(data: any, type?: any, refresh?: any): any {

@@ -5,8 +5,8 @@ import { Pipe, PipeTransform } from '@angular/core';
  *	Always returning an array, even if nothing is provided
  */
 @Pipe({
-	name: 'search',
-	standalone: false,
+        name: 'search',
+        standalone: true,
 })
 export class SearchPipe implements PipeTransform {
 	private c = 0;

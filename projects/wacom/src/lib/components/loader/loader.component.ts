@@ -1,10 +1,12 @@
 import { Component, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
 	selector: 'lib-loader',
-	templateUrl: './loader.component.html',
-	styleUrls: ['./loader.component.scss'],
-	standalone: false,
+        templateUrl: './loader.component.html',
+        styleUrls: ['./loader.component.scss'],
+        standalone: true,
+        imports: [CommonModule],
 })
 export class LoaderComponent {
 	@ViewChild('loader', { static: false }) loader: any;

@@ -1,13 +1,14 @@
 import {
-	Component,
-	ElementRef,
-	HostListener,
-	HostBinding,
-	Input,
-	OnInit,
-	EventEmitter,
-	Renderer2,
+        Component,
+        ElementRef,
+        HostListener,
+        HostBinding,
+        Input,
+        OnInit,
+        EventEmitter,
+        Renderer2,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { CoreService } from '../../services/core.service';
 
 @Component({
@@ -16,8 +17,9 @@ import { CoreService } from '../../services/core.service';
 	host: {
 		class: 'popup',
 	},
-	styleUrls: ['./popup.component.sass'],
-	standalone: false,
+        styleUrls: ['./popup.component.sass'],
+        standalone: true,
+        imports: [CommonModule],
 })
 export class PopupComponent {
 	_show: boolean = false;
