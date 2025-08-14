@@ -5,7 +5,7 @@ export interface MetaDefaults {
 	[key: string]: string | Record<string, string> | undefined;
 }
 
-export interface Meta {
+export interface MetaConfig {
 	useTitleSuffix?: boolean;
 	warnMissingGuard?: boolean;
 	defaults?: MetaDefaults;

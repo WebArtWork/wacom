@@ -6,10 +6,7 @@ import {
 	Config,
 	DEFAULT_CONFIG,
 } from '../interfaces/config.interface';
-import {
-	MetaDefaults,
-	Meta as MetaInterface,
-} from '../interfaces/meta.interface';
+import { MetaConfig, MetaDefaults } from '../interfaces/meta.interface';
 
 const isDefined = (val: any) => typeof val !== 'undefined';
 
@@ -17,7 +14,7 @@ const isDefined = (val: any) => typeof val !== 'undefined';
 	providedIn: 'root',
 })
 export class MetaService {
-	private _meta: MetaInterface;
+	private _meta: MetaConfig;
 
 	constructor(
 		private router: Router,
