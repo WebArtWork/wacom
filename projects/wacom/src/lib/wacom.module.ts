@@ -52,6 +52,9 @@ const COMPONENTS = [LoaderComponent, ModalComponent, AlertComponent];
 		provideHttpClient(withInterceptorsFromDi()),
 	],
 })
+/**
+ * @deprecated Use provideWacom instead.
+ */
 export class WacomModule {
 	static forRoot(
 		config: Config = DEFAULT_CONFIG
