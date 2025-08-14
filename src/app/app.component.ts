@@ -1,11 +1,15 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { StoreService, ModalService, UiService, AlertService } from 'wacom';
 import { LocalComponent } from './modals/local/local.component';
+import { CoreComponent } from './doc/service/core/core.component';
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    standalone: false
+    standalone: true,
+    imports: [CommonModule, FormsModule, CoreComponent]
 })
 export class AppComponent {
 	public password = '';
