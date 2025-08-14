@@ -1180,7 +1180,7 @@ The `MetaService` manages meta tags and titles in an Angular application. It all
 
 #### `setDefaults(defaults: { [key: string]: string }): void`
 
-Sets the default meta tags.
+Sets the default meta tags, merging the provided values with any existing defaults.
 
 **Parameters**:
 
@@ -1190,6 +1190,8 @@ Sets the default meta tags.
 
 ```Typescript
 metaService.setDefaults({ title: 'Default Title', description: 'Default Description' });
+// Later calls merge with previous defaults instead of replacing them
+metaService.setDefaults({ description: 'Updated Description' });
 ```
 
 #### `setTitle(title?: string, titleSuffix?: string): MetaService`

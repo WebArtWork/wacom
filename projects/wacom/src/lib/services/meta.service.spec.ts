@@ -34,3 +34,21 @@ test('warns when nested child route lacks MetaGuard', () => {
   assert.ok(warnings.some(w => w.includes('Route with path "child"')), 'should warn for child route');
   assert.ok(warnings.some(w => w.includes('To disable these warnings')), 'should show disable message');
 });
+
+test('setDefaults merges new defaults with existing ones', () => {
+  const router: any = { config: [] };
+  const meta: any = { updateTag() {}, removeTag() {} };
+  const title: any = { setTitle() {} };
+  const config: Config = {
+    meta: { warnMissingGuard: false, defaults: { title: 'Old', description: 'Old' } },
+  };
+  const service = new MetaService(router, meta, title, config);
+
+  service.setDefaults({ description: 'New', extra: 'value' });
+
+  assert.deepStrictEqual((service as any)._meta.defaults, {
+    title: 'Old',
+    description: 'New',
+    extra: 'value',
+  });
+});
