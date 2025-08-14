@@ -6,13 +6,6 @@ import {
 } from '../interfaces/config.interface';
 import { CoreService } from './core.service';
 
-/* app.module.ts
-import * as io from 'socket.io-client';
-WacomModule.forRoot({
-	io
-)
- */
-
 @Injectable({
 	providedIn: 'root',
 })
