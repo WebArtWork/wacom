@@ -9,15 +9,16 @@ import { MetaService } from '../services/meta.service';
 
 @Injectable({ providedIn: 'root' })
 export class MetaGuard {
-	public static IDENTIFIER = 'MetaGuard';
-	private _meta: any;
-	public constructor(
-		private metaService: MetaService,
-		@Inject(CONFIG_TOKEN) @Optional() private config: Config
-	) {
-		this._meta = config.meta;
-		if (!this.config) this.config = DEFAULT_CONFIG;
-	}
+        public static IDENTIFIER = 'MetaGuard';
+        private _meta: any;
+        public constructor(
+                private metaService: MetaService,
+                @Inject(CONFIG_TOKEN) @Optional() private config: Config
+        ) {
+                if (!this.config) this.config = DEFAULT_CONFIG;
+                this._meta = this.config.meta || {};
+                this._meta.defaults = this._meta.defaults || {};
+        }
 	public canActivate(
 		route: ActivatedRouteSnapshot,
 		state: RouterStateSnapshot
