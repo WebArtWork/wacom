@@ -16,19 +16,15 @@ export class SocketService {
 
 	private _connected = false;
 
-	private _opts: any = {};
+        private _opts: any = {};
 
-	constructor(
-		@Inject(CONFIG_TOKEN) @Optional() private _config: Config,
-		private _core: CoreService
-	) {
-		if (!this._config.io) {
-			return;
-		}
+        constructor(
+                @Inject(CONFIG_TOKEN) @Optional() private _config: Config,
+                private _core: CoreService
+        ) {
+                this._url = window.location.origin.replace('4200', '8080');
 
-		this._url = window.location.origin.replace('4200', '8080');
-
-		if (!this._config) this._config = DEFAULT_CONFIG;
+                if (!this._config) this._config = DEFAULT_CONFIG;
 
 		if (typeof this._config.socket === 'object') {
 			if (this._config.socket.url) {
@@ -62,20 +58,32 @@ export class SocketService {
 	/**
 	 * Loads and initializes the WebSocket connection.
 	 */
-	private load(): void {
-		if (this._config.io) {
-			const ioFunc = this._config.io.default
-				? this._config.io.default
-				: this._config.io;
+        private async load(): Promise<void> {
+                const init = (ioFunc: any) => {
+                        this._io = ioFunc(this._url, this._opts);
 
-			this._io = ioFunc(this._url, this._opts);
+                        this._io.on('connect', () => {
+                                this._connected = true;
+                                this._core.complete('socket');
+                        });
+                };
 
-			this._io.on('connect', () => {
-				this._connected = true;
-				this._core.complete('socket');
-			});
-		}
-	}
+                if (this._config.io) {
+                        const ioFunc = this._config.io.default
+                                ? this._config.io.default
+                                : this._config.io;
+                        init(ioFunc);
+                        return;
+                }
+
+                try {
+                        const mod: any = await import('socket.io-client');
+                        const ioFunc = mod.default ? mod.default : mod;
+                        init(ioFunc);
+                } catch (err) {
+                        console.warn('Failed to load socket.io client', err);
+                }
+        }
 
 	/**
 	 * Subscribes to a WebSocket event.
@@ -83,18 +91,23 @@ export class SocketService {
 	 * @param cb - The callback function to execute when the event is received.
 	 */
 	on(to: string, cb: (message: any) => void = () => {}): void {
-		if (!this._config.socket) {
-			return;
-		}
+                if (!this._config.socket) {
+                        return;
+                }
 
-		if (!this._connected) {
-			setTimeout(() => {
-				this.on(to, cb);
-			}, 100);
-			return;
-		}
+                if (!this._io) {
+                        console.warn('Socket client not loaded.');
+                        return;
+                }
 
-		this._io.on(to, cb);
+                if (!this._connected) {
+                        setTimeout(() => {
+                                this.on(to, cb);
+                        }, 100);
+                        return;
+                }
+
+                this._io.on(to, cb);
 	}
 
 	/**
@@ -104,17 +117,22 @@ export class SocketService {
 	 * @param room - Optional room to emit the message to.
 	 */
 	emit(to: string, message: any, room: any = false): void {
-		if (!this._config.socket) {
-			return;
-		}
+                if (!this._config.socket) {
+                        return;
+                }
 
-		if (!this._connected) {
-			setTimeout(() => {
-				this.emit(to, message, room);
-			}, 100);
-			return;
-		}
+                if (!this._io) {
+                        console.warn('Socket client not loaded.');
+                        return;
+                }
 
-		this._io.emit(to, message, room);
-	}
+                if (!this._connected) {
+                        setTimeout(() => {
+                                this.emit(to, message, room);
+                        }, 100);
+                        return;
+                }
+
+                this._io.emit(to, message, room);
+        }
 }
