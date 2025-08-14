@@ -2132,6 +2132,66 @@ const newDate = timeService.addYears(new Date(), 5);
 console.log(newDate);
 ```
 
+#### `addHours(date: Date, hours: number): Date`
+
+Adds a specified number of hours to a date.
+
+**Parameters**:
+
+-   `date` (Date): The date to which to add hours.
+-   `hours` (number): The number of hours to add.
+
+**Returns**:
+
+-   The new date with the added hours.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.addHours(new Date(), 3);
+console.log(newDate);
+```
+
+#### `addMinutes(date: Date, minutes: number): Date`
+
+Adds a specified number of minutes to a date.
+
+**Parameters**:
+
+-   `date` (Date): The date to which to add minutes.
+-   `minutes` (number): The number of minutes to add.
+
+**Returns**:
+
+-   The new date with the added minutes.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.addMinutes(new Date(), 30);
+console.log(newDate);
+```
+
+#### `addSeconds(date: Date, seconds: number): Date`
+
+Adds a specified number of seconds to a date.
+
+**Parameters**:
+
+-   `date` (Date): The date to which to add seconds.
+-   `seconds` (number): The number of seconds to add.
+
+**Returns**:
+
+-   The new date with the added seconds.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.addSeconds(new Date(), 45);
+console.log(newDate);
+```
+
 #### `subtractDays(date: Date, days: number): Date`
 
 Subtracts a specified number of days from a date.
@@ -2186,6 +2246,66 @@ Subtracts a specified number of years from a date.
 
 ```Typescript
 const newDate = timeService.subtractYears(new Date(), 2);
+console.log(newDate);
+```
+
+#### `subtractHours(date: Date, hours: number): Date`
+
+Subtracts a specified number of hours from a date.
+
+**Parameters**:
+
+-   `date` (Date): The date from which to subtract hours.
+-   `hours` (number): The number of hours to subtract.
+
+**Returns**:
+
+-   The new date with the subtracted hours.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.subtractHours(new Date(), 4);
+console.log(newDate);
+```
+
+#### `subtractMinutes(date: Date, minutes: number): Date`
+
+Subtracts a specified number of minutes from a date.
+
+**Parameters**:
+
+-   `date` (Date): The date from which to subtract minutes.
+-   `minutes` (number): The number of minutes to subtract.
+
+**Returns**:
+
+-   The new date with the subtracted minutes.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.subtractMinutes(new Date(), 15);
+console.log(newDate);
+```
+
+#### `subtractSeconds(date: Date, seconds: number): Date`
+
+Subtracts a specified number of seconds from a date.
+
+**Parameters**:
+
+-   `date` (Date): The date from which to subtract seconds.
+-   `seconds` (number): The number of seconds to subtract.
+
+**Returns**:
+
+-   The new date with the subtracted seconds.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.subtractSeconds(new Date(), 20);
 console.log(newDate);
 ```
 

@@ -137,9 +137,48 @@ export class TimeService {
 	 * @returns The new date with the added years.
 	 */
 	addYears(date: Date, years: number): Date {
-		const newDate = new Date(date);
-		newDate.setFullYear(newDate.getFullYear() + years);
-		return newDate;
+	        const newDate = new Date(date);
+	        newDate.setFullYear(newDate.getFullYear() + years);
+	        return newDate;
+	}
+
+	/**
+	* Adds a specified number of hours to a date.
+	*
+	* @param date - The date to which to add hours.
+	* @param hours - The number of hours to add.
+	* @returns The new date with the added hours.
+	*/
+	addHours(date: Date, hours: number): Date {
+	       const newDate = new Date(date);
+	       newDate.setHours(newDate.getHours() + hours);
+	       return newDate;
+	}
+
+	/**
+	* Adds a specified number of minutes to a date.
+	*
+	* @param date - The date to which to add minutes.
+	* @param minutes - The number of minutes to add.
+	* @returns The new date with the added minutes.
+	*/
+	addMinutes(date: Date, minutes: number): Date {
+	       const newDate = new Date(date);
+	       newDate.setMinutes(newDate.getMinutes() + minutes);
+	       return newDate;
+	}
+
+	/**
+	* Adds a specified number of seconds to a date.
+	*
+	* @param date - The date to which to add seconds.
+	* @param seconds - The number of seconds to add.
+	* @returns The new date with the added seconds.
+	*/
+	addSeconds(date: Date, seconds: number): Date {
+	       const newDate = new Date(date);
+	       newDate.setSeconds(newDate.getSeconds() + seconds);
+	       return newDate;
 	}
 
 	/**
@@ -172,7 +211,40 @@ export class TimeService {
 	 * @returns The new date with the subtracted years.
 	 */
 	subtractYears(date: Date, years: number): Date {
-		return this.addYears(date, -years);
+	       return this.addYears(date, -years);
+	}
+
+	/**
+	* Subtracts a specified number of hours from a date.
+	*
+	* @param date - The date from which to subtract hours.
+	* @param hours - The number of hours to subtract.
+	* @returns The new date with the subtracted hours.
+	*/
+	subtractHours(date: Date, hours: number): Date {
+	       return this.addHours(date, -hours);
+	}
+
+	/**
+	* Subtracts a specified number of minutes from a date.
+	*
+	* @param date - The date from which to subtract minutes.
+	* @param minutes - The number of minutes to subtract.
+	* @returns The new date with the subtracted minutes.
+	*/
+	subtractMinutes(date: Date, minutes: number): Date {
+	       return this.addMinutes(date, -minutes);
+	}
+
+	/**
+	* Subtracts a specified number of seconds from a date.
+	*
+	* @param date - The date from which to subtract seconds.
+	* @param seconds - The number of seconds to subtract.
+	* @returns The new date with the subtracted seconds.
+	*/
+	subtractSeconds(date: Date, seconds: number): Date {
+	       return this.addSeconds(date, -seconds);
 	}
 
 	/**
