@@ -1,10 +1,10 @@
 import {
-	ApplicationRef,
-	ComponentFactoryResolver,
-	ComponentRef,
-	EmbeddedViewRef,
-	Injectable,
-	Injector,
+        ApplicationRef,
+        ComponentRef,
+        EmbeddedViewRef,
+        EnvironmentInjector,
+        Injectable,
+        createComponent,
 } from '@angular/core';
 
 @Injectable({
@@ -13,11 +13,10 @@ import {
 export class DomService {
 	private providedIn: Record<string, boolean> = {};
 
-	constructor(
-		private componentFactoryResolver: ComponentFactoryResolver,
-		private appRef: ApplicationRef,
-		private injector: Injector
-	) {}
+        constructor(
+                private appRef: ApplicationRef,
+                private injector: EnvironmentInjector
+        ) {}
 
 	/**
 	 * Appends a component to a specified element by ID.
@@ -32,9 +31,9 @@ export class DomService {
 		options: any = {},
 		id: string
 	): { nativeElement: HTMLElement; componentRef: ComponentRef<any> } {
-		const componentRef = this.componentFactoryResolver
-			.resolveComponentFactory(component)
-			.create(this.injector);
+                const componentRef = createComponent(component, {
+                        environmentInjector: this.injector,
+                });
 
 		this.projectComponentInputs(componentRef, options);
 		this.appRef.attachView(componentRef.hostView);
@@ -70,9 +69,9 @@ export class DomService {
 			this.providedIn[options.providedIn] = true;
 		}
 
-		const componentRef = this.componentFactoryResolver
-			.resolveComponentFactory(component)
-			.create(this.injector);
+                const componentRef = createComponent(component, {
+                        environmentInjector: this.injector,
+                });
 		this.projectComponentInputs(componentRef, options);
 		this.appRef.attachView(componentRef.hostView);
 		const domElem = (componentRef.hostView as EmbeddedViewRef<any>)
@@ -94,9 +93,9 @@ export class DomService {
 	 * @returns The component reference.
 	 */
 	getComponentRef(component: any, options: any = {}): ComponentRef<any> {
-		const componentRef = this.componentFactoryResolver
-			.resolveComponentFactory(component)
-			.create(this.injector);
+                const componentRef = createComponent(component, {
+                        environmentInjector: this.injector,
+                });
 
 		this.projectComponentInputs(componentRef, options);
 		this.appRef.attachView(componentRef.hostView);
