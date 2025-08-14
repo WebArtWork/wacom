@@ -32,16 +32,15 @@ export class MetaGuard {
 		if (meta.title) {
 			this.metaService.setTitle(meta.title, meta.titleSuffix);
 		}
-		if (Array.isArray(meta.links)) {
-			this.metaService.setLink(meta.links);
-		} else if (typeof meta.links === 'string') {
-			this.metaService.setLink(meta.links.split(' '));
-		}
-		if (Array.isArray(this._meta.defaults?.links)) {
-			this.metaService.setLink(this._meta.defaults?.links);
-		} else if (typeof this._meta.defaults?.links === 'string') {
-			this.metaService.setLink(this._meta.defaults?.links.split(' '));
-		}
+                if (meta.links && Object.keys(meta.links).length) {
+                        this.metaService.setLink(meta.links);
+                }
+                if (
+                        this._meta.defaults?.links &&
+                        Object.keys(this._meta.defaults.links).length
+                ) {
+                        this.metaService.setLink(this._meta.defaults.links);
+                }
 		Object.keys(meta).forEach((prop) => {
 			if (
 				prop === 'title' ||
@@ -63,7 +62,10 @@ export class MetaGuard {
 			) {
 				return;
 			}
-			this.metaService.setTag(key, this._meta.defaults[key]);
-		});
-	}
+                        this.metaService.setTag(
+                                key,
+                                this._meta.defaults[key] as string
+                        );
+                });
+        }
 }

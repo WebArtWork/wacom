@@ -1,14 +1,18 @@
 import { InjectionToken } from '@angular/core';
 
+export interface MetaDefaults {
+        title?: string;
+        titleSuffix?: string;
+        links?: Record<string, string>;
+        [key: string]: string | Record<string, string> | undefined;
+}
+
 export interface Config {
-	meta?: {
-		useTitleSuffix?: boolean;
-		warnMissingGuard?: boolean;
-		defaults?: {
-			title?: string;
-			titleSuffix?: string;
-		} & { [key: string]: string | undefined };
-	};
+        meta?: {
+                useTitleSuffix?: boolean;
+                warnMissingGuard?: boolean;
+                defaults?: MetaDefaults;
+        };
 	alert?: {
 		text?: string;
 		type?: string;
@@ -59,15 +63,15 @@ export interface Config {
 }
 export const CONFIG_TOKEN = new InjectionToken<Config>('config');
 export const DEFAULT_CONFIG: Config = {
-	meta: {
-		useTitleSuffix: false,
-		warnMissingGuard: true,
-		defaults: {},
-	},
-	socket: false,
-	http: {
-		url: '',
-		headers: {},
+        meta: {
+                useTitleSuffix: false,
+                warnMissingGuard: true,
+                defaults: { links: {} },
+        },
+        socket: false,
+        http: {
+                url: '',
+                headers: {},
 	},
 	store: {
 		prefix: '',

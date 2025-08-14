@@ -2,9 +2,10 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Route, Router } from '@angular/router';
 import {
-	CONFIG_TOKEN,
-	Config,
-	DEFAULT_CONFIG,
+        CONFIG_TOKEN,
+        Config,
+        DEFAULT_CONFIG,
+        MetaDefaults,
 } from '../interfaces/config.interface';
 
 const isDefined = (val: any) => typeof val !== 'undefined';
@@ -31,9 +32,9 @@ export class MetaService {
 	 *
 	 * @param defaults - The default meta tags.
 	 */
-	setDefaults(defaults: { [key: string]: string }): void {
-		this._meta.defaults = defaults;
-	}
+        setDefaults(defaults: MetaDefaults): void {
+                this._meta.defaults = defaults;
+        }
 
 	/**
 	 * Sets the title and optional title suffix.
