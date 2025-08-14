@@ -50,13 +50,13 @@ export class MetaService {
 			titleContent += isDefined(titleSuffix)
 				? titleSuffix
 				: this._meta.defaults['titleSuffix'] || '';
-                }
-                this._updateMetaTag('title', titleContent);
-                this._updateMetaTag('og:title', titleContent);
-                this._updateMetaTag('twitter:title', titleContent);
-                this.titleService.setTitle(titleContent);
-                return this;
-        }
+		}
+		this._updateMetaTag('title', titleContent);
+		this._updateMetaTag('og:title', titleContent);
+		this._updateMetaTag('twitter:title', titleContent);
+		this.titleService.setTitle(titleContent);
+		return this;
+	}
 
 	/**
 	 * Sets link tags.
