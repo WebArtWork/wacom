@@ -114,6 +114,112 @@ export class TimeService {
 	}
 
 	/**
+	 * Returns the start of the week for a given date.
+	 *
+	 * @param date - The date for which to get the start of the week.
+	 * @param locale - A BCP 47 language tag to determine the first day of the week. Defaults to the runtime locale.
+	 * @returns The start of the week adjusted for the locale.
+	 *
+	 * @example
+	 * const date = new Date('2024-05-15');
+	 * service.startOfWeek(date); // => Monday May 13 2024 00:00:00 for en-GB
+	 */
+	startOfWeek(date: Date, locale?: string): Date {
+		const newDate = this.startOfDay(date);
+		const dtf = new Intl.DateTimeFormat(locale);
+		const resolved = dtf.resolvedOptions().locale;
+		const region = resolved.split('-')[1]?.toUpperCase();
+		const sundayFirst = ['US', 'CA', 'AU', 'NZ', 'PH', 'BR'];
+		const firstDay = sundayFirst.includes(region) ? 0 : 1;
+		const day = newDate.getDay();
+		const diff = (day - firstDay + 7) % 7;
+		newDate.setDate(newDate.getDate() - diff);
+		return newDate;
+	}
+		
+	/**
+	 * Returns the end of the week for a given date.
+	 *
+	 * @param date - The date for which to get the end of the week.
+	 * @param locale - A BCP 47 language tag to determine the first day of the week. Defaults to the runtime locale.
+	 * @returns The end of the week adjusted for the locale.
+	 *
+	 * @example
+	 * const date = new Date('2024-05-15');
+	 * service.endOfWeek(date); // => Sunday May 19 2024 23:59:59.999 for en-GB
+	 */
+	endOfWeek(date: Date, locale?: string): Date {
+		const start = this.startOfWeek(date, locale);
+		const end = this.addDays(start, 6);
+		return this.endOfDay(end);
+	}
+		
+	/**
+	 * Returns the start of the month for a given date.
+	 *
+	 * @param date - The date for which to get the start of the month.
+	 * @returns The start of the month.
+	 *
+	 * @example
+	 * const date = new Date('2024-05-15');
+	 * service.startOfMonth(date); // => May 1 2024 00:00:00
+	 */
+	startOfMonth(date: Date): Date {
+		const newDate = this.startOfDay(date);
+		newDate.setDate(1);
+		return newDate;
+	}
+		
+	/**
+	 * Returns the end of the month for a given date.
+	 *
+	 * @param date - The date for which to get the end of the month.
+	 * @returns The end of the month.
+	 *
+	 * @example
+	 * const date = new Date('2024-05-15');
+	 * service.endOfMonth(date); // => May 31 2024 23:59:59.999
+	 */
+	endOfMonth(date: Date): Date {
+		const start = this.startOfMonth(date);
+		const end = new Date(start);
+		end.setMonth(end.getMonth() + 1);
+		end.setDate(0);
+		return this.endOfDay(end);
+	}
+		
+	/**
+	 * Returns the start of the year for a given date.
+	 *
+	 * @param date - The date for which to get the start of the year.
+	 * @returns The start of the year.
+	 *
+	 * @example
+	 * const date = new Date('2024-05-15');
+	 * service.startOfYear(date); // => Jan 1 2024 00:00:00
+	 */
+	startOfYear(date: Date): Date {
+		const newDate = this.startOfDay(date);
+		newDate.setMonth(0, 1);
+		return newDate;
+	}
+		
+	/**
+	 * Returns the end of the year for a given date.
+	 *
+	 * @param date - The date for which to get the end of the year.
+	 * @returns The end of the year.
+	 *
+	 * @example
+	 * const date = new Date('2024-05-15');
+	 * service.endOfYear(date); // => Dec 31 2024 23:59:59.999
+	 */
+	endOfYear(date: Date): Date {
+		const end = new Date(date.getFullYear(), 11, 31);
+		return this.endOfDay(end);
+	}
+
+	/**
 	 * Returns the number of days in a given month and year.
 	 *
 	 * @param month - The month (0-11).
