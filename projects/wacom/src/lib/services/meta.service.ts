@@ -5,6 +5,7 @@ import {
 	CONFIG_TOKEN,
 	Config,
 	DEFAULT_CONFIG,
+	MetaDefaults,
 } from '../interfaces/config.interface';
 
 const isDefined = (val: any) => typeof val !== 'undefined';
@@ -26,17 +27,17 @@ export class MetaService {
 		this._warnMissingGuard();
 	}
 
-        /**
-         * Sets the default meta tags.
-         *
-         * @param defaults - The default meta tags.
-         */
-        setDefaults(defaults: { [key: string]: string }): void {
-                this._meta.defaults = {
-                        ...this._meta.defaults,
-                        ...defaults,
-                };
-        }
+	/**
+	 * Sets the default meta tags.
+	 *
+	 * @param defaults - The default meta tags.
+	 */
+	setDefaults(defaults: MetaDefaults) {
+		this._meta.defaults = {
+			...this._meta.defaults,
+			...defaults,
+		};
+	}
 
 	/**
 	 * Sets the title and optional title suffix.

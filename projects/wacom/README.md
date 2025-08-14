@@ -1178,13 +1178,13 @@ The `MetaService` manages meta tags and titles in an Angular application. It all
 
 ### Methods
 
-#### `setDefaults(defaults: { [key: string]: string }): void`
+#### `setDefaults(defaults: MetaDefaults): void`
 
 Sets the default meta tags, merging the provided values with any existing defaults.
 
 **Parameters**:
 
--   `defaults` (object): The default meta tags.
+-   `defaults` (object): The default meta tags including optional `links`.
 
 **Example**:
 
