@@ -82,11 +82,11 @@ export class MetaService {
 	 * @returns The MetaService instance.
 	 */
 	setTag(tag: string, value: string, prop?: string): MetaService {
-		if (tag === 'title' || tag === 'titleSuffix') {
-			throw new Error(
-				`Attempt to set ${tag} through 'setTag': 'title' and 'titleSuffix' are reserved tag names. Please use 'MetaService.setTitle' instead`
-			);
-		}
+                if (tag === 'title' || tag === 'titleSuffix') {
+                        throw new Error(
+                                `Attempt to set ${tag} through 'setTag': 'title' and 'titleSuffix' are reserved. Use 'MetaService.setTitle' instead.`
+                        );
+                }
 		const content = isDefined(value)
 			? value
 			: this._meta.defaults[tag] || '';
