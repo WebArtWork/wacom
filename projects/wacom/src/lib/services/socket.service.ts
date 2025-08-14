@@ -66,31 +66,48 @@ export class SocketService {
 	/**
 	 * Loads and initializes the WebSocket connection.
 	 */
-	private async load(): Promise<void> {
-		const init = (ioFunc: any) => {
+	private load(): void {
+		if (this._config.io) {
+			const ioFunc = this._config.io.default
+				? this._config.io.default
+				: this._config.io;
+
 			this._io = ioFunc(this._url, this._opts);
 
 			this._io.on('connect', () => {
 				this._connected = true;
 				this._core.complete('socket');
 			});
-		};
 
-		if (this._config.io) {
-			const ioFunc = this._config.io.default
-				? this._config.io.default
-				: this._config.io;
-			init(ioFunc);
-			return;
+			this._io.on('disconnect', (reason: any) => {
+				this._connected = false;
+				if (this._core && typeof this._core.emit === 'function') {
+					this._core.emit('socket_disconnect', reason);
+				} else {
+					console.warn('Socket disconnected', reason);
+				}
+			});
+
+			this._io.on('error', (err: any) => {
+				this._connected = false;
+				if (this._core && typeof this._core.emit === 'function') {
+					this._core.emit('socket_error', err);
+				} else {
+					console.warn('Socket error', err);
+				}
+			});
+		}
+	}
+
+	/**
+	 * Disconnects the WebSocket connection and resets the connection state.
+	 */
+	disconnect(): void {
+		if (this._io) {
+			this._io.disconnect();
 		}
 
-		try {
-			const mod: any = await import('socket.io-client');
-			const ioFunc = mod.default ? mod.default : mod;
-			init(ioFunc);
-		} catch (err) {
-			console.warn('Failed to load socket.io client', err);
-		}
+		this._connected = false;
 	}
 
 	/**
