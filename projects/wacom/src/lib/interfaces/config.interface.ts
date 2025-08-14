@@ -1,5 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { Meta } from './meta.interface';
+import { FirebaseConfig } from './firebase.interface';
 
 export interface Config {
 	meta?: Meta;
@@ -15,7 +16,7 @@ export interface Config {
 		close?: any;
 		buttons?: any;
 	};
-	modal?: {
+        modal?: {
 		size?: any;
 		timeout?: any;
 		timestart?: any;
@@ -23,10 +24,12 @@ export interface Config {
 		position?: string;
 		closable?: boolean;
 		unique?: string;
-	};
-	socket?: any;
-	io?: any;
-	http?: {
+        };
+        socket?: any;
+        io?: any;
+        firebase?: FirebaseConfig | boolean;
+        fb?: any;
+        http?: {
 		headers?: any;
 		url?: string;
 	};
@@ -57,9 +60,10 @@ export const DEFAULT_CONFIG: Config = {
 		useTitleSuffix: false,
 		warnMissingGuard: true,
 		defaults: { links: {} },
-	},
-	socket: false,
-	http: {
+        },
+        socket: false,
+        firebase: false,
+        http: {
 		url: '',
 		headers: {},
 	},

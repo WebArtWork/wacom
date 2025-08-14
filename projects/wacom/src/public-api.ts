@@ -5,6 +5,7 @@ export * from './lib/interfaces/alert.interface';
 export * from './lib/interfaces/config.interface';
 export * from './lib/interfaces/crud.interface';
 export * from './lib/interfaces/modal.interface';
+export * from './lib/interfaces/firebase.interface';
 /*
  *	Guard
  */
@@ -41,6 +42,7 @@ export * from './lib/services/core.service';
 export * from './lib/services/crud.service';
 export * from './lib/services/dom.service';
 export * from './lib/services/file.service';
+export * from './lib/services/firebase.service';
 export * from './lib/services/http.service';
 export * from './lib/services/loader.service';
 export * from './lib/services/meta.service';
