@@ -1,6 +1,5 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
-import { CoreService } from './core.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -8,12 +7,11 @@ import { CoreService } from './core.service';
 export class StoreService {
 	private _prefix = '';
 
-	constructor(
-		@Inject(CONFIG_TOKEN) @Optional() private config: Config,
-		private core: CoreService
-	) {
-		this.config = this.config || DEFAULT_CONFIG;
-	}
+        constructor(
+                @Inject(CONFIG_TOKEN) @Optional() private config: Config
+        ) {
+                this.config = this.config || DEFAULT_CONFIG;
+        }
 
 	/**
 	 * Sets the prefix for storage keys.
