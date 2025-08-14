@@ -1,25 +1,22 @@
 import {
+	ApplicationRef,
+	ComponentFactoryResolver,
 	Directive,
 	ElementRef,
-	HostListener,
-	Input,
-	ComponentFactoryResolver,
 	EmbeddedViewRef,
-	ApplicationRef,
-	Injector,
-	ComponentRef,
-	OnInit,
-	Output,
 	EventEmitter,
-	OnDestroy,
+	HostListener,
 	Inject,
+	Injector,
+	Input,
 	Optional,
+	Output,
 } from '@angular/core';
-import { PopupComponent } from './popup.component';
-import { PopupOptionsService } from './popup-options.service';
-import { defaultOptions, backwardCompatibilityOptions } from './options';
-import { PopupOptions } from './popup-options.interface';
 import { CoreService } from '../../services/core.service';
+import { backwardCompatibilityOptions, defaultOptions } from './options';
+import { PopupOptions } from './popup-options.interface';
+import { PopupOptionsService } from './popup-options.service';
+import { PopupComponent } from './popup.component';
 
 export interface AdComponent {
 	data: any;
@@ -29,9 +26,9 @@ export interface AdComponent {
 }
 
 @Directive({
-        selector: '[popup]',
-        exportAs: 'popup',
-        standalone: true,
+	selector: '[popup]',
+	exportAs: 'popup',
+	standalone: true,
 })
 export class PopupDirective {
 	hideTimeoutId: number;

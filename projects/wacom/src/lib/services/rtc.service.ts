@@ -25,7 +25,7 @@ export class RtcService {
 		if (!this.localStream) {
 			this.localStream = await navigator.mediaDevices.getUserMedia({
 				video: true,
-				audio: true
+				audio: true,
 			});
 		}
 
@@ -125,4 +125,3 @@ export class RtcService {
 		this.localStream = null;
 	}
 }
-

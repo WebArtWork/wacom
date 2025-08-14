@@ -1,12 +1,12 @@
 import {
-	Injectable,
 	Inject,
+	Injectable,
 	PLATFORM_ID,
 	Signal,
 	WritableSignal,
 	signal,
 } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Selectitem } from '../interfaces/select.item.interface';
 
 // Add capitalize method to String prototype if it doesn't already exist

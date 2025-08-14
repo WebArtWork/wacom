@@ -1,12 +1,12 @@
-import { Injectable, Inject, Optional } from '@angular/core';
-import { CONFIG_TOKEN, Config } from '../interfaces/config';
 import {
 	HttpClient,
 	HttpErrorResponse,
 	HttpHeaders,
 } from '@angular/common/http';
+import { Inject, Injectable, Optional } from '@angular/core';
 import { EMPTY, Observable, ReplaySubject } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
+import { CONFIG_TOKEN, Config } from '../interfaces/config';
 import { StoreService } from './store.service';
 
 @Injectable({

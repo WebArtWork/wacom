@@ -1,5 +1,3 @@
-import { InjectionToken } from '@angular/core';
-
 export interface Alert {
 	onClose?: any;
 	alerts?: object;

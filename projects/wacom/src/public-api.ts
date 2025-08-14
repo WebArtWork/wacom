@@ -1,10 +1,10 @@
 /*
  *	Interfaces
  */
-export * from './lib/interfaces/config';
 export * from './lib/interfaces/alert.interface';
-export * from './lib/interfaces/modal.interface';
+export * from './lib/interfaces/config';
 export * from './lib/interfaces/crud.interface';
+export * from './lib/interfaces/modal.interface';
 /*
  *	Guard
  */
@@ -13,10 +13,10 @@ export * from './lib/guard/meta.guard';
  *	Components
  */
 export * from './lib/components/alert/alert.component';
-export * from './lib/components/modal/modal.component';
-export * from './lib/components/loader/loader.component';
 export * from './lib/components/base.component';
 export * from './lib/components/crud.component';
+export * from './lib/components/loader/loader.component';
+export * from './lib/components/modal/modal.component';
 /*
  *	Directives
  */
@@ -26,33 +26,33 @@ export * from './lib/directives/click-outside.directive';
  */
 export * from './lib/pipes/arr.pipe';
 export * from './lib/pipes/mongodate.pipe';
+export * from './lib/pipes/number.pipe';
 export * from './lib/pipes/pagination.pipe';
 export * from './lib/pipes/safe.pipe';
 export * from './lib/pipes/search.pipe';
 export * from './lib/pipes/splice.pipe';
 export * from './lib/pipes/split.pipe';
-export * from './lib/pipes/number.pipe';
 /*
  *	Services
  */
+export * from './lib/services/alert.service';
 export * from './lib/services/base.service';
+export * from './lib/services/core.service';
 export * from './lib/services/crud.service';
-export * from './lib/services/meta.service';
-export * from './lib/services/store.service';
+export * from './lib/services/dom.service';
+export * from './lib/services/file.service';
+export * from './lib/services/hash.service';
 export * from './lib/services/http.service';
+export * from './lib/services/loader.service';
+export * from './lib/services/meta.service';
+export * from './lib/services/modal.service';
 export * from './lib/services/mongo.service';
 export * from './lib/services/render.service';
-export * from './lib/services/hash.service';
-export * from './lib/services/dom.service';
-export * from './lib/services/alert.service';
-export * from './lib/services/loader.service';
-export * from './lib/services/socket.service';
-export * from './lib/services/modal.service';
-export * from './lib/services/file.service';
-export * from './lib/services/ui.service';
-export * from './lib/services/core.service';
-export * from './lib/services/time.service';
 export * from './lib/services/rtc.service';
+export * from './lib/services/socket.service';
+export * from './lib/services/store.service';
+export * from './lib/services/time.service';
+export * from './lib/services/ui.service';
 /*
  *	Initial
  *

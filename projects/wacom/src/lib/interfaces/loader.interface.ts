@@ -1,5 +1,3 @@
-import { InjectionToken } from '@angular/core';
-
 export interface Loader {
 	onClose?: any;
 	loaders?: object;

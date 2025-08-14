@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpService } from './http.service';
-import { DomService } from './dom.service';
 import { FilesComponent } from '../components/files/files.component';
+import { DomService } from './dom.service';
+import { HttpService } from './http.service';
 
 interface FileOptions {
 	id: string;

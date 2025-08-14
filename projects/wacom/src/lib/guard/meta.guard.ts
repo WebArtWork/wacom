@@ -1,7 +1,7 @@
-import { Injectable, Inject, Optional } from '@angular/core';
+import { Inject, Injectable, Optional } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { MetaService } from '../services/meta.service';
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
+import { MetaService } from '../services/meta.service';
 
 @Injectable({ providedIn: 'root' })
 export class MetaGuard {

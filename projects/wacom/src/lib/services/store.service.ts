@@ -1,5 +1,5 @@
+import { Inject, Injectable, Optional } from '@angular/core';
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
-import { Injectable, Inject, Optional } from '@angular/core';
 import { CoreService } from './core.service';
 
 @Injectable({

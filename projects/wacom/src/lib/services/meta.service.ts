@@ -1,6 +1,6 @@
 import { Inject, Injectable, Optional } from '@angular/core';
-import { Title, Meta } from '@angular/platform-browser';
-import { Router, Route } from '@angular/router';
+import { Meta, Title } from '@angular/platform-browser';
+import { Route, Router } from '@angular/router';
 import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config';
 
 const isDefined = (val: any) => typeof val !== 'undefined';

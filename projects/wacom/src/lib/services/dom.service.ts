@@ -1,10 +1,10 @@
 import {
-	Injectable,
-	Injector,
+	ApplicationRef,
 	ComponentFactoryResolver,
 	ComponentRef,
 	EmbeddedViewRef,
-	ApplicationRef,
+	Injectable,
+	Injector,
 } from '@angular/core';
 
 @Injectable({

@@ -1,12 +1,12 @@
-import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, ViewChild } from '@angular/core';
 
 @Component({
 	selector: 'alert',
-        templateUrl: './alert.component.html',
-        styleUrls: ['./alert.component.scss'],
-        standalone: true,
-        imports: [CommonModule],
+	templateUrl: './alert.component.html',
+	styleUrls: ['./alert.component.scss'],
+	standalone: true,
+	imports: [CommonModule],
 })
 export class AlertComponent {
 	@ViewChild('alert', { static: false }) alert: any;

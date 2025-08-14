@@ -1,11 +1,11 @@
+import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { CrudDocument, CrudOptions } from '../interfaces/crud.interface';
+import { AlertService } from './alert.service';
+import { BaseService } from './base.service';
+import { CoreService } from './core.service';
 import { HttpService } from './http.service';
 import { StoreService } from './store.service';
-import { AlertService } from './alert.service';
-import { CoreService } from './core.service';
-import { CrudDocument, CrudOptions } from '../interfaces/crud.interface';
-import { BaseService } from './base.service';
-import { inject } from '@angular/core';
 
 interface CrudConfig<Document> {
 	signalFields?: Record<string, (doc: Document) => unknown>;
