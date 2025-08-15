@@ -27,14 +27,16 @@ interface FileOptions {
 	providedIn: 'root',
 })
 export class FileService {
-	private added: Record<string, FileOptions> = {};
-	private files: FileOptions[] = [];
+        private added: Record<string, FileOptions> = {};
+        private files: FileOptions[] = [];
+        private component: any;
 
-	constructor(private dom: DomService, private http: HttpService) {
-		this.dom.appendComponent(FilesComponent, {
-			fs: this,
-		});
-	}
+        constructor(private dom: DomService, private http: HttpService) {
+                this.component = this.dom.appendComponent(FilesComponent, {
+                        fs: this,
+                });
+        }
+
 
 	/**
 	 * Adds a file input configuration.

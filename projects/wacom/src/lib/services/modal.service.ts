@@ -46,17 +46,17 @@ export class ModalService {
 		}
 		opts.id = Math.floor(Math.random() * Date.now()) + Date.now();
 		this.opened[opts.id] = opts;
-		document.body.classList.add('modalOpened');
-		let component: any;
-		let content: any;
-		opts.close = () => {
-			content.componentRef.destroy();
-			component.nativeElement.remove();
-			if (typeof opts.onClose == 'function') opts.onClose();
-			delete this.opened[opts.id];
-			if (!Object.keys(this.opened).length) {
-				document.body.classList.remove('modalOpened');
-			}
+                document.body.classList.add('modalOpened');
+                let component: any;
+                let content: any;
+                opts.close = () => {
+                        content?.remove();
+                        component?.remove();
+                        if (typeof opts.onClose == 'function') opts.onClose();
+                        delete this.opened[opts.id];
+                        if (!Object.keys(this.opened).length) {
+                                document.body.classList.remove('modalOpened');
+                        }
 		};
 		if (typeof opts.timeout == 'number' && opts.timeout > 0) {
 			setTimeout(opts.close, opts.timeout);

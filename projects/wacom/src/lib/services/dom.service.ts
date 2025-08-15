@@ -1,17 +1,18 @@
 import {
-	ApplicationRef,
-	ComponentRef,
-	EmbeddedViewRef,
-	EnvironmentInjector,
-	Injectable,
-	createComponent,
+        ApplicationRef,
+        ComponentRef,
+        EmbeddedViewRef,
+        EnvironmentInjector,
+        Injectable,
+        ViewRef,
+        createComponent,
 } from '@angular/core';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class DomService {
-	private providedIn: Record<string, boolean> = {};
+        private providedIn: Record<string, boolean> = {};
 
 	constructor(
 		private appRef: ApplicationRef,
@@ -26,14 +27,18 @@ export class DomService {
 	 * @param id - The ID of the element to append the component to.
 	 * @returns An object containing the native element and the component reference.
 	 */
-	appendById(
-		component: any,
-		options: any = {},
-		id: string
-	): { nativeElement: HTMLElement; componentRef: ComponentRef<any> } {
-		const componentRef = createComponent(component, {
-			environmentInjector: this.injector,
-		});
+        appendById(
+                component: any,
+                options: any = {},
+                id: string
+        ): {
+                nativeElement: HTMLElement;
+                componentRef: ComponentRef<any>;
+                remove: () => void;
+        } {
+                const componentRef = createComponent(component, {
+                        environmentInjector: this.injector,
+                });
 
 		this.projectComponentInputs(componentRef, options);
 
@@ -48,11 +53,18 @@ export class DomService {
 			element.appendChild(domElem);
 		}
 
-		return {
-			nativeElement: domElem,
-			componentRef: componentRef,
-		};
-	}
+                const data = {
+                        nativeElement: domElem,
+                        componentRef: componentRef,
+                        providedIn: options.providedIn,
+                };
+
+                return {
+                        nativeElement: domElem,
+                        componentRef: componentRef,
+                        remove: () => this.removeComponent(data),
+                };
+        }
 
 	/**
 	 * Appends a component to a specified element or to the body.
@@ -62,14 +74,20 @@ export class DomService {
 	 * @param element - The element to append the component to. Defaults to body.
 	 * @returns An object containing the native element and the component reference.
 	 */
-	appendComponent(
-		component: any,
-		options: any = {},
-		element: HTMLElement = document.body
-	): { nativeElement: HTMLElement; componentRef: ComponentRef<any> } | void {
-		if (options.providedIn) {
-			if (this.providedIn[options.providedIn]) {
-				return;
+        appendComponent(
+                component: any,
+                options: any = {},
+                element: HTMLElement = document.body
+        ):
+                | {
+                                nativeElement: HTMLElement;
+                                componentRef: ComponentRef<any>;
+                                remove: () => void;
+                        }
+                | void {
+                if (options.providedIn) {
+                        if (this.providedIn[options.providedIn]) {
+                                return;
 			}
 
 			this.providedIn[options.providedIn] = true;
@@ -90,11 +108,18 @@ export class DomService {
 			element.appendChild(domElem);
 		}
 
-		return {
-			nativeElement: domElem,
-			componentRef: componentRef,
-		};
-	}
+                const data = {
+                        nativeElement: domElem,
+                        componentRef: componentRef,
+                        providedIn: options.providedIn,
+                };
+
+                return {
+                        nativeElement: domElem,
+                        componentRef: componentRef,
+                        remove: () => this.removeComponent(data),
+                };
+        }
 
 	/**
 	 * Gets a reference to a dynamically created component.
@@ -122,10 +147,10 @@ export class DomService {
 	 * @param options - The options to project into the component.
 	 * @returns The component reference with the projected inputs.
 	 */
-	private projectComponentInputs(
-		component: ComponentRef<any>,
-		options: any
-	): ComponentRef<any> {
+        private projectComponentInputs(
+                component: ComponentRef<any>,
+                options: any
+        ): ComponentRef<any> {
 		if (options) {
 			const props = Object.getOwnPropertyNames(options);
 
@@ -134,6 +159,25 @@ export class DomService {
 			}
 		}
 
-		return component;
-	}
+                return component;
+        }
+
+        /**
+         * Detaches and destroys a dynamically created component.
+         *
+         * @param data - Object containing component reference and native element.
+         */
+        removeComponent(data: {
+                componentRef: ComponentRef<any>;
+                nativeElement: HTMLElement;
+                providedIn?: string;
+        }): void {
+                const viewRef = data.componentRef.hostView as ViewRef;
+                this.appRef.detachView(viewRef);
+                data.componentRef.destroy();
+                data.nativeElement.remove();
+                if (data.providedIn) {
+                        delete this.providedIn[data.providedIn];
+                }
+        }
 }
