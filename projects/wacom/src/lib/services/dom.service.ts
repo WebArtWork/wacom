@@ -1,18 +1,24 @@
 import {
-	ApplicationRef,
-	ComponentRef,
-	EmbeddedViewRef,
-	EnvironmentInjector,
-	Injectable,
-	Type,
-	createComponent,
+        ApplicationRef,
+        ComponentRef,
+        EmbeddedViewRef,
+        EnvironmentInjector,
+        Injectable,
+        Type,
+        createComponent,
 } from '@angular/core';
 
+export interface DomComponent<T> {
+        nativeElement: HTMLElement;
+        componentRef: ComponentRef<T>;
+        remove: () => void;
+}
+
 @Injectable({
-	providedIn: 'root',
+        providedIn: 'root',
 })
 export class DomService {
-	private providedIn: Record<string, boolean> = {};
+        private providedIn: Record<string, boolean> = {};
 
 	constructor(
 		private appRef: ApplicationRef,
@@ -27,11 +33,11 @@ export class DomService {
 	 * @param id - The ID of the element to append the component to.
 	 * @returns An object containing the native element and the component reference.
 	 */
-	appendById<T>(
-		component: Type<T>,
-		options: Partial<T> = {},
-		id: string
-	): { nativeElement: HTMLElement; componentRef: ComponentRef<T> } {
+        appendById<T>(
+                component: Type<T>,
+                options: Partial<T> = {},
+                id: string
+        ): DomComponent<T> {
 		const componentRef = createComponent(component, {
 			environmentInjector: this.injector,
 		});
@@ -49,11 +55,12 @@ export class DomService {
 			element.appendChild(domElem);
 		}
 
-		return {
-			nativeElement: domElem,
-			componentRef: componentRef,
-		};
-	}
+                return {
+                        nativeElement: domElem,
+                        componentRef: componentRef,
+                        remove: () => this.removeComponent(componentRef),
+                };
+        }
 
 	/**
 	 * Appends a component to a specified element or to the body.
@@ -63,11 +70,11 @@ export class DomService {
 	 * @param element - The element to append the component to. Defaults to body.
 	 * @returns An object containing the native element and the component reference.
 	 */
-	appendComponent<T>(
-		component: Type<T>,
-		options: Partial<T & { providedIn?: string }> = {},
-		element: HTMLElement = document.body
-	): { nativeElement: HTMLElement; componentRef: ComponentRef<T> } | void {
+        appendComponent<T>(
+                component: Type<T>,
+                options: Partial<T & { providedIn?: string }> = {},
+                element: HTMLElement = document.body
+        ): DomComponent<T> | void {
 		if (options.providedIn) {
 			if (this.providedIn[options.providedIn]) {
 				return;
@@ -91,11 +98,16 @@ export class DomService {
 			element.appendChild(domElem);
 		}
 
-		return {
-			nativeElement: domElem,
-			componentRef: componentRef,
-		};
-	}
+                return {
+                        nativeElement: domElem,
+                        componentRef: componentRef,
+                        remove: () =>
+                                this.removeComponent(
+                                        componentRef,
+                                        options.providedIn
+                                ),
+                };
+        }
 
 	/**
 	 * Gets a reference to a dynamically created component.
@@ -126,9 +138,9 @@ export class DomService {
 	 * @param options - The options to project into the component.
 	 * @returns The component reference with the projected inputs.
 	 */
-	private projectComponentInputs<T>(
-		component: ComponentRef<T>,
-		options: Partial<T>
+        private projectComponentInputs<T>(
+                component: ComponentRef<T>,
+                options: Partial<T>
 	): ComponentRef<T> {
 		if (options) {
 			const props = Object.getOwnPropertyNames(options);
@@ -138,6 +150,17 @@ export class DomService {
 			}
 		}
 
-		return component;
-	}
+                return component;
+        }
+
+        removeComponent<T>(
+                componentRef: ComponentRef<T>,
+                providedIn?: string
+        ): void {
+                this.appRef.detachView(componentRef.hostView);
+                componentRef.destroy();
+                if (providedIn) {
+                        delete this.providedIn[providedIn];
+                }
+        }
 }

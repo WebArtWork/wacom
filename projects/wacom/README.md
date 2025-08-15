@@ -2494,6 +2494,7 @@ export class AppComponent {
     const result = this.domService.appendById(MyComponent, { inputProp: 'value' }, 'elementId');
     console.log(result.nativeElement); // Output: The native DOM element
     console.log(result.componentRef); // Output: The component reference
+    result.remove(); // Cleanup when done
   }
 }
 ```
