@@ -66,39 +66,39 @@ export class StoreService {
 	 * @param key - The storage key.
 	 * @returns A promise that resolves to the retrieved value or `null` if the key is missing.
 	 */
-        async get(
-                key: string,
-                callback?: (value: string | null) => void,
-                errCallback: (err: unknown) => void = () => {}
-        ): Promise<string | null> {
-                key = this._applyPrefix(key);
+	async get(
+		key: string,
+		callback?: (value: string | null) => void,
+		errCallback: (err: unknown) => void = () => {}
+	): Promise<string | null> {
+		key = this._applyPrefix(key);
 
-                try {
-                        if (this._config.get) {
-                                const value = await this._config.get(
-                                        key,
-                                        (val: string) => {
-                                                callback?.(val ?? null);
-                                        },
-                                        errCallback
-                                );
+		try {
+			if (this._config.get) {
+				const value = await this._config.get(
+					key,
+					(val: string) => {
+						callback?.(val ?? null);
+					},
+					errCallback
+				);
 
-                                return value ?? null;
-                        } else {
-                                const value = localStorage.getItem(key);
+				return value ?? null;
+			} else {
+				const value = localStorage.getItem(key);
 
-                                callback?.(value ?? null);
+				callback?.(value ?? null);
 
-                                return value ?? null;
-                        }
-                } catch (err) {
-                        console.error(err);
+				return value ?? null;
+			}
+		} catch (err) {
+			console.error(err);
 
-                        errCallback(err);
+			errCallback(err);
 
-                        return null;
-                }
-        }
+			return null;
+		}
+	}
 
 	/**
 	 * Sets a JSON value in storage asynchronously.
@@ -107,9 +107,9 @@ export class StoreService {
 	 * @param value - The value to store.
 	 * @returns A promise that resolves to a boolean indicating success.
 	 */
-        async setJson<T>(key: string, value: T): Promise<boolean> {
-                return await this.set(key, JSON.stringify(value));
-        }
+	async setJson<T>(key: string, value: T): Promise<boolean> {
+		return await this.set(key, JSON.stringify(value));
+	}
 
 	/**
 	 * Gets a JSON value from storage asynchronously.
@@ -117,15 +117,15 @@ export class StoreService {
 	 * @param key - The storage key.
 	 * @returns A promise that resolves to the retrieved value.
 	 */
-        async getJson<T = any>(key: string): Promise<T | null> {
-                const value = await this.get(key);
+	async getJson<T = any>(key: string): Promise<T | null> {
+		const value = await this.get(key);
 
 		if (value === null) {
 			return null;
 		}
 
 		try {
-                        return JSON.parse(value);
+			return JSON.parse(value);
 		} catch (err) {
 			console.error(err);
 
@@ -174,28 +174,28 @@ export class StoreService {
 	 * @param errCallback - The callback to execute on error.
 	 * @returns A promise that resolves to a boolean indicating success.
 	 */
-        async clear(
-                callback?: () => void,
-                errCallback?: (err: unknown) => void
-        ): Promise<boolean> {
-                try {
-                        if (this._config.clear) {
-                                await this._config.clear();
-                        } else {
-                                localStorage.clear();
+	async clear(
+		callback?: () => void,
+		errCallback?: (err: unknown) => void
+	): Promise<boolean> {
+		try {
+			if (this._config.clear) {
+				await this._config.clear();
+			} else {
+				localStorage.clear();
 			}
 
 			callback?.();
 
-                        return true;
-                } catch (err) {
-                        console.error(err);
+			return true;
+		} catch (err) {
+			console.error(err);
 
-                        errCallback?.(err);
+			errCallback?.(err);
 
-                        return false;
-                }
-        }
+			return false;
+		}
+	}
 
 	private _prefix = '';
 

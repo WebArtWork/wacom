@@ -51,21 +51,21 @@ export class HttpService {
 		}
 
 		// Retrieve and set the base URL and headers from the store
-                this.store.get('http_url', (url) => {
-                        this.url = url || this._http.url || '';
-                });
-
-                this.store
-                        .getJson<Record<string, string>>('http_headers')
-                        .then((headers) => {
-			headers ||= {};
-
-			for (const header in headers) {
-				this._headers[header] = headers[header];
-			}
-
-			this._http_headers = new HttpHeaders(this._headers);
+		this.store.get('http_url', (url) => {
+			this.url = url || this._http.url || '';
 		});
+
+		this.store
+			.getJson<Record<string, string>>('http_headers')
+			.then((headers) => {
+				headers ||= {};
+
+				for (const header in headers) {
+					this._headers[header] = headers[header];
+				}
+
+				this._http_headers = new HttpHeaders(this._headers);
+			});
 	}
 
 	// Set a new base URL and save it in the store
@@ -83,16 +83,16 @@ export class HttpService {
 	}
 
 	// Set a new HTTP header and update the stored headers
-        set(key: any, value: any) {
-                this._headers[key] = value;
+	set(key: any, value: any) {
+		this._headers[key] = value;
 
-                this.store.setJson<Record<string, string>>(
-                        'http_headers',
-                        this._headers
-                );
+		this.store.setJson<Record<string, string>>(
+			'http_headers',
+			this._headers
+		);
 
-                this._http_headers = new HttpHeaders(this._headers);
-        }
+		this._http_headers = new HttpHeaders(this._headers);
+	}
 
 	// Get the value of a specific HTTP header
 	header(key: any) {
@@ -105,11 +105,11 @@ export class HttpService {
 
 		this._http_headers = new HttpHeaders(this._headers);
 
-                this.store.setJson<Record<string, string>>(
-                        'http_headers',
-                        this._headers
-                );
-        }
+		this.store.setJson<Record<string, string>>(
+			'http_headers',
+			this._headers
+		);
+	}
 
 	// Internal method to make HTTP requests based on the method type
 	private _httpMethod(

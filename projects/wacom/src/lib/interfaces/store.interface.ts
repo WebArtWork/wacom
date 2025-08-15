@@ -16,8 +16,8 @@ export interface StoreConfig {
 		cb?: () => void,
 		errCb?: (err: unknown) => void
 	) => Promise<boolean>;
-        clear?: (
-                cb?: () => void,
-                errCb?: (err: unknown) => void
-        ) => Promise<boolean>;
+	clear?: (
+		cb?: () => void,
+		errCb?: (err: unknown) => void
+	) => Promise<boolean>;
 }

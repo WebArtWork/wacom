@@ -38,18 +38,17 @@ export interface Config {
 export const CONFIG_TOKEN = new InjectionToken<Config>('config');
 
 export const DEFAULT_CONFIG: Config = {
+	store: {
+		prefix: 'waStore',
+	},
 	meta: {
 		useTitleSuffix: false,
 		warnMissingGuard: true,
 		defaults: { links: {} },
 	},
 	socket: false,
-	firebase: false,
 	http: {
 		url: '',
 		headers: {},
-	},
-	store: {
-		prefix: 'waStore',
 	},
 };

@@ -4,7 +4,6 @@
 export * from './lib/interfaces/alert.interface';
 export * from './lib/interfaces/config.interface';
 export * from './lib/interfaces/crud.interface';
-export * from './lib/interfaces/firebase.interface';
 export * from './lib/interfaces/modal.interface';
 /*
  *	Guard
