@@ -55,7 +55,9 @@ export class HttpService {
                         this.url = url || this._http.url || '';
                 });
 
-		this.store.getJson('http_headers').then((headers) => {
+                this.store
+                        .getJson<Record<string, string>>('http_headers')
+                        .then((headers) => {
 			headers ||= {};
 
 			for (const header in headers) {
@@ -81,13 +83,16 @@ export class HttpService {
 	}
 
 	// Set a new HTTP header and update the stored headers
-	set(key: any, value: any) {
-		this._headers[key] = value;
+        set(key: any, value: any) {
+                this._headers[key] = value;
 
-		this.store.setJson('http_headers', this._headers);
+                this.store.setJson<Record<string, string>>(
+                        'http_headers',
+                        this._headers
+                );
 
-		this._http_headers = new HttpHeaders(this._headers);
-	}
+                this._http_headers = new HttpHeaders(this._headers);
+        }
 
 	// Get the value of a specific HTTP header
 	header(key: any) {
@@ -100,8 +105,11 @@ export class HttpService {
 
 		this._http_headers = new HttpHeaders(this._headers);
 
-		this.store.setJson('http_headers', this._headers);
-	}
+                this.store.setJson<Record<string, string>>(
+                        'http_headers',
+                        this._headers
+                );
+        }
 
 	// Internal method to make HTTP requests based on the method type
 	private _httpMethod(

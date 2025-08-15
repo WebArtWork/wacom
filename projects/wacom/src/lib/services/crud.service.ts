@@ -103,7 +103,9 @@ export abstract class CrudService<
 	}
 
 	async restoreDocs() {
-		const docs = await this.__store.getJson('docs_' + this._config.name);
+                const docs = await this.__store.getJson<Document[]>(
+                        'docs_' + this._config.name
+                );
 
 		if (Array.isArray(docs)) {
 			this._docs.push(...docs);
@@ -116,7 +118,10 @@ export abstract class CrudService<
 	 * Saves the current set of documents to local storage.
 	 */
 	setDocs(): void {
-		this.__store.setJson('docs_' + this._config.name, this._docs);
+                this.__store.setJson<Document[]>(
+                        'docs_' + this._config.name,
+                        this._docs
+                );
 	}
 
 	/**
