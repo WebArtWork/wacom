@@ -2401,13 +2401,13 @@ Appends a component to a specified element by ID.
 
 **Parameters**:
 
--   `component` (any): The component to append.
--   `options` (any): The options to project into the component.
--   `id` (string): The ID of the element to append the component to.
+-   `component` (`Type<T>`): The component to append.
+-   `options` (`Partial<T>`): The options to project into the component.
+-   `id` (`string`): The ID of the element to append the component to.
 
 **Returns**:
 
--   An object containing the native element and the component reference.
+-   An object containing the native element and the component reference (`ComponentRef<T>`).
 
 **Example**:
 
@@ -2417,18 +2417,18 @@ console.log(result.nativeElement); // Output: The native DOM element
 console.log(result.componentRef); // Output: The component reference
 ```
 
-#### `appendComponent(component: any, options: any = {}, element: HTMLElement = this.core.document.body): { nativeElement: HTMLElement, componentRef: ComponentRef<any> }`
+#### `appendComponent<T>(component: Type<T>, options: Partial<T> = {}, element: HTMLElement = this.core.document.body): { nativeElement: HTMLElement, componentRef: ComponentRef<T> }`
 
 Appends a component to a specified element or to the body.
 **Parameters**:
 
--   `component` (any): The component to append.
--   `options` (any): The options to project into the component.
--   `element` (HTMLElement): The element to append the component to. Defaults to body.
+-   `component` (`Type<T>`): The component to append.
+-   `options` (`Partial<T>`): The options to project into the component.
+-   `element` (`HTMLElement`): The element to append the component to. Defaults to body.
 
 **Returns**:
 
--   An object containing the native element and the component reference.
+-   An object containing the native element and the component reference (`ComponentRef<T>`).
 
 **Example**:
 
@@ -2438,17 +2438,17 @@ console.log(result.nativeElement); // Output: The native DOM element
 console.log(result.componentRef); // Output: The component reference
 ```
 
-#### `getComponentRef(component: any, options: any = {}): ComponentRef<any>`
+#### `getComponentRef<T>(component: Type<T>, options: Partial<T> = {}): ComponentRef<T>`
 
 Gets a reference to a dynamically created component.
 **Parameters**:
 
--   `component` (any): The component to create.
--   `options` (any): The options to project into the component.
+-   `component` (`Type<T>`): The component to create.
+-   `options` (`Partial<T>`): The options to project into the component.
 
 **Returns**:
 
--   The component reference.
+-   The component reference (`ComponentRef<T>`).
 
 **Example**:
 
@@ -2457,7 +2457,7 @@ const componentRef = domService.getComponentRef(MyComponent, { inputProp: 'value
 console.log(componentRef); // Output: The component reference
 ```
 
-#### `projectComponentInputs(component: ComponentRef<any>, options: any): ComponentRef<any>`
+#### `projectComponentInputs<T>(component: ComponentRef<T>, options: Partial<T>): ComponentRef<T>`
 
 Projects the inputs onto the component.
 **Parameters**:
