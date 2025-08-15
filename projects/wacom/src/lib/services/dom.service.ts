@@ -1,11 +1,11 @@
 import {
-        ApplicationRef,
-        ComponentRef,
-        EmbeddedViewRef,
-        EnvironmentInjector,
-        Injectable,
-        Type,
-        createComponent,
+	ApplicationRef,
+	ComponentRef,
+	EmbeddedViewRef,
+	EnvironmentInjector,
+	Injectable,
+	Type,
+	createComponent,
 } from '@angular/core';
 
 @Injectable({
@@ -27,21 +27,21 @@ export class DomService {
 	 * @param id - The ID of the element to append the component to.
 	 * @returns An object containing the native element and the component reference.
 	 */
-        appendById<T>(
-                component: Type<T>,
-                options: Partial<T> = {},
-                id: string
-        ): { nativeElement: HTMLElement; componentRef: ComponentRef<T> } {
-                const componentRef = createComponent(component, {
-                        environmentInjector: this.injector,
-                });
+	appendById<T>(
+		component: Type<T>,
+		options: Partial<T> = {},
+		id: string
+	): { nativeElement: HTMLElement; componentRef: ComponentRef<T> } {
+		const componentRef = createComponent(component, {
+			environmentInjector: this.injector,
+		});
 
 		this.projectComponentInputs(componentRef, options);
 
-                this.appRef.attachView(componentRef.hostView);
+		this.appRef.attachView(componentRef.hostView);
 
-                const domElem = (componentRef.hostView as EmbeddedViewRef<T>)
-                        .rootNodes[0] as HTMLElement;
+		const domElem = (componentRef.hostView as EmbeddedViewRef<T>)
+			.rootNodes[0] as HTMLElement;
 
 		const element = document.getElementById(id);
 
@@ -63,39 +63,39 @@ export class DomService {
 	 * @param element - The element to append the component to. Defaults to body.
 	 * @returns An object containing the native element and the component reference.
 	 */
-        appendComponent<T>(
-                component: Type<T>,
-                options: Partial<T & { providedIn?: string }> = {},
-                element: HTMLElement = document.body
-        ): { nativeElement: HTMLElement; componentRef: ComponentRef<T> } | void {
-                if (options.providedIn) {
-                        if (this.providedIn[options.providedIn]) {
-                                return;
-                        }
+	appendComponent<T>(
+		component: Type<T>,
+		options: Partial<T & { providedIn?: string }> = {},
+		element: HTMLElement = document.body
+	): { nativeElement: HTMLElement; componentRef: ComponentRef<T> } | void {
+		if (options.providedIn) {
+			if (this.providedIn[options.providedIn]) {
+				return;
+			}
 
-                        this.providedIn[options.providedIn] = true;
-                }
+			this.providedIn[options.providedIn] = true;
+		}
 
-                const componentRef = createComponent(component, {
-                        environmentInjector: this.injector,
-                });
+		const componentRef = createComponent(component, {
+			environmentInjector: this.injector,
+		});
 
-                this.projectComponentInputs(componentRef, options);
+		this.projectComponentInputs(componentRef, options);
 
-                this.appRef.attachView(componentRef.hostView);
+		this.appRef.attachView(componentRef.hostView);
 
-                const domElem = (componentRef.hostView as EmbeddedViewRef<T>)
-                        .rootNodes[0] as HTMLElement;
+		const domElem = (componentRef.hostView as EmbeddedViewRef<T>)
+			.rootNodes[0] as HTMLElement;
 
 		if (element && typeof element.appendChild === 'function') {
 			element.appendChild(domElem);
 		}
 
-                return {
-                        nativeElement: domElem,
-                        componentRef: componentRef,
-                };
-        }
+		return {
+			nativeElement: domElem,
+			componentRef: componentRef,
+		};
+	}
 
 	/**
 	 * Gets a reference to a dynamically created component.
@@ -104,20 +104,20 @@ export class DomService {
 	 * @param options - The options to project into the component.
 	 * @returns The component reference.
 	 */
-        getComponentRef<T>(
-                component: Type<T>,
-                options: Partial<T> = {}
-        ): ComponentRef<T> {
-                const componentRef = createComponent(component, {
-                        environmentInjector: this.injector,
-                });
+	getComponentRef<T>(
+		component: Type<T>,
+		options: Partial<T> = {}
+	): ComponentRef<T> {
+		const componentRef = createComponent(component, {
+			environmentInjector: this.injector,
+		});
 
-                this.projectComponentInputs(componentRef, options);
+		this.projectComponentInputs(componentRef, options);
 
-                this.appRef.attachView(componentRef.hostView);
+		this.appRef.attachView(componentRef.hostView);
 
-                return componentRef;
-        }
+		return componentRef;
+	}
 
 	/**
 	 * Projects the inputs onto the component.
@@ -126,18 +126,18 @@ export class DomService {
 	 * @param options - The options to project into the component.
 	 * @returns The component reference with the projected inputs.
 	 */
-        private projectComponentInputs<T>(
-                component: ComponentRef<T>,
-                options: Partial<T>
-        ): ComponentRef<T> {
-                if (options) {
-                        const props = Object.getOwnPropertyNames(options);
+	private projectComponentInputs<T>(
+		component: ComponentRef<T>,
+		options: Partial<T>
+	): ComponentRef<T> {
+		if (options) {
+			const props = Object.getOwnPropertyNames(options);
 
-                        for (const prop of props) {
-                                (component.instance as any)[prop] = (options as any)[prop];
-                        }
-                }
+			for (const prop of props) {
+				(component.instance as any)[prop] = (options as any)[prop];
+			}
+		}
 
-                return component;
-        }
+		return component;
+	}
 }
