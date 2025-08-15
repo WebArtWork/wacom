@@ -1,9 +1,12 @@
 import { InjectionToken } from '@angular/core';
 import { FirebaseConfig } from './firebase.interface';
 import { MetaConfig } from './meta.interface';
+import { StoreConfig } from './store.interface';
 
 export interface Config {
+	store?: StoreConfig;
 	meta?: MetaConfig;
+	firebase?: FirebaseConfig | boolean;
 	alert?: {
 		text?: string;
 		type?: string;
@@ -27,34 +30,15 @@ export interface Config {
 	};
 	socket?: any;
 	io?: any;
-	firebase?: FirebaseConfig | boolean;
 	fb?: any;
 	http?: {
 		headers?: any;
 		url?: string;
 	};
-	store?: {
-		prefix?: string;
-		set?: (
-			hold: any,
-			value: any,
-			cb?: () => void,
-			errCb?: () => void
-		) => Promise<boolean>;
-		get?: (
-			hold: any,
-			cb?: (value: string) => void,
-			errCb?: () => void
-		) => Promise<string>;
-		remove?: (
-			hold: any,
-			cb?: () => void,
-			errCb?: () => void
-		) => Promise<boolean>;
-		clear?: (cb?: () => void, errCb?: () => void) => Promise<boolean>;
-	};
 }
+
 export const CONFIG_TOKEN = new InjectionToken<Config>('config');
+
 export const DEFAULT_CONFIG: Config = {
 	meta: {
 		useTitleSuffix: false,
@@ -68,6 +52,6 @@ export const DEFAULT_CONFIG: Config = {
 		headers: {},
 	},
 	store: {
-		prefix: '',
+		prefix: 'waStore',
 	},
 };

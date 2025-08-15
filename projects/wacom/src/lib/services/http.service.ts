@@ -51,18 +51,20 @@ export class HttpService {
 		}
 
 		// Retrieve and set the base URL and headers from the store
-		this.store.get('http_url', (url: any) => {
+		this.store.get('http_url', (url) => {
 			this.url = url || this._http.url || '';
+
+			return url;
 		});
 
-		this.store.getJson('http_headers', (headers: any) => {
-			if (headers) {
-				for (const header in headers) {
-					this._headers[header] = headers[header];
-				}
+		this.store.getJson('http_headers').then((headers) => {
+			headers ||= {};
 
-				this._http_headers = new HttpHeaders(this._headers);
+			for (const header in headers) {
+				this._headers[header] = headers[header];
 			}
+
+			this._http_headers = new HttpHeaders(this._headers);
 		});
 	}
 

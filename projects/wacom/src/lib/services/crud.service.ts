@@ -102,14 +102,14 @@ export abstract class CrudService<
 		});
 	}
 
-	restoreDocs(): void {
-		this.__store.getJson('docs_' + this._config.name, (docs) => {
-			if (Array.isArray(docs)) {
-				this._docs.push(...docs);
+	async restoreDocs() {
+		const docs = await this.__store.getJson('docs_' + this._config.name);
 
-				this._filterDocuments();
-			}
-		});
+		if (Array.isArray(docs)) {
+			this._docs.push(...docs);
+
+			this._filterDocuments();
+		}
 	}
 
 	/**
