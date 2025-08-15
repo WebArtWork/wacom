@@ -66,33 +66,39 @@ export class StoreService {
 	 * @param key - The storage key.
 	 * @returns A promise that resolves to the retrieved value or `null` if the key is missing.
 	 */
-	async get(
-		key: string,
-		callback: (value: string | null) => string | null = () => {
-			return null;
-		},
-		errCallback: (err: unknown) => void = () => {}
-	): Promise<string | null> {
-		key = this._applyPrefix(key);
+        async get(
+                key: string,
+                callback?: (value: string | null) => void,
+                errCallback: (err: unknown) => void = () => {}
+        ): Promise<string | null> {
+                key = this._applyPrefix(key);
 
-		try {
-			if (this._config.get) {
-				return await this._config.get(key, callback, errCallback);
-			} else {
-				const value = localStorage.getItem(key);
+                try {
+                        if (this._config.get) {
+                                const value = await this._config.get(
+                                        key,
+                                        (val: string) => {
+                                                callback?.(val ?? null);
+                                        },
+                                        errCallback
+                                );
 
-				callback(value ?? null);
+                                return value ?? null;
+                        } else {
+                                const value = localStorage.getItem(key);
 
-				return value ?? null;
-			}
-		} catch (err) {
-			console.error(err);
+                                callback?.(value ?? null);
 
-			errCallback(err);
+                                return value ?? null;
+                        }
+                } catch (err) {
+                        console.error(err);
 
-			return null;
-		}
-	}
+                        errCallback(err);
+
+                        return null;
+                }
+        }
 
 	/**
 	 * Sets a JSON value in storage asynchronously.

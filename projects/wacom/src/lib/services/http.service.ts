@@ -51,11 +51,9 @@ export class HttpService {
 		}
 
 		// Retrieve and set the base URL and headers from the store
-		this.store.get('http_url', (url) => {
-			this.url = url || this._http.url || '';
-
-			return url;
-		});
+                this.store.get('http_url', (url) => {
+                        this.url = url || this._http.url || '';
+                });
 
 		this.store.getJson('http_headers').then((headers) => {
 			headers ||= {};
