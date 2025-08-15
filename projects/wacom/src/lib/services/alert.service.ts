@@ -29,8 +29,8 @@ export class AlertService {
 				this.alert[each] = DEFAULT_Alert[each];
 			}
 		}
-		this._container = this.dom.appendComponent(WrapperComponent);
-	}
+                this._container = this.dom.appendComponent(WrapperComponent);
+        }
 	private uniques: any = {};
 	private shortcuts: any = {
 		tl: 'topLeft',
@@ -72,13 +72,13 @@ export class AlertService {
 		if (this.shortcuts[opts.position])
 			opts.position = this.shortcuts[opts.position];
 		if (!opts.position) opts.position = 'bottomRight';
-		var content: any;
-		opts.close = () => {
-			if (content) content.componentRef.destroy();
-			opts.component.nativeElement.remove();
-			if (typeof (opts as Alert).onClose == 'function')
-				(opts as Alert).onClose();
-		};
+                var content: any;
+                opts.close = () => {
+                        content?.remove?.();
+                        (opts.component as any)?.remove?.();
+                        if (typeof (opts as Alert).onClose == 'function')
+                                (opts as Alert).onClose();
+                };
 		// let component = this.dom.appendById(AlertComponent, opts, opts.position);
 		let customElement = false;
 
@@ -154,10 +154,10 @@ export class AlertService {
 		this.show(opts);
 	}
 
-	destroy() {
-		[
-			'bottomRight',
-			'bottomLeft',
+        destroy() {
+                [
+                        'bottomRight',
+                        'bottomLeft',
 			'bottomCenter',
 			'topRight',
 			'topLeft',
@@ -167,6 +167,7 @@ export class AlertService {
 			const el = document.getElementById(id);
 
 			if (el) el.innerHTML = '';
-		});
-	}
+                });
+        }
+
 }
