@@ -1,12 +1,10 @@
 import { InjectionToken } from '@angular/core';
-import { FirebaseConfig } from './firebase.interface';
 import { MetaConfig } from './meta.interface';
 import { StoreConfig } from './store.interface';
 
 export interface Config {
 	store?: StoreConfig;
 	meta?: MetaConfig;
-	firebase?: FirebaseConfig | boolean;
 	alert?: {
 		text?: string;
 		type?: string;
