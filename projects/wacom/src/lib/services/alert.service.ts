@@ -1,4 +1,4 @@
-import { Inject, Injectable, Optional } from '@angular/core';
+import { Inject, Injectable, Optional, ComponentRef } from '@angular/core';
 import { AlertComponent } from '../components/alert/alert.component';
 import { WrapperComponent } from '../components/alert/wrapper/wrapper.component';
 import { Alert, DEFAULT_Alert } from '../interfaces/alert.interface';
@@ -13,8 +13,11 @@ import { DomService } from './dom.service';
 	providedIn: 'root',
 })
 export class AlertService {
-	private alert: any;
-	private _container: any;
+        private alert: any;
+        private _container: {
+                nativeElement: HTMLElement;
+                componentRef: ComponentRef<WrapperComponent>;
+        };
 	constructor(
 		private dom: DomService,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config
@@ -29,8 +32,8 @@ export class AlertService {
 				this.alert[each] = DEFAULT_Alert[each];
 			}
 		}
-		this._container = this.dom.appendComponent(WrapperComponent);
-	}
+                this._container = this.dom.appendComponent(WrapperComponent)!;
+        }
 	private uniques: any = {};
 	private shortcuts: any = {
 		tl: 'topLeft',
@@ -55,7 +58,7 @@ export class AlertService {
 		center: 6,
 	};
 
-	show(opts: any | Alert) {
+        show(opts: any | Alert) {
 		if (typeof opts === 'string') {
 			opts = {
 				text: opts,
@@ -72,7 +75,10 @@ export class AlertService {
 		if (this.shortcuts[opts.position])
 			opts.position = this.shortcuts[opts.position];
 		if (!opts.position) opts.position = 'bottomRight';
-		var content: any;
+                let content: {
+                        nativeElement: HTMLElement;
+                        componentRef: ComponentRef<any>;
+                };
 		opts.close = () => {
 			if (content) content.componentRef.destroy();
 			opts.component.nativeElement.remove();
@@ -97,14 +103,14 @@ export class AlertService {
 		}
 
 		if (typeof opts.component === 'function') {
-			content = this.dom.appendComponent(
-				opts.component,
-				opts,
-				this._container.nativeElement.children[0].children[
-					this.positionNumber[opts.position] || 0
-				]
-				// component.nativeElement.children[0].children[0].children[0] as HTMLElement
-			);
+                        content = this.dom.appendComponent(
+                                opts.component,
+                                opts,
+                                this._container.nativeElement.children[0].children[
+                                        this.positionNumber[opts.position] || 0
+                                ] as HTMLElement
+                                // component.nativeElement.children[0].children[0].children[0] as HTMLElement
+                        )!;
 		}
 
 		if (opts.unique) {
