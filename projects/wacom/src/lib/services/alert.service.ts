@@ -1,4 +1,4 @@
-import { ComponentRef, Inject, Injectable, Optional } from '@angular/core';
+import { Inject, Injectable, Optional } from '@angular/core';
 import { AlertComponent } from '../components/alert/alert.component';
 import { WrapperComponent } from '../components/alert/wrapper/wrapper.component';
 import { Alert, DEFAULT_Alert } from '../interfaces/alert.interface';
@@ -7,17 +7,14 @@ import {
 	Config,
 	DEFAULT_CONFIG,
 } from '../interfaces/config.interface';
-import { DomService } from './dom.service';
+import { DomComponent, DomService } from './dom.service';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class AlertService {
 	private alert: any;
-	private _container: {
-		nativeElement: HTMLElement;
-		componentRef: ComponentRef<WrapperComponent>;
-	};
+        private _container: DomComponent<WrapperComponent>;
 	constructor(
 		private dom: DomService,
 		@Inject(CONFIG_TOKEN) @Optional() private config: Config
@@ -34,7 +31,7 @@ export class AlertService {
 		}
 		this._container = this.dom.appendComponent(WrapperComponent)!;
 	}
-	private uniques: any = {};
+        private uniques: Record<string, DomComponent<any>> = {};
 	private shortcuts: any = {
 		tl: 'topLeft',
 		tc: 'topCenter',
@@ -75,61 +72,61 @@ export class AlertService {
 		if (this.shortcuts[opts.position])
 			opts.position = this.shortcuts[opts.position];
 		if (!opts.position) opts.position = 'bottomRight';
-		let content: {
-			nativeElement: HTMLElement;
-			componentRef: ComponentRef<any>;
-		};
-		opts.close = () => {
-			if (content) content.componentRef.destroy();
-			opts.component.nativeElement.remove();
-			if (typeof (opts as Alert).onClose == 'function')
-				(opts as Alert).onClose();
-		};
-		// let component = this.dom.appendById(AlertComponent, opts, opts.position);
-		let customElement = false;
+                let alertComponent: DomComponent<AlertComponent> | undefined;
+                let content: DomComponent<any> | undefined;
 
-		if (
-			typeof opts.component == 'string' &&
-			this.alert.alerts[opts.component]
-		) {
-			opts.component = this.alert.alerts[opts.component];
-			customElement = true;
-		} else {
-			opts.component = this.dom.appendById(
-				AlertComponent,
-				opts,
-				opts.position
-			);
-		}
+                opts.close = () => {
+                        content?.remove();
+                        alertComponent?.remove();
+                        if (typeof (opts as Alert).onClose == 'function')
+                                (opts as Alert).onClose();
+                };
 
-		if (typeof opts.component === 'function') {
-			content = this.dom.appendComponent(
-				opts.component,
-				opts,
-				this._container.nativeElement.children[0].children[
-					this.positionNumber[opts.position] || 0
-				] as HTMLElement
-				// component.nativeElement.children[0].children[0].children[0] as HTMLElement
-			)!;
-		}
+                let customElement = false;
 
-		if (opts.unique) {
-			if (this.uniques[opts.unique]) this.uniques[opts.unique].remove();
-			this.uniques[opts.unique] = opts.component.nativeElement;
-		}
+                if (
+                        typeof opts.component == 'string' &&
+                        this.alert.alerts[opts.component]
+                ) {
+                        opts.component = this.alert.alerts[opts.component];
+                        customElement = true;
+                } else {
+                        alertComponent = this.dom.appendById(
+                                AlertComponent,
+                                opts,
+                                opts.position
+                        );
+                }
 
-		if (typeof opts.timeout !== 'number') {
-			opts.timeout = 2000;
-		}
+                if (typeof opts.component === 'function') {
+                        content = this.dom.appendComponent(
+                                opts.component,
+                                opts,
+                                this._container.nativeElement.children[0].children[
+                                        this.positionNumber[opts.position] || 0
+                                ] as HTMLElement
+                        )!;
+                }
 
-		if (opts.timeout) {
-			setTimeout(() => {
-				opts.close();
-			}, opts.timeout);
-		}
+                const main = customElement ? content! : alertComponent!;
 
-		return opts.component.nativeElement;
-	}
+                if (opts.unique) {
+                        if (this.uniques[opts.unique]) this.uniques[opts.unique].remove();
+                        this.uniques[opts.unique] = main;
+                }
+
+                if (typeof opts.timeout !== 'number') {
+                        opts.timeout = 2000;
+                }
+
+                if (opts.timeout) {
+                        setTimeout(() => {
+                                opts.close();
+                        }, opts.timeout);
+                }
+
+                return main.nativeElement;
+        }
 
 	open(opts: Alert) {
 		this.show(opts);
@@ -160,19 +157,20 @@ export class AlertService {
 		this.show(opts);
 	}
 
-	destroy() {
-		[
-			'bottomRight',
-			'bottomLeft',
-			'bottomCenter',
-			'topRight',
-			'topLeft',
-			'topCenter',
-			'center',
-		].forEach((id) => {
-			const el = document.getElementById(id);
+        destroy() {
+                this._container.remove();
+                [
+                        'bottomRight',
+                        'bottomLeft',
+                        'bottomCenter',
+                        'topRight',
+                        'topLeft',
+                        'topCenter',
+                        'center',
+                ].forEach((id) => {
+                        const el = document.getElementById(id);
 
-			if (el) el.innerHTML = '';
-		});
-	}
+                        if (el) el.innerHTML = '';
+                });
+        }
 }
