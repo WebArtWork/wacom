@@ -168,28 +168,28 @@ export class StoreService {
 	 * @param errCallback - The callback to execute on error.
 	 * @returns A promise that resolves to a boolean indicating success.
 	 */
-	async clear(
-		callback?: () => void,
-		errCallback?: () => void
-	): Promise<boolean> {
-		try {
-			if (this._config.clear) {
-				await this._config.clear();
-			} else {
-				localStorage.clear();
+        async clear(
+                callback?: () => void,
+                errCallback?: (err: unknown) => void
+        ): Promise<boolean> {
+                try {
+                        if (this._config.clear) {
+                                await this._config.clear();
+                        } else {
+                                localStorage.clear();
 			}
 
 			callback?.();
 
-			return true;
-		} catch (err) {
-			console.error(err);
+                        return true;
+                } catch (err) {
+                        console.error(err);
 
-			errCallback?.();
+                        errCallback?.(err);
 
-			return false;
-		}
-	}
+                        return false;
+                }
+        }
 
 	private _prefix = '';
 
