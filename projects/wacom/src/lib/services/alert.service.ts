@@ -2,32 +2,47 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { AlertComponent } from '../components/alert/alert/alert.component';
 import { WrapperComponent } from '../components/alert/wrapper/wrapper.component';
 import {
-	Alert,
-	ALERT_POSITIONS,
-	AlertConfig,
-	DEFAULT_ALERT_CONFIG,
+        Alert,
+        ALERT_POSITIONS,
+        AlertConfig,
+        DEFAULT_ALERT_CONFIG,
 } from '../interfaces/alert.interface';
 import { Config, CONFIG_TOKEN } from '../interfaces/config.interface';
 import { DomComponent } from '../interfaces/dom.interface';
 import { DomService } from './dom.service';
 
 @Injectable({
-	providedIn: 'root',
+        providedIn: 'root',
 })
 export class AlertService {
-	constructor(
-		@Inject(CONFIG_TOKEN) @Optional() private config: Config,
-		private _dom: DomService
-	) {
-		this._config = {
-			...DEFAULT_ALERT_CONFIG,
-			...(this.config.alert || {}),
-		};
+        /**
+         * Creates a new alert service.
+         *
+         * @param config Optional global configuration provided via the
+         * `CONFIG_TOKEN` injection token.
+         * @param _dom Service responsible for DOM manipulation and dynamic
+         * component creation.
+         */
+        constructor(
+                @Inject(CONFIG_TOKEN) @Optional() private config: Config,
+                private _dom: DomService
+        ) {
+                this._config = {
+                        ...DEFAULT_ALERT_CONFIG,
+                        ...(this.config.alert || {}),
+                };
 
 		this._container = this._dom.appendComponent(WrapperComponent)!;
 	}
 
-	show(opts: Alert | string) {
+        /**
+         * Displays an alert. Accepts either an options object or a simple string
+         * which will be used as the alert text.
+         *
+         * @returns Reference to the created alert or embedded component
+         *          element.
+         */
+        show(opts: Alert | string) {
 		if (typeof opts === 'string') {
 			opts = {
 				...this._config,
@@ -90,63 +105,88 @@ export class AlertService {
 		return main.nativeElement;
 	}
 
-	open(opts: Alert) {
-		this.show(opts);
-	}
+        /**
+         * Convenience alias for `show`.
+         */
+        open(opts: Alert) {
+                this.show(opts);
+        }
 
-	info(opts: Alert) {
-		opts.type = 'info';
+        /**
+         * Displays an informational alert.
+         */
+        info(opts: Alert) {
+                opts.type = 'info';
 
-		this.show(opts);
-	}
+                this.show(opts);
+        }
 
-	success(opts: Alert) {
-		opts.type = 'success';
+        /**
+         * Displays a success alert.
+         */
+        success(opts: Alert) {
+                opts.type = 'success';
 
-		this.show(opts);
-	}
+                this.show(opts);
+        }
 
-	warning(opts: Alert) {
-		opts.type = 'warning';
+        /**
+         * Displays a warning alert.
+         */
+        warning(opts: Alert) {
+                opts.type = 'warning';
 
-		this.show(opts);
-	}
+                this.show(opts);
+        }
 
-	error(opts: Alert) {
-		opts.type = 'error';
+        /**
+         * Displays an error alert.
+         */
+        error(opts: Alert) {
+                opts.type = 'error';
 
-		this.show(opts);
-	}
+                this.show(opts);
+        }
 
-	question(opts: Alert) {
-		opts.type = 'question';
+        /**
+         * Displays a question alert.
+         */
+        question(opts: Alert) {
+                opts.type = 'question';
 
-		this.show(opts);
-	}
+                this.show(opts);
+        }
 
-	destroy() {
-		for (const id of ALERT_POSITIONS) {
-			const el = document.getElementById(id);
+        /**
+         * Removes all alert elements from the document.
+         */
+        destroy() {
+                for (const id of ALERT_POSITIONS) {
+                        const el = document.getElementById(id);
 
-			if (el) el.innerHTML = '';
-		}
-	}
+                        if (el) el.innerHTML = '';
+                }
+        }
 
-	private _config: AlertConfig;
+        /** Merged configuration applied to new alerts. */
+        private _config: AlertConfig;
 
-	private _container: DomComponent<WrapperComponent>;
+        /** Wrapper component that contains all alert placeholders. */
+        private _container: DomComponent<WrapperComponent>;
 
-	private _uniques: Record<string, DomComponent<any>> = {};
+        /** References to alerts that must remain unique by identifier. */
+        private _uniques: Record<string, DomComponent<any>> = {};
 
-	private _positionNumber: any = {
-		topLeft: 3,
-		topCenter: 4,
-		topRight: 2,
-		right: '',
-		bottomRight: 0,
-		bottomCenter: 5,
-		bottomLeft: 1,
-		left: '',
-		center: 6,
-	};
+        /** Mapping of alert positions to wrapper child indexes. */
+        private _positionNumber: any = {
+                topLeft: 3,
+                topCenter: 4,
+                topRight: 2,
+                right: '',
+                bottomRight: 0,
+                bottomCenter: 5,
+                bottomLeft: 1,
+                left: '',
+                center: 6,
+        };
 }
