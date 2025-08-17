@@ -12,32 +12,53 @@ import {
 	styleUrls: ['./alert.component.scss'],
 	imports: [CommonModule],
 })
+/**
+ * Displays an individual alert message with optional icon, actions and
+ * auto‑dismiss behaviour. All inputs are configured by the service when the
+ * component is created dynamically.
+ */
 export class AlertComponent implements OnInit {
-	@ViewChild('alertRef', { static: false }) alertRef: any;
+        /** Reference to the DOM element hosting the alert. */
+        @ViewChild('alertRef', { static: false }) alertRef: any;
 
-	close: () => void = () => {};
+        /** Callback invoked to remove the alert from the DOM. */
+        close: () => void = () => {};
 
-	text: string = '';
+        /** Text content displayed inside the alert. */
+        text: string = '';
 
-	class: string = '';
+        /** Additional CSS classes applied to the alert container. */
+        class: string = '';
 
-	type: AlertType = 'info';
+        /** Type of alert which determines styling and icon. */
+        type: AlertType = 'info';
 
-	position: AlertPosition = 'bottomRight';
+        /** Position on the screen where the alert appears. */
+        position: AlertPosition = 'bottomRight';
 
-	progress: boolean = true;
+        /** Whether a progress bar indicating remaining time is shown. */
+        progress: boolean = true;
 
-	icon: string = '';
+        /** Icon name displayed alongside the message. */
+        icon: string = '';
 
-	timeout: number = 5000;
+        /** Time in milliseconds before the alert auto closes. */
+        timeout: number = 5000;
 
-	closable: boolean = true;
+        /** Determines if a manual close button is visible. */
+        closable: boolean = true;
 
-	delete_animation = false;
+        /** Flag used to trigger the deletion animation. */
+        delete_animation = false;
 
-	buttons: AlertButton[] = [];
+        /** Optional action buttons rendered within the alert. */
+        buttons: AlertButton[] = [];
 
-	ngOnInit(): void {
+        /**
+         * Starts the auto‑dismiss timer and pauses it while the alert is
+         * hovered, resuming when the mouse leaves.
+         */
+        ngOnInit(): void {
 		if (this.timeout) {
 			let remaining = JSON.parse(JSON.stringify(this.timeout));
 
@@ -73,13 +94,17 @@ export class AlertComponent implements OnInit {
 		}
 	}
 
-	remove() {
-		this.delete_animation = true;
+        /**
+         * Triggers the closing animation and invokes the provided close
+         * callback once finished.
+         */
+        remove() {
+                this.delete_animation = true;
 
-		setTimeout(() => {
-			this.close();
+                setTimeout(() => {
+                        this.close();
 
-			this.delete_animation = false;
-		}, 350);
-	}
+                        this.delete_animation = false;
+                }, 350);
+        }
 }
