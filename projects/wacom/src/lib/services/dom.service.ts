@@ -1,23 +1,37 @@
 import {
-	ApplicationRef,
-	ComponentRef,
-	EmbeddedViewRef,
-	EnvironmentInjector,
-	Injectable,
-	Type,
-	createComponent,
-	inject,
+        ApplicationRef,
+        ComponentRef,
+        EmbeddedViewRef,
+        EnvironmentInjector,
+        Injectable,
+        Type,
+        createComponent,
+        inject,
 } from '@angular/core';
 
+/**
+ * Representation of a component that has been dynamically added to the DOM.
+ *
+ * @template T - Type of the attached component instance.
+ */
 export interface DomComponent<T> {
-	nativeElement: HTMLElement;
-	componentRef: ComponentRef<T>;
-	remove: () => void;
+        /** The root DOM element of the created component. */
+        nativeElement: HTMLElement;
+        /** Angular reference to the created component. */
+        componentRef: ComponentRef<T>;
+        /**
+         * Removes the component from the DOM and cleans up associated resources.
+         */
+        remove: () => void;
 }
 
 @Injectable({
-	providedIn: 'root',
+        providedIn: 'root',
 })
+/**
+ * Utility service for programmatically creating and interacting with Angular
+ * components within the DOM.
+ */
 export class DomService {
 	/**
 	 * Appends a component to a specified element by ID.
@@ -144,22 +158,35 @@ export class DomService {
 		return component;
 	}
 
-	removeComponent<T>(
-		componentRef: ComponentRef<T>,
-		providedIn?: string
-	): void {
-		this._appRef.detachView(componentRef.hostView);
+        /**
+         * Removes a previously attached component and optionally clears its
+         * unique `providedIn` flag.
+         *
+         * @param componentRef - Reference to the component to be removed.
+         * @param providedIn - Optional key used to track unique instances.
+         */
+        removeComponent<T>(
+                componentRef: ComponentRef<T>,
+                providedIn?: string
+        ): void {
+                this._appRef.detachView(componentRef.hostView);
 
-		componentRef.destroy();
+                componentRef.destroy();
 
-		if (providedIn) {
-			delete this._providedIn[providedIn];
-		}
-	}
+                if (providedIn) {
+                        delete this._providedIn[providedIn];
+                }
+        }
 
-	private _appRef = inject(ApplicationRef);
+        /** Reference to the root application used for view attachment. */
+        private _appRef = inject(ApplicationRef);
 
-	private _injector = inject(EnvironmentInjector);
+        /** Injector utilized when creating dynamic components. */
+        private _injector = inject(EnvironmentInjector);
 
-	private _providedIn: Record<string, boolean> = {};
+        /**
+         * Flags to ensure components with a specific `providedIn` key are only
+         * instantiated once at a time.
+         */
+        private _providedIn: Record<string, boolean> = {};
 }
