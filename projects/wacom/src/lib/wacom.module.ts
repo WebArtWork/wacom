@@ -33,7 +33,7 @@ const PIPES = [
 ];
 
 /* components */
-import { AlertComponent } from './components/alert/alert.component';
+import { AlertComponent } from './components/alert/alert/alert.component';
 import { WrapperComponent } from './components/alert/wrapper/wrapper.component';
 import { FilesComponent } from './components/files/files.component';
 import { LoaderComponent } from './components/loader/loader.component';

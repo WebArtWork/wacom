@@ -1,8 +1,9 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { ModalComponent } from '../components/modal/modal.component';
 import { CONFIG_TOKEN, Config } from '../interfaces/config.interface';
+import { DomComponent } from '../interfaces/dom.interface';
 import { Modal } from '../interfaces/modal.interface';
-import { DomComponent, DomService } from './dom.service';
+import { DomService } from './dom.service';
 @Injectable({
 	providedIn: 'root',
 })

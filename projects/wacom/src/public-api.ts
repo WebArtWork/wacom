@@ -12,7 +12,7 @@ export * from './lib/guard/meta.guard';
 /*
  *	Components
  */
-export * from './lib/components/alert/alert.component';
+export * from './lib/components/alert/alert/alert.component';
 export * from './lib/components/base.component';
 export * from './lib/components/crud.component';
 export * from './lib/components/loader/loader.component';

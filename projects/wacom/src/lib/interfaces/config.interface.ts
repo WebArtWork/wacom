@@ -1,22 +1,12 @@
 import { InjectionToken } from '@angular/core';
+import { AlertConfig } from './alert.interface';
 import { MetaConfig } from './meta.interface';
 import { StoreConfig } from './store.interface';
 
 export interface Config {
 	store?: StoreConfig;
 	meta?: MetaConfig;
-	alert?: {
-		text?: string;
-		type?: string;
-		icon?: string;
-		class?: string;
-		unique?: string;
-		progress?: boolean;
-		position?: string;
-		timeout?: number;
-		close?: any;
-		buttons?: any;
-	};
+	alert?: AlertConfig;
 	modal?: {
 		size?: any;
 		timeout?: any;

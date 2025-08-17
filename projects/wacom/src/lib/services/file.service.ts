@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FilesComponent } from '../components/files/files.component';
-import { DomComponent, DomService } from './dom.service';
+import { DomComponent } from '../interfaces/dom.interface';
+import { DomService } from './dom.service';
 import { HttpService } from './http.service';
 
 interface FileOptions {
@@ -27,15 +28,15 @@ interface FileOptions {
 	providedIn: 'root',
 })
 export class FileService {
-        private added: Record<string, FileOptions> = {};
-        private files: FileOptions[] = [];
-        private _component: DomComponent<FilesComponent>;
+	private added: Record<string, FileOptions> = {};
+	private files: FileOptions[] = [];
+	private _component: DomComponent<FilesComponent>;
 
-        constructor(private dom: DomService, private http: HttpService) {
-                this._component = this.dom.appendComponent(FilesComponent, {
-                        fs: this,
-                })!;
-        }
+	constructor(private dom: DomService, private http: HttpService) {
+		this._component = this.dom.appendComponent(FilesComponent, {
+			fs: this,
+		})!;
+	}
 
 	/**
 	 * Adds a file input configuration.
@@ -280,7 +281,7 @@ export class FileService {
 	 * @param info - The file options.
 	 */
 	// private process(file: File, info: FileOptions): void {
-        process(file: File, info: any): void {
+	process(file: File, info: any): void {
 		if (!file.type.startsWith('image/')) {
 			info.cb?.(false, file);
 			if (info.multiple_cb) {
@@ -340,10 +341,10 @@ export class FileService {
 			};
 			img.src = loadEvent.target?.result as string;
 		};
-                reader.readAsDataURL(file);
-        }
+		reader.readAsDataURL(file);
+	}
 
-        destroy() {
-                this._component.remove();
-        }
+	destroy() {
+		this._component.remove();
+	}
 }

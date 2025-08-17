@@ -1,0 +1,54 @@
+@if (text) {
+<div
+	class="waw-alert-container height"
+	[class._close]="delete_animation"
+	[ngClass]="class"
+>
+	<div
+		[ngClass]="
+			'waw-alert-color-' +
+			{
+				info: 'blue',
+				error: 'red',
+				success: 'green',
+				warning: 'orange',
+				question: 'yellow'
+			}[type]
+		"
+		class="waw-alert bounceInUp waw-alert-theme-light waw-alert-animateInside waw-alert-opened"
+		#alertRef
+	>
+		@if(progress) {
+		<div class="waw-alert__progress">
+			<span
+				[ngStyle]="{
+					'animation-duration': (timeout + 350) / 1000 + 's'
+				}"
+			></span>
+		</div>
+		}
+		<div class="waw-alert-body">
+			<div class="waw-alert-texts">
+				@if(icon) {
+				<div class="{{ icon }}"></div>
+				}
+				<div class="waw-alert-message slideIn">{{ text }}</div>
+			</div>
+			@if(type === 'question') {
+			<div>
+				@for (button of buttons; track $index) {
+				<button
+					(click)="remove(); button.callback && button.callback()"
+					class="alert-btn"
+				>
+					{{ button.text }}
+				</button>
+				}
+			</div>
+			} @if(closable) {
+			<div class="waw-alert__close" (click)="remove()"></div>
+			}
+		</div>
+	</div>
+</div>
+}

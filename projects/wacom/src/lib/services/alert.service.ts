@@ -1,49 +1,144 @@
 import { Inject, Injectable, Optional } from '@angular/core';
-import { AlertComponent } from '../components/alert/alert.component';
+import { AlertComponent } from '../components/alert/alert/alert.component';
 import { WrapperComponent } from '../components/alert/wrapper/wrapper.component';
-import { Alert, DEFAULT_Alert } from '../interfaces/alert.interface';
 import {
-	CONFIG_TOKEN,
-	Config,
-	DEFAULT_CONFIG,
-} from '../interfaces/config.interface';
-import { DomComponent, DomService } from './dom.service';
+	Alert,
+	ALERT_POSITIONS,
+	AlertConfig,
+	DEFAULT_ALERT_CONFIG,
+} from '../interfaces/alert.interface';
+import { Config, CONFIG_TOKEN } from '../interfaces/config.interface';
+import { DomComponent } from '../interfaces/dom.interface';
+import { DomService } from './dom.service';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class AlertService {
-	private alert: any;
-        private _container: DomComponent<WrapperComponent>;
 	constructor(
-		private dom: DomService,
-		@Inject(CONFIG_TOKEN) @Optional() private config: Config
+		@Inject(CONFIG_TOKEN) @Optional() private config: Config,
+		private _dom: DomService
 	) {
-		if (!this.config) this.config = DEFAULT_CONFIG;
-		this.alert = this.config.alert;
-		if (!this.alert) {
-			this.alert = DEFAULT_Alert;
-		} else {
-			for (let each in DEFAULT_Alert) {
-				if (this.alert[each]) continue;
-				this.alert[each] = DEFAULT_Alert[each];
-			}
-		}
-		this._container = this.dom.appendComponent(WrapperComponent)!;
+		this._config = {
+			...DEFAULT_ALERT_CONFIG,
+			...(this.config.alert || {}),
+		};
+
+		this._container = this._dom.appendComponent(WrapperComponent)!;
 	}
-        private uniques: Record<string, DomComponent<any>> = {};
-	private shortcuts: any = {
-		tl: 'topLeft',
-		tc: 'topCenter',
-		tr: 'topRight',
-		r: 'right',
-		br: 'bottomRight',
-		bc: 'bottomCenter',
-		bl: 'bottomLeft',
-		l: 'left',
-		c: 'center',
-	};
-	private positionNumber: any = {
+
+	show(opts: Alert | string) {
+		if (typeof opts === 'string') {
+			opts = {
+				...this._config,
+				text: opts,
+			};
+		}
+
+		if (!opts.type) opts.type = 'info';
+
+		if (!opts.position) opts.position = 'bottomRight';
+
+		let alertComponent: DomComponent<AlertComponent> | undefined;
+
+		let content: DomComponent<any> | undefined;
+
+		opts.close = () => {
+			content?.remove();
+
+			alertComponent?.remove();
+
+			if (typeof (opts as Alert).onClose == 'function') {
+				(opts as Alert).onClose?.();
+			}
+		};
+
+		alertComponent = this._dom.appendById(
+			AlertComponent,
+			opts,
+			opts.position
+		);
+
+		if (typeof opts.component === 'function') {
+			content = this._dom.appendComponent(
+				opts.component,
+				opts,
+				this._container.nativeElement.children[0].children[
+					this._positionNumber[opts.position] || 0
+				] as HTMLElement
+			)!;
+		}
+
+		const main = content ? content! : alertComponent!;
+
+		if (opts.unique) {
+			if (this._uniques[opts.unique]) this._uniques[opts.unique].remove();
+
+			this._uniques[opts.unique] = main;
+		}
+
+		if (typeof opts.timeout !== 'number') {
+			opts.timeout = 3000;
+		}
+
+		if (opts.timeout) {
+			setTimeout(() => {
+				opts.close?.();
+			}, opts.timeout);
+		}
+
+		return main.nativeElement;
+	}
+
+	open(opts: Alert) {
+		this.show(opts);
+	}
+
+	info(opts: Alert) {
+		opts.type = 'info';
+
+		this.show(opts);
+	}
+
+	success(opts: Alert) {
+		opts.type = 'success';
+
+		this.show(opts);
+	}
+
+	warning(opts: Alert) {
+		opts.type = 'warning';
+
+		this.show(opts);
+	}
+
+	error(opts: Alert) {
+		opts.type = 'error';
+
+		this.show(opts);
+	}
+
+	question(opts: Alert) {
+		opts.type = 'question';
+
+		this.show(opts);
+	}
+
+	destroy() {
+		for (const id of ALERT_POSITIONS) {
+			const el = document.getElementById(id);
+
+			if (el) el.innerHTML = '';
+		}
+	}
+
+	private _config: AlertConfig;
+
+	private _container: DomComponent<WrapperComponent>;
+
+	private _uniques: Record<string, DomComponent<any>> = {};
+
+	private _positionNumber: any = {
 		topLeft: 3,
 		topCenter: 4,
 		topRight: 2,
@@ -54,123 +149,4 @@ export class AlertService {
 		left: '',
 		center: 6,
 	};
-
-	show(opts: any | Alert) {
-		if (typeof opts === 'string') {
-			opts = {
-				text: opts,
-			};
-		}
-		if (!opts) opts = {};
-		if (!opts['type']) opts['type'] = 'info';
-		for (let each in this.alert) {
-			if (each == 'class')
-				opts[each] = opts[each] + ' ' + this.alert[each];
-			else if (typeof opts[each] == 'undefined')
-				opts[each] = this.alert[each];
-		}
-		if (this.shortcuts[opts.position])
-			opts.position = this.shortcuts[opts.position];
-		if (!opts.position) opts.position = 'bottomRight';
-                let alertComponent: DomComponent<AlertComponent> | undefined;
-                let content: DomComponent<any> | undefined;
-
-                opts.close = () => {
-                        content?.remove();
-                        alertComponent?.remove();
-                        if (typeof (opts as Alert).onClose == 'function')
-                                (opts as Alert).onClose();
-                };
-
-                let customElement = false;
-
-                if (
-                        typeof opts.component == 'string' &&
-                        this.alert.alerts[opts.component]
-                ) {
-                        opts.component = this.alert.alerts[opts.component];
-                        customElement = true;
-                } else {
-                        alertComponent = this.dom.appendById(
-                                AlertComponent,
-                                opts,
-                                opts.position
-                        );
-                }
-
-                if (typeof opts.component === 'function') {
-                        content = this.dom.appendComponent(
-                                opts.component,
-                                opts,
-                                this._container.nativeElement.children[0].children[
-                                        this.positionNumber[opts.position] || 0
-                                ] as HTMLElement
-                        )!;
-                }
-
-                const main = customElement ? content! : alertComponent!;
-
-                if (opts.unique) {
-                        if (this.uniques[opts.unique]) this.uniques[opts.unique].remove();
-                        this.uniques[opts.unique] = main;
-                }
-
-                if (typeof opts.timeout !== 'number') {
-                        opts.timeout = 2000;
-                }
-
-                if (opts.timeout) {
-                        setTimeout(() => {
-                                opts.close();
-                        }, opts.timeout);
-                }
-
-                return main.nativeElement;
-        }
-
-	open(opts: Alert) {
-		this.show(opts);
-	}
-
-	info(opts: Alert) {
-		opts['type'] = 'info';
-		this.show(opts);
-	}
-
-	success(opts: Alert) {
-		opts['type'] = 'success';
-		this.show(opts);
-	}
-
-	warning(opts: Alert) {
-		opts['type'] = 'warning';
-		this.show(opts);
-	}
-
-	error(opts: Alert) {
-		opts['type'] = 'error';
-		this.show(opts);
-	}
-
-	question(opts: Alert) {
-		opts['type'] = 'question';
-		this.show(opts);
-	}
-
-        destroy() {
-                this._container.remove();
-                [
-                        'bottomRight',
-                        'bottomLeft',
-                        'bottomCenter',
-                        'topRight',
-                        'topLeft',
-                        'topCenter',
-                        'center',
-                ].forEach((id) => {
-                        const el = document.getElementById(id);
-
-                        if (el) el.innerHTML = '';
-                });
-        }
 }
