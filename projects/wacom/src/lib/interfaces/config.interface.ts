@@ -1,5 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { AlertConfig } from './alert.interface';
+import { LoaderConfig } from './loader.interface';
 import { MetaConfig } from './meta.interface';
 import { StoreConfig } from './store.interface';
 
@@ -7,6 +8,7 @@ export interface Config {
 	store?: StoreConfig;
 	meta?: MetaConfig;
 	alert?: AlertConfig;
+	loader?: LoaderConfig;
 	modal?: {
 		size?: any;
 		timeout?: any;

@@ -24,12 +24,12 @@ export class AlertService {
 	 * component creation.
 	 */
 	constructor(
-		@Inject(CONFIG_TOKEN) @Optional() private config: Config,
+		@Inject(CONFIG_TOKEN) @Optional() config: Config,
 		private _dom: DomService
 	) {
 		this._config = {
 			...DEFAULT_ALERT_CONFIG,
-			...(this.config?.alert || {}),
+			...(config?.alert || {}),
 		};
 
 		this._container = this._dom.appendComponent(WrapperComponent)!;
@@ -62,6 +62,10 @@ export class AlertService {
 			content?.remove();
 
 			alertComponent?.remove();
+
+			content = undefined;
+
+			alertComponent = undefined;
 
 			if (typeof (opts as Alert).onClose == 'function') {
 				(opts as Alert).onClose?.();

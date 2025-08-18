@@ -1,12 +1,12 @@
-<ng-container *ngFor="let file of fs.files">
-	<input
-		[id]="file.id"
-		type="file"
-		name="file"
-		(change)="fs.change($event, file); input.value = ''"
-		#input
-		[hidden]="true"
-		[accept]="file.accept || (file.part && 'image/*') || ''"
-		[multiple]="(file.multiple && true) || ''"
-	/>
-</ng-container>
+@for (file of fs.files; track $index) {
+<input
+	[id]="file.id"
+	type="file"
+	name="file"
+	(change)="fs.change($event, file); input.value = ''"
+	#input
+	[hidden]="true"
+	[accept]="file.accept || (file.part && 'image/*') || ''"
+	[multiple]="(file.multiple && true) || ''"
+/>
+}

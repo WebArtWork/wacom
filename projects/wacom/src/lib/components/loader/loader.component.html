@@ -11,10 +11,12 @@
 		align-items: center;
 		z-index: 999999;
 	"
-	#loader
 >
-	<span class="close" (click)="close()" *ngIf="closable">&times;</span>
+	@if(closable){
+	<span class="close" (click)="close()">&times;</span>
+	} @if(text){
 	<span style="font-size: 30px; color: white">
 		{{ text }}
 	</span>
+	}
 </div>

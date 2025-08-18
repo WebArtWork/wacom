@@ -22,31 +22,31 @@ export class AlertComponent implements AfterViewInit {
 	@ViewChild('alertRef') alertRef!: ElementRef<HTMLDivElement>;
 
 	/** Callback invoked to remove the alert from the DOM. */
-	close: () => void = () => {};
+	close!: () => void;
 
 	/** Text content displayed inside the alert. */
-	text: string = '';
+	text!: string;
 
 	/** Additional CSS classes applied to the alert container. */
-	class: string = '';
+	class!: string;
 
 	/** Type of alert which determines styling and icon. */
 	type: AlertType = 'info';
 
 	/** Position on the screen where the alert appears. */
-	position: AlertPosition = 'bottomRight';
+	position: AlertPosition = 'bottom';
 
 	/** Whether a progress bar indicating remaining time is shown. */
-	progress: boolean = true;
+	progress!: boolean;
 
 	/** Icon name displayed alongside the message. */
-	icon: string = '';
+	icon!: string;
 
 	/** Time in milliseconds before the alert auto closes. */
-	timeout: number = 5000;
+	timeout!: number;
 
 	/** Determines if a manual close button is visible. */
-	closable: boolean = true;
+	closable!: boolean;
 
 	/** Flag used to trigger the deletion animation. */
 	delete_animation = false;

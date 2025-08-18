@@ -2,9 +2,7 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { AlertService } from 'projects/wacom/src/public-api';
 
 @Component({
-	selector: 'app-alerts',
 	templateUrl: './alerts.component.html',
-	styleUrl: './alerts.component.scss',
 })
 export class AlertsComponent {
 	constructor() {

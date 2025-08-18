@@ -1,23 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
-	selector: 'lib-loader',
 	templateUrl: './loader.component.html',
-	styleUrls: ['./loader.component.scss'],
-	standalone: true,
 	imports: [CommonModule],
 })
 export class LoaderComponent {
-	@ViewChild('loader', { static: false }) loader: any;
-	public text: string = 'Loading';
-	public class: string = '';
-	public progress: boolean = true;
-	public timeout: number = 5000;
-	public close: any;
-	public closable: any = true;
-	constructor() {}
-	ngOnInit() {
+	close!: () => void;
+
+	text!: string;
+
+	class!: string;
+
+	progress!: boolean;
+
+	timeout!: number;
+
+	closable!: boolean;
+
+	constructor() {
 		if (this.timeout) {
 			setTimeout(() => {
 				this.close();

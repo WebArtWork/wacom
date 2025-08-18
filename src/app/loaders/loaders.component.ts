@@ -1,11 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { LoaderService } from 'wacom';
 
 @Component({
-  selector: 'app-loaders',
-  imports: [],
-  templateUrl: './loaders.component.html',
-  styleUrl: './loaders.component.scss'
+	templateUrl: './loaders.component.html',
 })
 export class LoadersComponent {
+	constructor() {
+		this._loaderService.show();
 
+		this._destroyRef.onDestroy(() => {
+			this._loaderService.destroy();
+		});
+	}
+
+	private _destroyRef = inject(DestroyRef);
+
+	private _loaderService = inject(LoaderService);
 }
