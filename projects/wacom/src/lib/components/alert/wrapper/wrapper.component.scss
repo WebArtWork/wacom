@@ -72,24 +72,23 @@
         text-align: right;
 }
 
-/* Hide web-only positions on small screens */
-.waw-alert-wrapper-topLeft,
-.waw-alert-wrapper-topRight,
-.waw-alert-wrapper-left,
-.waw-alert-wrapper-right,
-.waw-alert-wrapper-bottomLeft,
-.waw-alert-wrapper-bottomRight {
-        display: none;
-}
-
-@media only screen and (min-width: 568px) {
+/* Mobile: show all positions full width */
+@media only screen and (max-width: 567px) {
         .waw-alert-wrapper-topLeft,
         .waw-alert-wrapper-topRight,
         .waw-alert-wrapper-left,
         .waw-alert-wrapper-right,
         .waw-alert-wrapper-bottomLeft,
         .waw-alert-wrapper-bottomRight {
-                display: flex;
+                left: 0;
+                right: 0;
+                text-align: center;
+        }
+
+        .waw-alert-wrapper-left,
+        .waw-alert-wrapper-right {
+                flex-flow: column;
+                align-items: center;
         }
 }
 
