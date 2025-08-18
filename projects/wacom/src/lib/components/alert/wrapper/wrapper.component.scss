@@ -1,57 +1,94 @@
 .waw-alert-wrapper {
-	z-index: 99999;
-	position: fixed;
-	width: 100%;
-	pointer-events: none;
-	display: flex;
-	flex-direction: column;
-}
-
-.waw-alert-wrapper-bottomLeft {
-	left: 0;
-	bottom: 0;
-	text-align: left;
-}
-
-.waw-alert-wrapper-bottomRight {
-	right: 0;
-	bottom: 0;
-	text-align: right;
+        z-index: 99999;
+        position: fixed;
+        width: 100%;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
 }
 
 .waw-alert-wrapper-topLeft {
-	left: 0;
-	top: 0;
-	text-align: left;
+        top: 0;
+        left: 0;
+        text-align: left;
+}
+
+.waw-alert-wrapper-top {
+        top: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
 }
 
 .waw-alert-wrapper-topRight {
-	top: 0;
-	right: 0;
-	text-align: right;
+        top: 0;
+        right: 0;
+        text-align: right;
 }
 
-.waw-alert-wrapper-topCenter {
-	top: 0;
-	left: 0;
-	right: 0;
-	text-align: center;
-}
-
-.waw-alert-wrapper-bottomCenter {
-	bottom: 0;
-	left: 0;
-	right: 0;
-	text-align: center;
+.waw-alert-wrapper-left {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        justify-content: center;
+        text-align: left;
 }
 
 .waw-alert-wrapper-center {
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	text-align: center;
-	justify-content: center;
-	flex-flow: column;
-	align-items: center;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
+        justify-content: center;
+        flex-flow: column;
+        align-items: center;
 }
+
+.waw-alert-wrapper-right {
+        top: 0;
+        bottom: 0;
+        right: 0;
+        justify-content: center;
+        text-align: right;
+}
+
+.waw-alert-wrapper-bottomLeft {
+        bottom: 0;
+        left: 0;
+        text-align: left;
+}
+
+.waw-alert-wrapper-bottom {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
+}
+
+.waw-alert-wrapper-bottomRight {
+        bottom: 0;
+        right: 0;
+        text-align: right;
+}
+
+/* Mobile: show all positions full width */
+@media only screen and (max-width: 567px) {
+        .waw-alert-wrapper-topLeft,
+        .waw-alert-wrapper-topRight,
+        .waw-alert-wrapper-left,
+        .waw-alert-wrapper-right,
+        .waw-alert-wrapper-bottomLeft,
+        .waw-alert-wrapper-bottomRight {
+                left: 0;
+                right: 0;
+                text-align: center;
+        }
+
+        .waw-alert-wrapper-left,
+        .waw-alert-wrapper-right {
+                flex-flow: column;
+                align-items: center;
+        }
+}
+
