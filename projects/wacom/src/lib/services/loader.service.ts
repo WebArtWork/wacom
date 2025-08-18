@@ -29,6 +29,11 @@ export class LoaderService {
 				...this._config,
 				text: opts,
 			};
+		} else {
+			opts = {
+				...this._config,
+				...opts,
+			};
 		}
 
 		let component!: DomComponent<LoaderComponent> | undefined;

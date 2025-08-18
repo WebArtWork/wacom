@@ -1,11 +1,6 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-modals',
-  imports: [],
-  templateUrl: './modals.component.html',
-  styleUrl: './modals.component.scss'
+	templateUrl: './modals.component.html',
 })
-export class ModalsComponent {
-
-}
+export class ModalsComponent {}

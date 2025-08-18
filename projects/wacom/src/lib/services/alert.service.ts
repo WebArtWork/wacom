@@ -48,6 +48,11 @@ export class AlertService {
 				...this._config,
 				text: opts,
 			};
+		} else {
+			opts = {
+				...this._config,
+				...opts,
+			};
 		}
 
 		if (!opts.type) opts.type = 'info';

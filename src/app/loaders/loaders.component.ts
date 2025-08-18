@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject } from '@angular/core';
-import { LoaderService } from 'wacom';
+import { LoaderService } from 'projects/wacom/src/public-api';
 
 @Component({
 	templateUrl: './loaders.component.html',
