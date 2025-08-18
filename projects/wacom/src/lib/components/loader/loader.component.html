@@ -1,18 +1,6 @@
 <div
         class="waw-loader"
         [ngClass]="class"
-        style="
-                position: fixed;
-                width: 100%;
-                height: 100%;
-                left: 0;
-                top: 0;
-                background-color: #334d6e;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 999999;
-        "
 >
         @if (progress) {
         <div class="waw-loader__progress">
@@ -27,7 +15,7 @@
         <span class="close" (click)="close()">&times;</span>
         }
         @if(text){
-        <span style="font-size: 30px; color: white">
+        <span class="waw-loader__text">
                 {{ text }}
         </span>
         }
