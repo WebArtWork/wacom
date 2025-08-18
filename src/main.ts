@@ -9,7 +9,9 @@ import { provideRouter } from '@angular/router';
 import { provideWacom } from 'projects/wacom/src/public-api';
 import { AlertsComponent } from './app/alerts/alerts.component';
 import { AppComponent } from './app/app.component';
+import { LoadersComponent } from './app/loaders/loaders.component';
 import { MenuComponent } from './app/menu/menu.component';
+import { ModalsComponent } from './app/modals/modals.component';
 
 bootstrapApplication(AppComponent, {
 	providers: [
@@ -24,6 +26,14 @@ bootstrapApplication(AppComponent, {
 			{
 				path: 'alerts',
 				component: AlertsComponent,
+			},
+			{
+				path: 'modals',
+				component: ModalsComponent,
+			},
+			{
+				path: 'loaders',
+				component: LoadersComponent,
 			},
 		]),
 	],
