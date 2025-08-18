@@ -79,10 +79,15 @@
         .waw-alert-wrapper-left,
         .waw-alert-wrapper-right,
         .waw-alert-wrapper-bottomLeft,
-        .waw-alert-wrapper-bottomRight {
+        .waw-alert-wrapper-bottomRight,
+        .waw-alert-wrapper-center {
                 left: 0;
                 right: 0;
                 text-align: center;
+        }
+
+        .waw-alert-wrapper-center {
+                align-items: stretch;
         }
 
         .waw-alert-wrapper-left,
