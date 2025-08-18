@@ -1,18 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AlertService } from 'projects/wacom/src/public-api';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
+
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
-	imports: [CommonModule, FormsModule],
+	imports: [CommonModule, FormsModule, RouterOutlet, RouterLink],
 })
 export class AppComponent {
-	private _alertService = inject(AlertService);
-
-	constructor() {
-		this._alertService.show({
-			text: 'Hello World',
-		});
-	}
+	router = inject(Router);
 }

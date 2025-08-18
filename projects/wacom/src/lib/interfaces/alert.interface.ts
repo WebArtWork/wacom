@@ -5,13 +5,15 @@ export const ALERT_TYPES = ['info', 'error', 'success', 'warning', 'question'];
 export type AlertType = (typeof ALERT_TYPES)[number];
 
 export const ALERT_POSITIONS = [
-	'bottomRight',
-	'bottomLeft',
-	'topRight',
 	'topLeft',
-	'topCenter',
-	'bottomCenter',
+	'top',
+	'topRight',
+	'left',
 	'center',
+	'right',
+	'bottomLeft',
+	'bottom',
+	'bottomRight',
 ];
 export type AlertPosition = (typeof ALERT_POSITIONS)[number];
 
@@ -66,7 +68,7 @@ export const DEFAULT_ALERT_CONFIG: Alert = {
 	type: 'info',
 	class: '',
 	progress: true,
-	position: 'bottomRight',
+	position: 'bottom',
 	timeout: 3000,
 	closable: true,
 	buttons: [],

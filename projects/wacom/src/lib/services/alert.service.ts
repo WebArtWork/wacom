@@ -179,14 +179,14 @@ export class AlertService {
 
 	/** Mapping of alert positions to wrapper child indexes. */
 	private _positionNumber: any = {
-		topLeft: 3,
-		topCenter: 4,
+		topLeft: 0,
+		top: 1,
 		topRight: 2,
-		right: '',
-		bottomRight: 0,
-		bottomCenter: 5,
-		bottomLeft: 1,
-		left: '',
-		center: 6,
+		left: 3,
+		center: 4,
+		right: 5,
+		bottomLeft: 6,
+		bottom: 7,
+		bottomRight: 8,
 	};
 }
