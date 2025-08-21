@@ -21,9 +21,8 @@
 		@if(progress) {
 		<div class="waw-alert__progress">
 			<span
-				[ngStyle]="{
-					'animation-duration': (timeout + 350) / 1000 + 's'
-				}"
+				[ngClass]="'_' + { info: 'blue', error: 'red', success: 'green', warning: 'orange', question: 'yellow' }[type]"
+				[ngStyle]="{ 'animation-duration': (timeout + 350) / 1000 + 's' }"
 			></span>
 		</div>
 		}
