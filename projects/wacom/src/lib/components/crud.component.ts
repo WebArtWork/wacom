@@ -133,7 +133,8 @@ export abstract class CrudComponent<
 		});
 	}
 
-	protected updatableFields = ['_id', 'name', 'description', 'data'];
+        /** Fields considered when performing bulk updates. */
+        protected updatableFields = ['_id', 'name', 'description', 'data'];
 
 	/**
 	 * Clears temporary metadata before document creation.
@@ -163,9 +164,10 @@ export abstract class CrudComponent<
 		return true;
 	}
 
-	protected allowSort(): boolean {
-		return false;
-	}
+        /** Determines whether manual sorting controls are available. */
+        protected allowSort(): boolean {
+                return false;
+        }
 
 	/**
 	 * Funciton which prepare get crud options.
@@ -241,7 +243,8 @@ export abstract class CrudComponent<
 		};
 	}
 
-	protected create() {
+        /** Opens a modal to create a new document. */
+        protected create() {
 		this.__form.modal<Document>(this.form, {
 			label: 'Create',
 			click: async (created: unknown, close: () => void) => {
@@ -255,7 +258,8 @@ export abstract class CrudComponent<
 		});
 	}
 
-	protected update(doc: Document) {
+        /** Displays a modal to edit an existing document. */
+        protected update(doc: Document) {
 		this.__form
 			.modal<Document>(this.form, [], doc)
 			.then((updated: Document) => {
@@ -267,7 +271,8 @@ export abstract class CrudComponent<
 			});
 	}
 
-	protected delete(doc: Document) {
+        /** Requests confirmation before deleting the provided document. */
+        protected delete(doc: Document) {
 		this.__alert.question({
 			text: this.translate.translate(
 				`Common.Are you sure you want to delete this${
@@ -288,11 +293,13 @@ export abstract class CrudComponent<
 		});
 	}
 
-	protected mutateUrl(doc: Document) {
+        /** Opens a modal to edit the document's unique URL. */
+        protected mutateUrl(doc: Document) {
 		this.__form.modalUnique<Document>(this._module, 'url', doc);
 	}
 
-	protected moveUp(doc: Document) {
+        /** Moves the given document one position up and updates ordering. */
+        protected moveUp(doc: Document) {
 		const index = this.documents().findIndex(
 			(document) => document()._id === doc._id
 		);
@@ -318,9 +325,11 @@ export abstract class CrudComponent<
 		this.__cdr.markForCheck();
 	}
 
-	protected configType: 'server' | 'local' = 'server';
+        /** Data source mode used for document retrieval. */
+        protected configType: 'server' | 'local' = 'server';
 
-	protected perPage = 20;
+        /** Number of documents fetched per page when paginating. */
+        protected perPage = 20;
 
 	/**
 	 * Configuration object used by the UI for rendering table and handling actions.
@@ -394,5 +403,6 @@ export abstract class CrudComponent<
 			: config;
 	}
 
-	private _module = '';
+        /** Name of the collection or module used for contextual actions. */
+        private _module = '';
 }
