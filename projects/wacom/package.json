@@ -5,9 +5,6 @@
 	"repository": "WebArtWork/wacom",
 	"keywords": [
 		"Angular",
-		"Angular Universal",
-		"SSR",
-		"Server-Side Rendering",
 		"Platform Detection",
 		"Local Storage",
 		"Window Object",
@@ -41,7 +38,6 @@
 		"image",
 		"crud",
 		"file",
-		"hash",
 		"web art work"
 	]
 }
