@@ -45,7 +45,7 @@ export abstract class CrudComponent<
 	FormInterface
 > {
 	/** Service responsible for data fetching, creating, updating, deleting */
-	protected service: Service;
+	protected crudService: Service;
 
 	/** The array of documents currently loaded and shown */
 	protected documents = signal<Signal<Document>[]>([]);
@@ -73,23 +73,23 @@ export abstract class CrudComponent<
 	 *
 	 * @param formConfig - Object describing form title and its component structure
 	 * @param formService - Any service that conforms to FormServiceInterface (usually casted)
-	 * @param translate - An object providing a translate() method for i18n
-	 * @param service - CRUD service implementing get/create/update/delete
+	 * @param translateService - An object providing a translate() method for i18n
+	 * @param crudService - CRUD service implementing get/create/update/delete
 	 */
 	constructor(
 		formConfig: unknown,
 		protected formService: unknown,
-		protected translate: { translate: (key: string) => string },
-		service: Service,
+		protected translateService: { translate: (key: string) => string },
+		crudService: Service,
 		module = ''
 	) {
-		this.service = service;
+		const form = formConfig as FormInterface;
 
 		this.__form = formService as FormServiceInterface<FormInterface>;
 
-		const form = formConfig as FormInterface;
-
 		this.form = this.__form.prepareForm(form);
+
+		this.crudService = crudService;
 
 		this._module = module;
 	}
@@ -105,7 +105,7 @@ export abstract class CrudComponent<
 				this.__core.afterWhile(
 					this,
 					() => {
-						this.service
+						this.crudService
 							.get({ page }, this.getOptions())
 							.subscribe((docs: Document[]) => {
 								this.documents.update(() =>
@@ -121,10 +121,10 @@ export abstract class CrudComponent<
 				);
 			} else {
 				this.documents.update(() =>
-					this.__core.toSignalsArray(this.service.getDocs())
+					this.__core.toSignalsArray(this.crudService.getDocs())
 				);
 
-				this.service.loaded.then(() => {
+				this.crudService.loaded.then(() => {
 					resolve();
 
 					this.__cdr.markForCheck();
@@ -133,8 +133,8 @@ export abstract class CrudComponent<
 		});
 	}
 
-        /** Fields considered when performing bulk updates. */
-        protected updatableFields = ['_id', 'name', 'description', 'data'];
+	/** Fields considered when performing bulk updates. */
+	protected updatableFields = ['_id', 'name', 'description', 'data'];
 
 	/**
 	 * Clears temporary metadata before document creation.
@@ -164,10 +164,10 @@ export abstract class CrudComponent<
 		return true;
 	}
 
-        /** Determines whether manual sorting controls are available. */
-        protected allowSort(): boolean {
-                return false;
-        }
+	/** Determines whether manual sorting controls are available. */
+	protected allowSort(): boolean {
+		return false;
+	}
 
 	/**
 	 * Funciton which prepare get crud options.
@@ -202,13 +202,13 @@ export abstract class CrudComponent<
 						for (const doc of docs) {
 							this.preCreate(doc);
 
-							await firstValueFrom(this.service.create(doc));
+							await firstValueFrom(this.crudService.create(doc));
 						}
 					} else {
 						for (const document of this.documents()) {
 							if (!docs.find((d) => d._id === document()._id)) {
 								await firstValueFrom(
-									this.service.delete(document())
+									this.crudService.delete(document())
 								);
 							}
 						}
@@ -228,12 +228,14 @@ export abstract class CrudComponent<
 								);
 
 								await firstValueFrom(
-									this.service.update(local())
+									this.crudService.update(local())
 								);
 							} else {
 								this.preCreate(doc);
 
-								await firstValueFrom(this.service.create(doc));
+								await firstValueFrom(
+									this.crudService.create(doc)
+								);
 							}
 						}
 					}
@@ -243,48 +245,50 @@ export abstract class CrudComponent<
 		};
 	}
 
-        /** Opens a modal to create a new document. */
-        protected create() {
+	/** Opens a modal to create a new document. */
+	protected create() {
 		this.__form.modal<Document>(this.form, {
 			label: 'Create',
 			click: async (created: unknown, close: () => void) => {
 				close();
 				this.preCreate(created as Document);
 
-				await firstValueFrom(this.service.create(created as Document));
+				await firstValueFrom(
+					this.crudService.create(created as Document)
+				);
 
 				this.setDocuments();
 			},
 		});
 	}
 
-        /** Displays a modal to edit an existing document. */
-        protected update(doc: Document) {
+	/** Displays a modal to edit an existing document. */
+	protected update(doc: Document) {
 		this.__form
 			.modal<Document>(this.form, [], doc)
 			.then((updated: Document) => {
 				this.__core.copy(updated, doc);
 
-				this.service.update(doc);
+				this.crudService.update(doc);
 
 				this.__cdr.markForCheck();
 			});
 	}
 
-        /** Requests confirmation before deleting the provided document. */
-        protected delete(doc: Document) {
+	/** Requests confirmation before deleting the provided document. */
+	protected delete(doc: Document) {
 		this.__alert.question({
-			text: this.translate.translate(
+			text: this.translateService.translate(
 				`Common.Are you sure you want to delete this${
 					this._module ? ' ' + this._module : ''
 				}?`
 			),
 			buttons: [
-				{ text: this.translate.translate('Common.No') },
+				{ text: this.translateService.translate('Common.No') },
 				{
-					text: this.translate.translate('Common.Yes'),
+					text: this.translateService.translate('Common.Yes'),
 					callback: async (): Promise<void> => {
-						await firstValueFrom(this.service.delete(doc));
+						await firstValueFrom(this.crudService.delete(doc));
 
 						this.setDocuments();
 					},
@@ -293,13 +297,13 @@ export abstract class CrudComponent<
 		});
 	}
 
-        /** Opens a modal to edit the document's unique URL. */
-        protected mutateUrl(doc: Document) {
+	/** Opens a modal to edit the document's unique URL. */
+	protected mutateUrl(doc: Document) {
 		this.__form.modalUnique<Document>(this._module, 'url', doc);
 	}
 
-        /** Moves the given document one position up and updates ordering. */
-        protected moveUp(doc: Document) {
+	/** Moves the given document one position up and updates ordering. */
+	protected moveUp(doc: Document) {
 		const index = this.documents().findIndex(
 			(document) => document()._id === doc._id
 		);
@@ -318,18 +322,18 @@ export abstract class CrudComponent<
 			if (this.documents()[i]().order !== i) {
 				this.documents()[i]().order = i;
 
-				this.service.update(this.documents()[i]());
+				this.crudService.update(this.documents()[i]());
 			}
 		}
 
 		this.__cdr.markForCheck();
 	}
 
-        /** Data source mode used for document retrieval. */
-        protected configType: 'server' | 'local' = 'server';
+	/** Data source mode used for document retrieval. */
+	protected configType: 'server' | 'local' = 'server';
 
-        /** Number of documents fetched per page when paginating. */
-        protected perPage = 20;
+	/** Number of documents fetched per page when paginating. */
+	protected perPage = 20;
 
 	/**
 	 * Configuration object used by the UI for rendering table and handling actions.
@@ -397,12 +401,14 @@ export abstract class CrudComponent<
 					...config,
 					paginate: this.setDocuments.bind(this),
 					perPage: this.perPage,
-					setPerPage: this.service.setPerPage?.bind(this.service),
+					setPerPage: this.crudService.setPerPage?.bind(
+						this.crudService
+					),
 					allDocs: false,
 			  }
 			: config;
 	}
 
-        /** Name of the collection or module used for contextual actions. */
-        private _module = '';
+	/** Name of the collection or module used for contextual actions. */
+	private _module = '';
 }

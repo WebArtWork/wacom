@@ -92,6 +92,8 @@ export class AlertComponent implements AfterViewInit {
 				false
 			);
 		}
+
+		console.log(this);
 	}
 
 	/**
