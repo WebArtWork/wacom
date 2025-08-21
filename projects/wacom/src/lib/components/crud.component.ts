@@ -241,6 +241,83 @@ export abstract class CrudComponent<
 		};
 	}
 
+	protected create() {
+		this.__form.modal<Document>(this.form, {
+			label: 'Create',
+			click: async (created: unknown, close: () => void) => {
+				close();
+				this.preCreate(created as Document);
+
+				await firstValueFrom(this.service.create(created as Document));
+
+				this.setDocuments();
+			},
+		});
+	}
+
+	protected update(doc: Document) {
+		this.__form
+			.modal<Document>(this.form, [], doc)
+			.then((updated: Document) => {
+				this.__core.copy(updated, doc);
+
+				this.service.update(doc);
+
+				this.__cdr.markForCheck();
+			});
+	}
+
+	protected delete(doc: Document) {
+		this.__alert.question({
+			text: this.translate.translate(
+				`Common.Are you sure you want to delete this${
+					this._module ? ' ' + this._module : ''
+				}?`
+			),
+			buttons: [
+				{ text: this.translate.translate('Common.No') },
+				{
+					text: this.translate.translate('Common.Yes'),
+					callback: async (): Promise<void> => {
+						await firstValueFrom(this.service.delete(doc));
+
+						this.setDocuments();
+					},
+				},
+			],
+		});
+	}
+
+	protected mutateUrl(doc: Document) {
+		this.__form.modalUnique<Document>(this._module, 'url', doc);
+	}
+
+	protected moveUp(doc: Document) {
+		const index = this.documents().findIndex(
+			(document) => document()._id === doc._id
+		);
+
+		if (index) {
+			this.documents.update((documents) => {
+				documents.splice(index, 1);
+
+				documents.splice(index - 1, 0, this.__core.toSignal(doc));
+
+				return documents;
+			});
+		}
+
+		for (let i = 0; i < this.documents().length; i++) {
+			if (this.documents()[i]().order !== i) {
+				this.documents()[i]().order = i;
+
+				this.service.update(this.documents()[i]());
+			}
+		}
+
+		this.__cdr.markForCheck();
+	}
+
 	protected configType: 'server' | 'local' = 'server';
 
 	protected perPage = 20;
@@ -252,63 +329,19 @@ export abstract class CrudComponent<
 		const config = {
 			create: this.allowCreate()
 				? (): void => {
-						this.__form.modal<Document>(this.form, {
-							label: 'Create',
-							click: async (
-								created: unknown,
-								close: () => void
-							) => {
-								close();
-								this.preCreate(created as Document);
-
-								await firstValueFrom(
-									this.service.create(created as Document)
-								);
-
-								this.setDocuments();
-							},
-						});
+						this.create();
 				  }
 				: null,
 
 			update: this.allowMutate()
 				? (doc: Document): void => {
-						this.__form
-							.modal<Document>(this.form, [], doc)
-							.then((updated: Document) => {
-								this.__core.copy(updated, doc);
-
-								this.service.update(doc);
-
-								this.__cdr.markForCheck();
-							});
+						this.update(doc);
 				  }
 				: null,
 
 			delete: this.allowMutate()
 				? (doc: Document): void => {
-						this.__alert.question({
-							text: this.translate.translate(
-								`Common.Are you sure you want to delete this${
-									this._module ? ' ' + this._module : ''
-								}?`
-							),
-							buttons: [
-								{ text: this.translate.translate('Common.No') },
-								{
-									text: this.translate.translate(
-										'Common.Yes'
-									),
-									callback: async (): Promise<void> => {
-										await firstValueFrom(
-											this.service.delete(doc)
-										);
-
-										this.setDocuments();
-									},
-								},
-							],
-						});
+						this.delete(doc);
 				  }
 				: null,
 
@@ -317,11 +350,7 @@ export abstract class CrudComponent<
 					? {
 							icon: 'cloud_download',
 							click: (doc: Document): void => {
-								this.__form.modalUnique<Document>(
-									this._module,
-									'url',
-									doc
-								);
+								this.mutateUrl(doc);
 							},
 					  }
 					: null,
@@ -329,39 +358,7 @@ export abstract class CrudComponent<
 					? {
 							icon: 'arrow_upward',
 							click: (doc: Document): void => {
-								const index = this.documents().findIndex(
-									(document) => document()._id === doc._id
-								);
-
-								if (index) {
-									this.documents.update((documents) => {
-										documents.splice(index, 1);
-
-										documents.splice(
-											index - 1,
-											0,
-											this.__core.toSignal(doc)
-										);
-
-										return documents;
-									});
-								}
-
-								for (
-									let i = 0;
-									i < this.documents().length;
-									i++
-								) {
-									if (this.documents()[i]().order !== i) {
-										this.documents()[i]().order = i;
-
-										this.service.update(
-											this.documents()[i]()
-										);
-									}
-								}
-
-								this.__cdr.markForCheck();
+								this.moveUp(doc);
 							},
 					  }
 					: null,
