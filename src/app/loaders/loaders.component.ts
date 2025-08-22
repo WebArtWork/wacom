@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { LoaderService } from 'projects/wacom/src/public-api';
 
 @Component({
@@ -6,7 +6,35 @@ import { LoaderService } from 'projects/wacom/src/public-api';
 })
 export class LoadersComponent {
 	constructor() {
+		// dummy example
 		this._loaderService.show();
+
+		// static example, which close after timeout
+		this._loaderService.show({
+			text: 'Loading based on progress and timeout, 50 seconds',
+			progress: true,
+			timeout: 50000,
+		});
+
+		// flexible example, which developer handle
+		const progressPercentage = signal(0);
+
+		const loader = this._loaderService.show({
+			text: 'Loading based on progressPercentage signal',
+			progressPercentage,
+		});
+
+		const intervalId = setInterval(() => {
+			const perc = progressPercentage();
+
+			if (perc >= 100) {
+				clearInterval(intervalId);
+
+				loader.remove();
+			} else {
+				progressPercentage.set(perc + 5);
+			}
+		}, 500);
 
 		this._destroyRef.onDestroy(() => {
 			this._loaderService.destroy();

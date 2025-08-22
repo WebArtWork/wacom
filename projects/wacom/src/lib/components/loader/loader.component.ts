@@ -2,28 +2,28 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-        templateUrl: './loader.component.html',
-        styleUrls: ['./loader.component.scss'],
-        imports: [CommonModule],
+	templateUrl: './loader.component.html',
+	styleUrls: ['./loader.component.scss'],
+	imports: [CommonModule],
 })
 export class LoaderComponent implements OnInit {
-        close!: () => void;
+	close!: () => void;
 
-        text!: string;
+	text!: string;
 
-        class!: string;
+	class!: string;
 
-        progress!: boolean;
+	progress!: boolean;
 
-        timeout!: number;
+	timeout!: number;
 
-        closable!: boolean;
+	closable!: boolean;
 
-        ngOnInit(): void {
-                if (this.timeout) {
-                        setTimeout(() => {
-                                this.close();
-                        }, this.timeout);
-                }
-        }
+	ngOnInit(): void {
+		if (this.timeout) {
+			setTimeout(() => {
+				this.close();
+			}, this.timeout);
+		}
+	}
 }

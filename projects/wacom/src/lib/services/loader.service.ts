@@ -24,17 +24,10 @@ export class LoaderService {
 	}
 
 	show(opts: Loader | string = 'Loading...') {
-		if (typeof opts === 'string') {
-			opts = {
-				...this._config,
-				text: opts,
-			};
-		} else {
-			opts = {
-				...this._config,
-				...opts,
-			};
-		}
+		opts = {
+			...this._config,
+			...(typeof opts === 'object' ? opts : { text: opts }),
+		};
 
 		let component!: DomComponent<LoaderComponent> | undefined;
 

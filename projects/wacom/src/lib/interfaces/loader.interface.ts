@@ -1,3 +1,5 @@
+import { Signal } from '@angular/core';
+
 /**
  * Configuration for a button rendered inside an Loader.
  */
@@ -26,11 +28,12 @@ export interface LoaderConfig {
 	close?: () => void;
 	/** Optional action buttons displayed within the Loader. */
 	buttons?: LoaderButton[];
+	closable?: boolean;
 }
 
 export interface Loader extends LoaderConfig {
+	progressPercentage?: Signal<number>;
 	onClose?: () => void;
-	closable?: boolean;
 	append?: HTMLElement;
 	component?: any;
 	[x: string]: any;
@@ -44,4 +47,5 @@ export const DEFAULT_LOADER_CONFIG: Loader = {
 	class: '',
 	progress: false,
 	timeout: 0,
+	closable: true,
 };

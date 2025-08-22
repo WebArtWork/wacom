@@ -1,22 +1,17 @@
-<div
-        class="waw-loader"
-        [ngClass]="class"
->
-        @if (progress) {
-        <div class="waw-loader__progress">
-                <span
-                        [ngStyle]="{
-                                'animation-duration': (timeout + 350) / 1000 + 's'
-                        }"
-                ></span>
-        </div>
-        }
-        @if(closable){
-        <span class="close" (click)="close()">&times;</span>
-        }
-        @if(text){
-        <span class="waw-loader__text">
-                {{ text }}
-        </span>
-        }
+<div class="waw-loader" [ngClass]="class">
+	@if (progress) {
+	<div class="waw-loader__progress">
+		<span
+			[ngStyle]="{
+				'animation-duration': (timeout + 350) / 1000 + 's'
+			}"
+		></span>
+	</div>
+	} @if(closable){
+	<span class="close" (click)="close()">&times;</span>
+	} @if(text){
+	<span class="waw-loader__text">
+		{{ text }}
+	</span>
+	}
 </div>
