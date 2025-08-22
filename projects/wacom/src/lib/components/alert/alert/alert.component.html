@@ -21,8 +21,19 @@
 		@if(progress) {
 		<div class="waw-alert__progress">
 			<span
-				[ngClass]="'_' + { info: 'blue', error: 'red', success: 'green', warning: 'orange', question: 'yellow' }[type]"
-				[ngStyle]="{ 'animation-duration': (timeout + 350) / 1000 + 's' }"
+				[ngClass]="
+					'_' +
+					{
+						info: 'blue',
+						error: 'red',
+						success: 'green',
+						warning: 'orange',
+						question: 'yellow'
+					}[type]
+				"
+				[ngStyle]="{
+					'animation-duration': (timeout + 350) / 1000 + 's'
+				}"
 			></span>
 		</div>
 		}
@@ -35,11 +46,8 @@
 			</div>
 			@if(type === 'question') {
 			<div>
-				@for (button of buttons; track $index) {
-				<button
-					(click)="remove(); button.callback && button.callback()"
-					class="alert-btn"
-				>
+				@for (button of buttons; track button.text) {
+				<button (click)="remove(button.callback)" class="alert-btn">
 					{{ button.text }}
 				</button>
 				}

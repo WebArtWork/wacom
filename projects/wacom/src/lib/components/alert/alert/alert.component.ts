@@ -92,15 +92,19 @@ export class AlertComponent implements AfterViewInit {
 				false
 			);
 		}
-
-		console.log(this);
 	}
 
 	/**
 	 * Triggers the closing animation and invokes the provided close
 	 * callback once finished.
 	 */
-	remove() {
+	remove(callback?: () => void) {
+		if (this._removed) return;
+
+		this._removed = true;
+
+		callback?.();
+
 		this.delete_animation = true;
 
 		setTimeout(() => {
@@ -109,4 +113,5 @@ export class AlertComponent implements AfterViewInit {
 			this.delete_animation = false;
 		}, 350);
 	}
+	private _removed = false;
 }
