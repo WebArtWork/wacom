@@ -7,26 +7,26 @@
 	flex-direction: column;
 }
 
-.waw-alert-wrapper-topLeft {
+.waw-alert-wrapper--top-left {
 	top: 0;
 	left: 0;
 	text-align: left;
 }
 
-.waw-alert-wrapper-top {
+.waw-alert-wrapper--top {
 	top: 0;
 	left: 0;
 	right: 0;
 	text-align: center;
 }
 
-.waw-alert-wrapper-topRight {
+.waw-alert-wrapper--top-right {
 	top: 0;
 	right: 0;
 	text-align: right;
 }
 
-.waw-alert-wrapper-left {
+.waw-alert-wrapper--left {
 	top: 0;
 	bottom: 0;
 	left: 0;
@@ -34,7 +34,7 @@
 	text-align: left;
 }
 
-.waw-alert-wrapper-center {
+.waw-alert-wrapper--center {
 	top: 0;
 	bottom: 0;
 	left: 0;
@@ -45,7 +45,7 @@
 	align-items: center;
 }
 
-.waw-alert-wrapper-right {
+.waw-alert-wrapper--right {
 	top: 0;
 	bottom: 0;
 	right: 0;
@@ -53,20 +53,20 @@
 	text-align: right;
 }
 
-.waw-alert-wrapper-bottomLeft {
+.waw-alert-wrapper--bottom-left {
 	bottom: 0;
 	left: 0;
 	text-align: left;
 }
 
-.waw-alert-wrapper-bottom {
+.waw-alert-wrapper--bottom {
 	bottom: 0;
 	left: 0;
 	right: 0;
 	text-align: center;
 }
 
-.waw-alert-wrapper-bottomRight {
+.waw-alert-wrapper--bottom-right {
 	bottom: 0;
 	right: 0;
 	text-align: right;
@@ -74,25 +74,25 @@
 
 /* Mobile: show all positions full width */
 @media only screen and (max-width: 567px) {
-	.waw-alert-wrapper-topLeft,
-	.waw-alert-wrapper-topRight,
-	.waw-alert-wrapper-left,
-	.waw-alert-wrapper-right,
-	.waw-alert-wrapper-bottomLeft,
-	.waw-alert-wrapper-bottomRight,
-	.waw-alert-wrapper-center {
+        .waw-alert-wrapper--top-left,
+        .waw-alert-wrapper--top-right,
+        .waw-alert-wrapper--left,
+        .waw-alert-wrapper--right,
+        .waw-alert-wrapper--bottom-left,
+        .waw-alert-wrapper--bottom-right,
+        .waw-alert-wrapper--center {
 		left: 0;
 		right: 0;
 		text-align: center;
 	}
 
-	.waw-alert-wrapper-center {
+        .waw-alert-wrapper--center {
 		align-items: stretch;
 	}
 
-	.waw-alert-wrapper-left,
-	.waw-alert-wrapper-right {
-		flex-flow: column;
-		align-items: center;
-	}
+        .waw-alert-wrapper--left,
+        .waw-alert-wrapper--right {
+                flex-flow: column;
+                align-items: center;
+        }
 }
