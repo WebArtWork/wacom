@@ -1,62 +1,67 @@
 @if (text) {
 <div
-        class="waw-alert__container waw-alert__container--auto-height"
-        [class.waw-alert__container--closing]="delete_animation"
-        [ngClass]="class"
+	class="waw-alert__container waw-alert__container--auto-height"
+	[class.waw-alert__container--closing]="delete_animation"
+	[ngClass]="class"
 >
-        <div
-                [ngClass]="
-                        'waw-alert--color-' +
-                        {
-                                info: 'blue',
-                                error: 'red',
-                                success: 'green',
-                                warning: 'orange',
-                                question: 'yellow'
-                        }[type]
-                "
-                class="waw-alert waw-alert--bounce-in-up"
-                #alertRef
-        >
-                @if(progress) {
-                <div class="waw-alert__progress">
-                        <span
-                                class="waw-alert__progress-bar"
-                                [ngClass]="
-                                        'waw-alert__progress-bar--' +
-                                        {
-                                                info: 'blue',
-                                                error: 'red',
-                                                success: 'green',
-                                                warning: 'orange',
-                                                question: 'yellow'
-                                        }[type]
-                                "
-                                [ngStyle]="{
-                                        'animation-duration': (timeout + 350) / 1000 + 's'
-                                }"
-                        ></span>
-                </div>
-                }
-                <div class="waw-alert__body">
-                        <div class="waw-alert__texts">
-                                @if(icon) {
-                                <div class="{{ icon }}"></div>
-                                }
-                                <div class="waw-alert__message waw-alert__message--slide-in">{{ text }}</div>
-                        </div>
-                        @if(type === 'question') {
-                        <div>
-                                @for (button of buttons; track button.text) {
-                                <button (click)="remove(button.callback)" class="waw-alert__button">
-                                        {{ button.text }}
-                                </button>
-                                }
-                        </div>
-                        } @if(closable) {
-                        <div class="waw-alert__close" (click)="remove()"></div>
-                        }
-                </div>
-        </div>
+	<div
+		[ngClass]="
+			'waw-alert--color-' +
+			{
+				info: 'blue',
+				error: 'red',
+				success: 'green',
+				warning: 'orange',
+				question: 'yellow'
+			}[type]
+		"
+		class="waw-alert waw-alert--bounce-in-up"
+		#alertRef
+	>
+		@if(progress) {
+		<div class="waw-alert__progress">
+			<span
+				class="waw-alert__progress-bar"
+				[ngClass]="
+					'waw-alert__progress-bar--' +
+					{
+						info: 'blue',
+						error: 'red',
+						success: 'green',
+						warning: 'orange',
+						question: 'yellow'
+					}[type]
+				"
+				[ngStyle]="{
+					'animation-duration': (timeout + 350) / 1000 + 's'
+				}"
+			></span>
+		</div>
+		}
+		<div class="waw-alert__body">
+			<div class="waw-alert__texts">
+				@if(icon) {
+				<div class="{{ icon }}"></div>
+				}
+				<div class="waw-alert__message waw-alert__message--slide-in">
+					{{ text }}
+				</div>
+			</div>
+			@if(type === 'question') {
+			<div>
+				@for (button of buttons; track button.text) {
+				<button
+					(click)="remove(button.callback)"
+					class="waw-alert__button"
+				>
+					{{ button.text }}
+				</button>
+				}
+			</div>
+			} @if(closable) {
+			<div class="waw-alert__close" (click)="remove()"></div>
+			}
+		</div>
+	</div>
 </div>
 }
