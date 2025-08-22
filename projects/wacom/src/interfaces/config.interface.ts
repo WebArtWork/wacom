@@ -2,6 +2,7 @@ import { InjectionToken } from '@angular/core';
 import { AlertConfig } from './alert.interface';
 import { LoaderConfig } from './loader.interface';
 import { MetaConfig } from './meta.interface';
+import { ModalConfig } from './modal.interface';
 import { StoreConfig } from './store.interface';
 
 export interface Config {
@@ -9,20 +10,11 @@ export interface Config {
 	meta?: MetaConfig;
 	alert?: AlertConfig;
 	loader?: LoaderConfig;
-	modal?: {
-		size?: any;
-		timeout?: any;
-		timestart?: any;
-		class?: string;
-		position?: string;
-		closable?: boolean;
-		unique?: string;
-	};
+	modal?: ModalConfig;
 	socket?: any;
 	io?: any;
-	fb?: any;
 	http?: {
-		headers?: any;
+		headers?: Record<string, unknown>;
 		url?: string;
 	};
 }

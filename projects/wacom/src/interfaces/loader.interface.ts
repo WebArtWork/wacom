@@ -1,4 +1,4 @@
-import { Signal } from '@angular/core';
+import { Signal, Type } from '@angular/core';
 
 /**
  * Configuration for a button rendered inside an Loader.
@@ -16,6 +16,8 @@ export interface LoaderButton {
 export interface LoaderConfig {
 	/** Message text displayed to the user. */
 	text?: string;
+	/** Optional action buttons displayed within the Loader. */
+	buttons?: LoaderButton[];
 	/** Custom CSS class applied to the Loader container. */
 	class?: string;
 	/** Identifier used to ensure only one Loader with this key exists. */
@@ -26,17 +28,16 @@ export interface LoaderConfig {
 	timeout?: number;
 	/** Callback executed when the Loader is closed. */
 	close?: () => void;
-	/** Optional action buttons displayed within the Loader. */
-	buttons?: LoaderButton[];
 	closable?: boolean;
 }
 
 export interface Loader extends LoaderConfig {
+	id?: number;
 	progressPercentage?: Signal<number>;
 	onClose?: () => void;
 	append?: HTMLElement;
-	component?: any;
-	[x: string]: any;
+	component?: Type<unknown>;
+	[x: string]: unknown;
 }
 
 /**

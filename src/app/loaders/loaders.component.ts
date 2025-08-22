@@ -30,7 +30,7 @@ export class LoadersComponent {
 			if (perc >= 100) {
 				clearInterval(intervalId);
 
-				loader.remove();
+				loader.close?.();
 			} else {
 				progressPercentage.set(perc + 5);
 			}

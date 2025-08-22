@@ -23,11 +23,22 @@ export class LoaderService {
 		};
 	}
 
-	show(opts: Loader | string = 'Loading...') {
+	show(opts: Loader | string = 'Loading...'): Loader {
 		opts = {
 			...this._config,
 			...(typeof opts === 'object' ? opts : { text: opts }),
 		};
+
+		if (
+			opts.unique &&
+			this._loaders.find((m) => m.unique === opts.unique)
+		) {
+			return this._loaders.find(
+				(m) => m.unique === opts.unique
+			) as Loader;
+		}
+
+		this._loaders.push(opts);
 
 		let component!: DomComponent<LoaderComponent> | undefined;
 
@@ -37,6 +48,11 @@ export class LoaderService {
 			component = undefined;
 
 			if (typeof opts.onClose === 'function') opts.onClose();
+
+			this._loaders.splice(
+				this._loaders.findIndex((m) => m.id === opts.id),
+				1
+			);
 		};
 
 		if (opts.append) {
@@ -55,18 +71,14 @@ export class LoaderService {
 			this._uniques[opts.unique] = component;
 		}
 
-		this._loaders.push(component);
+		this._loaders.push(opts);
 
-		return component.nativeElement;
+		return opts;
 	}
 
 	destroy() {
 		for (let i = this._loaders.length - 1; i >= 0; i--) {
-			this._loaders[i]?.remove();
-
-			this._loaders[i] = undefined;
-
-			this._loaders.splice(i, 1);
+			this._loaders[i].close?.();
 		}
 	}
 
@@ -76,5 +88,5 @@ export class LoaderService {
 	/** References to alerts that must remain unique by identifier. */
 	private _uniques: Record<string, DomComponent<any>> = {};
 
-	private _loaders: Array<DomComponent<LoaderComponent> | undefined> = [];
+	private _loaders: Loader[] = [];
 }

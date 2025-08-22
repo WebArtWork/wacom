@@ -1,124 +1,137 @@
-import { Inject, Injectable, Optional } from '@angular/core';
+import { Inject, Injectable, Optional, Type } from '@angular/core';
 import { ModalComponent } from '../components/modal/modal.component';
 import { CONFIG_TOKEN, Config } from '../interfaces/config.interface';
 import { DomComponent } from '../interfaces/dom.interface';
-import { Modal } from '../interfaces/modal.interface';
+import {
+	DEFAULT_MODAL_CONFIG,
+	Modal,
+	ModalConfig,
+} from '../interfaces/modal.interface';
 import { DomService } from './dom.service';
 @Injectable({
 	providedIn: 'root',
 })
 export class ModalService {
-	private _modal: any;
 	constructor(
-		private dom: DomService,
-		@Inject(CONFIG_TOKEN) @Optional() private config: Config
+		@Inject(CONFIG_TOKEN) @Optional() config: Config,
+		private _dom: DomService
 	) {
-		if (!this.config) this.config = {};
-		if (!this.config.modal) this.config.modal = {};
-		this._modal = config.modal;
+		this._config = {
+			...DEFAULT_MODAL_CONFIG,
+			...(config?.modal || {}),
+		};
 	}
 
-	show(opts: Modal | any) {
-		if (this.locked) {
-			return;
+	show(opts: Modal | Type<unknown>): Modal {
+		opts = this._opts(opts);
+
+		if (opts.unique && this._modals.find((m) => m.unique === opts.unique)) {
+			return this._modals.find((m) => m.unique === opts.unique) as Modal;
 		}
-		if (typeof opts == 'string' || typeof opts == 'function') {
-			opts = {
-				component: opts,
-			};
-		}
-		if (!opts || typeof opts != 'object') opts = {};
-		if (
-			typeof opts.component == 'string' &&
-			this._modal.modals[opts.component]
-		) {
-			opts.component = this._modal.modals[opts.component];
-		}
-		if (typeof opts.component != 'function') {
-			console.log('This component does not exists.');
-			return;
-		}
-		if (!opts.class) opts.class = '';
-		for (let each in this.config.modal) {
-			if (each == 'class')
-				opts.class +=
-					((opts.class && ' ') || '') + this.config.modal.class;
-			else if (!opts[each]) opts[each] = this._modal[each];
-		}
-		opts.id = Math.floor(Math.random() * Date.now()) + Date.now();
-		this.opened[opts.id] = opts;
+
+		this._modals.push(opts);
+
+		opts.class ||= '';
+
+		opts.id ||= Math.floor(Math.random() * Date.now()) + Date.now();
+
 		document.body.classList.add('modalOpened');
-		let component!: DomComponent<ModalComponent>;
-		let content!: DomComponent<any>;
+
+		let component!: DomComponent<ModalComponent> | undefined;
+
+		let content!: DomComponent<any> | undefined;
+
 		opts.close = () => {
 			content?.remove();
-			component.remove();
-			if (typeof opts.onClose == 'function') opts.onClose();
-			delete this.opened[opts.id];
-			if (!Object.keys(this.opened).length) {
+
+			content = undefined;
+
+			component?.remove();
+
+			component = undefined;
+
+			if (typeof opts.onClose === 'function') opts.onClose();
+
+			this._modals.splice(
+				this._modals.findIndex((m) => m.id === opts.id),
+				1
+			);
+
+			if (!this._modals.length) {
 				document.body.classList.remove('modalOpened');
 			}
 		};
-		if (typeof opts.timeout == 'number' && opts.timeout > 0) {
+
+		if (typeof opts.timeout === 'number' && opts.timeout > 0) {
 			setTimeout(opts.close, opts.timeout);
 		}
-		component = this.dom.appendComponent(ModalComponent, opts)!;
-		content = this.dom.appendComponent(
+
+		component = this._dom.appendComponent(ModalComponent, opts)!;
+
+		content = this._dom.appendComponent(
 			opts.component,
-			opts,
+			opts as Partial<{ providedIn?: string | undefined }>,
 			component.nativeElement.children[0].children[0]
 				.children[0] as HTMLElement
 		)!;
-		return component.nativeElement;
+
+		return opts;
 	}
-	open(opts: Modal) {
+
+	open(opts: Modal | Type<unknown>) {
 		this.show(opts);
 	}
+
 	small(opts: Modal) {
-		if (typeof opts == 'string' || typeof opts == 'function') {
-			opts = {
-				component: opts,
-			};
-		}
+		opts = this._opts(opts);
+
 		opts.size = 'small';
+
 		this.show(opts);
 	}
+
 	mid(opts: Modal) {
-		if (typeof opts == 'string' || typeof opts == 'function') {
-			opts = {
-				component: opts,
-			};
-		}
+		opts = this._opts(opts);
+
 		opts.size = 'mid';
+
 		this.show(opts);
 	}
+
 	big(opts: Modal) {
-		if (typeof opts == 'string' || typeof opts == 'function') {
-			opts = {
-				component: opts,
-			};
-		}
+		opts = this._opts(opts);
+
 		opts.size = 'big';
+
 		this.show(opts);
 	}
+
 	full(opts: Modal) {
-		if (typeof opts == 'string' || typeof opts == 'function') {
-			opts = {
-				component: opts,
-			};
-		}
+		opts = this._opts(opts);
+
 		opts.size = 'full';
+
 		this.show(opts);
 	}
-	private opened: any = {};
-	locked = false;
+
 	destroy() {
-		if (this.locked) {
-			return;
+		for (let i = this._modals.length - 1; i >= 0; i--) {
+			this._modals[i].close?.();
 		}
-		for (let each in this.opened) {
-			this.opened[each].close();
-		}
-		document.body.classList.remove('modalOpened');
+	}
+
+	private _modals: Modal[] = [];
+
+	/** Merged configuration applied to new alerts. */
+	private _config: ModalConfig;
+
+	private _opts(opts: Modal | Type<unknown>): Modal {
+		return typeof opts === 'function'
+			? { ...this._config, component: opts }
+			: {
+					...this._config,
+					...opts,
+					component: opts.component,
+			  };
 	}
 }

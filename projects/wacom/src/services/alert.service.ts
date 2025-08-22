@@ -3,7 +3,6 @@ import { AlertComponent } from '../components/alert/alert/alert.component';
 import { WrapperComponent } from '../components/alert/wrapper/wrapper.component';
 import {
 	Alert,
-	ALERT_POSITIONS,
 	AlertConfig,
 	DEFAULT_ALERT_CONFIG,
 } from '../interfaces/alert.interface';
@@ -42,18 +41,16 @@ export class AlertService {
 	 * @returns Reference to the created alert or embedded component
 	 *          element.
 	 */
-	show(opts: Alert | string) {
-		if (typeof opts === 'string') {
-			opts = {
-				...this._config,
-				text: opts,
-			};
-		} else {
-			opts = {
-				...this._config,
-				...opts,
-			};
+	show(opts: Alert | string): Alert {
+		opts = this._opts(opts);
+
+		if (opts.unique && this._alerts.find((m) => m.unique === opts.unique)) {
+			return this._alerts.find((m) => m.unique === opts.unique) as Alert;
 		}
+
+		this._alerts.push(opts);
+
+		opts.id ||= Math.floor(Math.random() * Date.now()) + Date.now();
 
 		if (!opts.type) opts.type = 'info';
 
@@ -75,6 +72,11 @@ export class AlertService {
 			if (typeof (opts as Alert).onClose == 'function') {
 				(opts as Alert).onClose?.();
 			}
+
+			this._alerts.splice(
+				this._alerts.findIndex((m) => m.id === opts.id),
+				1
+			);
 		};
 
 		alertComponent = this._dom.appendById(
@@ -86,19 +88,11 @@ export class AlertService {
 		if (typeof opts.component === 'function') {
 			content = this._dom.appendComponent(
 				opts.component,
-				opts,
+				opts as Partial<{ providedIn?: string | undefined }>,
 				this._container.nativeElement.children[0].children[
 					this._positionNumber[opts.position] || 0
 				] as HTMLElement
 			)!;
-		}
-
-		const main = content ? content! : alertComponent!;
-
-		if (opts.unique) {
-			if (this._uniques[opts.unique]) this._uniques[opts.unique].remove();
-
-			this._uniques[opts.unique] = main;
 		}
 
 		if (typeof opts.timeout !== 'number') {
@@ -111,7 +105,7 @@ export class AlertService {
 			}, opts.timeout);
 		}
 
-		return main.nativeElement;
+		return opts;
 	}
 
 	/**
@@ -125,6 +119,8 @@ export class AlertService {
 	 * Displays an informational alert.
 	 */
 	info(opts: Alert) {
+		opts = this._opts(opts);
+
 		opts.type = 'info';
 
 		this.show(opts);
@@ -134,6 +130,8 @@ export class AlertService {
 	 * Displays a success alert.
 	 */
 	success(opts: Alert) {
+		opts = this._opts(opts);
+
 		opts.type = 'success';
 
 		this.show(opts);
@@ -143,6 +141,8 @@ export class AlertService {
 	 * Displays a warning alert.
 	 */
 	warning(opts: Alert) {
+		opts = this._opts(opts);
+
 		opts.type = 'warning';
 
 		this.show(opts);
@@ -152,6 +152,8 @@ export class AlertService {
 	 * Displays an error alert.
 	 */
 	error(opts: Alert) {
+		opts = this._opts(opts);
+
 		opts.type = 'error';
 
 		this.show(opts);
@@ -161,6 +163,8 @@ export class AlertService {
 	 * Displays a question alert.
 	 */
 	question(opts: Alert) {
+		opts = this._opts(opts);
+
 		opts.type = 'question';
 
 		this.show(opts);
@@ -170,12 +174,11 @@ export class AlertService {
 	 * Removes all alert elements from the document.
 	 */
 	destroy() {
-		for (const id of ALERT_POSITIONS) {
-			const el = document.getElementById(id);
-
-			if (el) el.innerHTML = '';
+		for (let i = this._alerts.length - 1; i >= 0; i--) {
+			this._alerts[i].close?.();
 		}
 	}
+	private _alerts: Alert[] = [];
 
 	/** Merged configuration applied to new alerts. */
 	private _config: AlertConfig;
@@ -183,11 +186,8 @@ export class AlertService {
 	/** Wrapper component that contains all alert placeholders. */
 	private _container: DomComponent<WrapperComponent>;
 
-	/** References to alerts that must remain unique by identifier. */
-	private _uniques: Record<string, DomComponent<any>> = {};
-
 	/** Mapping of alert positions to wrapper child indexes. */
-	private _positionNumber: any = {
+	private _positionNumber: Record<string, number> = {
 		topLeft: 0,
 		top: 1,
 		topRight: 2,
@@ -198,4 +198,16 @@ export class AlertService {
 		bottom: 7,
 		bottomRight: 8,
 	};
+
+	private _opts(opts: Alert | string): Alert {
+		return typeof opts === 'string'
+			? {
+					...this._config,
+					text: opts,
+			  }
+			: {
+					...this._config,
+					...opts,
+			  };
+	}
 }

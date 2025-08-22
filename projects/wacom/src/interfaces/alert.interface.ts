@@ -1,3 +1,5 @@
+import { Signal, Type } from '@angular/core';
+
 /**
  * Possible alert variants that control styling and default icons.
  */
@@ -37,6 +39,8 @@ export interface AlertConfig {
 	type?: AlertType;
 	/** Location on screen where the alert should appear. */
 	position?: AlertPosition;
+	/** Optional action buttons displayed within the alert. */
+	buttons?: AlertButton[];
 	/** Optional icon name to show with the message. */
 	icon?: string;
 	/** Custom CSS class applied to the alert container. */
@@ -49,15 +53,15 @@ export interface AlertConfig {
 	timeout?: number;
 	/** Callback executed when the alert is closed. */
 	close?: () => void;
-	/** Optional action buttons displayed within the alert. */
-	buttons?: AlertButton[];
+	closable?: boolean;
 }
 
 export interface Alert extends AlertConfig {
+	id?: number;
+	progressPercentage?: Signal<number>;
 	onClose?: () => void;
-	closable?: boolean;
-	component?: any;
-	[x: string]: any;
+	component?: Type<unknown>;
+	[x: string]: unknown;
 }
 
 /**
