@@ -2,13 +2,15 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
 	name: 'splice',
-	standalone: true,
 })
 export class SplicePipe implements PipeTransform {
 	transform(from: any, which: any, refresh?: number): any {
 		if (Array.isArray(from)) from = { arr: from, prop: '_id' };
+
 		let arr = (which.keep && []) || from.arr.slice();
+
 		if (Array.isArray(which)) which = { arr: which, prop: '_id' };
+
 		for (let i = from.arr.length - 1; i >= 0; i--) {
 			for (let j = 0; j < which.arr.length; j++) {
 				if (from.prop && which.prop) {
@@ -18,6 +20,7 @@ export class SplicePipe implements PipeTransform {
 						} else {
 							arr.splice(i, 1);
 						}
+
 						break;
 					}
 				} else if (from.prop) {
@@ -27,6 +30,7 @@ export class SplicePipe implements PipeTransform {
 						} else {
 							arr.splice(i, 1);
 						}
+
 						break;
 					}
 				} else if (which.prop) {
@@ -36,6 +40,7 @@ export class SplicePipe implements PipeTransform {
 						} else {
 							arr.splice(i, 1);
 						}
+
 						break;
 					}
 				} else if (from.arr[i] == which.arr[j]) {
@@ -44,10 +49,12 @@ export class SplicePipe implements PipeTransform {
 					} else {
 						arr.splice(i, 1);
 					}
+
 					break;
 				}
 			}
 		}
+
 		return arr;
 	}
 }
