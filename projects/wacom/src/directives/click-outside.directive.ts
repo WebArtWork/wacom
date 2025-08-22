@@ -1,27 +1,43 @@
 import {
+	ChangeDetectorRef,
+	DestroyRef,
 	Directive,
 	ElementRef,
-	EventEmitter,
-	HostListener,
-	Output,
+	inject,
+	output,
 } from '@angular/core';
 
+/**
+ * Stand-alone “click outside” directive (zoneless-safe).
+ *
+ * Usage:
+ * <div (clickOutside)="close()">…</div>
+ */
 @Directive({
 	selector: '[clickOutside]',
-	standalone: true,
 })
 export class ClickOutsideDirective {
-	@Output() clickOutside: EventEmitter<Event> = new EventEmitter<Event>();
+	readonly clickOutside = output<MouseEvent>();
 
-	constructor(private elementRef: ElementRef) {}
+	constructor() {
+		document.addEventListener('pointerdown', this.handler, true);
 
-	@HostListener('document:click', ['$event'])
-	onClick(event: Event): void {
-		const clickedInside = this.elementRef.nativeElement.contains(
-			event.target
+		// cleanup
+		this._dref.onDestroy(() =>
+			document.removeEventListener('pointerdown', this.handler, true)
 		);
-		if (!clickedInside) {
-			this.clickOutside.emit(event);
-		}
 	}
+
+	private _host = inject(ElementRef<HTMLElement>);
+
+	private _cdr = inject(ChangeDetectorRef);
+
+	private _dref = inject(DestroyRef);
+
+	private handler = (e: MouseEvent): void => {
+		if (!this._host.nativeElement.contains(e.target as Node)) {
+			this.clickOutside.emit(e); // notify parent
+			this._cdr.markForCheck(); // trigger CD for OnPush comps
+		}
+	};
 }

@@ -31,7 +31,6 @@ export const appConfig = {
 | [**`Core`**](https://www.npmjs.com/package/wacom#core-service)     |     Common supportive function which can be used in any service     |
 | [**`Http`**](https://www.npmjs.com/package/wacom#http-service)     |                      Http layer for HttpClient                      |
 | [**`Store`**](https://www.npmjs.com/package/wacom#store-service)   |  Service will is responsible for keeping information on the device  |
-| [**`Hash`**](https://www.npmjs.com/package/wacom#hash-service)     |      Hash management for easily use, storage which stay in url      |
 | [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service)     |             Website meta tags management within router              |
 | [**`UI`**](https://www.npmjs.com/package/wacom#ui-service)         |                      Supportive UI/UX service                       |
 | [**`Crud`**](https://www.npmjs.com/package/wacom#crud-service)     | Provides basic CRUD operations for managing data with HTTP services |
