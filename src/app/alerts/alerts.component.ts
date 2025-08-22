@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject } from '@angular/core';
-import { AlertService } from 'projects/wacom/src/public-api';
+import { AlertService } from 'projects/wacom/public-api';
 
 @Component({
 	templateUrl: './alerts.component.html',
