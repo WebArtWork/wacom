@@ -7,6 +7,7 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { EMPTY, Observable, ReplaySubject } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
 import { CONFIG_TOKEN, Config } from '../interfaces/config.interface';
+import { DEFAULT_HTTP_CONFIG, HttpConfig } from '../interfaces/http.interface';
 import { StoreService } from './store.service';
 
 @Injectable({
@@ -26,7 +27,7 @@ export class HttpService {
 	awaitLocked: any[] = [];
 
 	// Configuration object for HTTP settings
-	private _http: any;
+	private _config: HttpConfig;
 
 	// Object to store HTTP headers
 	private _headers: any = {};
@@ -35,16 +36,19 @@ export class HttpService {
 	private _http_headers = new HttpHeaders(this._headers);
 
 	constructor(
+		@Inject(CONFIG_TOKEN) @Optional() config: Config,
 		private store: StoreService,
-		private http: HttpClient,
-		@Inject(CONFIG_TOKEN) @Optional() private _config: Config
+		private http: HttpClient
 	) {
 		// Initialize HTTP configuration and headers from injected config
-		this._http = this._config.http || {};
+		this._config = {
+			...DEFAULT_HTTP_CONFIG,
+			...config.http,
+		};
 
-		if (typeof this._http.headers === 'object') {
-			for (const header in this._http.headers) {
-				this._headers[header] = this._http.headers[header];
+		if (typeof this._config.headers === 'object') {
+			for (const header in this._config.headers) {
+				this._headers[header] = this._config.headers[header];
 			}
 
 			this._http_headers = new HttpHeaders(this._headers);
@@ -52,7 +56,7 @@ export class HttpService {
 
 		// Retrieve and set the base URL and headers from the store
 		this.store.get('http_url', (url) => {
-			this.url = url || this._http.url || '';
+			this.url = url || this._config.url || '';
 		});
 
 		this.store
@@ -77,7 +81,7 @@ export class HttpService {
 
 	// Remove the base URL and revert to the default or stored one
 	removeUrl() {
-		this.url = this._http.url || '';
+		this.url = this._config.url || '';
 
 		this.store.remove('http_url');
 	}

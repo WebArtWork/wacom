@@ -59,9 +59,13 @@ export class RtcService {
 	 */
 	async createOffer(id: string): Promise<RTCSessionDescriptionInit> {
 		const peer = this.peers.get(id);
+
 		if (!peer) throw new Error('Peer not found');
+
 		const offer = await peer.createOffer();
+
 		await peer.setLocalDescription(offer);
+
 		return offer;
 	}
 
@@ -73,10 +77,15 @@ export class RtcService {
 		offer: RTCSessionDescriptionInit
 	): Promise<RTCSessionDescriptionInit> {
 		const peer = this.peers.get(id);
+
 		if (!peer) throw new Error('Peer not found');
+
 		await peer.setRemoteDescription(new RTCSessionDescription(offer));
+
 		const answer = await peer.createAnswer();
+
 		await peer.setLocalDescription(answer);
+
 		return answer;
 	}
 
@@ -85,7 +94,9 @@ export class RtcService {
 	 */
 	async setRemoteAnswer(id: string, answer: RTCSessionDescriptionInit) {
 		const peer = this.peers.get(id);
+
 		if (!peer) throw new Error('Peer not found');
+
 		await peer.setRemoteDescription(new RTCSessionDescription(answer));
 	}
 
@@ -94,6 +105,7 @@ export class RtcService {
 	 */
 	addIceCandidate(id: string, candidate: RTCIceCandidateInit) {
 		const peer = this.peers.get(id);
+
 		if (peer) peer.addIceCandidate(new RTCIceCandidate(candidate));
 	}
 
@@ -109,8 +121,10 @@ export class RtcService {
 	 */
 	closePeer(id: string) {
 		const peer = this.peers.get(id);
+
 		if (peer) {
 			peer.close();
+
 			this.peers.delete(id);
 		}
 	}
@@ -120,8 +134,11 @@ export class RtcService {
 	 */
 	closeAll() {
 		this.peers.forEach((peer) => peer.close());
+
 		this.peers.clear();
+
 		this.localStream?.getTracks().forEach((track) => track.stop());
+
 		this.localStream = null;
 	}
 }

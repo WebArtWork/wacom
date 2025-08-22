@@ -1,5 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { AlertConfig } from './alert.interface';
+import { HttpConfig } from './http.interface';
 import { LoaderConfig } from './loader.interface';
 import { MetaConfig } from './meta.interface';
 import { ModalConfig } from './modal.interface';
@@ -11,12 +12,9 @@ export interface Config {
 	alert?: AlertConfig;
 	loader?: LoaderConfig;
 	modal?: ModalConfig;
+	http?: HttpConfig;
 	socket?: any;
 	io?: any;
-	http?: {
-		headers?: Record<string, unknown>;
-		url?: string;
-	};
 }
 
 export const CONFIG_TOKEN = new InjectionToken<Config>('config');
