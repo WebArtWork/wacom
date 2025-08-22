@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Signal } from '@angular/core';
 
 @Component({
 	templateUrl: './loader.component.html',
@@ -13,7 +13,9 @@ export class LoaderComponent implements OnInit {
 
 	class!: string;
 
-	progress!: boolean;
+        progress!: boolean;
+
+        progressPercentage?: Signal<number>;
 
 	timeout!: number;
 
