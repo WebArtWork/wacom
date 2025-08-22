@@ -31,8 +31,13 @@
 
 // Text displayed in the loader
 .waw-loader__text {
-	font-size: 30px;
-	color: white;
+        font-size: 30px;
+        color: white;
+}
+
+.waw-loader__progress-text {
+        font-size: 30px;
+        color: white;
 }
 
 .waw-loader__progress {
