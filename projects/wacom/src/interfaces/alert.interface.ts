@@ -6,6 +6,9 @@ import { Signal, Type } from '@angular/core';
 export const ALERT_TYPES = ['info', 'error', 'success', 'warning', 'question'];
 export type AlertType = (typeof ALERT_TYPES)[number];
 
+/**
+ * Possible screen positions where alerts can be placed.
+ */
 export const ALERT_POSITIONS = [
 	'topLeft',
 	'top',
@@ -57,11 +60,15 @@ export interface AlertConfig {
 }
 
 export interface Alert extends AlertConfig {
-	id?: number;
-	progressPercentage?: Signal<number>;
-	onClose?: () => void;
-	component?: Type<unknown>;
-	[x: string]: unknown;
+        /** Unique identifier for the alert instance. */
+        id?: number;
+        /** Reactive signal tracking progress bar value. */
+        progressPercentage?: Signal<number>;
+        /** Handler executed when the alert closes. */
+        onClose?: () => void;
+        /** Component rendered inside the alert body. */
+        component?: Type<unknown>;
+        [x: string]: unknown;
 }
 
 /**
