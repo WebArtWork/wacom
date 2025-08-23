@@ -4,34 +4,12 @@
 		[class.waw-alert__container--closing]="delete_animation"
 		[ngClass]="class"
 	>
-		<div
-			[ngClass]="
-				'waw-alert--color-' +
-				{
-					info: 'blue',
-					error: 'red',
-					success: 'green',
-					warning: 'orange',
-					question: 'yellow',
-				}[type]
-			"
-			class="waw-alert waw-alert--bounce-in-up"
-			#alertRef
-		>
+		<div [ngClass]="'waw-alert--color-' + type" class="waw-alert waw-alert--bounce-in-up" #alertRef>
 			@if (progress) {
 				<div class="waw-alert__progress">
 					<span
 						class="waw-alert__progress-bar"
-						[ngClass]="
-							'waw-alert__progress-bar--' +
-							{
-								info: 'blue',
-								error: 'red',
-								success: 'green',
-								warning: 'orange',
-								question: 'yellow',
-							}[type]
-						"
+						[ngClass]="'waw-alert__progress-bar--' + type"
 						[ngStyle]="{
 							'animation-duration': (timeout + 350) / 1000 + 's',
 						}"

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from './interfaces/config.interface';
+import { Config, CONFIG_TOKEN, DEFAULT_CONFIG } from './interfaces/config.interface';
 
 /* directives */
 import { ClickOutsideDirective } from './directives/click-outside.directive';
@@ -24,6 +24,7 @@ import { WrapperComponent } from './components/alert/wrapper/wrapper.component';
 import { FilesComponent } from './components/files/files.component';
 import { LoaderComponent } from './components/loader/loader.component';
 import { ModalComponent } from './components/modal/modal.component';
+import { themeProvider } from './theme';
 const LOCAL_COMPONENTS = [WrapperComponent, FilesComponent];
 const COMPONENTS = [LoaderComponent, ModalComponent, AlertComponent];
 
@@ -44,6 +45,7 @@ export class WacomModule {
 					provide: CONFIG_TOKEN,
 					useValue: config,
 				},
+				themeProvider(),
 			],
 		};
 	}

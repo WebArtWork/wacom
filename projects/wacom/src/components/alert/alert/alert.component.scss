@@ -122,32 +122,21 @@
 	animation-duration: 10s;
 	border-radius: 50px;
 
-	&--red {
-		background-color: rgba(255, 175, 180, 1);
+	&--info {
+		// background-color: #9ddeff;
+		background-color: var(--wacom-info);
 	}
-
-	&--green {
-		background-color: rgba(166, 239, 184, 1);
+	&--error {
+		background-color: #ffafb4;
 	}
-
-	&--yellow {
-		background-color: rgba(255, 249, 178, 1);
+	&--success {
+		background-color: #a6efb8;
 	}
-
-	&--orange {
-		background-color: rgba(255, 207, 165, 1);
+	&--warning {
+		background-color: #ffcfa5;
 	}
-
-	&--blue {
-		background-color: rgba(157, 222, 255, 1);
-	}
-
-	&--white {
-		background-color: white;
-	}
-
-	&--black {
-		background-color: black;
+	&--question {
+		background-color: #fff9b2;
 	}
 }
 
@@ -199,29 +188,22 @@
 	}
 }
 
-.waw-alert--color-red {
-	background: rgba(255, 175, 180, 0.9);
-	border-color: rgba(255, 175, 180, 0.9);
-}
-
-.waw-alert--color-orange {
-	background: rgba(255, 207, 165, 0.9);
-	border-color: rgba(255, 207, 165, 0.9);
-}
-
-.waw-alert--color-yellow {
-	background: rgba(255, 249, 178, 0.9);
-	border-color: rgba(255, 249, 178, 0.9);
-}
-
-.waw-alert--color-blue {
-	background: rgba(157, 222, 255, 0.9);
-	border-color: rgba(157, 222, 255, 0.9);
-}
-
-.waw-alert--color-green {
-	background: rgba(166, 239, 184, 0.9);
-	border-color: rgba(166, 239, 184, 0.9);
+.waw-alert--color {
+	&-info {
+		background-color: var(--wacom-info);
+	}
+	&-error {
+		background-color: var(--wacom-error);
+	}
+	&-success {
+		background-color: var(--wacom-success);
+	}
+	&-warning {
+		background-color: var(--wacom-warning);
+	}
+	&-question {
+		background-color: var(--wacom-question);
+	}
 }
 
 .waw-alert--bounce-in-up {

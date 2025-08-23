@@ -28,6 +28,15 @@ export interface Config {
 	socket?: any;
 	/** Raw Socket.IO client instance, if used. */
 	io?: any;
+	theme?: {
+		primary: string;
+		secondary: string;
+		info: string;
+		error: string;
+		success: string;
+		warning: string;
+		question: string;
+	};
 }
 
 export const CONFIG_TOKEN = new InjectionToken<Config>('config');
@@ -45,5 +54,14 @@ export const DEFAULT_CONFIG: Config = {
 	http: {
 		url: '',
 		headers: {},
+	},
+	theme: {
+		primary: '#fff',
+		secondary: '#000',
+		info: '#9ddeff',
+		error: '#ffafb4',
+		success: '#a6efb8',
+		warning: '#ffcfa5',
+		question: '#fff9b2',
 	},
 };
