@@ -1,8 +1,14 @@
 {
 	"name": "wacom",
-	"version": "20.2.1",
+	"version": "20.2.2",
 	"license": "MIT",
 	"repository": "WebArtWork/wacom",
+	"funding": [
+		{
+			"type": "website",
+			"url": "http://wawjs.wiki/fund"
+		}
+	],
 	"keywords": [
 		"Angular",
 		"Platform Detection",
