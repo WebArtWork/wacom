@@ -29,10 +29,7 @@
 				"@typescript-eslint/await-thenable": "off",
 				"@typescript-eslint/no-namespace": "off",
 
-				"prettier/prettier": [
-					"error",
-					{ "printWidth": 140, "trailingComma": "all" }
-				],
+				"prettier/prettier": ["error", { "printWidth": 140, "trailingComma": "all" }],
 
 				"@typescript-eslint/naming-convention": [
 					"error",
@@ -59,10 +56,7 @@
 						"next": "*"
 					}
 				],
-				"@typescript-eslint/explicit-member-accessibility": [
-					"error",
-					{ "accessibility": "no-public" }
-				],
+				"@typescript-eslint/explicit-member-accessibility": ["error", { "accessibility": "no-public" }],
 
 				"@typescript-eslint/consistent-type-imports": "error",
 				"@typescript-eslint/no-unused-vars": [
@@ -77,10 +71,7 @@
 		},
 		{
 			"files": ["*.html"],
-			"extends": [
-				"plugin:@angular-eslint/template/recommended",
-				"plugin:prettier/recommended"
-			],
+			"extends": ["plugin:@angular-eslint/template/recommended", "plugin:prettier/recommended"],
 			"rules": {}
 		}
 	]
