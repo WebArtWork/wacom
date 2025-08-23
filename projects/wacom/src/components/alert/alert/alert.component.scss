@@ -87,7 +87,7 @@
 		content: " ";
 		height: 12px;
 		width: 2px;
-		background-color: #47525d;
+                background-color: var(--wacom-secondary);
 	}
 
 	&:before {
@@ -122,22 +122,21 @@
 	animation-duration: 10s;
 	border-radius: 50px;
 
-	&--info {
-		// background-color: #9ddeff;
-		background-color: var(--wacom-info);
-	}
-	&--error {
-		background-color: #ffafb4;
-	}
-	&--success {
-		background-color: #a6efb8;
-	}
-	&--warning {
-		background-color: #ffcfa5;
-	}
-	&--question {
-		background-color: #fff9b2;
-	}
+        &--info {
+                background-color: var(--wacom-info);
+        }
+        &--error {
+                background-color: var(--wacom-error);
+        }
+        &--success {
+                background-color: var(--wacom-success);
+        }
+        &--warning {
+                background-color: var(--wacom-warning);
+        }
+        &--question {
+                background-color: var(--wacom-question);
+        }
 }
 
 .waw-alert:hover .waw-alert__progress-bar {

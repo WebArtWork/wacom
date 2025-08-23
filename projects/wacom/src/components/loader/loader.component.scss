@@ -1,14 +1,14 @@
 .waw-loader {
-	position: fixed;
-	width: 100%;
-	height: 100%;
-	left: 0;
-	top: 0;
-	background-color: #334d6e;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	z-index: 999999;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        background-color: var(--wacom-secondary);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
 }
 
 .waw-loader__close {
@@ -19,17 +19,17 @@
 	font-size: 32px;
 	line-height: 1;
 
-	&:hover,
-	&:focus {
-		color: black;
-		text-decoration: none;
-		cursor: pointer;
-	}
+        &:hover,
+        &:focus {
+                color: var(--wacom-secondary);
+                text-decoration: none;
+                cursor: pointer;
+        }
 }
 
 .waw-loader__text {
-	font-size: 30px;
-	color: white;
+        font-size: 30px;
+        color: var(--wacom-primary);
 }
 
 .waw-loader__progress {
