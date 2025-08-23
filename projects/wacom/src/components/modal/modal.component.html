@@ -1,8 +1,6 @@
-<div [ngClass]="class + ' ' + size" (click)="onClickOutside()" class="modal">
-	<!--  (click)="$event.stopPropagation()" -->
-	<!-- <div class="modal-content" (mousedown)="allowClose = false"> -->
-	<div class="modal-content" (click)="$event.stopPropagation()">
-		<div><!-- Content Will Drop Here --></div>
-		<span class="close" (click)="close()" *ngIf="closable">&times;</span>
-	</div>
+<div class="wacom-modal" (click)="onClickOutside()">
+        <div class="wacom-modal__content" (click)="$event.stopPropagation()">
+                <div><!-- Content Will Drop Here --></div>
+                <span class="wacom-modal__close" (click)="close()" *ngIf="closable">&times;</span>
+        </div>
 </div>
