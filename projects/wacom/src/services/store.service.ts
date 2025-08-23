@@ -103,8 +103,13 @@ export class StoreService {
 	 * @param value - The value to store.
 	 * @returns A promise that resolves to a boolean indicating success.
 	 */
-	async setJson<T>(key: string, value: T): Promise<boolean> {
-		return await this.set(key, JSON.stringify(value));
+	async setJson<T>(
+		key: string,
+		value: T,
+		callback: () => void = () => {},
+		errCallback: (err: unknown) => void = () => {},
+	): Promise<boolean> {
+		return await this.set(key, JSON.stringify(value), callback, errCallback);
 	}
 
 	/**
@@ -113,8 +118,12 @@ export class StoreService {
 	 * @param key - The storage key.
 	 * @returns A promise that resolves to the retrieved value.
 	 */
-	async getJson<T = any>(key: string): Promise<T | null> {
-		const value = await this.get(key);
+	async getJson<T = any>(
+		key: string,
+		callback?: (value: string | null) => void,
+		errCallback: (err: unknown) => void = () => {},
+	): Promise<T | null> {
+		const value = await this.get(key, callback, errCallback);
 
 		if (value === null) {
 			return null;
