@@ -1,102 +1,102 @@
 .wacom-wrapper {
-    &__alert {
-        z-index: 99999;
-        position: fixed;
-        width: 100%;
-        pointer-events: none;
-        display: flex;
-        flex-direction: column;
+	&__alert {
+		z-index: 99999;
+		position: fixed;
+		width: 100%;
+		pointer-events: none;
+		display: flex;
+		flex-direction: column;
 
-        &--top-left {
-            top: 0;
-            left: 0;
-            text-align: left;
-        }
+		&--top-left {
+			top: 0;
+			left: 0;
+			text-align: left;
+		}
 
-        &--top {
-            top: 0;
-            left: 0;
-            right: 0;
-            text-align: center;
-        }
+		&--top {
+			top: 0;
+			left: 0;
+			right: 0;
+			text-align: center;
+		}
 
-        &--top-right {
-            top: 0;
-            right: 0;
-            text-align: right;
-        }
+		&--top-right {
+			top: 0;
+			right: 0;
+			text-align: right;
+		}
 
-        &--left {
-            top: 0;
-            bottom: 0;
-            left: 0;
-            justify-content: center;
-            text-align: left;
-        }
+		&--left {
+			top: 0;
+			bottom: 0;
+			left: 0;
+			justify-content: center;
+			text-align: left;
+		}
 
-        &--center {
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            text-align: center;
-            justify-content: center;
-            flex-flow: column;
-            align-items: center;
-        }
+		&--center {
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			text-align: center;
+			justify-content: center;
+			flex-flow: column;
+			align-items: center;
+		}
 
-        &--right {
-            top: 0;
-            bottom: 0;
-            right: 0;
-            justify-content: center;
-            text-align: right;
-        }
+		&--right {
+			top: 0;
+			bottom: 0;
+			right: 0;
+			justify-content: center;
+			text-align: right;
+		}
 
-        &--bottom-left {
-            bottom: 0;
-            left: 0;
-            text-align: left;
-        }
+		&--bottom-left {
+			bottom: 0;
+			left: 0;
+			text-align: left;
+		}
 
-        &--bottom {
-            bottom: 0;
-            left: 0;
-            right: 0;
-            text-align: center;
-        }
+		&--bottom {
+			bottom: 0;
+			left: 0;
+			right: 0;
+			text-align: center;
+		}
 
-        &--bottom-right {
-            bottom: 0;
-            right: 0;
-            text-align: right;
-        }
-    }
+		&--bottom-right {
+			bottom: 0;
+			right: 0;
+			text-align: right;
+		}
+	}
 
-    /* Mobile: show all positions full width */
-    @media only screen and (max-width: 567px) {
-        &__alert {
-            &--top-left,
-            &--top-right,
-            &--left,
-            &--right,
-            &--bottom-left,
-            &--bottom-right,
-            &--center {
-                left: 0;
-                right: 0;
-                text-align: center;
-            }
+	/* Mobile: show all positions full width */
+	@media only screen and (max-width: 567px) {
+		&__alert {
+			&--top-left,
+			&--top-right,
+			&--left,
+			&--right,
+			&--bottom-left,
+			&--bottom-right,
+			&--center {
+				left: 0;
+				right: 0;
+				text-align: center;
+			}
 
-            &--center {
-                align-items: stretch;
-            }
+			&--center {
+				align-items: stretch;
+			}
 
-            &--left,
-            &--right {
-                flex-flow: column;
-                align-items: center;
-            }
-        }
-    }
+			&--left,
+			&--right {
+				flex-flow: column;
+				align-items: center;
+			}
+		}
+	}
 }

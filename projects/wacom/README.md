@@ -32,20 +32,20 @@ You can pass an optional configuration object to `provideWacom` to override the 
 import { provideWacom } from "wacom";
 
 export const appConfig = {
-        providers: [
-                provideWacom({
-                        http: { url: "https://api.example.com" },
-                        theme: {
-                                primary: "#1976d2",
-                                secondary: "#424242",
-                                info: "#29b6f6",
-                                error: "#ef5350",
-                                success: "#66bb6a",
-                                warning: "#ffa726",
-                                question: "#fff59d",
-                        },
-                }),
-        ],
+	providers: [
+		provideWacom({
+			http: { url: "https://api.example.com" },
+			theme: {
+				primary: "#1976d2",
+				secondary: "#424242",
+				info: "#29b6f6",
+				error: "#ef5350",
+				success: "#66bb6a",
+				warning: "#ffa726",
+				question: "#fff59d",
+			},
+		}),
+	],
 };
 ```
 
@@ -62,7 +62,6 @@ The `theme` section customises the colours used by Wacom components. Values are 
 - `--wacom-question`
 
 You can reference these variables in your global styles to keep the design consistent with the library.
-
 
 ## Services
 
