@@ -1,211 +1,213 @@
 @keyframes iziT-bounceInUp {
-	0% {
-		opacity: 0;
-		transform: translateY(200px);
-	}
-	50% {
-		opacity: 1;
-		transform: translateY(-10px);
-	}
-	70% {
-		transform: translateY(5px);
-	}
-	to {
-		transform: translateY(0);
-	}
-}
-
-@keyframes waw-alert-progress {
-	from {
-		width: 100%;
-	}
-
-	to {
-		width: 0%;
-	}
-}
-
-.waw-alert__container {
-	font-size: 0;
-	height: 100px;
-	width: 100%;
-	transform: translateZ(0);
-	backface-visibility: hidden;
-	transition: 0.3s all ease-in-out;
-	opacity: 1;
-
-	&--closing {
-		opacity: 0;
-		transition: 0.3s all ease-in-out;
-	}
-
-	&--auto-height {
-		height: auto !important;
-	}
-}
-
-.waw-alert {
-	display: inline-block;
-	clear: both;
-	position: relative;
-	font-family: "Lato", Tahoma, Arial;
-	font-size: 14px;
-	padding: 8px 0 9px 0;
-	background: rgba(238, 238, 238, 0.9);
-	border-color: rgba(238, 238, 238, 0.9);
-	width: 100%;
-	pointer-events: all;
-	cursor: default;
-	transform: translateX(0);
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	min-height: 54px;
-}
-
-.waw-alert__close {
-	width: 15px;
-	height: 15px;
-	right: 17px;
-	top: -5px;
-	opacity: 0.3;
-	position: relative;
-	order: 2;
-
-	&:hover {
-		opacity: 1;
-	}
-
-	&::before,
-	&::after {
-		cursor: pointer;
-		position: absolute;
-		left: 15px;
-		content: " ";
-		height: 12px;
-		width: 2px;
-                background-color: var(--wacom-secondary);
-	}
-
-	&:before {
-		transform: rotate(45deg);
-	}
-
-	&:after {
-		transform: rotate(-45deg);
-	}
-}
-
-.waw-alert__progress {
-	bottom: 0;
-	position: absolute;
-	width: 100%;
-	margin-bottom: 0;
-	border-radius: 50px;
-
-	&:hover {
-		.waw-alert__progress-bar {
-			animation-play-state: paused;
-		}
-	}
-}
-
-.waw-alert__progress-bar {
-	display: block;
-	width: 100%;
-	height: 2px;
-	background-color: #a5a5a5ed;
-	animation-name: waw-alert-progress;
-	animation-duration: 10s;
-	border-radius: 50px;
-
-        &--info {
-                background-color: var(--wacom-info);
+        0% {
+                opacity: 0;
+                transform: translateY(200px);
         }
-        &--error {
-                background-color: var(--wacom-error);
+        50% {
+                opacity: 1;
+                transform: translateY(-10px);
         }
-        &--success {
-                background-color: var(--wacom-success);
+        70% {
+                transform: translateY(5px);
         }
-        &--warning {
-                background-color: var(--wacom-warning);
-        }
-        &--question {
-                background-color: var(--wacom-question);
+        to {
+                transform: translateY(0);
         }
 }
 
-.waw-alert:hover .waw-alert__progress-bar {
-	animation-play-state: paused;
+@keyframes wacom-alert-progress {
+        from {
+                width: 100%;
+        }
+
+        to {
+                width: 0%;
+        }
 }
 
-.waw-alert__body {
-	position: relative;
-	padding: 0 0 0 10px;
-	min-height: 36px;
-	margin: 0 0 0 15px;
-	text-align: left;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
+.wacom-alert {
+        font-size: 0;
+        height: 100px;
+        width: 100%;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        transition: 0.3s all ease-in-out;
+        opacity: 1;
 
-.waw-alert__texts {
-	margin: 10px 0 0 0;
-	padding-right: 2px;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
+        &--closing {
+                opacity: 0;
+                transition: 0.3s all ease-in-out;
+        }
 
-.waw-alert__message {
-	padding: 0;
-	font-size: 14px;
-	line-height: 16px;
-	text-align: left;
-	color: rgba(0, 0, 0, 0.6);
-	white-space: normal;
+        &--auto-height {
+                height: auto !important;
+        }
 
-	&--slide-in {
-		-webkit-animation: iziT-slideIn 1s cubic-bezier(0.16, 0.81, 0.32, 1) both;
-		-moz-animation: iziT-slideIn 1s cubic-bezier(0.16, 0.81, 0.32, 1) both;
-		animation: iziT-slideIn 1s cubic-bezier(0.16, 0.81, 0.32, 1) both;
-	}
-}
+        &__content {
+                display: inline-block;
+                clear: both;
+                position: relative;
+                font-family: "Lato", Tahoma, Arial;
+                font-size: 14px;
+                padding: 8px 0 9px 0;
+                background: rgba(238, 238, 238, 0.9);
+                border-color: rgba(238, 238, 238, 0.9);
+                width: 100%;
+                pointer-events: all;
+                cursor: default;
+                transform: translateX(0);
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                min-height: 54px;
 
-.waw-alert--theme-dark {
-	background: #565c70;
-	border-color: #565c70;
+                &:hover {
+                        .wacom-alert__progress-bar {
+                                animation-play-state: paused;
+                        }
+                }
 
-	.waw-alert__message {
-		color: rgba(255, 255, 255, 0.7);
-		font-weight: 300;
-	}
-}
+                &--bounce-in-up {
+                        -webkit-animation: iziT-bounceInUp 0.7s ease-in-out both;
+                        animation: iziT-bounceInUp 0.7s ease-in-out both;
+                }
 
-.waw-alert--color {
-	&-info {
-		background-color: var(--wacom-info);
-	}
-	&-error {
-		background-color: var(--wacom-error);
-	}
-	&-success {
-		background-color: var(--wacom-success);
-	}
-	&-warning {
-		background-color: var(--wacom-warning);
-	}
-	&-question {
-		background-color: var(--wacom-question);
-	}
-}
+                &--theme-dark {
+                        background: #565c70;
+                        border-color: #565c70;
 
-.waw-alert--bounce-in-up {
-	-webkit-animation: iziT-bounceInUp 0.7s ease-in-out both;
-	animation: iziT-bounceInUp 0.7s ease-in-out both;
+                        .wacom-alert__message {
+                                color: rgba(255, 255, 255, 0.7);
+                                font-weight: 300;
+                        }
+                }
+
+                &--color {
+                        &-info {
+                                background-color: var(--wacom-info);
+                        }
+                        &-error {
+                                background-color: var(--wacom-error);
+                        }
+                        &-success {
+                                background-color: var(--wacom-success);
+                        }
+                        &-warning {
+                                background-color: var(--wacom-warning);
+                        }
+                        &-question {
+                                background-color: var(--wacom-question);
+                        }
+                }
+        }
+
+        &__close {
+                width: 15px;
+                height: 15px;
+                right: 17px;
+                top: -5px;
+                opacity: 0.3;
+                position: relative;
+                order: 2;
+
+                &:hover {
+                        opacity: 1;
+                }
+
+                &::before,
+                &::after {
+                        cursor: pointer;
+                        position: absolute;
+                        left: 15px;
+                        content: " ";
+                        height: 12px;
+                        width: 2px;
+                        background-color: var(--wacom-secondary);
+                }
+
+                &:before {
+                        transform: rotate(45deg);
+                }
+
+                &:after {
+                        transform: rotate(-45deg);
+                }
+        }
+
+        &__progress {
+                bottom: 0;
+                position: absolute;
+                width: 100%;
+                margin-bottom: 0;
+                border-radius: 50px;
+
+                &:hover {
+                        .wacom-alert__progress-bar {
+                                animation-play-state: paused;
+                        }
+                }
+        }
+
+        &__progress-bar {
+                display: block;
+                width: 100%;
+                height: 2px;
+                background-color: #a5a5a5ed;
+                animation-name: wacom-alert-progress;
+                animation-duration: 10s;
+                border-radius: 50px;
+
+                &--info {
+                        background-color: var(--wacom-info);
+                }
+                &--error {
+                        background-color: var(--wacom-error);
+                }
+                &--success {
+                        background-color: var(--wacom-success);
+                }
+                &--warning {
+                        background-color: var(--wacom-warning);
+                }
+                &--question {
+                        background-color: var(--wacom-question);
+                }
+        }
+
+        &__body {
+                position: relative;
+                padding: 0 0 0 10px;
+                min-height: 36px;
+                margin: 0 0 0 15px;
+                text-align: left;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+        }
+
+        &__texts {
+                margin: 10px 0 0 0;
+                padding-right: 2px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+        }
+
+        &__message {
+                padding: 0;
+                font-size: 14px;
+                line-height: 16px;
+                text-align: left;
+                color: rgba(0, 0, 0, 0.6);
+                white-space: normal;
+
+                &--slide-in {
+                        -webkit-animation: iziT-slideIn 1s cubic-bezier(0.16, 0.81, 0.32, 1) both;
+                        -moz-animation: iziT-slideIn 1s cubic-bezier(0.16, 0.81, 0.32, 1) both;
+                        animation: iziT-slideIn 1s cubic-bezier(0.16, 0.81, 0.32, 1) both;
+                }
+        }
 }
