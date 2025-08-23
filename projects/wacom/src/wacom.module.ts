@@ -1,16 +1,9 @@
 /* initialize */
 import { CommonModule } from '@angular/common';
-import {
-	provideHttpClient,
-	withInterceptorsFromDi,
-} from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-	CONFIG_TOKEN,
-	Config,
-	DEFAULT_CONFIG,
-} from './interfaces/config.interface';
+import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from './interfaces/config.interface';
 
 /* directives */
 import { ClickOutsideDirective } from './directives/click-outside.directive';
@@ -23,14 +16,7 @@ import { PaginationPipe } from './pipes/pagination.pipe';
 import { SafePipe } from './pipes/safe.pipe';
 import { SearchPipe } from './pipes/search.pipe';
 import { SplicePipe } from './pipes/splice.pipe';
-const PIPES = [
-	ArrPipe,
-	SafePipe,
-	SplicePipe,
-	SearchPipe,
-	MongodatePipe,
-	PaginationPipe,
-];
+const PIPES = [ArrPipe, SafePipe, SplicePipe, SearchPipe, MongodatePipe, PaginationPipe];
 
 /* components */
 import { AlertComponent } from './components/alert/alert/alert.component';
@@ -42,27 +28,15 @@ const LOCAL_COMPONENTS = [WrapperComponent, FilesComponent];
 const COMPONENTS = [LoaderComponent, ModalComponent, AlertComponent];
 
 @NgModule({
-	imports: [
-		CommonModule,
-		FormsModule,
-		...LOCAL_COMPONENTS,
-		...PIPES,
-		...COMPONENTS,
-		...DIRECTIVES,
-	],
+	imports: [CommonModule, FormsModule, ...LOCAL_COMPONENTS, ...PIPES, ...COMPONENTS, ...DIRECTIVES],
 	exports: [...PIPES, ...COMPONENTS, ...DIRECTIVES],
-	providers: [
-		{ provide: CONFIG_TOKEN, useValue: DEFAULT_CONFIG },
-		provideHttpClient(withInterceptorsFromDi()),
-	],
+	providers: [{ provide: CONFIG_TOKEN, useValue: DEFAULT_CONFIG }, provideHttpClient(withInterceptorsFromDi())],
 })
 /**
  * @deprecated Use provideWacom instead.
  */
 export class WacomModule {
-	static forRoot(
-		config: Config = DEFAULT_CONFIG
-	): ModuleWithProviders<WacomModule> {
+	static forRoot(config: Config = DEFAULT_CONFIG): ModuleWithProviders<WacomModule> {
 		return {
 			ngModule: WacomModule,
 			providers: [

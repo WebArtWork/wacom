@@ -1,11 +1,7 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Route, Router } from '@angular/router';
-import {
-	CONFIG_TOKEN,
-	Config,
-	DEFAULT_CONFIG,
-} from '../interfaces/config.interface';
+import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config.interface';
 import { MetaConfig, MetaDefaults } from '../interfaces/meta.interface';
 
 const isDefined = (val: any) => typeof val !== 'undefined';
@@ -17,10 +13,10 @@ export class MetaService {
 	private _meta: MetaConfig;
 
 	constructor(
+		@Inject(CONFIG_TOKEN) @Optional() private config: Config,
 		private router: Router,
 		private meta: Meta,
 		private titleService: Title,
-		@Inject(CONFIG_TOKEN) @Optional() private config: Config
 	) {
 		this.config = this.config || DEFAULT_CONFIG;
 
@@ -49,14 +45,10 @@ export class MetaService {
 	 * @returns The MetaService instance.
 	 */
 	setTitle(title?: string, titleSuffix?: string): MetaService {
-		let titleContent = isDefined(title)
-			? title || ''
-			: this._meta.defaults?.['title'] || '';
+		let titleContent = isDefined(title) ? title || '' : this._meta.defaults?.['title'] || '';
 
 		if (this._meta.useTitleSuffix) {
-			titleContent += isDefined(titleSuffix)
-				? titleSuffix
-				: this._meta.defaults?.['titleSuffix'] || '';
+			titleContent += isDefined(titleSuffix) ? titleSuffix : this._meta.defaults?.['titleSuffix'] || '';
 		}
 
 		this._updateMetaTag('title', titleContent);
@@ -100,14 +92,11 @@ export class MetaService {
 	setTag(tag: string, value: string, prop?: string) {
 		if (tag === 'title' || tag === 'titleSuffix') {
 			throw new Error(
-				`Attempt to set ${tag} through 'setTag': 'title' and 'titleSuffix' are reserved. Use 'MetaService.setTitle' instead.`
+				`Attempt to set ${tag} through 'setTag': 'title' and 'titleSuffix' are reserved. Use 'MetaService.setTitle' instead.`,
 			);
 		}
 
-		const content =
-			(isDefined(value)
-				? value || ''
-				: this._meta.defaults?.[tag] || '') + '';
+		const content = (isDefined(value) ? value || '' : this._meta.defaults?.[tag] || '') + '';
 
 		this._updateMetaTag(tag, content, prop);
 
@@ -126,11 +115,7 @@ export class MetaService {
 	 * @param prop - The meta tag property.
 	 */
 	private _updateMetaTag(tag: string, value: string, prop?: string): void {
-		prop =
-			prop ||
-			(tag.startsWith('og:') || tag.startsWith('twitter:')
-				? 'property'
-				: 'name');
+		prop = prop || (tag.startsWith('og:') || tag.startsWith('twitter:') ? 'property' : 'name');
 
 		this.meta.updateTag({ [prop]: tag, content: value });
 	}
@@ -142,11 +127,7 @@ export class MetaService {
 	 * @param prop - The meta tag property.
 	 */
 	removeTag(tag: string, prop?: string): void {
-		prop =
-			prop ||
-			(tag.startsWith('og:') || tag.startsWith('twitter:')
-				? 'property'
-				: 'name');
+		prop = prop || (tag.startsWith('og:') || tag.startsWith('twitter:') ? 'property' : 'name');
 
 		this.meta.removeTag(`${prop}="${tag}"`);
 	}
@@ -155,17 +136,13 @@ export class MetaService {
 	 * Warns about missing meta guards in routes.
 	 */
 	private _warnMissingGuard(): void {
-		if (
-			isDefined(this._meta.warnMissingGuard) &&
-			!this._meta.warnMissingGuard
-		) {
+		if (isDefined(this._meta.warnMissingGuard) && !this._meta.warnMissingGuard) {
 			return;
 		}
 
 		const hasDefaultMeta = !!Object.keys(this._meta.defaults ?? {}).length;
 
-		const hasMetaGuardInArr = (it: any) =>
-			it && it.IDENTIFIER === 'MetaGuard';
+		const hasMetaGuardInArr = (it: any) => it && it.IDENTIFIER === 'MetaGuard';
 
 		let hasShownWarnings = false;
 
@@ -173,15 +150,13 @@ export class MetaService {
 			const hasRouteMeta = route.data && route.data['meta'];
 
 			const showWarning =
-				!isDefined(route.redirectTo) &&
-				(hasDefaultMeta || hasRouteMeta) &&
-				!(route.canActivate || []).some(hasMetaGuardInArr);
+				!isDefined(route.redirectTo) && (hasDefaultMeta || hasRouteMeta) && !(route.canActivate || []).some(hasMetaGuardInArr);
 
 			if (showWarning) {
 				console.warn(
 					`Route with path "${route.path}" has ${
 						hasRouteMeta ? '' : 'default '
-					}meta tags, but does not use MetaGuard. Please add MetaGuard to the canActivate array in your route configuration`
+					}meta tags, but does not use MetaGuard. Please add MetaGuard to the canActivate array in your route configuration`,
 				);
 				hasShownWarnings = true;
 			}
@@ -193,7 +168,7 @@ export class MetaService {
 
 		if (hasShownWarnings) {
 			console.warn(
-				`To disable these warnings, set metaConfig.warnMissingGuard: false in your MetaConfig passed to MetaModule.forRoot()`
+				`To disable these warnings, set metaConfig.warnMissingGuard: false in your MetaConfig passed to MetaModule.forRoot()`,
 			);
 		}
 	}

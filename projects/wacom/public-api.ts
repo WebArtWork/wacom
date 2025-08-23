@@ -49,7 +49,7 @@ export * from './src/services/rtc.service';
 export * from './src/services/socket.service';
 export * from './src/services/store.service';
 export * from './src/services/time.service';
-export * from './src/services/ui.service';
+export * from './src/services/util.service';
 /*
  *	Initial
  *

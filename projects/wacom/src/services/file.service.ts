@@ -32,7 +32,10 @@ export class FileService {
 	private files: FileOptions[] = [];
 	private _component: DomComponent<FilesComponent>;
 
-	constructor(private dom: DomService, private http: HttpService) {
+	constructor(
+		private dom: DomService,
+		private http: HttpService,
+	) {
 		this._component = this.dom.appendComponent(FilesComponent, {
 			fs: this,
 		})!;
@@ -89,9 +92,7 @@ export class FileService {
 					info.multiple_files = [];
 					info.multiple_counter = input.files.length;
 				}
-				Array.from(input.files).forEach((file) =>
-					this.process(file, info)
-				);
+				Array.from(input.files).forEach((file) => this.process(file, info));
 			} else {
 				this.process(input.files[0], info);
 			}
@@ -101,7 +102,7 @@ export class FileService {
 					Array.from(input.files).map((file) => ({
 						dataUrl: '',
 						file,
-					}))
+					})),
 				);
 			}
 			Array.from(input.files).forEach((file) => info.cb?.('', file));
@@ -121,20 +122,11 @@ export class FileService {
 	 * @param opts - Additional options.
 	 * @param cb - The callback function.
 	 */
-	remove(
-		part: string,
-		url: string,
-		opts: any = {},
-		cb: (resp: any) => void = () => {}
-	): void | (() => void) {
+	remove(part: string, url: string, opts: any = {}, cb: (resp: any) => void = () => {}): void | (() => void) {
 		opts.url = url;
 		if (opts.save) {
 			return () => {
-				this.http.post(
-					opts.api || `/api/${part}/file/delete`,
-					opts,
-					cb
-				);
+				this.http.post(opts.api || `/api/${part}/file/delete`, opts, cb);
 			};
 		} else {
 			this.http.post(opts.api || `/api/${part}/file/delete`, opts, cb);
@@ -148,51 +140,30 @@ export class FileService {
 	 * @param files - The files to upload.
 	 * @param cb - The callback function.
 	 */
-	uploadFiles(
-		info: FileOptions,
-		files: File[],
-		cb: (resp: any) => void = () => {}
-	): void {
+	uploadFiles(info: FileOptions, files: File[], cb: (resp: any) => void = () => {}): void {
 		const formData = new FormData();
 
 		if (info.append) {
 			info.append(formData, files);
 		} else {
-			files.forEach((file, index) =>
-				formData.append(`file[${index}]`, file)
-			);
+			files.forEach((file, index) => formData.append(`file[${index}]`, file));
 		}
 
-		const body =
-			typeof info.body === 'function' ? info.body() : info.body || {};
-		Object.entries(body).forEach(([key, value]) =>
-			formData.append(key, value)
-		);
+		const body = typeof info.body === 'function' ? info.body() : info.body || {};
+		Object.entries(body).forEach(([key, value]) => formData.append(key, value));
 
 		if (info.save) {
 			info.complete = () => {
-				this.http.post(
-					info.api ||
-						`/api/${info.part}/file${
-							info.name ? `/${info.name}` : ''
-						}`,
-					formData,
-					(resp: any) => {
-						info.resp?.(resp);
-						cb(resp);
-					}
-				);
-			};
-		} else {
-			this.http.post(
-				info.api ||
-					`/api/${info.part}/file${info.name ? `/${info.name}` : ''}`,
-				formData,
-				(resp: any) => {
+				this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, formData, (resp: any) => {
 					info.resp?.(resp);
 					cb(resp);
-				}
-			);
+				});
+			};
+		} else {
+			this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, formData, (resp: any) => {
+				info.resp?.(resp);
+				cb(resp);
+			});
 		}
 	}
 
@@ -202,28 +173,13 @@ export class FileService {
 	 * @param info - The file options.
 	 * @param cb - The callback function.
 	 */
-	image(
-		info: FileOptions,
-		cb: (resp: any) => void = () => {}
-	): void | (() => void) {
+	image(info: FileOptions, cb: (resp: any) => void = () => {}): void | (() => void) {
 		if (info.save) {
 			return () => {
-				this.http.post(
-					info.api ||
-						`/api/${info.part}/file${
-							info.name ? `/${info.name}` : ''
-						}`,
-					info,
-					cb
-				);
+				this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, info, cb);
 			};
 		} else {
-			this.http.post(
-				info.api ||
-					`/api/${info.part}/file${info.name ? `/${info.name}` : ''}`,
-				info,
-				cb
-			);
+			this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, info, cb);
 		}
 	}
 
@@ -239,38 +195,24 @@ export class FileService {
 		info.cb?.(dataUrl, file);
 		if (info.multiple_cb) {
 			info.multiple_files.push({ dataUrl, file });
-			if (--info.multiple_counter === 0)
-				info.multiple_cb(info.multiple_files);
+			if (--info.multiple_counter === 0) info.multiple_cb(info.multiple_files);
 		}
 
 		if (!info.part) return;
 
-		const obj =
-			typeof info.body === 'function' ? info.body() : info.body || {};
+		const obj = typeof info.body === 'function' ? info.body() : info.body || {};
 		obj['dataUrl'] = dataUrl;
 
 		if (info.save) {
 			info.complete = () => {
-				this.http.post(
-					info.api ||
-						`/api/${info.part}/file${
-							info.name ? `/${info.name}` : ''
-						}`,
-					obj,
-					(resp: any) => {
-						info.cb?.(resp);
-					}
-				);
+				this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, obj, (resp: any) => {
+					info.cb?.(resp);
+				});
 			};
 		} else {
-			this.http.post(
-				info.api ||
-					`/api/${info.part}/file${info.name ? `/${info.name}` : ''}`,
-				obj,
-				(resp: any) => {
-					info.cb?.(resp);
-				}
-			);
+			this.http.post(info.api || `/api/${info.part}/file${info.name ? `/${info.name}` : ''}`, obj, (resp: any) => {
+				info.cb?.(resp);
+			});
 		}
 	}
 
@@ -286,8 +228,7 @@ export class FileService {
 			info.cb?.(false, file);
 			if (info.multiple_cb) {
 				info.multiple_files.push({ dataUrl: '', file });
-				if (--info.multiple_counter === 0)
-					info.multiple_cb(info.multiple_files);
+				if (--info.multiple_counter === 0) info.multiple_cb(info.multiple_files);
 			}
 			return;
 		}
@@ -300,25 +241,14 @@ export class FileService {
 		const reader = new FileReader();
 		reader.onload = (loadEvent) => {
 			if (!info.resize) {
-				return this.update(
-					loadEvent.target?.result as string,
-					info,
-					file
-				);
+				return this.update(loadEvent.target?.result as string, info, file);
 			}
 
 			const canvas = document.createElement('canvas');
 			const img = document.createElement('img');
 			img.onload = () => {
-				if (
-					img.width <= info.resize.width &&
-					img.height <= info.resize.height
-				) {
-					return this.update(
-						loadEvent.target?.result as string,
-						info,
-						file
-					);
+				if (img.width <= info.resize.width && img.height <= info.resize.height) {
+					return this.update(loadEvent.target?.result as string, info, file);
 				}
 
 				const infoRatio = info.resize.width / info.resize.height;

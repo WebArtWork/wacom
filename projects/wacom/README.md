@@ -47,11 +47,11 @@ The `CoreService` manages the initialization of various platform-specific servic
 
 #### Properties
 
--   `ssr` (boolean): Indicates whether the application is running on the server side.
--   `localStorage` (any): Local storage object. Uses a mock object on the server side.
--   `navigator` (any): Navigator object. Uses a mock object on the server side.
--   `document` (any): Document object. Uses a mock object on the server side.
--   `window` (any): Window object. Uses a mock object on the server side.
+- `ssr` (boolean): Indicates whether the application is running on the server side.
+- `localStorage` (any): Local storage object. Uses a mock object on the server side.
+- `navigator` (any): Navigator object. Uses a mock object on the server side.
+- `document` (any): Document object. Uses a mock object on the server side.
+- `window` (any): Window object. Uses a mock object on the server side.
 
 ### String Prototype Extension
 
@@ -61,9 +61,9 @@ The `CoreService` extends the `String` prototype with a `capitalize` method, all
 
 Capitalizes the first letter of the string and makes the rest of the string lowercase.
 
--   **Example**:
-    const exampleString = "hellO";
-    console.log(exampleString.capitalize()); // Output: "Hello"
+- **Example**:
+  const exampleString = "hellO";
+  console.log(exampleString.capitalize()); // Output: "Hello"
 
 ### Object to Array Function
 
@@ -73,16 +73,14 @@ The `CoreService` provides an `ota` method to convert an object to an array. Opt
 
 Converts an object to an array. Optionally holds keys instead of values.
 
--   **Parameters**:
+- **Parameters**:
+    - `obj` (any): The object to be converted.
+    - `holder` (boolean): If true, the keys will be held in the array; otherwise, the values will be held. Default is `false`.
 
-    -   `obj` (any): The object to be converted.
-    -   `holder` (boolean): If true, the keys will be held in the array; otherwise, the values will be held. Default is `false`.
+- **Returns**:
+    - `any[]`: The resulting array.
 
--   **Returns**:
-
-    -   `any[]`: The resulting array.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 const exampleObj = { a: 1, b: 2, c: 3 };
@@ -100,17 +98,15 @@ The `CoreService` provides a `splice` method to remove elements from one array t
 
 Removes elements from `fromArray` that are present in `removeArray` based on a comparison field.
 
--   **Parameters**:
+- **Parameters**:
+    - `removeArray` (any[]): The array of elements to remove.
+    - `fromArray` (any[]): The array from which to remove elements.
+    - `compareField` (string): The field to use for comparison. Default is `_id`.
 
-    -   `removeArray` (any[]): The array of elements to remove.
-    -   `fromArray` (any[]): The array from which to remove elements.
-    -   `compareField` (string): The field to use for comparison. Default is `_id`.
+- **Returns**:
+    - `any[]`: The modified `fromArray` with elements removed.
 
--   **Returns**:
-
-    -   `any[]`: The modified `fromArray` with elements removed.
-
--   **Example**:
+- **Example**:
 
 ```
 const removeArray = [{ _id: '1' }, { _id: '3' }];
@@ -128,15 +124,13 @@ The `CoreService` provides an `ids2id` method to unite multiple \_id values into
 
 Unites multiple \_id values into a single unique \_id. The resulting \_id is unique regardless of the order of the input \_id values.
 
--   **Parameters**:
+- **Parameters**:
+    - `...args` (string[]): The \_id values to be united.
 
-    -   `...args` (string[]): The \_id values to be united.
+- **Returns**:
+    - `string`: The unique combined \_id.
 
--   **Returns**:
-
-    -   `string`: The unique combined \_id.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 const id1 = "20230101abc";
@@ -155,13 +149,12 @@ The `CoreService` provides an `afterWhile` method to delay the execution of a ca
 
 Delays the execution of a callback function for a specified amount of time. If called again within that time, the timer resets.
 
--   **Parameters**:
+- **Parameters**:
+    - `doc` (string | object | (() => void)): A unique identifier for the timer, an object to host the timer, or the callback function.
+    - `cb` (() => void): The callback function to execute after the delay.
+    - `time` (number): The delay time in milliseconds. Default is 1000.
 
-    -   `doc` (string | object | (() => void)): A unique identifier for the timer, an object to host the timer, or the callback function.
-    -   `cb` (() => void): The callback function to execute after the delay.
-    -   `time` (number): The delay time in milliseconds. Default is 1000.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 coreService.afterWhile('example', () => {
@@ -186,12 +179,11 @@ The `CoreService` provides a `copy` method to recursively copy properties from o
 
 Recursively copies properties from one object to another.
 
--   **Parameters**:
+- **Parameters**:
+    - `from`: The source object from which properties are copied.
+    - `to`: The target object to which properties are copied.
 
-    -   `from`: The source object from which properties are copied.
-    -   `to`: The target object to which properties are copied.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 const source = { a: 1, b: { c: 2 } };
@@ -206,7 +198,7 @@ The `CoreService` provides methods to detect the client's device type (mobile, t
 
 #### Properties
 
--   `device` (string): The detected device type.
+- `device` (string): The detected device type.
 
 #### Methods
 
@@ -214,7 +206,7 @@ The `CoreService` provides methods to detect the client's device type (mobile, t
 
 Detects the device type based on the user agent.
 
--   **Example**:
+- **Example**:
 
 ```Typescript
 coreService.detectDevice();
@@ -224,11 +216,10 @@ coreService.detectDevice();
 
 Checks if the device is a mobile device.
 
--   **Returns**:
+- **Returns**:
+    - `boolean`: Returns true if the device is a mobile device.
 
-    -   `boolean`: Returns true if the device is a mobile device.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 console.log(coreService.isMobile()); // Output: true or false
@@ -238,11 +229,10 @@ console.log(coreService.isMobile()); // Output: true or false
 
 Checks if the device is a tablet.
 
--   **Returns**:
+- **Returns**:
+    - `boolean`: Returns true if the device is a tablet.
 
-    -   `boolean`: Returns true if the device is a tablet.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 console.log(coreService.isTablet()); // Output: true or false
@@ -252,11 +242,10 @@ console.log(coreService.isTablet()); // Output: true or false
 
 Checks if the device is a web browser.
 
--   **Returns**:
+- **Returns**:
+    - `boolean`: Returns true if the device is a web browser.
 
-    -   `boolean`: Returns true if the device is a web browser.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 console.log(coreService.isWeb()); // Output: true or false
@@ -266,11 +255,10 @@ console.log(coreService.isWeb()); // Output: true or false
 
 Checks if the device is an Android device.
 
--   **Returns**:
+- **Returns**:
+    - `boolean`: Returns true if the device is an Android device.
 
-    -   `boolean`: Returns true if the device is an Android device.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 console.log(coreService.isAndroid()); // Output: true or false
@@ -280,11 +268,10 @@ console.log(coreService.isAndroid()); // Output: true or false
 
 Checks if the device is an iOS device.
 
--   **Returns**:
+- **Returns**:
+    - `boolean`: Returns true if the device is an iOS device.
 
-    -   `boolean`: Returns true if the device is an iOS device.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 console.log(coreService.isIos()); // Output: true or false
@@ -296,9 +283,9 @@ The `CoreService` provides methods for managing the application's version. The v
 
 #### Properties
 
--   `version` (string): The combined version string of the application.
--   `appVersion` (string): The application version.
--   `dateVersion` (string): The date version.
+- `version` (string): The combined version string of the application.
+- `appVersion` (string): The application version.
+- `dateVersion` (string): The date version.
 
 #### Methods
 
@@ -306,7 +293,7 @@ The `CoreService` provides methods for managing the application's version. The v
 
 Sets the combined version string based on `appVersion` and `dateVersion`.
 
--   **Example**:
+- **Example**:
 
 ```Typescript
 coreService.setVersion();
@@ -316,11 +303,10 @@ coreService.setVersion();
 
 Sets the app version and updates the combined version string.
 
--   **Parameters**:
+- **Parameters**:
+    - `appVersion` (string): The application version to set.
 
-    -   `appVersion` (string): The application version to set.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 coreService.setAppVersion('1.2.3');
@@ -330,11 +316,10 @@ coreService.setAppVersion('1.2.3');
 
 Sets the date version and updates the combined version string.
 
--   **Parameters**:
+- **Parameters**:
+    - `dateVersion` (string): The date version to set.
 
-    -   `dateVersion` (string): The date version to set.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 coreService.setDateVersion('2023-01-01');
@@ -350,27 +335,24 @@ The `CoreService` provides methods for managing signals (events) to facilitate c
 
 Emits a signal, optionally passing data to the listeners.
 
--   **Parameters**:
+- **Parameters**:
+    - `signal` (string): The name of the signal to emit.
+    - `data` (any): Optional data to pass to the listeners.
 
-    -   `signal` (string): The name of the signal to emit.
-    -   `data` (any): Optional data to pass to the listeners.
-
--   **Example**:
-    coreService.emit('mySignal', { key: 'value' });
+- **Example**:
+  coreService.emit('mySignal', { key: 'value' });
 
 ##### `on(signal: string): Observable<any>`
 
 Returns an Observable that emits values when the specified signal is emitted. Multiple components or services can subscribe to this Observable to be notified of the signal.
 
--   **Parameters**:
+- **Parameters**:
+    - `signal` (string): The name of the signal to listen for.
 
-    -   `signal` (string): The name of the signal to listen for.
+- **Returns**:
+    - `Observable<any>`: An Observable that emits when the signal is emitted.
 
--   **Returns**:
-
-    -   `Observable<any>`: An Observable that emits when the signal is emitted.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 const subscription = coreService.on('mySignal').subscribe(data => {
@@ -384,11 +366,10 @@ subscription.unsubscribe();
 
 Completes the Subject for a specific signal, effectively stopping any future emissions. This also unsubscribes all listeners for the signal.
 
--   **Parameters**:
+- **Parameters**:
+    - `signal` (string): The name of the signal to stop.
 
-    -   `signal` (string): The name of the signal to stop.
-
--   **Example**:
+- **Example**:
 
 ```Typescript
 coreService.off('mySignal');
@@ -448,48 +429,43 @@ The `CoreService` provides methods for managing the completion of tasks. This is
 
 Marks a task as complete.
 
--   **Parameters**:
+- **Parameters**:
+    - `task` (string): The task to mark as complete, identified by a string.
 
-    -   `task` (string): The task to mark as complete, identified by a string.
-
--   **Example**:
-    coreService.complete('myTask');
+- **Example**:
+  coreService.complete('myTask');
 
 ##### `onComplete(task: string): Promise<void>`
 
 Returns a Promise that resolves when the specified task is complete. This is useful for waiting until a task is completed.
 
--   **Parameters**:
+- **Parameters**:
+    - `task` (string): The task to watch for completion, identified by a string.
 
-    -   `task` (string): The task to watch for completion, identified by a string.
+- **Returns**:
+    - `Promise<void>`: A Promise that resolves when the task is complete.
 
--   **Returns**:
-
-    -   `Promise<void>`: A Promise that resolves when the task is complete.
-
--   **Example**:
-    coreService.onComplete('myTask').then(() => {
-    console.log('Task is now complete');
-    });
+- **Example**:
+  coreService.onComplete('myTask').then(() => {
+  console.log('Task is now complete');
+  });
 
 ##### `completed(task: string): boolean`
 
 Checks if a task is completed.
 
--   **Parameters**:
+- **Parameters**:
+    - `task` (string): The task to check, identified by a string.
 
-    -   `task` (string): The task to check, identified by a string.
+- **Returns**:
+    - `boolean`: True if the task is completed, false otherwise.
 
--   **Returns**:
-
-    -   `boolean`: True if the task is completed, false otherwise.
-
--   **Example**:
-    if (coreService.completed('myTask')) {
-    console.log('Task is completed');
-    } else {
-    console.log('Task is not yet completed');
-    }
+- **Example**:
+  if (coreService.completed('myTask')) {
+  console.log('Task is completed');
+  } else {
+  console.log('Task is not yet completed');
+  }
 
 #### Example Usage
 
@@ -532,59 +508,53 @@ The `CoreService` provides methods for managing locks on resources to prevent co
 
 Locks a resource to prevent concurrent access.
 
--   **Parameters**:
+- **Parameters**:
+    - `which` (string): The resource to lock, identified by a string.
 
-    -   `which` (string): The resource to lock, identified by a string.
-
--   **Example**:
-    coreService.lock('myResource');
+- **Example**:
+  coreService.lock('myResource');
 
 #### `unlock(which: string): void`
 
 Unlocks a resource, allowing other processes or threads to access it.
 
--   **Parameters**:
+- **Parameters**:
+    - `which` (string): The resource to unlock, identified by a string.
 
-    -   `which` (string): The resource to unlock, identified by a string.
-
--   **Example**:
-    coreService.unlock('myResource');
+- **Example**:
+  coreService.unlock('myResource');
 
 #### `onUnlock(which: string): Promise<void>`
 
 Returns a Promise that resolves when the specified resource is unlocked. This is useful for waiting until a resource becomes available.
 
--   **Parameters**:
+- **Parameters**:
+    - `which` (string): The resource to watch for unlocking, identified by a string.
 
-    -   `which` (string): The resource to watch for unlocking, identified by a string.
+- **Returns**:
+    - `Promise<void>`: A Promise that resolves when the resource is unlocked.
 
--   **Returns**:
-
-    -   `Promise<void>`: A Promise that resolves when the resource is unlocked.
-
--   **Example**:
-    coreService.onUnlock('myResource').then(() => {
-    console.log('Resource is now unlocked');
-    });
+- **Example**:
+  coreService.onUnlock('myResource').then(() => {
+  console.log('Resource is now unlocked');
+  });
 
 #### `locked(which: string): boolean`
 
 Checks if a resource is currently locked.
 
--   **Parameters**:
+- **Parameters**:
+    - `which` (string): The resource to check, identified by a string.
 
-    -   `which` (string): The resource to check, identified by a string.
+- **Returns**:
+    - `boolean`: True if the resource is locked, false otherwise.
 
--   **Returns**:
-
-    -   `boolean`: True if the resource is locked, false otherwise.
-
--   **Example**:
-    if (coreService.locked('myResource')) {
-    console.log('Resource is currently locked');
-    } else {
-    console.log('Resource is available');
-    }
+- **Example**:
+  if (coreService.locked('myResource')) {
+  console.log('Resource is currently locked');
+  } else {
+  console.log('Resource is available');
+  }
 
 ### Example Usage
 
@@ -631,7 +601,7 @@ The `HttpService` provides an HTTP layer for `HttpClient` in Angular, supporting
 Sets the base URL for HTTP requests.
 **Parameters**:
 
--   `url` (string): The base URL.
+- `url` (string): The base URL.
 
 **Example**:
 
@@ -653,8 +623,8 @@ httpService.removeUrl();
 Sets a header for HTTP requests.
 **Parameters**:
 
--   `key` (string): The header key.
--   `value` (string): The header value.
+- `key` (string): The header key.
+- `value` (string): The header value.
 
 **Example**:
 
@@ -667,11 +637,11 @@ httpService.set('Authorization', 'Bearer token');
 Gets the value of a specified header.
 **Parameters**:
 
--   `key` (string): The header key.
+- `key` (string): The header key.
 
 **Returns**:
 
--   The header value.
+- The header value.
 
 **Example**:
 
@@ -684,7 +654,7 @@ const authHeader = httpService.header('Authorization');
 Removes a specified header.
 **Parameters**:
 
--   `key` (string): The header key.
+- `key` (string): The header key.
 
 **Example**:
 
@@ -697,14 +667,14 @@ httpService.remove('Authorization');
 Performs a POST request.
 **Parameters**:
 
--   `url` (string): The URL for the request.
--   `doc` (any): The request body.
--   `callback` (function): The callback function.
--   `opts` (any): Additional options.
+- `url` (string): The URL for the request.
+- `doc` (any): The request body.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
 
 **Returns**:
 
--   An observable for the request.
+- An observable for the request.
 
 **Example**:
 
@@ -719,14 +689,14 @@ httpService.post('/endpoint', data, (resp) => {
 Performs a PUT request.
 **Parameters**:
 
--   `url` (string): The URL for the request.
--   `doc` (any): The request body.
--   `callback` (function): The callback function.
--   `opts` (any): Additional options.
+- `url` (string): The URL for the request.
+- `doc` (any): The request body.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
 
 **Returns**:
 
--   An observable for the request.
+- An observable for the request.
 
 **Example**:
 
@@ -741,14 +711,14 @@ httpService.put('/endpoint', data, (resp) => {
 Performs a PATCH request.
 **Parameters**:
 
--   `url` (string): The URL for the request.
--   `doc` (any): The request body.
--   `callback` (function): The callback function.
--   `opts` (any): Additional options.
+- `url` (string): The URL for the request.
+- `doc` (any): The request body.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
 
 **Returns**:
 
--   An observable for the request.
+- An observable for the request.
 
 **Example**:
 
@@ -763,13 +733,13 @@ httpService.patch('/endpoint', data, (resp) => {
 Performs a DELETE request.
 **Parameters**:
 
--   `url` (string): The URL for the request.
--   `callback` (function): The callback function.
--   `opts` (any): Additional options.
+- `url` (string): The URL for the request.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
 
 **Returns**:
 
--   An observable for the request.
+- An observable for the request.
 
 **Example**:
 
@@ -784,13 +754,13 @@ httpService.delete('/endpoint', (resp) => {
 Performs a GET request.
 **Parameters**:
 
--   `url` (string): The URL for the request.
--   `callback` (function): The callback function.
--   `opts` (any): Additional options.
+- `url` (string): The URL for the request.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
 
 **Returns**:
 
--   An observable for the request.
+- An observable for the request.
 
 **Example**:
 
@@ -844,7 +814,7 @@ The prefix for storage keys.
 Sets the prefix for storage keys.
 **Parameters**:
 
--   `prefix` (string): The prefix to set.
+- `prefix` (string): The prefix to set.
 
 **Example**:
 
@@ -858,10 +828,10 @@ Sets a value in storage.
 
 **Parameters**:
 
--   `key` (string): The storage key.
--   `value` (string): The value to store.
--   `callback` (function): The callback to execute on success.
--   `errCallback` (function): The callback to execute on error.
+- `key` (string): The storage key.
+- `value` (string): The value to store.
+- `callback` (function): The callback to execute on success.
+- `errCallback` (function): The callback to execute on error.
 
 **Example**:
 
@@ -875,12 +845,12 @@ Sets a value in storage asynchronously.
 
 **Parameters**:
 
--   `key` (string): The storage key.
--   `value` (string): The value to store.
+- `key` (string): The storage key.
+- `value` (string): The value to store.
 
 **Returns**:
 
--   `Promise<boolean>`: A promise that resolves to a boolean indicating success.
+- `Promise<boolean>`: A promise that resolves to a boolean indicating success.
 
 **Example**:
 
@@ -894,9 +864,9 @@ Gets a value from storage.
 
 **Parameters**:
 
--   `key` (string): The storage key.
--   `callback` (function): The callback to execute with the retrieved value.
--   `errCallback` (function): The callback to execute on error.
+- `key` (string): The storage key.
+- `callback` (function): The callback to execute with the retrieved value.
+- `errCallback` (function): The callback to execute on error.
 
 **Example**:
 
@@ -910,11 +880,11 @@ Gets a value from storage asynchronously.
 
 **Parameters**:
 
--   `key` (string): The storage key.
+- `key` (string): The storage key.
 
 **Returns**:
 
--   `Promise<string | null>`: A promise that resolves to the retrieved value or `null` if the key is missing.
+- `Promise<string | null>`: A promise that resolves to the retrieved value or `null` if the key is missing.
 
 **Example**:
 
@@ -928,10 +898,10 @@ Sets a JSON value in storage.
 
 **Parameters**:
 
--   `key` (string): The storage key.
--   `value` (any): The value to store.
--   `callback` (function): The callback to execute on success.
--   `errCallback` (function): The callback to execute on error.
+- `key` (string): The storage key.
+- `value` (any): The value to store.
+- `callback` (function): The callback to execute on success.
+- `errCallback` (function): The callback to execute on error.
 
 **Example**:
 
@@ -945,12 +915,12 @@ Sets a JSON value in storage asynchronously.
 
 **Parameters**:
 
--   `key` (string): The storage key.
--   `value` (any): The value to store.
+- `key` (string): The storage key.
+- `value` (any): The value to store.
 
 **Returns**:
 
--   `Promise<boolean>`: A promise that resolves to a boolean indicating success.
+- `Promise<boolean>`: A promise that resolves to a boolean indicating success.
 
 **Example**:
 
@@ -964,9 +934,9 @@ Gets a JSON value from storage.
 
 **Parameters**:
 
--   `key` (string): The storage key.
--   `callback` (function): The callback to execute with the retrieved value.
--   `errCallback` (function): The callback to execute on error.
+- `key` (string): The storage key.
+- `callback` (function): The callback to execute with the retrieved value.
+- `errCallback` (function): The callback to execute on error.
 
 **Example**:
 
@@ -980,11 +950,11 @@ Gets a JSON value from storage asynchronously.
 
 **Parameters**:
 
--   `key` (string): The storage key.
+- `key` (string): The storage key.
 
 **Returns**:
 
--   `Promise<T | null>`: A promise that resolves to the retrieved value.
+- `Promise<T | null>`: A promise that resolves to the retrieved value.
 
 **Example**:
 
@@ -998,13 +968,13 @@ Removes a value from storage.
 
 **Parameters**:
 
--   `key` (string): The storage key.
--   `callback` (function): The callback to execute on success.
--   `errCallback` (function): The callback to execute on error.
+- `key` (string): The storage key.
+- `callback` (function): The callback to execute on success.
+- `errCallback` (function): The callback to execute on error.
 
 **Returns**:
 
--   `Promise<boolean>`: A promise that resolves to a boolean indicating success.
+- `Promise<boolean>`: A promise that resolves to a boolean indicating success.
 
 **Example**:
 
@@ -1018,12 +988,12 @@ Clears all values from storage.
 
 **Parameters**:
 
--   `callback` (function): The callback to execute on success.
--   `errCallback` (function): The callback to execute on error.
+- `callback` (function): The callback to execute on success.
+- `errCallback` (function): The callback to execute on error.
 
 **Returns**:
 
--   `Promise<boolean>`: A promise that resolves to a boolean indicating success.
+- `Promise<boolean>`: A promise that resolves to a boolean indicating success.
 
 **Example**:
 
@@ -1037,11 +1007,11 @@ Applies the configured prefix to a storage key.
 
 **Parameters**:
 
--   `key` (string): The storage key.
+- `key` (string): The storage key.
 
 **Returns**:
 
--   `string`: The prefixed storage key.
+- `string`: The prefixed storage key.
 
 **Example**:
 
@@ -1086,11 +1056,11 @@ Applies replacements to a given string based on the replacements array.
 
 **Parameters**:
 
--   `str` (string | undefined): The string to apply replacements to.
+- `str` (string | undefined): The string to apply replacements to.
 
 **Returns**:
 
--   `string`: The string with replacements applied.
+- `string`: The string with replacements applied.
 
 **Example**:
 
@@ -1104,8 +1074,8 @@ Executes a callback with the value of a specific hash field once the hash is loa
 
 **Parameters**:
 
--   `field` (string): The hash field to get the value for.
--   `cb` (function): The callback to execute with the value.
+- `field` (string): The hash field to get the value for.
+- `cb` (function): The callback to execute with the value.
 
 **Example**:
 
@@ -1129,8 +1099,8 @@ Sets a value for a specific hash field and updates the URL.
 
 **Parameters**:
 
--   `field` (string): The hash field to set the value for.
--   `value` (string): The value to set.
+- `field` (string): The hash field to set the value for.
+- `value` (string): The value to set.
 
 **Example**:
 
@@ -1144,11 +1114,11 @@ Gets the value of a specific hash field.
 
 **Parameters**:
 
--   `field` (string): The hash field to get the value for.
+- `field` (string): The hash field to get the value for.
 
 **Returns**:
 
--   `string | undefined`: The value of the hash field.
+- `string | undefined`: The value of the hash field.
 
 **Example**:
 
@@ -1162,7 +1132,7 @@ Clears a specific hash field or all hash fields and updates the URL.
 
 **Parameters**:
 
--   `field` (string | undefined): The hash field to clear. If not provided, clears all hash fields.
+- `field` (string | undefined): The hash field to clear. If not provided, clears all hash fields.
 
 **Example**:
 
@@ -1183,7 +1153,7 @@ Sets the default meta tags, merging the provided values with any existing defaul
 
 **Parameters**:
 
--   `defaults` (object): The default meta tags including optional `links`.
+- `defaults` (object): The default meta tags including optional `links`.
 
 **Example**:
 
@@ -1199,12 +1169,12 @@ Sets the title and optional title suffix, updating the `title`, `og:title`, and 
 
 **Parameters**:
 
--   `title` (string): The title to set.
--   `titleSuffix` (string): The title suffix to append.
+- `title` (string): The title to set.
+- `titleSuffix` (string): The title suffix to append.
 
 **Returns**:
 
--   `MetaService`: The MetaService instance.
+- `MetaService`: The MetaService instance.
 
 **Example**:
 
@@ -1218,11 +1188,11 @@ Sets link tags.
 
 **Parameters**:
 
--   `links` (object): The links to set.
+- `links` (object): The links to set.
 
 **Returns**:
 
--   `MetaService`: The MetaService instance.
+- `MetaService`: The MetaService instance.
 
 **Example**:
 
@@ -1236,13 +1206,13 @@ Sets a meta tag.
 
 **Parameters**:
 
--   `tag` (string): The meta tag name.
--   `value` (string): The meta tag value.
--   `prop` (string): The meta tag property.
+- `tag` (string): The meta tag name.
+- `value` (string): The meta tag value.
+- `prop` (string): The meta tag property.
 
 **Returns**:
 
--   `MetaService`: The MetaService instance.
+- `MetaService`: The MetaService instance.
 
 **Example**:
 
@@ -1256,8 +1226,8 @@ Removes a meta tag.
 
 **Parameters**:
 
--   `tag` (string): The meta tag name.
--   `prop` (string): The meta tag property.
+- `tag` (string): The meta tag name.
+- `prop` (string): The meta tag property.
 
 **Example**:
 
@@ -1273,9 +1243,9 @@ Updates a meta tag.
 
 **Parameters**:
 
--   `tag` (string): The meta tag name.
--   `value` (string): The meta tag value.
--   `prop` (string): The meta tag property.
+- `tag` (string): The meta tag name.
+- `value` (string): The meta tag value.
+- `prop` (string): The meta tag property.
 
 #### `_warnMissingGuard(): void`
 
@@ -1299,11 +1269,11 @@ Manages form states.
 
 **Parameters**:
 
--   `id` (string): The form identifier.
+- `id` (string): The form identifier.
 
 **Returns**:
 
--   `any`: The form state object.
+- `any`: The form state object.
 
 **Example**:
 
@@ -1317,13 +1287,13 @@ Validates input values based on the specified type.
 
 **Parameters**:
 
--   `value` (any): The value to validate.
--   `kind` (string): The type of validation.
--   `extra` (number): Additional validation criteria.
+- `value` (any): The value to validate.
+- `kind` (string): The type of validation.
+- `extra` (number): Additional validation criteria.
 
 **Returns**:
 
--   `boolean`: True if the value is valid, false otherwise.
+- `boolean`: True if the value is valid, false otherwise.
 
 **Example**:
 
@@ -1337,11 +1307,11 @@ Determines the strength of a password.
 
 **Parameters**:
 
--   `value` (string): The password to evaluate.
+- `value` (string): The password to evaluate.
 
 **Returns**:
 
--   `number`: The strength level of the password.
+- `number`: The strength level of the password.
 
 **Example**:
 
@@ -1355,8 +1325,8 @@ Sets multiple CSS variables.
 
 **Parameters**:
 
--   `variables` (object): The CSS variables to set.
--   `opts` (any): Options for setting the variables.
+- `variables` (object): The CSS variables to set.
+- `opts` (any): Options for setting the variables.
 
 **Example**:
 
@@ -1370,7 +1340,7 @@ Retrieves the stored CSS variables.
 
 **Returns**:
 
--   `object`: The stored CSS variables.
+- `object`: The stored CSS variables.
 
 **Example**:
 
@@ -1384,7 +1354,7 @@ Removes specified CSS variables.
 
 **Parameters**:
 
--   `keys` (string | array): The keys of the CSS variables to remove.
+- `keys` (string | array): The keys of the CSS variables to remove.
 
 **Example**:
 
@@ -1398,12 +1368,12 @@ Generates an array of sample data.
 
 **Parameters**:
 
--   `arrLen` (number): The length of the array.
--   `type` (string): The type of data to generate.
+- `arrLen` (number): The length of the array.
+- `type` (string): The type of data to generate.
 
 **Returns**:
 
--   `array`: An array of sample data.
+- `array`: An array of sample data.
 
 **Example**:
 
@@ -1417,11 +1387,11 @@ Generates a random text string.
 
 **Parameters**:
 
--   `length` (number): The length of the text string.
+- `length` (number): The length of the text string.
 
 **Returns**:
 
--   `string`: A random text string.
+- `string`: A random text string.
 
 **Example**:
 
@@ -1443,11 +1413,11 @@ Creates a new document with a temporary ID and status flags.
 
 **Parameters**:
 
--   `doc` (Document, optional): A base document to initialize.
+- `doc` (Document, optional): A base document to initialize.
 
 **Returns**:
 
--   `Document`: A new document instance with default properties.
+- `Document`: A new document instance with default properties.
 
 **Example**:
 const newDoc = workService.new();
@@ -1460,11 +1430,11 @@ Retrieves a document by its ID. If the document doesn't exist, a new one is crea
 
 **Parameters**:
 
--   `_id` (string): The document ID.
+- `_id` (string): The document ID.
 
 **Returns**:
 
--   `Document`: The document instance.
+- `Document`: The document instance.
 
 **Example**:
 const doc = workService.doc('12345');
@@ -1477,7 +1447,7 @@ Adds a new document or updates an existing document in the local store. It will 
 
 **Parameters**:
 
--   `doc` (Document): The document to add or update.
+- `doc` (Document): The document to add or update.
 
 **Example**:
 workService.addDoc(doc);
@@ -1490,7 +1460,7 @@ Adds multiple documents to the service. Each document will either be added or up
 
 **Parameters**:
 
--   `docs` (Document[]): The array of documents to add.
+- `docs` (Document[]): The array of documents to add.
 
 **Example**:
 workService.addDocs(docs);
@@ -1512,7 +1482,7 @@ Retrieves the current list of documents stored locally.
 
 **Returns**:
 
--   `Document[]`: The list of documents.
+- `Document[]`: The list of documents.
 
 **Example**:
 const docs = workService.getDocs();
@@ -1525,7 +1495,7 @@ Sets the number of documents to display per page for pagination.
 
 **Parameters**:
 
--   `_perPage` (number): The number of documents per page.
+- `_perPage` (number): The number of documents per page.
 
 **Example**:
 workService.setPerPage(10);
@@ -1538,12 +1508,12 @@ Fetches a list of documents from the API with optional pagination and other sett
 
 **Parameters**:
 
--   `config` (object, optional): The configuration for pagination (`page` and `perPage`).
--   `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
+- `config` (object, optional): The configuration for pagination (`page` and `perPage`).
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
 
 **Returns**:
 
--   `Observable<Document[]>`: An observable of the retrieved documents.
+- `Observable<Document[]>`: An observable of the retrieved documents.
 
 **Example**:
 workService.get({ page: 1 }, { callback: (docs) => console.log(docs) });
@@ -1556,12 +1526,12 @@ Creates a new document in the API and adds it to the local store. The document i
 
 **Parameters**:
 
--   `doc` (Document): The document to create.
--   `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
+- `doc` (Document): The document to create.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
 
 **Returns**:
 
--   `Observable<Document> | void`: An observable of the created document or void if the document was already created.
+- `Observable<Document> | void`: An observable of the created document or void if the document was already created.
 
 **Example**:
 workService.create(newDoc, { callback: (doc) => console.log(doc) });
@@ -1574,12 +1544,12 @@ Fetches a document from the API based on a query object and adds it to the local
 
 **Parameters**:
 
--   `query` (object, optional): The query object to filter the documents.
--   `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
+- `query` (object, optional): The query object to filter the documents.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
 
 **Returns**:
 
--   `Observable<Document>`: An observable of the fetched document.
+- `Observable<Document>`: An observable of the fetched document.
 
 **Example**:
 workService.fetch({ name: 'example' }, { callback: (doc) => console.log(doc) });
@@ -1592,8 +1562,8 @@ Updates a document after a specified delay using a core service function to hand
 
 **Parameters**:
 
--   `doc` (Document): The document to update.
--   `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
+- `doc` (Document): The document to update.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
 
 **Example**:
 workService.updateAfterWhile(doc, { callback: (doc) => console.log(doc) });
@@ -1606,12 +1576,12 @@ Updates a document in the API and reflects the changes locally.
 
 **Parameters**:
 
--   `doc` (Document): The document to update.
--   `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
+- `doc` (Document): The document to update.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
 
 **Returns**:
 
--   `Observable<Document>`: An observable of the updated document.
+- `Observable<Document>`: An observable of the updated document.
 
 **Example**:
 workService.update(doc, { callback: (doc) => console.log(doc) });
@@ -1624,12 +1594,12 @@ Unique update a document field in the API.
 
 **Parameters**:
 
--   `doc` (Document): The document to update.
--   `options` (CrudOptions<Document>, optional): Optional callback and error handling configuration.
+- `doc` (Document): The document to update.
+- `options` (CrudOptions<Document>, optional): Optional callback and error handling configuration.
 
 **Returns**:
 
--   `Observable<Document>`: An observable that resolves with the updated document.
+- `Observable<Document>`: An observable that resolves with the updated document.
 
 **Example**:
 workService.unique(doc, { callback: (doc) => console.log('Document updated', doc) });
@@ -1642,12 +1612,12 @@ Deletes a document from the API and updates the local store.
 
 **Parameters**:
 
--   `doc` (Document): The document to delete.
--   `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
+- `doc` (Document): The document to delete.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
 
 **Returns**:
 
--   `Observable<Document>`: An observable of the deleted document.
+- `Observable<Document>`: An observable of the deleted document.
 
 **Example**:
 workService.delete(doc, { callback: (doc) => console.log(doc) });
@@ -1664,9 +1634,9 @@ Represents a CRUD document.
 
 **Properties**:
 
--   `_id` (string): The document ID.
--   `__created` (boolean): Indicates if the document is created.
--   `__modified` (boolean): Indicates if the document is modified.
+- `_id` (string): The document ID.
+- `__created` (boolean): Indicates if the document is created.
+- `__modified` (boolean): Indicates if the document is modified.
 
 **Example**:
 interface CrudDocument {
@@ -1702,7 +1672,7 @@ export class WorkService extends CrudService<Work> {
 			_http,
 			_store,
 			_alert,
-			_core
+			_core,
 		);
 
 		this.get();
@@ -1721,7 +1691,7 @@ The `FileService` is designed to handle file uploads, image processing, and file
 Adds a file input configuration.
 **Parameters**:
 
--   `opts` (FileOptions | string): The file options or a string ID.
+- `opts` (FileOptions | string): The file options or a string ID.
 
 **Example**:
 
@@ -1742,8 +1712,8 @@ fs.add({
 Handles file input change event.
 **Parameters**:
 
--   `event` (Event): The input change event.
--   `info` (FileOptions): The file options.
+- `event` (Event): The input change event.
+- `info` (FileOptions): The file options.
 
 **Example**:
 
@@ -1757,10 +1727,10 @@ Removes a file.
 
 **Parameters**:
 
--   `part` (string): The part of the API.
--   `url` (string): The URL of the file.
--   `opts` (object): Additional options.
--   `cb` (function): The callback function.
+- `part` (string): The part of the API.
+- `url` (string): The URL of the file.
+- `opts` (object): Additional options.
+- `cb` (function): The callback function.
 
 **Example**:
 
@@ -1775,9 +1745,9 @@ fs.remove('images', 'https://example.com/image.jpg', {}, (resp) => {
 Uploads files to the server.
 **Parameters**:
 
--   `info` (FileOptions): The file options.
--   `files` (File[]): The files to upload.
--   `cb` (function): The callback function.
+- `info` (FileOptions): The file options.
+- `files` (File[]): The files to upload.
+- `cb` (function): The callback function.
 
 **Example**:
 
@@ -1793,8 +1763,8 @@ fs.uploadFiles(fileOptions, files, (resp) => {
 Uploads an image to the server.
 **Parameters**:
 
--   `info` (FileOptions): The file options.
--   `cb` (function): The callback function.
+- `info` (FileOptions): The file options.
+- `cb` (function): The callback function.
 
 **Example**:
 
@@ -1815,23 +1785,23 @@ fs.image({
 Represents the file options for uploading and processing files.
 **Properties**:
 
--   `id` (string): The unique ID for the file input.
--   `type` (string): The type of file ('image' or 'file').
--   `resize` (number | object): The dimensions for resizing the image.
--   `multiple` (boolean): Indicates if multiple files can be uploaded.
--   `multiple_cb` (function): Callback function for multiple files.
--   `cb` (function): Callback function for file processing.
--   `save` (boolean): Indicates if the file should be saved.
--   `complete` (function): Function to call when the file is saved.
--   `api` (string): The API endpoint for uploading the file.
--   `part` (string): The part of the API.
--   `name` (string): The name of the file.
--   `body` (function | object): Function or object to generate the request body.
--   `resp` (function): Function to handle the response.
--   `append` (function): Function to append files to FormData.
--   `multiple_files` (array): Array of multiple files.
--   `multiple_counter` (number): Counter for multiple files.
--   `url` (string): The URL for the file.
+- `id` (string): The unique ID for the file input.
+- `type` (string): The type of file ('image' or 'file').
+- `resize` (number | object): The dimensions for resizing the image.
+- `multiple` (boolean): Indicates if multiple files can be uploaded.
+- `multiple_cb` (function): Callback function for multiple files.
+- `cb` (function): Callback function for file processing.
+- `save` (boolean): Indicates if the file should be saved.
+- `complete` (function): Function to call when the file is saved.
+- `api` (string): The API endpoint for uploading the file.
+- `part` (string): The part of the API.
+- `name` (string): The name of the file.
+- `body` (function | object): Function or object to generate the request body.
+- `resp` (function): Function to handle the response.
+- `append` (function): Function to append files to FormData.
+- `multiple_files` (array): Array of multiple files.
+- `multiple_counter` (number): Counter for multiple files.
+- `url` (string): The URL for the file.
 
 **Example**:
 
@@ -1869,7 +1839,7 @@ The `SocketService` manages WebSocket connections using `socket.io`. It handles 
 Sets the URL for the WebSocket connection and reloads the socket.
 **Parameters**:
 
--   `url` (string): The URL of the WebSocket server.
+- `url` (string): The URL of the WebSocket server.
 
 **Example**:
 
@@ -1883,8 +1853,8 @@ Subscribes to a WebSocket event.
 
 **Parameters**:
 
--   `to` (string): The event to subscribe to.
--   `cb` (function): The callback function to execute when the event is received.
+- `to` (string): The event to subscribe to.
+- `cb` (function): The callback function to execute when the event is received.
 
 **Example**:
 
@@ -1900,9 +1870,9 @@ Emits a message to a WebSocket event.
 
 **Parameters**:
 
--   `to` (string): The event to emit the message to.
--   `message` (any): The message to emit.
--   `room` (any): Optional room to emit the message to.
+- `to` (string): The event to emit the message to.
+- `message` (any): The message to emit.
+- `room` (any): Optional room to emit the message to.
 
 **Example**:
 
@@ -1949,12 +1919,12 @@ Returns the name of the day of the week for a given date.
 
 **Parameters**:
 
--   `date` (Date): The date for which to get the day of the week.
--   `format` ('short' | 'long'): The format in which to return the day name. Default is 'long'.
+- `date` (Date): The date for which to get the day of the week.
+- `format` ('short' | 'long'): The format in which to return the day name. Default is 'long'.
 
 **Returns**:
 
--   The name of the day of the week.
+- The name of the day of the week.
 
 **Example**:
 
@@ -1969,12 +1939,12 @@ Returns the name of the month for a given index.
 
 **Parameters**:
 
--   `monthIndex` (number): The month index (0-11).
--   `format` ('short' | 'long'): The format in which to return the month name. Default is 'long'.
+- `monthIndex` (number): The month index (0-11).
+- `format` ('short' | 'long'): The format in which to return the month name. Default is 'long'.
 
 **Returns**:
 
--   The name of the month.
+- The name of the month.
 
 **Example**:
 
@@ -1989,13 +1959,13 @@ Formats a date according to the specified format and timezone.
 
 **Parameters**:
 
--   `date` (Date): The date to format.
--   `format` (string): The format string (see Angular DatePipe documentation for format options).
--   `timezone` (string): The timezone to use for formatting.
+- `date` (Date): The date to format.
+- `format` (string): The format string (see Angular DatePipe documentation for format options).
+- `timezone` (string): The timezone to use for formatting.
 
 **Returns**:
 
--   The formatted date string.
+- The formatted date string.
 
 **Example**:
 
@@ -2009,12 +1979,12 @@ console.log(formattedDate); // Output: 'Monday, January 1, 2023'
 Converts a date to a different timezone.
 **Parameters**:
 
--   `date` (Date): The date to convert.
--   `timezone` (string): The timezone to convert to.
+- `date` (Date): The date to convert.
+- `timezone` (string): The timezone to convert to.
 
 **Returns**:
 
--   The date in the new timezone.
+- The date in the new timezone.
 
 **Example**:
 
@@ -2028,11 +1998,11 @@ console.log(dateInTimezone);
 Returns the start of the day for a given date.
 **Parameters**:
 
--   `date` (Date): The date for which to get the start of the day.
+- `date` (Date): The date for which to get the start of the day.
 
 **Returns**:
 
--   The start of the day (midnight) for the given date.
+- The start of the day (midnight) for the given date.
 
 **Example**:
 
@@ -2046,11 +2016,11 @@ console.log(startOfDay); // Output: '2023-01-01T00:00:00.000Z'
 Returns the end of the day for a given date.
 **Parameters**:
 
--   `date` (Date): The date for which to get the end of the day.
+- `date` (Date): The date for which to get the end of the day.
 
 **Returns**:
 
--   The end of the day (one millisecond before midnight) for the given date.
+- The end of the day (one millisecond before midnight) for the given date.
 
 **Example**:
 
@@ -2064,12 +2034,12 @@ console.log(endOfDay); // Output: '2023-01-01T23:59:59.999Z'
 Returns the number of days in a given month and year.
 **Parameters**:
 
--   `month` (number): The month (0-11).
--   `year` (number): The year.
+- `month` (number): The month (0-11).
+- `year` (number): The year.
 
 **Returns**:
 
--   The number of days in the month.
+- The number of days in the month.
 
 **Example**:
 
@@ -2083,11 +2053,11 @@ console.log(daysInMonth); // Output: 28
 Checks if a given year is a leap year.
 **Parameters**:
 
--   `year` (number): The year to check.
+- `year` (number): The year to check.
 
 **Returns**:
 
--   True if the year is a leap year, false otherwise.
+- True if the year is a leap year, false otherwise.
 
 **Example**:
 
@@ -2101,12 +2071,12 @@ console.log(isLeap); // Output: true
 Adds a specified number of days to a date.
 **Parameters**:
 
--   `date` (Date): The date to which to add days.
--   `days` (number): The number of days to add.
+- `date` (Date): The date to which to add days.
+- `days` (number): The number of days to add.
 
 **Returns**:
 
--   The new date with the added days.
+- The new date with the added days.
 
 **Example**:
 
@@ -2120,12 +2090,12 @@ console.log(newDate);
 Adds a specified number of months to a date.
 **Parameters**:
 
--   `date` (Date): The date to which to add months.
--   `months` (number): The number of months to add.
+- `date` (Date): The date to which to add months.
+- `months` (number): The number of months to add.
 
 **Returns**:
 
--   The new date with the added months.
+- The new date with the added months.
 
 **Example**:
 
@@ -2139,12 +2109,12 @@ console.log(newDate);
 Adds a specified number of years to a date.
 **Parameters**:
 
--   `date` (Date): The date to which to add years.
--   `years` (number): The number of years to add.
+- `date` (Date): The date to which to add years.
+- `years` (number): The number of years to add.
 
 **Returns**:
 
--   The new date with the added years.
+- The new date with the added years.
 
 **Example**:
 
@@ -2159,12 +2129,12 @@ Adds a specified number of hours to a date.
 
 **Parameters**:
 
--   `date` (Date): The date to which to add hours.
--   `hours` (number): The number of hours to add.
+- `date` (Date): The date to which to add hours.
+- `hours` (number): The number of hours to add.
 
 **Returns**:
 
--   The new date with the added hours.
+- The new date with the added hours.
 
 **Example**:
 
@@ -2179,12 +2149,12 @@ Adds a specified number of minutes to a date.
 
 **Parameters**:
 
--   `date` (Date): The date to which to add minutes.
--   `minutes` (number): The number of minutes to add.
+- `date` (Date): The date to which to add minutes.
+- `minutes` (number): The number of minutes to add.
 
 **Returns**:
 
--   The new date with the added minutes.
+- The new date with the added minutes.
 
 **Example**:
 
@@ -2199,12 +2169,12 @@ Adds a specified number of seconds to a date.
 
 **Parameters**:
 
--   `date` (Date): The date to which to add seconds.
--   `seconds` (number): The number of seconds to add.
+- `date` (Date): The date to which to add seconds.
+- `seconds` (number): The number of seconds to add.
 
 **Returns**:
 
--   The new date with the added seconds.
+- The new date with the added seconds.
 
 **Example**:
 
@@ -2218,12 +2188,12 @@ console.log(newDate);
 Subtracts a specified number of days from a date.
 **Parameters**:
 
--   `date` (Date): The date from which to subtract days.
--   `days` (number): The number of days to subtract.
+- `date` (Date): The date from which to subtract days.
+- `days` (number): The number of days to subtract.
 
 **Returns**:
 
--   The new date with the subtracted days.
+- The new date with the subtracted days.
 
 **Example**:
 
@@ -2237,12 +2207,12 @@ console.log(newDate);
 Subtracts a specified number of months from a date.
 **Parameters**:
 
--   `date` (Date): The date from which to subtract months.
--   `months` (number): The number of months to subtract.
+- `date` (Date): The date from which to subtract months.
+- `months` (number): The number of months to subtract.
 
 **Returns**:
 
--   The new date with the subtracted months.
+- The new date with the subtracted months.
 
 **Example**:
 
@@ -2256,12 +2226,12 @@ console.log(newDate);
 Subtracts a specified number of years from a date.
 **Parameters**:
 
--   `date` (Date): The date from which to subtract years.
--   `years` (number): The number of years to subtract.
+- `date` (Date): The date from which to subtract years.
+- `years` (number): The number of years to subtract.
 
 **Returns**:
 
--   The new date with the subtracted years.
+- The new date with the subtracted years.
 
 **Example**:
 
@@ -2276,12 +2246,12 @@ Subtracts a specified number of hours from a date.
 
 **Parameters**:
 
--   `date` (Date): The date from which to subtract hours.
--   `hours` (number): The number of hours to subtract.
+- `date` (Date): The date from which to subtract hours.
+- `hours` (number): The number of hours to subtract.
 
 **Returns**:
 
--   The new date with the subtracted hours.
+- The new date with the subtracted hours.
 
 **Example**:
 
@@ -2296,12 +2266,12 @@ Subtracts a specified number of minutes from a date.
 
 **Parameters**:
 
--   `date` (Date): The date from which to subtract minutes.
--   `minutes` (number): The number of minutes to subtract.
+- `date` (Date): The date from which to subtract minutes.
+- `minutes` (number): The number of minutes to subtract.
 
 **Returns**:
 
--   The new date with the subtracted minutes.
+- The new date with the subtracted minutes.
 
 **Example**:
 
@@ -2316,12 +2286,12 @@ Subtracts a specified number of seconds from a date.
 
 **Parameters**:
 
--   `date` (Date): The date from which to subtract seconds.
--   `seconds` (number): The number of seconds to subtract.
+- `date` (Date): The date from which to subtract seconds.
+- `seconds` (number): The number of seconds to subtract.
 
 **Returns**:
 
--   The new date with the subtracted seconds.
+- The new date with the subtracted seconds.
 
 **Example**:
 
@@ -2335,12 +2305,12 @@ console.log(newDate);
 Checks if two dates are on the same day.
 **Parameters**:
 
--   `date1` (Date): The first date.
--   `date2` (Date): The second date.
+- `date1` (Date): The first date.
+- `date2` (Date): The second date.
 
 **Returns**:
 
--   True if the dates are on the same day, false otherwise.
+- True if the dates are on the same day, false otherwise.
 
 **Example**:
 
@@ -2355,11 +2325,11 @@ Returns the ISO week number for a given date.
 
 **Parameters**:
 
--   `date` (Date): The date for which to get the week number.
+- `date` (Date): The date for which to get the week number.
 
 **Returns**:
 
--   The ISO week number (1-53).
+- The ISO week number (1-53).
 
 **Example**:
 
@@ -2374,12 +2344,12 @@ Returns the number of weeks in a month for a given month and year.
 
 **Parameters**:
 
--   `month` (number): The month (0-11).
--   `year` (number): The year.
+- `month` (number): The month (0-11).
+- `year` (number): The year.
 
 **Returns**:
 
--   The number of weeks in the month.
+- The number of weeks in the month.
 
 **Example**:
 
@@ -2400,13 +2370,13 @@ Appends a component to a specified element by ID.
 
 **Parameters**:
 
--   `component` (`Type<T>`): The component to append.
--   `options` (`Partial<T>`): The options to project into the component.
--   `id` (`string`): The ID of the element to append the component to.
+- `component` (`Type<T>`): The component to append.
+- `options` (`Partial<T>`): The options to project into the component.
+- `id` (`string`): The ID of the element to append the component to.
 
 **Returns**:
 
--   An object containing the native element and the component reference (`ComponentRef<T>`).
+- An object containing the native element and the component reference (`ComponentRef<T>`).
 
 **Example**:
 
@@ -2421,13 +2391,13 @@ console.log(result.componentRef); // Output: The component reference
 Appends a component to a specified element or to the body.
 **Parameters**:
 
--   `component` (`Type<T>`): The component to append.
--   `options` (`Partial<T>`): The options to project into the component.
--   `element` (`HTMLElement`): The element to append the component to. Defaults to body.
+- `component` (`Type<T>`): The component to append.
+- `options` (`Partial<T>`): The options to project into the component.
+- `element` (`HTMLElement`): The element to append the component to. Defaults to body.
 
 **Returns**:
 
--   An object containing the native element and the component reference (`ComponentRef<T>`).
+- An object containing the native element and the component reference (`ComponentRef<T>`).
 
 **Example**:
 
@@ -2442,12 +2412,12 @@ console.log(result.componentRef); // Output: The component reference
 Gets a reference to a dynamically created component.
 **Parameters**:
 
--   `component` (`Type<T>`): The component to create.
--   `options` (`Partial<T>`): The options to project into the component.
+- `component` (`Type<T>`): The component to create.
+- `options` (`Partial<T>`): The options to project into the component.
 
 **Returns**:
 
--   The component reference (`ComponentRef<T>`).
+- The component reference (`ComponentRef<T>`).
 
 **Example**:
 
@@ -2461,12 +2431,12 @@ console.log(componentRef); // Output: The component reference
 Projects the inputs onto the component.
 **Parameters**:
 
--   `component` (ComponentRef<any>): The component reference.
--   `options` (any): The options to project into the component.
+- `component` (ComponentRef<any>): The component reference.
+- `options` (any): The options to project into the component.
 
 **Returns**:
 
--   The component reference with the projected inputs.
+- The component reference with the projected inputs.
 
 **Example**:
 

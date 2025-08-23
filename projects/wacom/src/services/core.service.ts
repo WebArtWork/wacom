@@ -1,11 +1,4 @@
-import {
-	Inject,
-	Injectable,
-	PLATFORM_ID,
-	Signal,
-	WritableSignal,
-	signal,
-} from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID, Signal, WritableSignal, signal } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { Selectitem } from '../interfaces/select.item.interface';
 
@@ -30,11 +23,7 @@ declare global {
 	providedIn: 'root',
 })
 export class CoreService {
-	deviceID =
-		localStorage.getItem('deviceID') ||
-		(typeof crypto?.randomUUID === 'function'
-			? crypto.randomUUID()
-			: this.UUID());
+	deviceID = localStorage.getItem('deviceID') || (typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : this.UUID());
 
 	constructor(@Inject(PLATFORM_ID) private platformId: boolean) {
 		localStorage.setItem('deviceID', this.deviceID);
@@ -60,14 +49,11 @@ export class CoreService {
 	 * @returns A string containing a UUID v4.
 	 */
 	UUID(): string {
-		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-			/[xy]/g,
-			(c: string) => {
-				const r = (Math.random() * 16) | 0;
-				const v = c === 'x' ? r : (r & 0x3) | 0x8;
-				return v.toString(16);
-			}
-		);
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c: string) => {
+			const r = (Math.random() * 16) | 0;
+			const v = c === 'x' ? r : (r & 0x3) | 0x8;
+			return v.toString(16);
+		});
 	}
 
 	/**
@@ -82,12 +68,7 @@ export class CoreService {
 		if (typeof obj !== 'object' || obj === null) return [];
 		const arr = [];
 		for (const each in obj) {
-			if (
-				obj.hasOwnProperty(each) &&
-				(obj[each] ||
-					typeof obj[each] === 'number' ||
-					typeof obj[each] === 'boolean')
-			) {
+			if (obj.hasOwnProperty(each) && (obj[each] || typeof obj[each] === 'number' || typeof obj[each] === 'boolean')) {
 				if (holder) {
 					arr.push(each);
 				} else {
@@ -106,18 +87,12 @@ export class CoreService {
 	 * @param {string} [compareField='_id'] - The field to use for comparison.
 	 * @returns {any[]} The modified `fromArray` with elements removed.
 	 */
-	splice(
-		removeArray: any[],
-		fromArray: any[],
-		compareField: string = '_id'
-	): any[] {
+	splice(removeArray: any[], fromArray: any[], compareField: string = '_id'): any[] {
 		if (!Array.isArray(removeArray) || !Array.isArray(fromArray)) {
 			return fromArray;
 		}
 
-		const removeSet = new Set(
-			removeArray.map((item) => item[compareField])
-		);
+		const removeSet = new Set(removeArray.map((item) => item[compareField]));
 		return fromArray.filter((item) => !removeSet.has(item[compareField]));
 	}
 
@@ -130,10 +105,7 @@ export class CoreService {
 	 */
 	ids2id(...args: string[]): string {
 		args.sort((a, b) => {
-			if (
-				Number(a.toString().substring(0, 8)) >
-				Number(b.toString().substring(0, 8))
-			) {
+			if (Number(a.toString().substring(0, 8)) > Number(b.toString().substring(0, 8))) {
 				return 1;
 			}
 			return -1;
@@ -152,11 +124,7 @@ export class CoreService {
 	 * @param {() => void} [cb] - The callback function to execute after the delay.
 	 * @param {number} [time=1000] - The delay time in milliseconds.
 	 */
-	afterWhile(
-		doc: string | object | (() => void),
-		cb?: () => void,
-		time: number = 1000
-	): void {
+	afterWhile(doc: string | object | (() => void), cb?: () => void, time: number = 1000): void {
 		if (typeof doc === 'function') {
 			cb = doc as () => void;
 			doc = 'common';
@@ -168,8 +136,7 @@ export class CoreService {
 				this._afterWhile[doc] = window.setTimeout(cb, time);
 			} else if (typeof doc === 'object') {
 				clearTimeout((doc as { __afterWhile: number }).__afterWhile);
-				(doc as { __afterWhile: number }).__afterWhile =
-					window.setTimeout(cb, time);
+				(doc as { __afterWhile: number }).__afterWhile = window.setTimeout(cb, time);
 			} else {
 				console.warn('badly configured after while');
 			}
@@ -185,20 +152,10 @@ export class CoreService {
 	 */
 	copy(from: any, to: any) {
 		for (const each in from) {
-			if (
-				typeof from[each] !== 'object' ||
-				from[each] instanceof Date ||
-				Array.isArray(from[each]) ||
-				from[each] === null
-			) {
+			if (typeof from[each] !== 'object' || from[each] instanceof Date || Array.isArray(from[each]) || from[each] === null) {
 				to[each] = from[each];
 			} else {
-				if (
-					typeof to[each] !== 'object' ||
-					to[each] instanceof Date ||
-					Array.isArray(to[each]) ||
-					to[each] === null
-				) {
+				if (typeof to[each] !== 'object' || to[each] instanceof Date || Array.isArray(to[each]) || to[each] === null) {
 					to[each] = {};
 				}
 
@@ -213,16 +170,12 @@ export class CoreService {
 	 * Detects the device type based on the user agent.
 	 */
 	detectDevice(): void {
-		const userAgent =
-			navigator.userAgent || navigator.vendor || (window as any).opera;
+		const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
 		if (/windows phone/i.test(userAgent)) {
 			this.device = 'Windows Phone';
 		} else if (/android/i.test(userAgent)) {
 			this.device = 'Android';
-		} else if (
-			/iPad|iPhone|iPod/.test(userAgent) &&
-			!(window as any).MSStream
-		) {
+		} else if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {
 			this.device = 'iOS';
 		} else {
 			this.device = 'Web';
@@ -234,11 +187,7 @@ export class CoreService {
 	 * @returns {boolean} - Returns true if the device is a mobile device.
 	 */
 	isMobile(): boolean {
-		return (
-			this.device === 'Windows Phone' ||
-			this.device === 'Android' ||
-			this.device === 'iOS'
-		);
+		return this.device === 'Windows Phone' || this.device === 'Android' || this.device === 'iOS';
 	}
 
 	/**
@@ -367,9 +316,7 @@ export class CoreService {
 		this._completed[task] = document;
 
 		if (this._completeResolvers[task]) {
-			this._completeResolvers[task].forEach((resolve) =>
-				resolve(document)
-			);
+			this._completeResolvers[task].forEach((resolve) => resolve(document));
 
 			this._completeResolvers[task] = [];
 		}
@@ -393,11 +340,7 @@ export class CoreService {
 		}
 
 		if (this._isCompleted(tasks)) {
-			return Promise.resolve(
-				tasks.length > 1
-					? tasks.map((task) => this._completed[task])
-					: this._completed[tasks[0]]
-			);
+			return Promise.resolve(tasks.length > 1 ? tasks.map((task) => this._completed[task]) : this._completed[tasks[0]]);
 		}
 
 		return new Promise((resolve) => {
@@ -406,9 +349,7 @@ export class CoreService {
 					this._completeResolvers[task] = [];
 				}
 
-				this._completeResolvers[task].push(
-					this._allCompleted(tasks, resolve)
-				);
+				this._completeResolvers[task].push(this._allCompleted(tasks, resolve));
 			}
 		});
 	}
@@ -424,17 +365,10 @@ export class CoreService {
 	 * @remarks
 	 * This function does not manage or clean up resolvers. It assumes the developer handles any potential duplicates or memory concerns.
 	 */
-	private _allCompleted(
-		tasks: string[],
-		resolve: (value: unknown) => void
-	): (doc: unknown) => void {
+	private _allCompleted(tasks: string[], resolve: (value: unknown) => void): (doc: unknown) => void {
 		return (doc: unknown) => {
 			if (this._isCompleted(tasks)) {
-				resolve(
-					tasks.length > 1
-						? tasks.map((task) => this._completed[task])
-						: this._completed[tasks[0]]
-				);
+				resolve(tasks.length > 1 ? tasks.map((task) => this._completed[task]) : this._completed[tasks[0]]);
 			}
 		};
 	}
@@ -578,10 +512,7 @@ export class CoreService {
 	 * console.log(sig().name); // 'Alice'
 	 * console.log(sig().score()); // 42 — field is now a signal
 	 */
-	toSignal<Document>(
-		document: Document,
-		signalFields: Record<string, (doc: Document) => unknown> = {}
-	): Signal<Document> {
+	toSignal<Document>(document: Document, signalFields: Record<string, (doc: Document) => unknown> = {}): Signal<Document> {
 		if (Object.keys(signalFields).length) {
 			const fields: Record<string, Signal<unknown>> = {};
 
@@ -614,10 +545,7 @@ export class CoreService {
 	 *   score: (u) => u.score,
 	 * });
 	 */
-	toSignalsArray<Document>(
-		arr: Document[],
-		signalFields: Record<string, (doc: Document) => unknown> = {}
-	): Signal<Document>[] {
+	toSignalsArray<Document>(arr: Document[], signalFields: Record<string, (doc: Document) => unknown> = {}): Signal<Document>[] {
 		return arr.map((obj) => this.toSignal(obj, signalFields));
 	}
 
@@ -633,11 +561,7 @@ export class CoreService {
 	 *
 	 * @returns {void}
 	 */
-	pushSignal<Document>(
-		signals: Signal<Document>[],
-		item: Document,
-		signalFields: Record<string, (doc: Document) => unknown> = {}
-	): void {
+	pushSignal<Document>(signals: Signal<Document>[], item: Document, signalFields: Record<string, (doc: Document) => unknown> = {}): void {
 		signals.push(this.toSignal(item, signalFields));
 	}
 
@@ -652,7 +576,7 @@ export class CoreService {
 	removeSignalByField<Document extends Record<string, unknown>>(
 		signals: WritableSignal<Document>[],
 		value: unknown,
-		field: string = '_id'
+		field: string = '_id',
 	): void {
 		const idx = signals.findIndex((sig) => sig()[field] === value);
 
@@ -665,9 +589,7 @@ export class CoreService {
 	 * @param {string} field - The object field to use for tracking (e.g., '_id').
 	 * @returns {(index: number, sig: Signal<Document>) => unknown} TrackBy function for Angular.
 	 */
-	trackBySignalField<Document extends Record<string, unknown>>(
-		field: string
-	) {
+	trackBySignalField<Document extends Record<string, unknown>>(field: string) {
 		return (_: number, sig: Signal<Document>) => sig()[field];
 	}
 
@@ -682,11 +604,9 @@ export class CoreService {
 	findSignalByField<Document extends Record<string, unknown>>(
 		signals: Signal<Document>[],
 		value: unknown,
-		field = '_id'
+		field = '_id',
 	): Signal<Document> | undefined {
-		return signals.find(
-			(sig) => sig()[field] === value
-		) as Signal<Document>;
+		return signals.find((sig) => sig()[field] === value) as Signal<Document>;
 	}
 
 	/**
@@ -702,13 +622,9 @@ export class CoreService {
 		signals: WritableSignal<Document>[],
 		value: unknown,
 		updater: (val: Document) => Document,
-		field: string
+		field: string,
 	): void {
-		const sig = this.findSignalByField<Document>(
-			signals,
-			value,
-			field
-		) as WritableSignal<Document>;
+		const sig = this.findSignalByField<Document>(signals, value, field) as WritableSignal<Document>;
 
 		if (sig) sig.update(updater);
 	}

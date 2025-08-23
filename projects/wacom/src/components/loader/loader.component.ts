@@ -13,9 +13,9 @@ export class LoaderComponent implements OnInit {
 
 	class!: string;
 
-        progress!: boolean;
+	progress!: boolean;
 
-        progressPercentage?: Signal<number>;
+	progressPercentage?: Signal<number>;
 
 	timeout!: number;
 

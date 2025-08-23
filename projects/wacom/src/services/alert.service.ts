@@ -1,11 +1,7 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { AlertComponent } from '../components/alert/alert/alert.component';
 import { WrapperComponent } from '../components/alert/wrapper/wrapper.component';
-import {
-	Alert,
-	AlertConfig,
-	DEFAULT_ALERT_CONFIG,
-} from '../interfaces/alert.interface';
+import { Alert, AlertConfig, DEFAULT_ALERT_CONFIG } from '../interfaces/alert.interface';
 import { Config, CONFIG_TOKEN } from '../interfaces/config.interface';
 import { DomComponent } from '../interfaces/dom.interface';
 import { DomService } from './dom.service';
@@ -24,7 +20,7 @@ export class AlertService {
 	 */
 	constructor(
 		@Inject(CONFIG_TOKEN) @Optional() config: Config,
-		private _dom: DomService
+		private _dom: DomService,
 	) {
 		this._config = {
 			...DEFAULT_ALERT_CONFIG,
@@ -75,23 +71,17 @@ export class AlertService {
 
 			this._alerts.splice(
 				this._alerts.findIndex((m) => m.id === opts.id),
-				1
+				1,
 			);
 		};
 
-		alertComponent = this._dom.appendById(
-			AlertComponent,
-			opts,
-			opts.position
-		);
+		alertComponent = this._dom.appendById(AlertComponent, opts, opts.position);
 
 		if (typeof opts.component === 'function') {
 			content = this._dom.appendComponent(
 				opts.component,
 				opts as Partial<{ providedIn?: string | undefined }>,
-				this._container.nativeElement.children[0].children[
-					this._positionNumber[opts.position] || 0
-				] as HTMLElement
+				this._container.nativeElement.children[0].children[this._positionNumber[opts.position] || 0] as HTMLElement,
 			)!;
 		}
 
@@ -204,10 +194,10 @@ export class AlertService {
 			? {
 					...this._config,
 					text: opts,
-			  }
+				}
 			: {
 					...this._config,
 					...opts,
-			  };
+				};
 	}
 }

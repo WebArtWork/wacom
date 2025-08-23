@@ -1,10 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import {
-	AlertButton,
-	AlertPosition,
-	AlertType,
-} from '../../../interfaces/alert.interface';
+import { AlertButton, AlertPosition, AlertType } from '../../../interfaces/alert.interface';
 
 @Component({
 	selector: 'alert',
@@ -75,7 +71,7 @@ export class AlertComponent implements AfterViewInit {
 
 					remaining -= new Date().getTime() - start.getTime();
 				},
-				false
+				false,
 			);
 
 			this.alertRef.nativeElement.addEventListener(
@@ -89,7 +85,7 @@ export class AlertComponent implements AfterViewInit {
 						this.remove();
 					}, remaining);
 				},
-				false
+				false,
 			);
 		}
 	}

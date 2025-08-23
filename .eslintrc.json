@@ -1,6 +1,6 @@
 {
 	"root": true,
-	"ignorePatterns": ["projects/**/*"],
+	"ignorePatterns": ["projects/**/*", "dist/**/*", "coverage/**/*"],
 	"overrides": [
 		{
 			"files": ["*.ts"],
@@ -8,6 +8,7 @@
 				"project": ["./tsconfig.json", "./e2e/tsconfig.json"],
 				"createDefaultProgram": true
 			},
+			"env": { "browser": true, "es2022": true },
 			"extends": [
 				"plugin:@angular-eslint/recommended",
 				"plugin:@angular-eslint/template/process-inline-templates",
@@ -27,12 +28,12 @@
 				"@typescript-eslint/ban-ts-comment": "off",
 				"@typescript-eslint/await-thenable": "off",
 				"@typescript-eslint/no-namespace": "off",
+
 				"prettier/prettier": [
 					"error",
-					{
-						"printWidth": 140
-					}
+					{ "printWidth": 140, "trailingComma": "all" }
 				],
+
 				"@typescript-eslint/naming-convention": [
 					"error",
 					{
@@ -46,11 +47,7 @@
 				"padding-line-between-statements": "off",
 				"@typescript-eslint/padding-line-between-statements": [
 					"error",
-					{
-						"blankLine": "always",
-						"prev": "*",
-						"next": "*"
-					},
+					{ "blankLine": "always", "prev": "*", "next": "*" },
 					{
 						"blankLine": "never",
 						"prev": "import",
@@ -64,15 +61,26 @@
 				],
 				"@typescript-eslint/explicit-member-accessibility": [
 					"error",
+					{ "accessibility": "no-public" }
+				],
+
+				"@typescript-eslint/consistent-type-imports": "error",
+				"@typescript-eslint/no-unused-vars": [
+					"warn",
 					{
-						"accessibility": "no-public"
+						"argsIgnorePattern": "^_",
+						"varsIgnorePattern": "^_",
+						"caughtErrorsIgnorePattern": "^_"
 					}
 				]
 			}
 		},
 		{
 			"files": ["*.html"],
-			"extends": ["plugin:@angular-eslint/template/recommended", "plugin:prettier/recommended"],
+			"extends": [
+				"plugin:@angular-eslint/template/recommended",
+				"plugin:prettier/recommended"
+			],
 			"rules": {}
 		}
 	]

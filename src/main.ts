@@ -1,7 +1,4 @@
-import {
-	importProvidersFrom,
-	provideZonelessChangeDetection,
-} from '@angular/core';
+import { importProvidersFrom, provideZonelessChangeDetection } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 

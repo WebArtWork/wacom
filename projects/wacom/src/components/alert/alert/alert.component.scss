@@ -183,8 +183,7 @@
 	white-space: normal;
 
 	&--slide-in {
-		-webkit-animation: iziT-slideIn 1s cubic-bezier(0.16, 0.81, 0.32, 1)
-			both;
+		-webkit-animation: iziT-slideIn 1s cubic-bezier(0.16, 0.81, 0.32, 1) both;
 		-moz-animation: iziT-slideIn 1s cubic-bezier(0.16, 0.81, 0.32, 1) both;
 		animation: iziT-slideIn 1s cubic-bezier(0.16, 0.81, 0.32, 1) both;
 	}

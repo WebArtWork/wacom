@@ -1,9 +1,5 @@
 import { Inject, Injectable, Optional } from '@angular/core';
-import {
-	CONFIG_TOKEN,
-	Config,
-	DEFAULT_CONFIG,
-} from '../interfaces/config.interface';
+import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config.interface';
 import { CoreService } from './core.service';
 
 @Injectable({
@@ -20,7 +16,7 @@ export class SocketService {
 
 	constructor(
 		@Inject(CONFIG_TOKEN) @Optional() private _config: Config,
-		private _core: CoreService
+		private _core: CoreService,
 	) {
 		this._config = { ...DEFAULT_CONFIG, ...(this._config || {}) };
 
@@ -68,9 +64,7 @@ export class SocketService {
 	 */
 	private load(): void {
 		if (this._config.io) {
-			const ioFunc = this._config.io.default
-				? this._config.io.default
-				: this._config.io;
+			const ioFunc = this._config.io.default ? this._config.io.default : this._config.io;
 
 			this._io = ioFunc(this._url, this._opts);
 

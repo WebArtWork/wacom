@@ -2,11 +2,7 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { LoaderComponent } from '../components/loader/loader.component';
 import { CONFIG_TOKEN, Config } from '../interfaces/config.interface';
 import { DomComponent } from '../interfaces/dom.interface';
-import {
-	DEFAULT_LOADER_CONFIG,
-	Loader,
-	LoaderConfig,
-} from '../interfaces/loader.interface';
+import { DEFAULT_LOADER_CONFIG, Loader, LoaderConfig } from '../interfaces/loader.interface';
 import { DomService } from './dom.service';
 
 @Injectable({
@@ -15,7 +11,7 @@ import { DomService } from './dom.service';
 export class LoaderService {
 	constructor(
 		@Inject(CONFIG_TOKEN) @Optional() config: Config,
-		private _dom: DomService
+		private _dom: DomService,
 	) {
 		this._config = {
 			...DEFAULT_LOADER_CONFIG,
@@ -29,13 +25,8 @@ export class LoaderService {
 			...(typeof opts === 'object' ? opts : { text: opts }),
 		};
 
-		if (
-			opts.unique &&
-			this._loaders.find((m) => m.unique === opts.unique)
-		) {
-			return this._loaders.find(
-				(m) => m.unique === opts.unique
-			) as Loader;
+		if (opts.unique && this._loaders.find((m) => m.unique === opts.unique)) {
+			return this._loaders.find((m) => m.unique === opts.unique) as Loader;
 		}
 
 		this._loaders.push(opts);
@@ -51,16 +42,12 @@ export class LoaderService {
 
 			this._loaders.splice(
 				this._loaders.findIndex((m) => m.id === opts.id),
-				1
+				1,
 			);
 		};
 
 		if (opts.append) {
-			component = this._dom.appendComponent(
-				LoaderComponent,
-				opts,
-				opts.append
-			)!;
+			component = this._dom.appendComponent(LoaderComponent, opts, opts.append)!;
 		} else {
 			component = this._dom.appendComponent(LoaderComponent, opts)!;
 		}

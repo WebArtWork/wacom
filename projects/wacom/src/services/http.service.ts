@@ -1,8 +1,4 @@
-import {
-	HttpClient,
-	HttpErrorResponse,
-	HttpHeaders,
-} from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable, Optional } from '@angular/core';
 import { EMPTY, Observable, ReplaySubject } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
@@ -38,7 +34,7 @@ export class HttpService {
 	constructor(
 		@Inject(CONFIG_TOKEN) @Optional() config: Config,
 		private store: StoreService,
-		private http: HttpClient
+		private http: HttpClient,
 	) {
 		// Initialize HTTP configuration and headers from injected config
 		this._config = {
@@ -59,17 +55,15 @@ export class HttpService {
 			this.url = url || this._config.url || '';
 		});
 
-		this.store
-			.getJson<Record<string, string>>('http_headers')
-			.then((headers) => {
-				headers ||= {};
+		this.store.getJson<Record<string, string>>('http_headers').then((headers) => {
+			headers ||= {};
 
-				for (const header in headers) {
-					this._headers[header] = headers[header];
-				}
+			for (const header in headers) {
+				this._headers[header] = headers[header];
+			}
 
-				this._http_headers = new HttpHeaders(this._headers);
-			});
+			this._http_headers = new HttpHeaders(this._headers);
+		});
 	}
 
 	// Set a new base URL and save it in the store
@@ -90,10 +84,7 @@ export class HttpService {
 	set(key: any, value: any) {
 		this._headers[key] = value;
 
-		this.store.setJson<Record<string, string>>(
-			'http_headers',
-			this._headers
-		);
+		this.store.setJson<Record<string, string>>('http_headers', this._headers);
 
 		this._http_headers = new HttpHeaders(this._headers);
 	}
@@ -109,19 +100,11 @@ export class HttpService {
 
 		this._http_headers = new HttpHeaders(this._headers);
 
-		this.store.setJson<Record<string, string>>(
-			'http_headers',
-			this._headers
-		);
+		this.store.setJson<Record<string, string>>('http_headers', this._headers);
 	}
 
 	// Internal method to make HTTP requests based on the method type
-	private _httpMethod(
-		method: string,
-		_url: string,
-		doc: unknown,
-		headers: any
-	): Observable<any> {
+	private _httpMethod(method: string, _url: string, doc: unknown, headers: any): Observable<any> {
 		if (method === 'post') {
 			return this.http.post<any>(_url, doc, headers);
 		} else if (method === 'put') {
@@ -162,13 +145,7 @@ export class HttpService {
 	 * @param method - The HTTP method (e.g., 'post', 'put', 'patch', 'delete', 'get').
 	 * @returns An Observable that emits the processed HTTP response or an error.
 	 */
-	private _post(
-		url: string,
-		doc: unknown,
-		callback = (resp: unknown) => {},
-		opts: any = {},
-		method = 'post'
-	): Observable<any> {
+	private _post(url: string, doc: unknown, callback = (resp: unknown) => {}, opts: any = {}, method = 'post'): Observable<any> {
 		if (typeof opts === 'function') {
 			opts = { err: opts };
 		}
@@ -181,9 +158,7 @@ export class HttpService {
 		if (this.locked && !opts.skipLock) {
 			return new Observable((observer) => {
 				const wait = setTimeout(() => {
-					this._post(url, doc, callback, opts, method).subscribe(
-						observer
-					);
+					this._post(url, doc, callback, opts, method).subscribe(observer);
 				}, 100);
 				this.awaitLocked.push(wait);
 			});
@@ -201,22 +176,17 @@ export class HttpService {
 				first(),
 				catchError((error: HttpErrorResponse) => {
 					this.handleError(opts.err, () => {
-						this._post(url, doc, callback, opts, method).subscribe(
-							responseSubject
-						);
+						this._post(url, doc, callback, opts, method).subscribe(responseSubject);
 					})(error);
 
 					responseSubject.error(error);
 
 					return EMPTY;
-				})
+				}),
 			)
 			.subscribe({
 				next: (resp: unknown) => {
-					if (
-						opts.acceptance &&
-						typeof opts.acceptance === 'function'
-					) {
+					if (opts.acceptance && typeof opts.acceptance === 'function') {
 						if (!opts.acceptance(resp)) {
 							const error = new HttpErrorResponse({
 								error: 'Acceptance failed',
@@ -232,50 +202,23 @@ export class HttpService {
 					}
 
 					if (opts.replace && typeof opts.replace === 'function') {
-						if (
-							Array.isArray(
-								this._getObjectToReplace(resp, opts.data)
-							)
-						) {
-							(
-								this._getObjectToReplace(
-									resp,
-									opts.data
-								) as Array<unknown>
-							).map((item: unknown) => opts.replace(item));
+						if (Array.isArray(this._getObjectToReplace(resp, opts.data))) {
+							(this._getObjectToReplace(resp, opts.data) as Array<unknown>).map((item: unknown) => opts.replace(item));
 						} else if (this._getObjectToReplace(resp, opts.data)) {
-							opts.replace(
-								this._getObjectToReplace(resp, opts.data)
-							);
+							opts.replace(this._getObjectToReplace(resp, opts.data));
 						}
 					}
 
 					if (Array.isArray(opts.fields)) {
-						if (
-							Array.isArray(
-								this._getObjectToReplace(resp, opts.data)
-							)
-						) {
-							(
-								this._getObjectToReplace(
-									resp,
-									opts.data
-								) as Array<unknown>
-							).map((item: unknown) => {
+						if (Array.isArray(this._getObjectToReplace(resp, opts.data))) {
+							(this._getObjectToReplace(resp, opts.data) as Array<unknown>).map((item: unknown) => {
 								return this._newDoc(item, opts.fields);
 							});
 						} else if (this._getObjectToReplace(resp, opts.data)) {
-							const newDoc = this._newDoc(
-								this._getObjectToReplace(resp, opts.data),
-								opts.fields
-							);
+							const newDoc = this._newDoc(this._getObjectToReplace(resp, opts.data), opts.fields);
 
 							if (opts.data) {
-								this._setObjectToReplace(
-									resp,
-									opts.data,
-									newDoc
-								);
+								this._setObjectToReplace(resp, opts.data, newDoc);
 							} else {
 								resp = newDoc;
 							}
@@ -300,12 +243,7 @@ export class HttpService {
 	 * - Supports legacy callback usage.
 	 * - Returns an Observable for reactive programming.
 	 */
-	post(
-		url: string,
-		doc: any,
-		callback = (resp: any) => {},
-		opts: any = {}
-	): Observable<any> {
+	post(url: string, doc: any, callback = (resp: any) => {}, opts: any = {}): Observable<any> {
 		return this._post(url, doc, callback, opts);
 	}
 
@@ -314,12 +252,7 @@ export class HttpService {
 	 * - Supports legacy callback usage.
 	 * - Returns an Observable for reactive programming.
 	 */
-	put(
-		url: string,
-		doc: any,
-		callback = (resp: any) => {},
-		opts: any = {}
-	): Observable<any> {
+	put(url: string, doc: any, callback = (resp: any) => {}, opts: any = {}): Observable<any> {
 		return this._post(url, doc, callback, opts, 'put');
 	}
 
@@ -328,12 +261,7 @@ export class HttpService {
 	 * - Supports legacy callback usage.
 	 * - Returns an Observable for reactive programming.
 	 */
-	patch(
-		url: string,
-		doc: any,
-		callback = (resp: any) => {},
-		opts: any = {}
-	): Observable<any> {
+	patch(url: string, doc: any, callback = (resp: any) => {}, opts: any = {}): Observable<any> {
 		return this._post(url, doc, callback, opts, 'patch');
 	}
 
@@ -342,11 +270,7 @@ export class HttpService {
 	 * - Supports legacy callback usage.
 	 * - Returns an Observable for reactive programming.
 	 */
-	delete(
-		url: string,
-		callback = (resp: any) => {},
-		opts: any = {}
-	): Observable<any> {
+	delete(url: string, callback = (resp: any) => {}, opts: any = {}): Observable<any> {
 		return this._post(url, null, callback, opts, 'delete');
 	}
 
@@ -355,11 +279,7 @@ export class HttpService {
 	 * - Supports legacy callback usage.
 	 * - Returns an Observable for reactive programming.
 	 */
-	get(
-		url: string,
-		callback = (resp: any) => {},
-		opts: any = {}
-	): Observable<any> {
+	get(url: string, callback = (resp: any) => {}, opts: any = {}): Observable<any> {
 		return this._post(url, null, callback, opts, 'get');
 	}
 
@@ -397,11 +317,7 @@ export class HttpService {
 	/**
 	 * Internal method to trigger error handling callbacks.
 	 */
-	private err_handle(
-		err: HttpErrorResponse,
-		next: (err: HttpErrorResponse) => void,
-		retry: () => void
-	) {
+	private err_handle(err: HttpErrorResponse, next: (err: HttpErrorResponse) => void, retry: () => void) {
 		if (typeof next === 'function') {
 			next(err);
 		}
@@ -438,10 +354,7 @@ export class HttpService {
 
 			const currentBase: string = newBase.pop() || '';
 
-			return this._getObjectToReplace(
-				(resp as Record<string, unknown>)[currentBase] || {},
-				newBase.join('.')
-			);
+			return this._getObjectToReplace((resp as Record<string, unknown>)[currentBase] || {}, newBase.join('.'));
 		} else if (base) {
 			return (resp as Record<string, unknown>)[base];
 		} else {
