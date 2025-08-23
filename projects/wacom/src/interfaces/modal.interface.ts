@@ -14,30 +14,38 @@ export interface ModalButton {
 }
 
 export interface ModalConfig {
-	size?: ModalSizes;
-	/** Optional action buttons displayed within the Modal. */
-	buttons?: ModalButton[];
-	/** Custom CSS class applied to the Modal container. */
-	class?: string;
-	/** Identifier used to ensure only one Modal with this key exists. */
-	unique?: string;
-	/** Whether to show a progress bar. */
-	progress?: boolean;
-	/** Milliseconds before auto dismissal. */
-	timeout?: number;
-	/** Callback executed when the Modal is closed. */
-	close?: () => void;
-	closable?: boolean;
+        /** Size of the modal window. */
+        size?: ModalSizes;
+        /** Optional action buttons displayed within the Modal. */
+        buttons?: ModalButton[];
+        /** Custom CSS class applied to the Modal container. */
+        class?: string;
+        /** Identifier used to ensure only one Modal with this key exists. */
+        unique?: string;
+        /** Whether to show a progress bar. */
+        progress?: boolean;
+        /** Milliseconds before auto dismissal. */
+        timeout?: number;
+        /** Callback executed when the Modal is closed. */
+        close?: () => void;
+        /** Allow closing the modal via UI controls. */
+        closable?: boolean;
 }
 
 export interface Modal extends ModalConfig {
-	component: Type<unknown>;
-	id?: number;
-	progressPercentage?: Signal<number>;
-	onClickOutside?: () => void;
-	onClose?: () => void;
-	onOpen?: () => void;
-	[x: string]: unknown;
+        /** Component used to render the modal content. */
+        component: Type<unknown>;
+        /** Unique identifier for the modal instance. */
+        id?: number;
+        /** Signal emitting the current progress percentage. */
+        progressPercentage?: Signal<number>;
+        /** Handler called when the user clicks outside the modal. */
+        onClickOutside?: () => void;
+        /** Callback executed when the modal closes. */
+        onClose?: () => void;
+        /** Callback executed when the modal opens. */
+        onOpen?: () => void;
+        [x: string]: unknown;
 }
 
 export const DEFAULT_MODAL_CONFIG: ModalConfig = {

@@ -32,12 +32,17 @@ export interface LoaderConfig {
 }
 
 export interface Loader extends LoaderConfig {
-	id?: number;
-	progressPercentage?: Signal<number>;
-	onClose?: () => void;
-	append?: HTMLElement;
-	component?: Type<unknown>;
-	[x: string]: unknown;
+        /** Unique identifier for the loader instance. */
+        id?: number;
+        /** Signal emitting the current progress percentage. */
+        progressPercentage?: Signal<number>;
+        /** Called when the loader is dismissed. */
+        onClose?: () => void;
+        /** Element to which the loader should be appended. */
+        append?: HTMLElement;
+        /** Component used to render custom loader content. */
+        component?: Type<unknown>;
+        [x: string]: unknown;
 }
 
 /**

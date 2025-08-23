@@ -1,4 +1,9 @@
+/**
+ * Simple representation of an option used by select controls.
+ */
 export interface Selectitem {
-	name: string;
-	_id: string;
+        /** Display name of the option. */
+        name: string;
+        /** Associated unique identifier. */
+        _id: string;
 }
