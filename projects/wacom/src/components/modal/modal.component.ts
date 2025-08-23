@@ -9,8 +9,6 @@ import { Component, OnInit } from '@angular/core';
 	imports: [CommonModule],
 })
 export class ModalComponent implements OnInit {
-	class: string = '';
-	size: string = 'flex';
 	closable: boolean = true;
 	close: any;
 	onOpen: any;
