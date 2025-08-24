@@ -31,7 +31,9 @@ interface GetConfig {
  *
  * @template Document - The type of the document the service handles.
  */
-export abstract class CrudService<Document extends CrudDocument> extends BaseService {
+export abstract class CrudService<
+	Document extends CrudDocument,
+> extends BaseService {
 	/**
 	 * URL for the API.
 	 */
@@ -85,7 +87,10 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 		} else if (localStorage.getItem('waw_user')) {
 			const user = JSON.parse(localStorage.getItem('waw_user') as string);
 
-			if (user._id === localStorage.getItem(this._config.name + 'waw_user_id')) {
+			if (
+				user._id ===
+				localStorage.getItem(this._config.name + 'waw_user_id')
+			) {
 				this.restoreDocs();
 			}
 		}
@@ -98,7 +103,9 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 	}
 
 	async restoreDocs() {
-		const docs = await this.__store.getJson<Document[]>('docs_' + this._config.name);
+		const docs = await this.__store.getJson<Document[]>(
+			'docs_' + this._config.name,
+		);
 
 		if (Array.isArray(docs)) {
 			this._docs.push(...docs);
@@ -111,7 +118,10 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 	 * Saves the current set of documents to local storage.
 	 */
 	setDocs(): void {
-		this.__store.setJson<Document[]>('docs_' + this._config.name, this._docs);
+		this.__store.setJson<Document[]>(
+			'docs_' + this._config.name,
+			this._docs,
+		);
 	}
 
 	/**
@@ -157,7 +167,9 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 			this._config.replace(doc);
 		}
 
-		const existingDoc = this._docs.find((d) => this._id(d) === this._id(doc));
+		const existingDoc = this._docs.find(
+			(d) => this._id(d) === this._id(doc),
+		);
 
 		if (existingDoc) {
 			// Update the existing document
@@ -200,7 +212,10 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 				_id,
 			} as Document);
 
-		if (!this._docs.find((d) => this._id(d) === _id) && !this._fetchingId[_id]) {
+		if (
+			!this._docs.find((d) => this._id(d) === _id) &&
+			!this._fetchingId[_id]
+		) {
 			this._fetchingId[_id] = true;
 
 			setTimeout(() => {
@@ -233,7 +248,10 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that resolves with the list of documents.
 	 */
-	get(config: GetConfig = {}, options: CrudOptions<Document> = {}): Observable<Document[]> {
+	get(
+		config: GetConfig = {},
+		options: CrudOptions<Document> = {},
+	): Observable<Document[]> {
 		if (!this._config.unauthorized && localStorage.getItem('waw_user')) {
 			const user = JSON.parse(localStorage.getItem('waw_user') as string);
 
@@ -245,7 +263,9 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 		const params =
 			(typeof config.page === 'number' || config.query ? '?' : '') +
 			(config.query || '') +
-			(typeof config.page === 'number' ? `&skip=${this._perPage * (config.page - 1)}&limit=${this._perPage}` : '');
+			(typeof config.page === 'number'
+				? `&skip=${this._perPage * (config.page - 1)}&limit=${this._perPage}`
+				: '');
 
 		const obs = this.__http.get(`${url}${params}`);
 
@@ -266,7 +286,10 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 				if (typeof config.page !== 'number') {
 					this._filterDocuments();
 
-					this.__core.complete(this._config.name + '_loaded', this._docs);
+					this.__core.complete(
+						this._config.name + '_loaded',
+						this._docs,
+					);
 				}
 
 				this.__core.emit(`${this._config.name}_get`, this._docs);
@@ -288,7 +311,10 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that resolves with the created document, or emits an error if already created.
 	 */
-	create(doc: Document = {} as Document, options: CrudOptions<Document> = {}): Observable<Document> {
+	create(
+		doc: Document = {} as Document,
+		options: CrudOptions<Document> = {},
+	): Observable<Document> {
 		if (doc.__created) {
 			// Emit an error observable if the document is already created
 			return new Observable<Document>((observer) => {
@@ -302,7 +328,10 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 
 		doc.__created = true;
 
-		const obs = this.__http.post(`${this._url}/create${options.name || ''}`, doc);
+		const obs = this.__http.post(
+			`${this._url}/create${options.name || ''}`,
+			doc,
+		);
 
 		obs.subscribe({
 			next: (resp: unknown) => {
@@ -354,8 +383,14 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that resolves with the fetched document.
 	 */
-	fetch(query: object = {}, options: CrudOptions<Document> = {}): Observable<Document> {
-		const obs = this.__http.post(`${this._url}/fetch${options.name || ''}`, query);
+	fetch(
+		query: object = {},
+		options: CrudOptions<Document> = {},
+	): Observable<Document> {
+		const obs = this.__http.post(
+			`${this._url}/fetch${options.name || ''}`,
+			query,
+		);
 
 		obs.subscribe({
 			next: (doc: unknown) => {
@@ -397,7 +432,10 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that emits the updated document.
 	 */
-	updateAfterWhile(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> {
+	updateAfterWhile(
+		doc: Document,
+		options: CrudOptions<Document> = {},
+	): Observable<Document> {
 		doc.__modified = true;
 
 		return new Observable<Document>((observer) => {
@@ -424,10 +462,16 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that resolves with the updated document.
 	 */
-	update(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> {
+	update(
+		doc: Document,
+		options: CrudOptions<Document> = {},
+	): Observable<Document> {
 		doc.__modified = true;
 
-		const obs = this.__http.post(`${this._url}/update${options.name || ''}`, doc);
+		const obs = this.__http.post(
+			`${this._url}/update${options.name || ''}`,
+			doc,
+		);
 
 		obs.subscribe({
 			next: (resp: unknown) => {
@@ -477,10 +521,16 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that resolves with the updated document.
 	 */
-	unique(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> {
+	unique(
+		doc: Document,
+		options: CrudOptions<Document> = {},
+	): Observable<Document> {
 		doc.__modified = true;
 
-		const obs = this.__http.post(`${this._url}/unique${options.name || ''}`, doc);
+		const obs = this.__http.post(
+			`${this._url}/unique${options.name || ''}`,
+			doc,
+		);
 
 		obs.subscribe({
 			next: (resp: unknown) => {
@@ -526,14 +576,22 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that resolves with the deleted document.
 	 */
-	delete(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> {
-		const obs = this.__http.post(`${this._url}/delete${options.name || ''}`, doc);
+	delete(
+		doc: Document,
+		options: CrudOptions<Document> = {},
+	): Observable<Document> {
+		const obs = this.__http.post(
+			`${this._url}/delete${options.name || ''}`,
+			doc,
+		);
 
 		obs.subscribe({
 			next: (resp: unknown) => {
 				if (resp) {
 					this._docs.splice(
-						this._docs.findIndex((d) => this._id(d) === this._id(doc)),
+						this._docs.findIndex(
+							(d) => this._id(d) === this._id(doc),
+						),
 						1,
 					);
 
@@ -573,83 +631,118 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 		return obs as Observable<Document>;
 	}
 
-	/**
-	 * Filters documents based on specific conditions and stores the result in a provided object.
-	 *
-	 * @param storeObject - Object to store filtered documents.
-	 * @param field - The field to filter by or a function to extract the field.
-	 * @param valid - Optional function to check the validity of a document.
-	 * @param sort - Function to sort the filtered documents.
-	 * @returns A callback function that triggers the filtering process.
-	 */
 	filteredDocuments(
-		storeObject: Record<string, Document[]>,
-		field: string | ((doc: Document) => string) = 'author',
-		valid?: (doc: Document) => boolean,
-		sort: (a: Document, b: Document) => number = (a: Document, b: Document) => {
-			if ((a as any)[this._id(a)] < (b as any)[this._id(b)]) return -1;
-
-			if ((a as any)[this._id(a)] > (b as any)[this._id(b)]) return 1;
-
-			return 0;
-		},
-	): () => void {
+		storeObjectOrArray: Record<string, Document[]> | Document[],
+		config: {
+			field?: string | ((doc: Document) => string);
+			valid?: (doc: Document) => boolean;
+			sort?: (a: Document, b: Document) => number;
+			filtered?: () => {};
+		} = {},
+	) {
 		const callback = (): void => {
-			/* remove docs if they were removed */
-			for (const parentId in storeObject) {
-				for (let i = storeObject[parentId].length - 1; i >= 0; i--) {
-					const _field = typeof field === 'function' ? field(storeObject[parentId][i]) : field;
-					const _doc: any = storeObject[parentId][i];
+			if (Array.isArray(storeObjectOrArray)) {
+				const result = this._docs.filter(config.valid ?? (() => true));
+
+				storeObjectOrArray.length = 0;
+
+				storeObjectOrArray.push(...result);
+
+				if (typeof config.sort === 'function') {
+					storeObjectOrArray.sort(config.sort);
+				}
+			} else {
+				const storeObject = storeObjectOrArray as Record<
+					string,
+					Document[]
+				>;
+
+				/* remove docs if they were removed */
+				for (const parentId in storeObject) {
+					for (
+						let i = storeObject[parentId].length - 1;
+						i >= 0;
+						i--
+					) {
+						const _field =
+							typeof config.field === 'function'
+								? config.field(storeObject[parentId][i])
+								: config.field || 'author';
+						const _doc: any = storeObject[parentId][i];
+
+						if (
+							!this._docs.find((doc: any) =>
+								Array.isArray(doc[_field])
+									? doc[_field].includes(_doc[this._id(doc)])
+									: doc[_field] === _doc[this._id(doc)],
+							)
+						) {
+							storeObject[parentId].splice(i, 1);
+						}
+					}
+				}
+
+				/* add docs if they are not added */
+				for (const doc of this._docs) {
+					const _field =
+						typeof config.field === 'function'
+							? config.field(doc)
+							: config.field || 'author';
 
 					if (
-						!this._docs.find((doc: any) =>
-							Array.isArray(doc[_field]) ? doc[_field].includes(_doc[this._id(doc)]) : doc[_field] === _doc[this._id(doc)],
-						)
+						typeof config.valid === 'function'
+							? !config.valid(doc)
+							: Array.isArray((doc as any)[_field])
+								? !(doc as any)[_field]?.length
+								: !(doc as any)[_field]
 					) {
-						storeObject[parentId].splice(i, 1);
+						continue;
 					}
-				}
-			}
 
-			/* add docs if they are not added */
-			for (const doc of this._docs) {
-				const _field = typeof field === 'function' ? field(doc) : field;
-
-				if (
-					typeof valid === 'function'
-						? !valid(doc)
-						: Array.isArray((doc as any)[_field])
-							? !(doc as any)[_field]?.length
-							: !(doc as any)[_field]
-				) {
-					continue;
-				}
-
-				if (typeof field === 'function') {
-					if (field(doc) && !storeObject[(doc as any)[_field]].find((c) => c._id === doc._id)) {
-						storeObject[(doc as any)[_field]].push(doc);
-					}
-				} else if (Array.isArray((doc as any)[_field])) {
-					(doc as any)[_field].forEach((_field: string) => {
-						storeObject[_field] = storeObject[_field] || [];
-
-						if (!storeObject[_field].find((c) => c._id === doc._id)) {
-							storeObject[_field].push(doc);
+					if (typeof config.field === 'function') {
+						if (
+							config.field(doc) &&
+							!storeObject[(doc as any)[_field]].find(
+								(c) => c._id === doc._id,
+							)
+						) {
+							storeObject[(doc as any)[_field]].push(doc);
 						}
-					});
-				} else {
-					storeObject[(doc as any)[_field]] = storeObject[(doc as any)[_field]] || [];
+					} else if (Array.isArray((doc as any)[_field])) {
+						(doc as any)[_field].forEach((_field: string) => {
+							storeObject[_field] = storeObject[_field] || [];
 
-					if (!storeObject[(doc as any)[_field]].find((c) => c._id === doc._id)) {
-						storeObject[(doc as any)[_field]].push(doc);
+							if (
+								!storeObject[_field].find(
+									(c) => c._id === doc._id,
+								)
+							) {
+								storeObject[_field].push(doc);
+							}
+						});
+					} else {
+						storeObject[(doc as any)[_field]] =
+							storeObject[(doc as any)[_field]] || [];
+
+						if (
+							!storeObject[(doc as any)[_field]].find(
+								(c) => c._id === doc._id,
+							)
+						) {
+							storeObject[(doc as any)[_field]].push(doc);
+						}
+					}
+				}
+
+				/* sort the array's */
+				if (typeof config.sort === 'function') {
+					for (const parentId in storeObject) {
+						storeObject[parentId].sort(config.sort);
 					}
 				}
 			}
 
-			/* sort the array's */
-			for (const parentId in storeObject) {
-				storeObject[parentId].sort(sort);
-			}
+			config.filtered?.();
 		};
 
 		this._filteredDocumentsCallbacks.push(callback);
@@ -664,7 +757,9 @@ export abstract class CrudService<Document extends CrudDocument> extends BaseSer
 	 * @returns The unique ID as a string.
 	 */
 	private _id(doc: Document): string {
-		return (doc as unknown as Record<string, unknown>)[this._config._id || '_id']?.toString() as string;
+		return (doc as unknown as Record<string, unknown>)[
+			this._config._id || '_id'
+		]?.toString() as string;
 	}
 
 	/**
