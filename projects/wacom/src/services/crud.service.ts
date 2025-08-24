@@ -644,15 +644,15 @@ export abstract class CrudService<
 	) {
 		const callback = (): void => {
 			if (Array.isArray(storeObjectOrArray)) {
-				const result = this._docs.filter(config.valid ?? (() => true));
+				let result = this._docs.filter(config.valid ?? (() => true));
 
 				storeObjectOrArray.length = 0;
 
-				storeObjectOrArray.push(...result);
-
 				if (typeof config.sort === 'function') {
-					storeObjectOrArray.sort(config.sort);
+					result = result.sort(config.sort);
 				}
+
+				storeObjectOrArray.push(...result);
 			} else {
 				const storeObject = storeObjectOrArray as Record<
 					string,
