@@ -637,7 +637,9 @@ export abstract class CrudService<
 			field?: string | ((doc: Document) => string);
 			valid?: (doc: Document) => boolean;
 			sort?: (a: Document, b: Document) => number;
-			filtered?: () => {};
+			filtered?: (
+				storeObjectOrArray: Record<string, Document[]> | Document[],
+			) => void;
 		} = {},
 	) {
 		const callback = (): void => {
@@ -742,7 +744,7 @@ export abstract class CrudService<
 				}
 			}
 
-			config.filtered?.();
+			config.filtered?.(storeObjectOrArray);
 		};
 
 		this._filteredDocumentsCallbacks.push(callback);
