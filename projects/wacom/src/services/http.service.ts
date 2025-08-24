@@ -12,7 +12,6 @@ import {
 	HttpConfig,
 	HttpHeaderType,
 } from '../interfaces/http.interface';
-import { StoreService } from './store.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -22,7 +21,7 @@ export class HttpService {
 	errors: ((err: HttpErrorResponse, retry?: () => void) => {})[] = [];
 
 	// Base URL for HTTP requests
-	url = '';
+	url = localStorage.getItem('wacom-http.url') || '';
 
 	// Flag to lock the service to prevent multiple requests
 	locked = false;
@@ -36,15 +35,16 @@ export class HttpService {
 	// Object to store HTTP headers
 	private _headers: {
 		[name: string]: HttpHeaderType;
-	} = {};
+	} = localStorage.getItem('wacom-http.headers')
+		? JSON.parse(localStorage.getItem('wacom-http.headers') as string)
+		: {};
 
 	// Instance of HttpHeaders with current headers
 	private _http_headers = new HttpHeaders(this._headers);
 
 	constructor(
 		@Inject(CONFIG_TOKEN) @Optional() config: Config,
-		private store: StoreService,
-		private http: HttpClient,
+		private _http: HttpClient,
 	) {
 		// Initialize HTTP configuration and headers from injected config
 		this._config = {
@@ -59,46 +59,29 @@ export class HttpService {
 
 			this._http_headers = new HttpHeaders(this._headers);
 		}
-
-		// Retrieve and set the base URL and headers from the store
-		this.store.get('http_url', (url) => {
-			this.url = url || this._config.url || '';
-		});
-
-		this.store
-			.getJson<Record<string, string>>('http_headers')
-			.then((headers) => {
-				headers ||= {};
-
-				for (const header in headers) {
-					this._headers[header] = headers[header];
-				}
-
-				this._http_headers = new HttpHeaders(this._headers);
-			});
 	}
 
 	// Set a new base URL and save it in the store
 	setUrl(url: string) {
 		this.url = url;
 
-		this.store.set('http_url', url);
+		localStorage.setItem('wacom-http.url', url);
 	}
 
 	// Remove the base URL and revert to the default or stored one
 	removeUrl() {
 		this.url = this._config.url || '';
 
-		this.store.remove('http_url');
+		localStorage.removeItem('wacom-http.url');
 	}
 
 	// Set a new HTTP header and update the stored headers
 	set(key: any, value: any) {
 		this._headers[key] = value;
 
-		this.store.setJson<Record<string, HttpHeaderType>>(
-			'http_headers',
-			this._headers,
+		localStorage.setItem(
+			'wacom-http.headers',
+			JSON.stringify(this._headers),
 		);
 
 		this._http_headers = new HttpHeaders(this._headers);
@@ -113,12 +96,12 @@ export class HttpService {
 	remove(key: any) {
 		delete this._headers[key];
 
-		this._http_headers = new HttpHeaders(this._headers);
-
-		this.store.setJson<Record<string, HttpHeaderType>>(
-			'http_headers',
-			this._headers,
+		localStorage.setItem(
+			'wacom-http.headers',
+			JSON.stringify(this._headers),
 		);
+
+		this._http_headers = new HttpHeaders(this._headers);
 	}
 
 	// Internal method to make HTTP requests based on the method type
@@ -129,15 +112,15 @@ export class HttpService {
 		headers: any,
 	): Observable<any> {
 		if (method === 'post') {
-			return this.http.post<any>(_url, doc, headers);
+			return this._http.post<any>(_url, doc, headers);
 		} else if (method === 'put') {
-			return this.http.put<any>(_url, doc, headers);
+			return this._http.put<any>(_url, doc, headers);
 		} else if (method === 'patch') {
-			return this.http.patch<any>(_url, doc, headers);
+			return this._http.patch<any>(_url, doc, headers);
 		} else if (method === 'delete') {
-			return this.http.delete<any>(_url, headers);
+			return this._http.delete<any>(_url, headers);
 		} else {
-			return this.http.get<any>(_url, headers);
+			return this._http.get<any>(_url, headers);
 		}
 	}
 
