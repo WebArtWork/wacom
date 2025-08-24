@@ -1,10 +1,12 @@
+export type HttpHeaderType = string | number | (string | number)[];
+
 /**
  * Configuration values used by the HTTP service when
  * issuing requests to a backend API.
  */
 export interface HttpConfig {
 	/** Map of default headers appended to each request. */
-	headers?: Record<string, unknown>;
+	headers?: Record<string, HttpHeaderType>;
 	/** Base URL for all HTTP requests. */
 	url?: string;
 }

@@ -9,7 +9,17 @@ export type AlertType = (typeof ALERT_TYPES)[number];
 /**
  * Possible screen positions where alerts can be placed.
  */
-export const ALERT_POSITIONS = ['topLeft', 'top', 'topRight', 'left', 'center', 'right', 'bottomLeft', 'bottom', 'bottomRight'];
+export const ALERT_POSITIONS = [
+	'topLeft',
+	'top',
+	'topRight',
+	'left',
+	'center',
+	'right',
+	'bottomLeft',
+	'bottom',
+	'bottomRight',
+];
 export type AlertPosition = (typeof ALERT_POSITIONS)[number];
 
 /**
