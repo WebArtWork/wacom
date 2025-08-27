@@ -105,6 +105,10 @@ export abstract class CrudService<
 
 			this._filterDocuments();
 		});
+
+		this.__coreService.on('wacom_online').subscribe(() => {
+			// review docs which has to be created or updated
+		});
 	}
 
 	async restoreDocs() {
@@ -198,7 +202,8 @@ export abstract class CrudService<
 	new(doc: Document = {} as Document): Document {
 		return {
 			...doc,
-			_id: doc._id || Date.now().toString(),
+			_id: undefined,
+			_localId: Date.now().toString(),
 			__created: false,
 			__modified: false,
 		} as Document;
@@ -257,6 +262,12 @@ export abstract class CrudService<
 		config: GetConfig = {},
 		options: CrudOptions<Document> = {},
 	): Observable<Document[]> {
+		if (!this.__networkService.isOnline()) {
+			return new Observable((observer) => {
+				// observer.next();
+			});
+		}
+
 		if (!this._config.unauthorized && localStorage.getItem('waw_user')) {
 			const user = JSON.parse(localStorage.getItem('waw_user') as string);
 
