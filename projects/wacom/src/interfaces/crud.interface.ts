@@ -4,6 +4,8 @@
 export interface CrudDocument {
 	/** Unique identifier of the document. */
 	_id?: string;
+	/** Temporary unique identifier of the document for offline use */
+	_localId?: number;
 	/** Optional application identifier to which the document belongs. */
 	appId?: string;
 	/** Numerical position used for manual ordering. */

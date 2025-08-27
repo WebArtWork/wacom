@@ -4,6 +4,7 @@ import { HttpConfig } from './http.interface';
 import { LoaderConfig } from './loader.interface';
 import { MetaConfig } from './meta.interface';
 import { ModalConfig } from './modal.interface';
+import { NetworkConfig } from './network.interface';
 import { StoreConfig } from './store.interface';
 
 /**
@@ -37,6 +38,7 @@ export interface Config {
 		warning: string;
 		question: string;
 	};
+	network?: NetworkConfig;
 }
 
 export const CONFIG_TOKEN = new InjectionToken<Config>('config');
