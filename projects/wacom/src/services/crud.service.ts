@@ -478,7 +478,7 @@ export abstract class CrudService<
 				if (resp) {
 					doc.__modified = false;
 
-					const storedDoc = this.doc(doc._id);
+					const storedDoc = this.doc(doc._id as string);
 
 					this.__core.copy(resp, storedDoc);
 

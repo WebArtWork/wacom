@@ -3,7 +3,7 @@
  */
 export interface CrudDocument {
 	/** Unique identifier of the document. */
-	_id: string;
+	_id?: string;
 	/** Optional application identifier to which the document belongs. */
 	appId?: string;
 	/** Numerical position used for manual ordering. */
