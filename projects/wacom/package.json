@@ -91,6 +91,10 @@
 		"Util Service",
 		"Provide Wacom",
 		"Theme",
-		"Wacom Module"
+		"Wacom Module",
+		"CRUD",
+		"CRUD Service",
+		"CRUD Component",
+		"CRUD Offline"
 	]
 }
