@@ -1,6 +1,17 @@
-import { ChangeDetectorRef, inject, Signal, signal, WritableSignal } from '@angular/core';
+import {
+	ChangeDetectorRef,
+	inject,
+	Signal,
+	signal,
+	WritableSignal,
+} from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { CrudDocument, CrudOptions, CrudServiceInterface, TableConfig } from '../interfaces/crud.interface';
+import {
+	CrudDocument,
+	CrudOptions,
+	CrudServiceInterface,
+	TableConfig,
+} from '../interfaces/crud.interface';
 import { AlertService } from '../services/alert.service';
 import { CoreService } from '../services/core.service';
 
@@ -14,7 +25,10 @@ interface FormServiceInterface<FormInterface> {
 	modalDocs: <T>(docs: T[]) => Promise<T[]>;
 	modalUnique: <T>(collection: string, key: string, doc: T) => void;
 	alert?: {
-		question: (config: { text: string; buttons: { text: string; callback?: () => void }[] }) => void;
+		question: (config: {
+			text: string;
+			buttons: { text: string; callback?: () => void }[];
+		}) => void;
 	};
 }
 
@@ -25,7 +39,11 @@ interface FormServiceInterface<FormInterface> {
  * @template Service - A service implementing CrudServiceInterface for a specific document type
  * @template Document - The data model extending CrudDocument
  */
-export abstract class CrudComponent<Service extends CrudServiceInterface<Document>, Document extends CrudDocument, FormInterface> {
+export abstract class CrudComponent<
+	Service extends CrudServiceInterface<Document>,
+	Document extends CrudDocument<Document>,
+	FormInterface,
+> {
 	/** Service responsible for data fetching, creating, updating, deleting */
 	protected crudService: Service;
 
@@ -87,18 +105,24 @@ export abstract class CrudComponent<Service extends CrudServiceInterface<Documen
 				this.__core.afterWhile(
 					this,
 					() => {
-						this.crudService.get({ page }, this.getOptions()).subscribe((docs: Document[]) => {
-							this.documents.update(() => this.__core.toSignalsArray(docs));
+						this.crudService
+							.get({ page }, this.getOptions())
+							.subscribe((docs: Document[]) => {
+								this.documents.update(() =>
+									this.__core.toSignalsArray(docs),
+								);
 
-							resolve();
+								resolve();
 
-							this.__cdr.markForCheck();
-						});
+								this.__cdr.markForCheck();
+							});
 					},
 					250,
 				);
 			} else {
-				this.documents.update(() => this.__core.toSignalsArray(this.crudService.getDocs()));
+				this.documents.update(() =>
+					this.__core.toSignalsArray(this.crudService.getDocs()),
+				);
 
 				this.crudService.loaded.then(() => {
 					resolve();
@@ -116,7 +140,7 @@ export abstract class CrudComponent<Service extends CrudServiceInterface<Documen
 	 * Clears temporary metadata before document creation.
 	 */
 	protected preCreate(doc: Document): void {
-		delete doc.__created;
+		delete doc.__creating;
 	}
 
 	/**
@@ -164,7 +188,13 @@ export abstract class CrudComponent<Service extends CrudServiceInterface<Documen
 					create
 						? []
 						: this.documents().map(
-								(obj: any) => Object.fromEntries(this.updatableFields.map((key) => [key, obj()[key]])) as Document,
+								(obj: any) =>
+									Object.fromEntries(
+										this.updatableFields.map((key) => [
+											key,
+											obj()[key],
+										]),
+									) as Document,
 							),
 				)
 				.then(async (docs: Document[]) => {
@@ -177,25 +207,35 @@ export abstract class CrudComponent<Service extends CrudServiceInterface<Documen
 					} else {
 						for (const document of this.documents()) {
 							if (!docs.find((d) => d._id === document()._id)) {
-								await firstValueFrom(this.crudService.delete(document()));
+								await firstValueFrom(
+									this.crudService.delete(document()),
+								);
 							}
 						}
 
 						for (const doc of docs) {
-							const local = this.documents().find((document) => document()._id === doc._id);
+							const local = this.documents().find(
+								(document) => document()._id === doc._id,
+							);
 
 							if (local) {
-								(local as WritableSignal<Document>).update((document) => {
-									this.__core.copy(doc, document);
+								(local as WritableSignal<Document>).update(
+									(document) => {
+										this.__core.copy(doc, document);
 
-									return document;
-								});
+										return document;
+									},
+								);
 
-								await firstValueFrom(this.crudService.update(local()));
+								await firstValueFrom(
+									this.crudService.update(local()),
+								);
 							} else {
 								this.preCreate(doc);
 
-								await firstValueFrom(this.crudService.create(doc));
+								await firstValueFrom(
+									this.crudService.create(doc),
+								);
 							}
 						}
 					}
@@ -213,7 +253,9 @@ export abstract class CrudComponent<Service extends CrudServiceInterface<Documen
 				close();
 				this.preCreate(created as Document);
 
-				await firstValueFrom(this.crudService.create(created as Document));
+				await firstValueFrom(
+					this.crudService.create(created as Document),
+				);
 
 				this.setDocuments();
 			},
@@ -222,19 +264,23 @@ export abstract class CrudComponent<Service extends CrudServiceInterface<Documen
 
 	/** Displays a modal to edit an existing document. */
 	protected update(doc: Document) {
-		this.__form.modal<Document>(this.form, [], doc).then((updated: Document) => {
-			this.__core.copy(updated, doc);
+		this.__form
+			.modal<Document>(this.form, [], doc)
+			.then((updated: Document) => {
+				this.__core.copy(updated, doc);
 
-			this.crudService.update(doc);
+				this.crudService.update(doc);
 
-			this.__cdr.markForCheck();
-		});
+				this.__cdr.markForCheck();
+			});
 	}
 
 	/** Requests confirmation before deleting the provided document. */
 	protected delete(doc: Document) {
 		this.__alert.question({
-			text: this.translateService.translate(`Common.Are you sure you want to delete this${this._module ? ' ' + this._module : ''}?`),
+			text: this.translateService.translate(
+				`Common.Are you sure you want to delete this${this._module ? ' ' + this._module : ''}?`,
+			),
 			buttons: [
 				{ text: this.translateService.translate('Common.No') },
 				{
@@ -256,7 +302,9 @@ export abstract class CrudComponent<Service extends CrudServiceInterface<Documen
 
 	/** Moves the given document one position up and updates ordering. */
 	protected moveUp(doc: Document) {
-		const index = this.documents().findIndex((document) => document()._id === doc._id);
+		const index = this.documents().findIndex(
+			(document) => document()._id === doc._id,
+		);
 
 		if (index) {
 			this.documents.update((documents) => {
@@ -351,7 +399,9 @@ export abstract class CrudComponent<Service extends CrudServiceInterface<Documen
 					...config,
 					paginate: this.setDocuments.bind(this),
 					perPage: this.perPage,
-					setPerPage: this.crudService.setPerPage?.bind(this.crudService),
+					setPerPage: this.crudService.setPerPage?.bind(
+						this.crudService,
+					),
 					allDocs: false,
 				}
 			: config;

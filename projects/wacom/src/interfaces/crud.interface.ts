@@ -1,7 +1,7 @@
 /**
  * Basic fields expected on a document managed by the CRUD service.
  */
-export interface CrudDocument {
+export interface CrudDocument<Document> {
 	/** Unique identifier of the document. */
 	_id?: string;
 	/** Temporary unique identifier of the document for offline use */
@@ -13,9 +13,10 @@ export interface CrudDocument {
 	/** Flag indicating the document is creating */
 	__creating?: boolean;
 	/** Flag set when the document has been modified locally. */
-	__modified?: boolean;
+	__modified?: string[];
 	/** Flag set when the document has been deleted locally. */
 	__deleted?: boolean;
+	__options: Record<string, CrudOptions<Document>>;
 }
 
 /**

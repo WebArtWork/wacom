@@ -1,12 +1,16 @@
 {
 	"name": "wacom",
-	"version": "20.2.8",
+	"version": "20.2.9",
 	"license": "MIT",
 	"repository": "WebArtWork/wacom",
 	"funding": [
 		{
 			"type": "website",
 			"url": "http://wawjs.wiki/fund"
+		},
+		{
+			"type": "opencollective",
+			"url": "https://opencollective.com/wawjs"
 		}
 	],
 	"keywords": [

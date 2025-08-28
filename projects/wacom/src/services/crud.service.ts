@@ -33,7 +33,7 @@ interface GetConfig {
  * @template Document - The type of the document the service handles.
  */
 export abstract class CrudService<
-	Document extends CrudDocument,
+	Document extends CrudDocument<Document>,
 > extends BaseService {
 	/**
 	 * URL for the API.
@@ -121,9 +121,27 @@ export abstract class CrudService<
 		);
 
 		if (Array.isArray(docs)) {
+			this._docs.length = 0;
+
 			this._docs.push(...docs);
 
 			this._filterDocuments();
+
+			for (const doc of this._docs) {
+				if (doc.__deleted) {
+					this.delete(doc, doc.__options?.['delete'] || {});
+				} else if (!doc._id) {
+					this.create(doc, doc.__options?.['create'] || {});
+				} else if (doc.__modified?.length) {
+					for (const id of doc.__modified) {
+						if (id.startsWith('up')) {
+							this.update(doc, doc.__options?.[id] || {});
+						} else {
+							this.unique(doc, doc.__options?.[id] || {});
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -181,7 +199,7 @@ export abstract class CrudService<
 		}
 
 		const existingDoc = this._docs.find(
-			(d) => this._id(d) === this._id(doc),
+			(d) => this._id(d) === this._id(doc) || d._localId === doc._localId,
 		);
 
 		if (existingDoc) {
@@ -207,7 +225,7 @@ export abstract class CrudService<
 		return {
 			...doc,
 			_id: undefined,
-			_localId: Date.now().toString(),
+			_localId: Date.now(),
 			__created: false,
 			__modified: false,
 		} as Document;
@@ -340,6 +358,14 @@ export abstract class CrudService<
 		if (doc._id) {
 			return this.update(doc, options);
 		}
+
+		doc._localId ||= Date.now();
+
+		doc.__options ||= {};
+
+		doc.__options['create'] = options;
+
+		this.addDoc(doc);
 
 		if (!this.__networkService.isOnline()) {
 			return new Observable((observer) => {
@@ -511,9 +537,7 @@ export abstract class CrudService<
 		doc: Document,
 		options: CrudOptions<Document> = {},
 	): Observable<Document> {
-		doc.__modified = true;
-
-		this.setDocs();
+		this._updateModified(doc, 'up' + (options.name || ''), options);
 
 		if (!this.__networkService.isOnline()) {
 			return new Observable((observer) => {
@@ -531,7 +555,7 @@ export abstract class CrudService<
 		obs.subscribe({
 			next: (resp: unknown) => {
 				if (resp) {
-					doc.__modified = false;
+					this._removeModified(doc, 'up' + (options.name || ''));
 
 					const storedDoc = this.doc(doc._id as string);
 
@@ -580,9 +604,7 @@ export abstract class CrudService<
 		doc: Document,
 		options: CrudOptions<Document> = {},
 	): Observable<Document> {
-		doc.__modified = true;
-
-		this.setDocs();
+		this._updateModified(doc, 'un' + (options.name || ''), options);
 
 		if (!this.__networkService.isOnline()) {
 			return new Observable((observer) => {
@@ -600,7 +622,7 @@ export abstract class CrudService<
 		obs.subscribe({
 			next: (resp: unknown) => {
 				if (resp) {
-					doc.__modified = false;
+					this._removeModified(doc, 'un' + (options.name || ''));
 
 					(doc as any)[options.name as string] = resp;
 
@@ -646,6 +668,10 @@ export abstract class CrudService<
 		options: CrudOptions<Document> = {},
 	): Observable<Document> {
 		doc.__deleted = true;
+
+		doc.__options ||= {};
+
+		doc.__options['delete'] = options;
 
 		this._filterDocuments();
 
@@ -835,6 +861,10 @@ export abstract class CrudService<
 		return callback;
 	}
 
+	private _fetchingId: Record<string, boolean> = {};
+
+	private _onOnline: (() => void)[] = [];
+
 	/**
 	 * Generates a unique ID for a document.
 	 *
@@ -858,7 +888,34 @@ export abstract class CrudService<
 		this.__coreService.emit(`${this._config.name}_filtered`);
 	}
 
-	private _fetchingId: Record<string, boolean> = {};
+	private _updateModified(
+		doc: Document,
+		id: string,
+		options: CrudOptions<Document>,
+	) {
+		doc.__modified ||= [];
 
-	private _onOnline: (() => void)[] = [];
+		doc.__options ||= {};
+
+		doc.__options[id] = options;
+
+		if (!doc.__modified.find((m) => m === id)) {
+			doc.__modified.push(id);
+
+			this.setDocs();
+		}
+	}
+
+	private _removeModified(doc: Document, id: string) {
+		doc.__modified ||= [];
+
+		if (doc.__modified.find((m) => m === id)) {
+			doc.__modified.splice(
+				doc.__modified.findIndex((m) => m === id),
+				1,
+			);
+
+			this.setDocs();
+		}
+	}
 }
