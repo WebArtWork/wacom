@@ -77,6 +77,7 @@ You can reference these variables in your global styles to keep the design consi
 | [**`Socket`**](https://www.npmjs.com/package/wacom#socket-service) |   Manages WebSocket connections and real-time data communication    |
 | [**`Time`**](https://www.npmjs.com/package/wacom#time-service)     |  Provides utilities for date and time manipulation and formatting   |
 | [**`Dom`**](https://www.npmjs.com/package/wacom#dom-service)       |     Facilitates DOM manipulation and dynamic component loading      |
+| [**`Network`**](https://www.npmjs.com/package/wacom#network-service) | Monitors network connectivity and latency |
 
 ## [Core Service](#core-service)
 
@@ -2506,3 +2507,28 @@ export class AppComponent {
   }
 }
 ```
+
+## [Network Service](#network-service)
+
+The `NetworkService` monitors network connectivity and latency using Angular signals.
+It periodically probes configurable endpoints and emits `wacom_online` or `wacom_offline`
+events through the `CoreService` when status changes.
+
+### Properties
+
+- `status` (`Signal<NetworkStatus>`): Current connectivity classification (`good`, `poor`, or `none`).
+- `latencyMs` (`Signal<number | null>`): Measured latency to the nearest reachable endpoint.
+- `isOnline` (`Signal<boolean>`): Indicates whether the browser reports an online state.
+
+### Methods
+
+#### `recheckNow(): Promise<void>`
+
+Performs an immediate connectivity check and updates all signals.
+
+**Example**:
+
+```Typescript
+await networkService.recheckNow();
+```
+
