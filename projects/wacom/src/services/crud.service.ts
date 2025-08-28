@@ -367,6 +367,8 @@ export abstract class CrudService<
 
 		this.addDoc(doc);
 
+		this._filterDocuments();
+
 		if (!this.__networkService.isOnline()) {
 			return new Observable((observer) => {
 				this._onOnline.push(() => {
@@ -673,9 +675,9 @@ export abstract class CrudService<
 
 		doc.__options['delete'] = options;
 
-		this._filterDocuments();
+		this.addDoc(doc);
 
-		this.setDocs();
+		this._filterDocuments();
 
 		if (!this.__networkService.isOnline()) {
 			return new Observable((observer) => {
@@ -902,7 +904,7 @@ export abstract class CrudService<
 		if (!doc.__modified.find((m) => m === id)) {
 			doc.__modified.push(id);
 
-			this.setDocs();
+			this.addDoc(doc);
 		}
 	}
 
@@ -915,7 +917,7 @@ export abstract class CrudService<
 				1,
 			);
 
-			this.setDocs();
+			this.addDoc(doc);
 		}
 	}
 }
