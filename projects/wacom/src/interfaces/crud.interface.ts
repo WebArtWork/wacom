@@ -16,7 +16,7 @@ export interface CrudDocument<Document> {
 	__modified?: string[];
 	/** Flag set when the document has been deleted locally. */
 	__deleted?: boolean;
-	__options: Record<string, CrudOptions<Document>>;
+	__options?: Record<string, CrudOptions<Document>>;
 }
 
 /**
