@@ -107,7 +107,11 @@ export abstract class CrudService<
 		});
 
 		this.__coreService.on('wacom_online').subscribe(() => {
-			// review docs which has to be created or updated
+			for (const callback of this._onOnline) {
+				callback();
+			}
+
+			this._onOnline.length = 0;
 		});
 	}
 
@@ -264,7 +268,9 @@ export abstract class CrudService<
 	): Observable<Document[]> {
 		if (!this.__networkService.isOnline()) {
 			return new Observable((observer) => {
-				// observer.next();
+				this._onOnline.push(() => {
+					this.get(config, options).subscribe(observer);
+				});
 			});
 		}
 
@@ -331,10 +337,24 @@ export abstract class CrudService<
 		doc: Document = {} as Document,
 		options: CrudOptions<Document> = {},
 	): Observable<Document> {
-		if (doc.__created) {
+		if (doc._id) {
+			return this.update(doc, options);
+		}
+
+		if (!this.__networkService.isOnline()) {
+			return new Observable((observer) => {
+				this._onOnline.push(() => {
+					this.create(doc, options).subscribe(observer);
+				});
+			});
+		}
+
+		if (doc.__creating) {
 			// Emit an error observable if the document is already created
 			return new Observable<Document>((observer) => {
-				observer.error(new Error('Document has already been created.'));
+				observer.error(
+					new Error('Document is currently already creating.'),
+				);
 			});
 		}
 
@@ -342,7 +362,7 @@ export abstract class CrudService<
 			doc.appId = this._config.appId;
 		}
 
-		doc.__created = true;
+		doc.__creating = true;
 
 		const obs = this.__httpService.post(
 			`${this._url}/create${options.name || ''}`,
@@ -369,7 +389,7 @@ export abstract class CrudService<
 						});
 					}
 				} else {
-					doc.__created = false;
+					doc.__creating = false;
 
 					if (options.errCallback) {
 						options.errCallback(resp);
@@ -383,7 +403,7 @@ export abstract class CrudService<
 				this.__coreService.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
-				doc.__created = false;
+				doc.__creating = false;
 
 				if (options.errCallback) options.errCallback(err);
 			},
@@ -403,6 +423,14 @@ export abstract class CrudService<
 		query: object = {},
 		options: CrudOptions<Document> = {},
 	): Observable<Document> {
+		if (!this.__networkService.isOnline()) {
+			return new Observable((observer) => {
+				this._onOnline.push(() => {
+					this.fetch(query, options).subscribe(observer);
+				});
+			});
+		}
+
 		const obs = this.__httpService.post(
 			`${this._url}/fetch${options.name || ''}`,
 			query,
@@ -455,8 +483,6 @@ export abstract class CrudService<
 		doc: Document,
 		options: CrudOptions<Document> = {},
 	): Observable<Document> {
-		doc.__modified = true;
-
 		return new Observable<Document>((observer) => {
 			this.__coreService.afterWhile(this._id(doc), () => {
 				this.update(doc, options).subscribe({
@@ -486,6 +512,16 @@ export abstract class CrudService<
 		options: CrudOptions<Document> = {},
 	): Observable<Document> {
 		doc.__modified = true;
+
+		this.setDocs();
+
+		if (!this.__networkService.isOnline()) {
+			return new Observable((observer) => {
+				this._onOnline.push(() => {
+					this.update(doc, options).subscribe(observer);
+				});
+			});
+		}
 
 		const obs = this.__httpService.post(
 			`${this._url}/update${options.name || ''}`,
@@ -546,6 +582,16 @@ export abstract class CrudService<
 	): Observable<Document> {
 		doc.__modified = true;
 
+		this.setDocs();
+
+		if (!this.__networkService.isOnline()) {
+			return new Observable((observer) => {
+				this._onOnline.push(() => {
+					this.unique(doc, options).subscribe(observer);
+				});
+			});
+		}
+
 		const obs = this.__httpService.post(
 			`${this._url}/unique${options.name || ''}`,
 			doc,
@@ -599,6 +645,20 @@ export abstract class CrudService<
 		doc: Document,
 		options: CrudOptions<Document> = {},
 	): Observable<Document> {
+		doc.__deleted = true;
+
+		this._filterDocuments();
+
+		this.setDocs();
+
+		if (!this.__networkService.isOnline()) {
+			return new Observable((observer) => {
+				this._onOnline.push(() => {
+					this.delete(doc, options).subscribe(observer);
+				});
+			});
+		}
+
 		const obs = this.__httpService.post(
 			`${this._url}/delete${options.name || ''}`,
 			doc,
@@ -663,7 +723,9 @@ export abstract class CrudService<
 	) {
 		const callback = (): void => {
 			if (Array.isArray(storeObjectOrArray)) {
-				let result = this._docs.filter(config.valid ?? (() => true));
+				let result = this._docs
+					.filter((doc) => !doc.__deleted)
+					.filter(config.valid ?? (() => true));
 
 				storeObjectOrArray.length = 0;
 
@@ -705,6 +767,8 @@ export abstract class CrudService<
 
 				/* add docs if they are not added */
 				for (const doc of this._docs) {
+					if (doc.__deleted) continue;
+
 					const _field =
 						typeof config.field === 'function'
 							? config.field(doc)
@@ -795,4 +859,6 @@ export abstract class CrudService<
 	}
 
 	private _fetchingId: Record<string, boolean> = {};
+
+	private _onOnline: (() => void)[] = [];
 }

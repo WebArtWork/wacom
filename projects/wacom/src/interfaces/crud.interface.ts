@@ -10,10 +10,12 @@ export interface CrudDocument {
 	appId?: string;
 	/** Numerical position used for manual ordering. */
 	order?: number;
-	/** Flag indicating the document was freshly created client‑side. */
-	__created?: boolean;
+	/** Flag indicating the document is creating */
+	__creating?: boolean;
 	/** Flag set when the document has been modified locally. */
 	__modified?: boolean;
+	/** Flag set when the document has been deleted locally. */
+	__deleted?: boolean;
 }
 
 /**
