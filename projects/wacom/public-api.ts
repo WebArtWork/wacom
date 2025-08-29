@@ -45,6 +45,7 @@ export * from './src/services/http.service';
 export * from './src/services/loader.service';
 export * from './src/services/meta.service';
 export * from './src/services/modal.service';
+export * from './src/services/network.service';
 export * from './src/services/rtc.service';
 export * from './src/services/socket.service';
 export * from './src/services/store.service';
