@@ -225,7 +225,7 @@ export abstract class CrudService<
 		return {
 			...doc,
 			_id: undefined,
-			_localId: Date.now(),
+			_localId: this._localId(),
 			__created: false,
 			__modified: false,
 		} as Document;
@@ -359,7 +359,7 @@ export abstract class CrudService<
 			return this.update(doc, options);
 		}
 
-		doc._localId ||= Date.now();
+		doc._localId ||= this._localId();
 
 		doc.__options ||= {};
 
@@ -867,6 +867,8 @@ export abstract class CrudService<
 
 	private _onOnline: (() => void)[] = [];
 
+	private _randomCount = 0;
+
 	/**
 	 * Generates a unique ID for a document.
 	 *
@@ -919,5 +921,9 @@ export abstract class CrudService<
 
 			this.addDoc(doc);
 		}
+	}
+
+	private _localId() {
+		return Number(Date.now() + '' + this._randomCount++);
 	}
 }
