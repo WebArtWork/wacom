@@ -68,16 +68,21 @@ You can reference these variables in your global styles to keep the design consi
 | Name                                                               |                             Description                             |
 | ------------------------------------------------------------------ | :-----------------------------------------------------------------: |
 | [**`Core`**](https://www.npmjs.com/package/wacom#core-service)     |     Common supportive function which can be used in any service     |
+| [**`Base`**](https://www.npmjs.com/package/wacom#base-service)     |     Tracks timestamps and can refresh to the current time           |
 | [**`Http`**](https://www.npmjs.com/package/wacom#http-service)     |                      Http layer for HttpClient                      |
-| [**`Store`**](https://www.npmjs.com/package/wacom#store-service)   |  Service will is responsible for keeping information on the device  |
+| [**`Store`**](https://www.npmjs.com/package/wacom#store-service)   |  Service responsible for keeping information on the device          |
 | [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service)     |             Website meta tags management within router              |
-| [**`UI`**](https://www.npmjs.com/package/wacom#ui-service)         |                      Supportive UI/UX service                       |
 | [**`Crud`**](https://www.npmjs.com/package/wacom#crud-service)     | Provides basic CRUD operations for managing data with HTTP services |
 | [**`File`**](https://www.npmjs.com/package/wacom#file-service)     |  Handles file uploads, image processing, and file management tasks  |
 | [**`Socket`**](https://www.npmjs.com/package/wacom#socket-service) |   Manages WebSocket connections and real-time data communication    |
 | [**`Time`**](https://www.npmjs.com/package/wacom#time-service)     |  Provides utilities for date and time manipulation and formatting   |
 | [**`Dom`**](https://www.npmjs.com/package/wacom#dom-service)       |     Facilitates DOM manipulation and dynamic component loading      |
-| [**`Network`**](https://www.npmjs.com/package/wacom#network-service) | Monitors network connectivity and latency |
+| [**`Network`**](https://www.npmjs.com/package/wacom#network-service) | Monitors network connectivity and latency                          |
+| [**`Alert`**](https://www.npmjs.com/package/wacom#alert-service)   |   Displays configurable alert messages                              |
+| [**`Loader`**](https://www.npmjs.com/package/wacom#loader-service) |   Shows and manages loading indicators                              |
+| [**`Modal`**](https://www.npmjs.com/package/wacom#modal-service)   |   Creates and controls modal dialogs                                |
+| [**`RTC`**](https://www.npmjs.com/package/wacom#rtc-service)       |   Wraps WebRTC peer connections and local media streams             |
+| [**`Util`**](https://www.npmjs.com/package/wacom#util-service)     |   Utility methods for forms, validation, and CSS variables          |
 
 ## [Core Service](#core-service)
 
@@ -630,6 +635,32 @@ In this example:
 
 This ensures controlled access to the resource, preventing race conditions and ensuring data integrity.
 
+## [Base Service](#base-service)
+
+The `BaseService` provides a minimal utility for tracking the current timestamp.
+
+### Properties
+
+- `now` (`number`): Stores the current timestamp in milliseconds.
+
+### Methods
+
+#### `refreshNow(): void`
+
+Updates the `now` property to the current timestamp.
+
+**Example**:
+
+```Typescript
+import { BaseService } from 'wacom';
+
+constructor(private baseService: BaseService) {}
+
+refresh() {
+  this.baseService.refreshNow();
+}
+```
+
 ## [Http Service](#http-service)
 
 The `HttpService` provides an HTTP layer for `HttpClient` in Angular, supporting both callbacks and observables for various HTTP operations.
@@ -1059,128 +1090,6 @@ Applies the configured prefix to a storage key.
 const prefixedKey = storeService.applyPrefix('key');
 ```
 
-## [Hash Service](#hash-service)
-
-The `HashService` manages the URL hash in an Angular application. It can parse, set, get, and clear hash values, providing a simple API for manipulating the URL hash.
-
-### Properties
-
-#### `hash: { [key: string]: string }`
-
-The object containing the parsed hash values.
-
-### Methods
-
-#### `initialize(): void`
-
-Initializes the hash service by loading the current hash from the URL.
-**Example**:
-
-```Typescript
-hashService.initialize();
-```
-
-#### `load(): void`
-
-Loads the current hash from the URL into the hash object.
-
-**Example**:
-
-```Typescript
-hashService.load();
-```
-
-#### `applyReplacements(str: string | undefined): string`
-
-Applies replacements to a given string based on the replacements array.
-
-**Parameters**:
-
-- `str` (string | undefined): The string to apply replacements to.
-
-**Returns**:
-
-- `string`: The string with replacements applied.
-
-**Example**:
-
-```Typescript
-const result = hashService.applyReplacements('hello%20world');
-```
-
-#### `on(field: string, cb: (value: string) => void): void`
-
-Executes a callback with the value of a specific hash field once the hash is loaded.
-
-**Parameters**:
-
-- `field` (string): The hash field to get the value for.
-- `cb` (function): The callback to execute with the value.
-
-**Example**:
-
-```Typescript
-hashService.on('key', value => console.log(value));
-```
-
-#### `save(): void`
-
-Saves the current hash object to the URL.
-
-**Example**:
-
-```Typescript
-hashService.save();
-```
-
-#### `set(field: string, value: string): void`
-
-Sets a value for a specific hash field and updates the URL.
-
-**Parameters**:
-
-- `field` (string): The hash field to set the value for.
-- `value` (string): The value to set.
-
-**Example**:
-
-```Typescript
-hashService.set('key', 'value');
-```
-
-#### `get(field: string): string | undefined`
-
-Gets the value of a specific hash field.
-
-**Parameters**:
-
-- `field` (string): The hash field to get the value for.
-
-**Returns**:
-
-- `string | undefined`: The value of the hash field.
-
-**Example**:
-
-```Typescript
-const value = hashService.get('key');
-```
-
-#### `clear(field?: string): void`
-
-Clears a specific hash field or all hash fields and updates the URL.
-
-**Parameters**:
-
-- `field` (string | undefined): The hash field to clear. If not provided, clears all hash fields.
-
-**Example**:
-
-```Typescript
-hashService.clear('key');
-hashService.clear();
-```
-
 ## [Meta Service](#meta-service)
 
 The `MetaService` manages meta tags and titles in an Angular application. It allows setting defaults, updating meta tags, and configuring titles dynamically.
@@ -1297,9 +1206,9 @@ Warns about missing meta guards in routes.
 metaService._warnMissingGuard();
 ```
 
-## [UI Service](#ui-service)
+## [Util Service](#util-service)
 
-The `UiService` manages various UI-related tasks in an Angular application, including CSS management, form validation, and generating sample data for UI components.
+The `UtilService` manages various UI-related tasks in an Angular application, including CSS management, form validation, and generating sample data for UI components.
 
 ### Methods
 
@@ -1318,7 +1227,7 @@ Manages form states.
 **Example**:
 
 ```Typescript
-const formState = uiService.form('contactForm');
+const formState = utilService.form('contactForm');
 ```
 
 #### `valid(value: any, kind = 'email', extra = 0): boolean`
@@ -1338,7 +1247,7 @@ Validates input values based on the specified type.
 **Example**:
 
 ```Typescript
-const isValidEmail = uiService.valid('test@example.com', 'email');
+const isValidEmail = utilService.valid('test@example.com', 'email');
 ```
 
 #### `level(value = ''): number`
@@ -1356,7 +1265,7 @@ Determines the strength of a password.
 **Example**:
 
 ```Typescript
-const passwordLevel = uiService.level('Password123!');
+const passwordLevel = utilService.level('Password123!');
 ```
 
 #### `set(variables: { [key: string]: string }, opts: any = {}): void`
@@ -1371,7 +1280,7 @@ Sets multiple CSS variables.
 **Example**:
 
 ```Typescript
-uiService.set({ '--primary-color': '#ff0000' }, 'local');
+utilService.set({ '--primary-color': '#ff0000' }, 'local');
 ```
 
 #### `get(): { [key: string]: string }`
@@ -1385,7 +1294,7 @@ Retrieves the stored CSS variables.
 **Example**:
 
 ```Typescript
-const cssVariables = uiService.get();
+const cssVariables = utilService.get();
 ```
 
 #### `remove(keys: string | string[]): void`
@@ -1399,7 +1308,7 @@ Removes specified CSS variables.
 **Example**:
 
 ```Typescript
-uiService.remove('primary-color secondary-color');
+utilService.remove('primary-color secondary-color');
 ```
 
 #### `arr(arrLen = 10, type: string = 'number'): any[]`
@@ -1418,7 +1327,7 @@ Generates an array of sample data.
 **Example**:
 
 ```Typescript
-const sampleArray = uiService.arr(5, 'text');
+const sampleArray = utilService.arr(5, 'text');
 ```
 
 #### `text(length = 10): string`
@@ -1436,7 +1345,7 @@ Generates a random text string.
 **Example**:
 
 ```Typescript
-const randomText = uiService.text(15);
+const randomText = utilService.text(15);
 ```
 
 ## [Crud Service](#crud-service)
@@ -2530,5 +2439,132 @@ Performs an immediate connectivity check and updates all signals.
 
 ```Typescript
 await networkService.recheckNow();
+```
+
+## [Alert Service](#alert-service)
+
+The `AlertService` displays configurable alert messages such as information, success, warning, error or question prompts.
+
+### Methods
+
+#### `show(opts: Alert | string): Alert`
+Displays a customizable alert. Passing a string uses it as the alert text.
+
+#### `info(opts: Alert): void`
+Shows an informational alert.
+
+#### `success(opts: Alert): void`
+Shows a success alert.
+
+#### `warning(opts: Alert): void`
+Shows a warning alert.
+
+#### `error(opts: Alert): void`
+Shows an error alert.
+
+#### `question(opts: Alert): void`
+Shows a question alert.
+
+#### `destroy(): void`
+Removes all alerts.
+
+**Example**:
+
+```Typescript
+import { AlertService } from 'wacom';
+
+constructor(private alertService: AlertService) {}
+
+notify() {
+  this.alertService.success({ text: 'Saved!' });
+}
+```
+
+## [Loader Service](#loader-service)
+
+The `LoaderService` provides global loading indicators.
+
+### Methods
+
+#### `show(opts: Loader | string = 'Loading...'): Loader`
+Displays a loader with optional text or configuration.
+
+#### `destroy(): void`
+Removes all active loaders.
+
+**Example**:
+
+```Typescript
+import { LoaderService } from 'wacom';
+
+constructor(private loader: LoaderService) {}
+
+load() {
+  const l = this.loader.show();
+  // ...do work...
+  l.close?.();
+}
+```
+
+## [Modal Service](#modal-service)
+
+The `ModalService` manages modal dialogs and projects components into them.
+
+### Methods
+
+#### `show(opts: Modal | Type<unknown>): Modal`
+Opens a modal with the given configuration or component type.
+
+#### `small(opts: Modal): void`
+#### `mid(opts: Modal): void`
+#### `big(opts: Modal): void`
+#### `full(opts: Modal): void`
+Convenience helpers to open modals of different sizes.
+
+#### `destroy(): void`
+Closes all open modals.
+
+**Example**:
+
+```Typescript
+import { ModalService } from 'wacom';
+import { MyComponent } from './my.component';
+
+constructor(private modal: ModalService) {}
+
+open() {
+  this.modal.show({ component: MyComponent, size: 'mid' });
+}
+```
+
+## [RTC Service](#rtc-service)
+
+The `RtcService` wraps WebRTC peer connections and local media streams.
+
+### Methods
+
+- `initLocalStream(): Promise<MediaStream>` – initializes and returns the local media stream.
+- `createPeer(id: string): Promise<RTCPeerConnection>` – creates a peer connection and attaches local tracks.
+- `createOffer(id: string): Promise<RTCSessionDescriptionInit>` – creates an SDP offer.
+- `createAnswer(id: string, offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit>` – responds to an offer.
+- `setRemoteAnswer(id: string, answer: RTCSessionDescriptionInit): Promise<void>` – applies a remote answer.
+- `addIceCandidate(id: string, candidate: RTCIceCandidateInit): void` – adds an ICE candidate.
+- `getLocalStream(): MediaStream | null` – returns the initialized local stream.
+- `closePeer(id: string): void` – closes a peer connection.
+- `closeAll(): void` – closes all peers and stops the local stream.
+
+**Example**:
+
+```Typescript
+import { RtcService } from 'wacom';
+
+constructor(private rtc: RtcService) {}
+
+async connect(id: string) {
+  await this.rtc.initLocalStream();
+  await this.rtc.createPeer(id);
+  const offer = await this.rtc.createOffer(id);
+  // send offer to remote peer...
+}
 ```
 
