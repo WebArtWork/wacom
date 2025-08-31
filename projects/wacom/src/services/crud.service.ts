@@ -199,7 +199,9 @@ export abstract class CrudService<
 		}
 
 		const existingDoc = this._docs.find(
-			(d) => this._id(d) === this._id(doc) || d._localId === doc._localId,
+			(d) =>
+				(this._id(doc) && this._id(d) === this._id(doc)) ||
+				d._localId === doc._localId,
 		);
 
 		if (existingDoc) {
