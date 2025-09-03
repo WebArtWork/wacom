@@ -185,8 +185,6 @@ export class HttpService {
 
 		const _url = (opts.url || this.url) + url;
 
-		console.log(_url);
-
 		this.prepare_handle(_url, doc);
 
 		// Using ReplaySubject to allow multiple subscriptions without re-triggering the HTTP request

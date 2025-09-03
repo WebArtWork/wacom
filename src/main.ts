@@ -19,11 +19,7 @@ bootstrapApplication(AppComponent, {
 		importProvidersFrom(BrowserModule, FormsModule),
 		provideZonelessChangeDetection(),
 		provideHttpClient(),
-		provideWacom({
-			http: {
-				url: '',
-			},
-		}),
+		provideWacom(),
 		provideRouter([
 			{
 				path: '',

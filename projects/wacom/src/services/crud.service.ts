@@ -120,7 +120,7 @@ export abstract class CrudService<
 			'docs_' + this._config.name,
 		);
 
-		if (Array.isArray(docs)) {
+		if (docs?.length) {
 			this._docs.length = 0;
 
 			this._docs.push(...docs);
@@ -201,7 +201,7 @@ export abstract class CrudService<
 		const existingDoc = this._docs.find(
 			(d) =>
 				(this._id(doc) && this._id(d) === this._id(doc)) ||
-				d._localId === doc._localId,
+				(doc._localId && d._localId === doc._localId),
 		);
 
 		if (existingDoc) {

@@ -18,6 +18,19 @@ export class AppCrudService extends CrudService<Bird> {
 
 		console.log(this.getDocs());
 
+		this.loaded.then(() => {
+			console.log(this.getDocs());
+
+			console.time('time');
+
+			this.loaded.then(() => {
+				console.timeEnd('time');
+				console.log(this.getDocs());
+			});
+		});
+
+		this.get();
+
 		this.create({ name: 'test', description: 'test' });
 	}
 }
