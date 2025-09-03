@@ -1,6 +1,6 @@
 {
 	"name": "wacom",
-	"version": "20.3.5",
+	"version": "20.3.6",
 	"license": "MIT",
 	"repository": "WebArtWork/wacom",
 	"funding": [
@@ -13,6 +13,23 @@
 			"url": "https://opencollective.com/wawjs"
 		}
 	],
+	"peerDependencies": {
+		"@angular/core": ">=16.0.0",
+		"@angular/common": ">=16.0.0",
+		"@angular/forms": ">=16.0.0",
+		"@angular/platform-browser": ">=16.0.0",
+		"@angular/animations": ">=16.0.0",
+		"@angular/router": ">=16.0.0",
+		"rxjs": ">=7.5.0"
+	},
+	"engines": {
+		"node": ">=18.18.0",
+		"npm": ">=9.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"sideEffects": false,
 	"keywords": [
 		"Angular",
 		"Platform Detection",

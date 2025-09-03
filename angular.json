@@ -79,18 +79,6 @@
 					"options": {
 						"buildTarget": "app:build"
 					}
-				},
-				"test": {
-					"builder": "@angular/build:karma",
-					"options": {
-						"main": "src/test.ts",
-						"tsConfig": "tsconfig.spec.json",
-						"karmaConfig": "karma.conf.js",
-						"inlineStyleLanguage": "scss",
-						"assets": ["src/favicon.ico", "src/assets"],
-						"styles": ["src/styles.scss"],
-						"scripts": []
-					}
 				}
 			}
 		},
@@ -114,14 +102,6 @@
 						}
 					},
 					"defaultConfiguration": "production"
-				},
-				"test": {
-					"builder": "@angular/build:karma",
-					"options": {
-						"main": "projects/wacom/src/test.ts",
-						"tsConfig": "projects/wacom/tsconfig.spec.json",
-						"karmaConfig": "projects/wacom/karma.conf.js"
-					}
 				}
 			}
 		}
