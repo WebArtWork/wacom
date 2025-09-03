@@ -1,7 +1,11 @@
-import { importProvidersFrom, provideZonelessChangeDetection } from '@angular/core';
+import {
+	importProvidersFrom,
+	provideZonelessChangeDetection,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 
+import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { provideWacom } from 'projects/wacom/public-api';
 import { AlertsComponent } from './app/alerts/alerts.component';
@@ -14,7 +18,12 @@ bootstrapApplication(AppComponent, {
 	providers: [
 		importProvidersFrom(BrowserModule, FormsModule),
 		provideZonelessChangeDetection(),
-		provideWacom({}),
+		provideHttpClient(),
+		provideWacom({
+			http: {
+				url: '',
+			},
+		}),
 		provideRouter([
 			{
 				path: '',

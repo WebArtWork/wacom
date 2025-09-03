@@ -49,8 +49,12 @@ export class HttpService {
 		// Initialize HTTP configuration and headers from injected config
 		this._config = {
 			...DEFAULT_HTTP_CONFIG,
-			...config.http,
+			...(config.http || {}),
 		};
+
+		if (typeof this._config.url === 'string') {
+			this.setUrl(this._config.url);
+		}
 
 		if (typeof this._config.headers === 'object') {
 			for (const header in this._config.headers) {
@@ -180,6 +184,8 @@ export class HttpService {
 		}
 
 		const _url = (opts.url || this.url) + url;
+
+		console.log(_url);
 
 		this.prepare_handle(_url, doc);
 
