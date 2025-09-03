@@ -1,211 +1,245 @@
-import { Injectable } from '@angular/core';
+// util.service.ts — Angular 20, zoneless-friendly
+// Modernized in the same style as EmitterService (Maps, helpers, signals).
 
-@Injectable({
-	providedIn: 'root',
-})
+import { Injectable, WritableSignal, signal } from '@angular/core';
+
+type Dict<T = unknown> = Record<string, T>;
+
+@Injectable({ providedIn: 'root' })
 export class UtilService {
-	private variables: { [key: string]: string } = {};
+	// --- CSS variables (persisted) ---
+	private readonly _storageKey = 'css_variables';
+	private _css: Dict<string> = {};
+	private _cssSig = signal<Dict<string>>({});
 
-	private _forms: { [key: string]: any } = {};
+	// --- Forms store ---
+	private _forms = new Map<string, WritableSignal<any>>();
 
-	// global variable use for design purposes
-	var: Record<string, unknown> = {};
+	// --- Global bag for design/debug ---
+	var: Dict = {};
 
 	constructor() {
-		const storedVariables = localStorage.getItem('css_variables');
+		this._loadCss();
+		// apply on boot
+		for (const k of Object.keys(this._css))
+			this._setProperty(k, this._css[k]);
+		this._cssSig.set({ ...this._css });
+	}
 
-		this.variables = storedVariables ? JSON.parse(storedVariables) : {};
+	// ===== Forms Management =====
 
-		for (const key in this.variables) {
-			this.setProperty(key, this.variables[key]);
+	/** Get or create a form state as a writable signal */
+	formSignal<T = any>(id: string): WritableSignal<T> {
+		let s = this._forms.get(id);
+		if (!s) {
+			s = signal<T>({} as T);
+			this._forms.set(id, s);
 		}
+		return s as WritableSignal<T>;
 	}
 
-	/* Forms Management */
-	/**
-	 * Manages form states.
-	 *
-	 * @param id - The form identifier.
-	 * @returns The form state object.
-	 */
-	public form(id: string): any {
-		if (typeof id !== 'string') return {};
-
-		if (!this._forms[id]) this._forms[id] = {};
-
-		return this._forms[id];
+	/** Back-compat: returns the current form object (mutable reference). Prefer formSignal(). */
+	form<T = any>(id: string): T {
+		const s = this.formSignal<T>(id);
+		const v = s();
+		if (v && typeof v === 'object') return v;
+		const obj = {} as T;
+		s.set(obj);
+		return obj;
 	}
 
-	/**
-	 * Validates input values based on the specified type.
-	 *
-	 * @param value - The value to validate.
-	 * @param kind - The type of validation.
-	 * @param extra - Additional validation criteria.
-	 * @returns True if the value is valid, false otherwise.
-	 */
-	public valid(value: any, kind = 'email', extra = 0): boolean {
-		const validators: { [key: string]: (value: any) => boolean } = {
-			email: (value) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,10})+$/.test(value || ''),
-			text: (value) => typeof value === 'string',
-			array: (value) => Array.isArray(value),
-			object: (value) => typeof value === 'object' && !Array.isArray(value) && value !== null,
-			number: (value) => typeof value === 'number',
-			password: (value) => {
+	hasForm(id: string): boolean {
+		return this._forms.has(id);
+	}
+
+	clearForm(id: string): void {
+		this._forms.delete(id);
+	}
+
+	// ===== Validation =====
+
+	valid(
+		value: any,
+		kind:
+			| 'email'
+			| 'text'
+			| 'array'
+			| 'object'
+			| 'number'
+			| 'password' = 'email',
+		extra = 0,
+	): boolean {
+		switch (kind) {
+			case 'email':
+				return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,10})+$/.test(
+					value || '',
+				);
+			case 'text':
+				return typeof value === 'string';
+			case 'array':
+				return Array.isArray(value);
+			case 'object':
+				return (
+					typeof value === 'object' &&
+					!Array.isArray(value) &&
+					value !== null
+				);
+			case 'number':
+				return typeof value === 'number' && Number.isFinite(value);
+			case 'password':
 				if (!value) return false;
 				switch (extra) {
 					case 1:
-						return /^((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9]))/.test(value || '');
+						return /^((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9]))/.test(
+							value,
+						);
 					case 2:
-						return /^(((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,})/.test(value || '');
+						return /^(((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,})/.test(
+							value,
+						);
 					case 3:
-						return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]))(?=.{8,})/.test(value || '');
+						return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]))(?=.{8,})/.test(
+							value,
+						);
 					case 4:
-						return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%&!-_]))(?=.{8,})/.test(value || '');
+						return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%&!\-_]))(?=.{8,})/.test(
+							value,
+						);
 					default:
 						return !!value;
 				}
-			},
-		};
-
-		return validators[kind] ? validators[kind](value) : false;
+		}
 	}
 
-	/**
-	 * Determines the strength of a password.
-	 *
-	 * @param value - The password to evaluate.
-	 * @returns The strength level of the password.
-	 */
-	public level(value = ''): number {
+	/** Password strength: 0..5 */
+	level(value = ''): number {
 		if (!value) return 0;
-
-		let level = 0;
-
-		if (value.length > 8) level++;
-
-		if (/[a-z]/.test(value)) level++;
-
-		if (/[A-Z]/.test(value)) level++;
-
-		if (/[1-9]/.test(value)) level++;
-
-		if (/[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(value)) level++;
-
-		return level;
+		let lvl = 0;
+		if (value.length > 8) lvl++;
+		if (/[a-z]/.test(value)) lvl++;
+		if (/[A-Z]/.test(value)) lvl++;
+		if (/[0-9]/.test(value)) lvl++;
+		if (/[`~!@#$%^&*()_\-+=\[\]{};:'",.<>/?\\|]/.test(value)) lvl++;
+		return lvl;
 	}
 
-	/* CSS Management */
-	/**
-	 * Saves the CSS variables to local storage.
-	 */
-	private save(): void {
-		localStorage.setItem('css_variables', JSON.stringify(this.variables));
-	}
+	// ===== CSS Variables Management =====
 
-	/**
-	 * Sets a CSS variable.
-	 *
-	 * @param key - The CSS variable name.
-	 * @param value - The CSS variable value.
-	 */
-	private setProperty(key: string, value: string): void {
-		document.documentElement.style.setProperty(key, value);
-	}
-
-	/**
-	 * Sets multiple CSS variables.
-	 *
-	 * @param variables - The CSS variables to set.
-	 * @param opts - Options for setting the variables.
-	 */
-	public set(variables: { [key: string]: string }, opts: any = {}): void {
+	/** Set multiple CSS vars. opts: { local?: boolean; host?: string } */
+	setCss(
+		vars: Dict<string>,
+		opts: { local?: boolean; host?: string } | string = {},
+	): void {
 		if (typeof opts === 'string') {
 			opts = opts === 'local' ? { local: true } : { host: opts };
 		}
-		if (opts.host && window.location.host !== opts.host) return;
-		for (const key in variables) {
-			if (opts.local) {
-				this.variables[key] = variables[key];
-			} else if (this.variables[key]) {
+		const { local = false, host } = opts as {
+			local?: boolean;
+			host?: string;
+		};
+		if (
+			host &&
+			typeof window !== 'undefined' &&
+			window.location.host !== host
+		)
+			return;
+
+		for (const k of Object.keys(vars)) {
+			const v = vars[k];
+			if (local) {
+				this._css[k] = v;
+			} else if (this._css[k]) {
+				// keep persisted value unless explicitly local
+				this._setProperty(k, this._css[k]);
 				continue;
 			}
-			this.setProperty(key, variables[key]);
-		}
-		if (opts.local) this.save();
-	}
-
-	/**
-	 * Retrieves the stored CSS variables.
-	 *
-	 * @returns The stored CSS variables.
-	 */
-	public get(): { [key: string]: string } {
-		return this.variables;
-	}
-
-	/**
-	 * Removes specified CSS variables.
-	 *
-	 * @param keys - The keys of the CSS variables to remove.
-	 */
-	public remove(keys: string | string[]): void {
-		const keyArray = Array.isArray(keys) ? keys : keys.split(' ');
-
-		for (const key of keyArray) {
-			delete this.variables[key];
+			this._setProperty(k, v);
 		}
 
-		this.save();
+		if (local) {
+			this._saveCss();
+			this._cssSig.set({ ...this._css });
+		}
 	}
 
-	/**
-	 * Generates an array of sample data.
-	 *
-	 * @param arrLen - The length of the array.
-	 * @param type - The type of data to generate.
-	 * @returns An array of sample data.
-	 */
-	public arr(arrLen = 10, type: string = 'number'): any[] {
-		const arr = [];
+	/** Current persisted CSS vars snapshot */
+	getCss(): Dict<string> {
+		return { ...this._css };
+	}
 
-		for (let i = 0; i < arrLen; i++) {
+	/** Reactive signal with current persisted CSS vars */
+	cssSignal(): WritableSignal<Dict<string>> {
+		return this._cssSig;
+	}
+
+	/** Remove persisted vars by key(s) and save */
+	removeCss(keys: string | string[]): void {
+		const list = Array.isArray(keys) ? keys : keys.split(' ');
+		for (const k of list) delete this._css[k];
+		this._saveCss();
+		this._cssSig.set({ ...this._css });
+	}
+
+	// ===== Generators =====
+
+	arr(len = 10, type: 'number' | 'text' | 'date' | string = 'number'): any[] {
+		const out: any[] = [];
+		for (let i = 0; i < len; i++) {
 			switch (type) {
 				case 'number':
-					arr.push(i + 1);
-
+					out.push(i + 1);
 					break;
 				case 'text':
-					arr.push(this.text());
-
+					out.push(this.text());
 					break;
 				case 'date':
-					arr.push(new Date(new Date().getTime() + i * 86400000));
-
+					out.push(new Date(Date.now() + i * 86_400_000));
 					break;
 				default:
-					arr.push(type);
+					out.push(type);
 			}
 		}
-
-		return arr;
+		return out;
 	}
 
-	/**
-	 * Generates a random text string.
-	 *
-	 * @param length - The length of the text string.
-	 * @returns A random text string.
-	 */
-	public text(length = 10): string {
-		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	text(length = 10): string {
+		const chars =
+			'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		let res = '';
+		for (let i = 0; i < length; i++)
+			res += chars.charAt(Math.floor(Math.random() * chars.length));
+		return res;
+	}
 
-		let result = '';
+	// ===== Internals =====
 
-		for (let i = 0; i < length; i++) {
-			result += characters.charAt(Math.floor(Math.random() * characters.length));
+	private _saveCss(): void {
+		try {
+			if (typeof localStorage !== 'undefined') {
+				localStorage.setItem(
+					this._storageKey,
+					JSON.stringify(this._css),
+				);
+			}
+		} catch {}
+	}
+
+	private _loadCss(): void {
+		try {
+			if (typeof localStorage !== 'undefined') {
+				const raw = localStorage.getItem(this._storageKey);
+				this._css = raw ? JSON.parse(raw) : {};
+			}
+		} catch {
+			this._css = {};
 		}
+	}
 
-		return result;
+	private _setProperty(key: string, value: string): void {
+		try {
+			if (typeof document !== 'undefined') {
+				document.documentElement.style.setProperty(key, value);
+			}
+		} catch {}
 	}
 }

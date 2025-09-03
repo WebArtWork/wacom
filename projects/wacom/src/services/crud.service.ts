@@ -4,6 +4,7 @@ import { CrudDocument, CrudOptions } from '../interfaces/crud.interface';
 import { AlertService } from './alert.service';
 import { BaseService } from './base.service';
 import { CoreService } from './core.service';
+import { EmitterService } from './emitter.service';
 import { HttpService } from './http.service';
 import { NetworkService } from './network.service';
 import { StoreService } from './store.service';
@@ -72,9 +73,11 @@ export abstract class CrudService<
 
 	protected __coreService = inject(CoreService);
 
+	protected __emitterService = inject(EmitterService);
+
 	protected __networkService = inject(NetworkService);
 
-	loaded: Promise<unknown>;
+	loaded: Observable<unknown>;
 
 	constructor(private _config: CrudConfig<Document>) {
 		super();
@@ -83,7 +86,7 @@ export abstract class CrudService<
 
 		this._url += this._config.name;
 
-		this.loaded = this.__coreService.onComplete(
+		this.loaded = this.__emitterService.onComplete(
 			this._config.name + '_loaded',
 		);
 
@@ -100,13 +103,13 @@ export abstract class CrudService<
 			}
 		}
 
-		this.__coreService.on('wipe').subscribe((): void => {
+		this.__emitterService.on('wipe').subscribe((): void => {
 			this.clearDocs();
 
 			this._filterDocuments();
 		});
 
-		this.__coreService.on('wacom_online').subscribe(() => {
+		this.__emitterService.on('wacom_online').subscribe(() => {
 			for (const callback of this._onOnline) {
 				callback();
 			}
@@ -328,13 +331,16 @@ export abstract class CrudService<
 				if (typeof config.page !== 'number') {
 					this._filterDocuments();
 
-					this.__coreService.complete(
+					this.__emitterService.complete(
 						this._config.name + '_loaded',
 						this._docs,
 					);
 				}
 
-				this.__coreService.emit(`${this._config.name}_get`, this._docs);
+				this.__emitterService.emit(
+					`${this._config.name}_get`,
+					this._docs,
+				);
 			},
 			error: (err: unknown): void => {
 				if (options.errCallback) {
@@ -426,11 +432,11 @@ export abstract class CrudService<
 					}
 				}
 
-				this.__coreService.emit(`${this._config.name}_create`, doc);
+				this.__emitterService.emit(`${this._config.name}_create`, doc);
 
-				this.__coreService.emit(`${this._config.name}_list`, doc);
+				this.__emitterService.emit(`${this._config.name}_list`, doc);
 
-				this.__coreService.emit(`${this._config.name}_changed`, doc);
+				this.__emitterService.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
 				doc.__creating = false;
@@ -482,7 +488,7 @@ export abstract class CrudService<
 						});
 					}
 
-					this.__coreService.emit(
+					this.__emitterService.emit(
 						`${this._config.name}_changed`,
 						doc,
 					);
@@ -583,9 +589,9 @@ export abstract class CrudService<
 					}
 				}
 
-				this.__coreService.emit(`${this._config.name}_update`, doc);
+				this.__emitterService.emit(`${this._config.name}_update`, doc);
 
-				this.__coreService.emit(`${this._config.name}_changed`, doc);
+				this.__emitterService.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
 				if (options.errCallback) {
@@ -646,9 +652,9 @@ export abstract class CrudService<
 					}
 				}
 
-				this.__coreService.emit(`${this._config.name}_unique`, doc);
+				this.__emitterService.emit(`${this._config.name}_unique`, doc);
 
-				this.__coreService.emit(`${this._config.name}_changed`, doc);
+				this.__emitterService.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
 				if (options.errCallback) {
@@ -724,11 +730,11 @@ export abstract class CrudService<
 					}
 				}
 
-				this.__coreService.emit(`${this._config.name}_delete`, doc);
+				this.__emitterService.emit(`${this._config.name}_delete`, doc);
 
-				this.__coreService.emit(`${this._config.name}_list`, doc);
+				this.__emitterService.emit(`${this._config.name}_list`, doc);
 
-				this.__coreService.emit(`${this._config.name}_changed`, doc);
+				this.__emitterService.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
 				if (options.errCallback) {
@@ -891,7 +897,7 @@ export abstract class CrudService<
 			callback();
 		}
 
-		this.__coreService.emit(`${this._config.name}_filtered`);
+		this.__emitterService.emit(`${this._config.name}_filtered`);
 	}
 
 	private _updateModified(

@@ -1,6 +1,10 @@
-import { Inject, Injectable, Optional } from '@angular/core';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config.interface';
-import { CoreService } from './core.service';
+import { inject, Inject, Injectable, Optional } from '@angular/core';
+import {
+	Config,
+	CONFIG_TOKEN,
+	DEFAULT_CONFIG,
+} from '../interfaces/config.interface';
+import { EmitterService } from './emitter.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -14,10 +18,7 @@ export class SocketService {
 
 	private _opts: any = {};
 
-	constructor(
-		@Inject(CONFIG_TOKEN) @Optional() private _config: Config,
-		private _core: CoreService,
-	) {
+	constructor(@Inject(CONFIG_TOKEN) @Optional() private _config: Config) {
 		this._config = { ...DEFAULT_CONFIG, ...(this._config || {}) };
 
 		if (!this._config.io) {
@@ -64,31 +65,32 @@ export class SocketService {
 	 */
 	private load(): void {
 		if (this._config.io) {
-			const ioFunc = this._config.io.default ? this._config.io.default : this._config.io;
+			const ioFunc = this._config.io.default
+				? this._config.io.default
+				: this._config.io;
 
 			this._io = ioFunc(this._url, this._opts);
 
 			this._io.on('connect', () => {
 				this._connected = true;
-				this._core.complete('socket');
+
+				this._emitterService.complete('socket');
 			});
 
 			this._io.on('disconnect', (reason: any) => {
 				this._connected = false;
-				if (this._core && typeof this._core.emit === 'function') {
-					this._core.emit('socket_disconnect', reason);
-				} else {
-					console.warn('Socket disconnected', reason);
-				}
+
+				this._emitterService.emit('socket_disconnect', reason);
+
+				console.warn('Socket disconnected', reason);
 			});
 
 			this._io.on('error', (err: any) => {
 				this._connected = false;
-				if (this._core && typeof this._core.emit === 'function') {
-					this._core.emit('socket_error', err);
-				} else {
-					console.warn('Socket error', err);
-				}
+
+				this._emitterService.emit('socket_error', err);
+
+				console.warn('Socket error', err);
 			});
 		}
 	}
@@ -154,4 +156,6 @@ export class SocketService {
 
 		this._io.emit(to, message, room);
 	}
+
+	private _emitterService = inject(EmitterService);
 }

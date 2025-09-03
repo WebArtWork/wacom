@@ -40,6 +40,7 @@ export * from './src/services/base.service';
 export * from './src/services/core.service';
 export * from './src/services/crud.service';
 export * from './src/services/dom.service';
+export * from './src/services/emitter.service';
 export * from './src/services/file.service';
 export * from './src/services/http.service';
 export * from './src/services/loader.service';

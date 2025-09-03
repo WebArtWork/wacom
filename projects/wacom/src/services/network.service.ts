@@ -6,7 +6,7 @@ import {
 	NetworkConfig,
 	NetworkStatus,
 } from '../interfaces/network.interface';
-import { CoreService } from './core.service';
+import { EmitterService } from './emitter.service';
 
 @Injectable({ providedIn: 'root' })
 export class NetworkService {
@@ -14,8 +14,6 @@ export class NetworkService {
 	private _status = signal<NetworkStatus>(navigator.onLine ? 'poor' : 'none');
 	private _latencyMs = signal<number | null>(null);
 	private _isOnline = signal<boolean>(navigator.onLine);
-
-	private _coreService = inject(CoreService);
 
 	/** Public read-only signals. */
 	readonly status = this._status.asReadonly();
@@ -82,7 +80,7 @@ export class NetworkService {
 			if (this._status() !== 'none') {
 				this._status.set('none');
 
-				this._coreService.emit('wacom_offline');
+				this._emitterService.emit('wacom_offline');
 			}
 
 			return;
@@ -94,12 +92,12 @@ export class NetworkService {
 			if (this._status() !== 'good') {
 				this._status.set('good');
 
-				this._coreService.emit('wacom_online');
+				this._emitterService.emit('wacom_online');
 			}
 		} else if (this._status() !== 'poor') {
 			this._status.set('poor');
 
-			this._coreService.emit('wacom_online');
+			this._emitterService.emit('wacom_online');
 		}
 	}
 
@@ -190,4 +188,6 @@ export class NetworkService {
 	}
 
 	private _config: NetworkConfig;
+
+	private _emitterService = inject(EmitterService);
 }

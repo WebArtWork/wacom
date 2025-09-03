@@ -1,6 +1,12 @@
-import { Inject, Injectable, PLATFORM_ID, Signal, WritableSignal, signal } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import {
+	Injectable,
+	Signal,
+	WritableSignal,
+	inject,
+	signal,
+} from '@angular/core';
 import { Selectitem } from '../interfaces/select.item.interface';
+import { EmitterService } from './emitter.service';
 
 // Add capitalize method to String prototype if it doesn't already exist
 if (!String.prototype.capitalize) {
@@ -23,9 +29,13 @@ declare global {
 	providedIn: 'root',
 })
 export class CoreService {
-	deviceID = localStorage.getItem('deviceID') || (typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : this.UUID());
+	deviceID =
+		localStorage.getItem('deviceID') ||
+		(typeof crypto?.randomUUID === 'function'
+			? crypto.randomUUID()
+			: this.UUID());
 
-	constructor(@Inject(PLATFORM_ID) private platformId: boolean) {
+	constructor() {
 		localStorage.setItem('deviceID', this.deviceID);
 
 		this.detectDevice();
@@ -49,11 +59,14 @@ export class CoreService {
 	 * @returns A string containing a UUID v4.
 	 */
 	UUID(): string {
-		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c: string) => {
-			const r = (Math.random() * 16) | 0;
-			const v = c === 'x' ? r : (r & 0x3) | 0x8;
-			return v.toString(16);
-		});
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+			/[xy]/g,
+			(c: string) => {
+				const r = (Math.random() * 16) | 0;
+				const v = c === 'x' ? r : (r & 0x3) | 0x8;
+				return v.toString(16);
+			},
+		);
 	}
 
 	/**
@@ -68,7 +81,12 @@ export class CoreService {
 		if (typeof obj !== 'object' || obj === null) return [];
 		const arr = [];
 		for (const each in obj) {
-			if (obj.hasOwnProperty(each) && (obj[each] || typeof obj[each] === 'number' || typeof obj[each] === 'boolean')) {
+			if (
+				obj.hasOwnProperty(each) &&
+				(obj[each] ||
+					typeof obj[each] === 'number' ||
+					typeof obj[each] === 'boolean')
+			) {
 				if (holder) {
 					arr.push(each);
 				} else {
@@ -87,12 +105,18 @@ export class CoreService {
 	 * @param {string} [compareField='_id'] - The field to use for comparison.
 	 * @returns {any[]} The modified `fromArray` with elements removed.
 	 */
-	splice(removeArray: any[], fromArray: any[], compareField: string = '_id'): any[] {
+	splice(
+		removeArray: any[],
+		fromArray: any[],
+		compareField: string = '_id',
+	): any[] {
 		if (!Array.isArray(removeArray) || !Array.isArray(fromArray)) {
 			return fromArray;
 		}
 
-		const removeSet = new Set(removeArray.map((item) => item[compareField]));
+		const removeSet = new Set(
+			removeArray.map((item) => item[compareField]),
+		);
 		return fromArray.filter((item) => !removeSet.has(item[compareField]));
 	}
 
@@ -105,7 +129,10 @@ export class CoreService {
 	 */
 	ids2id(...args: string[]): string {
 		args.sort((a, b) => {
-			if (Number(a.toString().substring(0, 8)) > Number(b.toString().substring(0, 8))) {
+			if (
+				Number(a.toString().substring(0, 8)) >
+				Number(b.toString().substring(0, 8))
+			) {
 				return 1;
 			}
 			return -1;
@@ -124,7 +151,11 @@ export class CoreService {
 	 * @param {() => void} [cb] - The callback function to execute after the delay.
 	 * @param {number} [time=1000] - The delay time in milliseconds.
 	 */
-	afterWhile(doc: string | object | (() => void), cb?: () => void, time: number = 1000): void {
+	afterWhile(
+		doc: string | object | (() => void),
+		cb?: () => void,
+		time: number = 1000,
+	): void {
 		if (typeof doc === 'function') {
 			cb = doc as () => void;
 			doc = 'common';
@@ -136,7 +167,8 @@ export class CoreService {
 				this._afterWhile[doc] = window.setTimeout(cb, time);
 			} else if (typeof doc === 'object') {
 				clearTimeout((doc as { __afterWhile: number }).__afterWhile);
-				(doc as { __afterWhile: number }).__afterWhile = window.setTimeout(cb, time);
+				(doc as { __afterWhile: number }).__afterWhile =
+					window.setTimeout(cb, time);
 			} else {
 				console.warn('badly configured after while');
 			}
@@ -152,10 +184,20 @@ export class CoreService {
 	 */
 	copy(from: any, to: any) {
 		for (const each in from) {
-			if (typeof from[each] !== 'object' || from[each] instanceof Date || Array.isArray(from[each]) || from[each] === null) {
+			if (
+				typeof from[each] !== 'object' ||
+				from[each] instanceof Date ||
+				Array.isArray(from[each]) ||
+				from[each] === null
+			) {
 				to[each] = from[each];
 			} else {
-				if (typeof to[each] !== 'object' || to[each] instanceof Date || Array.isArray(to[each]) || to[each] === null) {
+				if (
+					typeof to[each] !== 'object' ||
+					to[each] instanceof Date ||
+					Array.isArray(to[each]) ||
+					to[each] === null
+				) {
 					to[each] = {};
 				}
 
@@ -170,12 +212,16 @@ export class CoreService {
 	 * Detects the device type based on the user agent.
 	 */
 	detectDevice(): void {
-		const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+		const userAgent =
+			navigator.userAgent || navigator.vendor || (window as any).opera;
 		if (/windows phone/i.test(userAgent)) {
 			this.device = 'Windows Phone';
 		} else if (/android/i.test(userAgent)) {
 			this.device = 'Android';
-		} else if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {
+		} else if (
+			/iPad|iPhone|iPod/.test(userAgent) &&
+			!(window as any).MSStream
+		) {
 			this.device = 'iOS';
 		} else {
 			this.device = 'Web';
@@ -187,7 +233,11 @@ export class CoreService {
 	 * @returns {boolean} - Returns true if the device is a mobile device.
 	 */
 	isMobile(): boolean {
-		return this.device === 'Windows Phone' || this.device === 'Android' || this.device === 'iOS';
+		return (
+			this.device === 'Windows Phone' ||
+			this.device === 'Android' ||
+			this.device === 'iOS'
+		);
 	}
 
 	/**
@@ -262,155 +312,6 @@ export class CoreService {
 		this.setVersion();
 	}
 
-	// Signal management
-	private _signals: Record<string, Subject<any>> = {};
-
-	/**
-	 * Emits a signal, optionally passing data to the listeners.
-	 * @param signal - The name of the signal to emit.
-	 * @param data - Optional data to pass to the listeners.
-	 */
-	emit(signal: string, data?: any): void {
-		if (!this._signals[signal]) {
-			this._signals[signal] = new Subject<any>();
-		}
-
-		this._signals[signal].next(data);
-	}
-
-	/**
-	 * Returns an Observable that emits values when the specified signal is emitted.
-	 * Multiple components or services can subscribe to this Observable to be notified of the signal.
-	 * @param signal - The name of the signal to listen for.
-	 * @returns An Observable that emits when the signal is emitted.
-	 */
-	on(signal: string): Observable<any> {
-		if (!this._signals[signal]) {
-			this._signals[signal] = new Subject<any>();
-		}
-
-		return this._signals[signal].asObservable();
-	}
-
-	/**
-	 * Completes the Subject for a specific signal, effectively stopping any future emissions.
-	 * This also unsubscribes all listeners for the signal.
-	 * @param signal - The name of the signal to stop.
-	 */
-	off(signal: string): void {
-		if (!this._signals[signal]) return;
-		this._signals[signal].complete();
-		delete this._signals[signal];
-	}
-
-	// Await management
-	private _completed: Record<string, unknown> = {};
-
-	private _completeResolvers: Record<string, ((doc: unknown) => void)[]> = {};
-
-	/**
-	 * Marks a task as complete.
-	 * @param task - The task to mark as complete, identified by a string.
-	 */
-	complete(task: string, document: unknown = true): void {
-		this._completed[task] = document;
-
-		if (this._completeResolvers[task]) {
-			this._completeResolvers[task].forEach((resolve) => resolve(document));
-
-			this._completeResolvers[task] = [];
-		}
-	}
-
-	/**
-	 * Waits for one or more tasks to be marked as complete.
-	 *
-	 * @param {string | string[]} tasks - The task or array of tasks to wait for.
-	 * @returns {Promise<unknown>} A promise that resolves when all specified tasks are complete.
-	 * - If a single task is provided, resolves with its completion result.
-	 * - If multiple tasks are provided, resolves with an array of results in the same order.
-	 *
-	 * @remarks
-	 * If any task is not yet completed, a resolver is attached. The developer is responsible for managing
-	 * resolver cleanup if needed. Resolvers remain after resolution and are not removed automatically.
-	 */
-	onComplete(tasks: string | string[]): Promise<unknown> {
-		if (typeof tasks === 'string') {
-			tasks = [tasks];
-		}
-
-		if (this._isCompleted(tasks)) {
-			return Promise.resolve(tasks.length > 1 ? tasks.map((task) => this._completed[task]) : this._completed[tasks[0]]);
-		}
-
-		return new Promise((resolve) => {
-			for (const task of tasks) {
-				if (!this._completeResolvers[task]) {
-					this._completeResolvers[task] = [];
-				}
-
-				this._completeResolvers[task].push(this._allCompleted(tasks, resolve));
-			}
-		});
-	}
-
-	/**
-	 * Returns a resolver function that checks if all given tasks are completed,
-	 * and if so, calls the provided resolve function with their results.
-	 *
-	 * @param {string[]} tasks - The list of task names to monitor for completion.
-	 * @param {(value: unknown) => void} resolve - The resolver function to call once all tasks are complete.
-	 * @returns {(doc: unknown) => void} A function that can be registered as a resolver for each task.
-	 *
-	 * @remarks
-	 * This function does not manage or clean up resolvers. It assumes the developer handles any potential duplicates or memory concerns.
-	 */
-	private _allCompleted(tasks: string[], resolve: (value: unknown) => void): (doc: unknown) => void {
-		return (doc: unknown) => {
-			if (this._isCompleted(tasks)) {
-				resolve(tasks.length > 1 ? tasks.map((task) => this._completed[task]) : this._completed[tasks[0]]);
-			}
-		};
-	}
-
-	/**
-	 * Checks whether all specified tasks have been marked as completed.
-	 *
-	 * @param {string[]} tasks - The array of task names to check.
-	 * @returns {boolean} `true` if all tasks are completed, otherwise `false`.
-	 */
-	private _isCompleted(tasks: string[]): boolean {
-		for (const task of tasks) {
-			if (!this._completed[task]) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Checks if a task is completed.
-	 * @param task - The task to check, identified by a string.
-	 * @returns True if the task is completed, false otherwise.
-	 */
-	completed(task: string): unknown {
-		return this._completed[task];
-	}
-
-	/**
-	 * Clears the completed state for a specific task.
-	 *
-	 * This removes the task from the internal `_completed` store,
-	 * allowing it to be awaited again in the future if needed.
-	 * It does not affect pending resolvers or trigger any callbacks.
-	 *
-	 * @param task - The task identifier to clear from completed state.
-	 */
-	clearCompleted(task: string) {
-		delete this._completed[task];
-	}
-
 	// Locking management
 	private _locked: Record<string, boolean> = {};
 	private _unlockResolvers: Record<string, (() => void)[]> = {};
@@ -479,15 +380,19 @@ export class CoreService {
 
 		this.linkRealCollectionName[name] = realName || name;
 
-		this.onComplete(name.toLowerCase() + '_loaded').then(() => {
-			this.linkIds[name] = reset();
-		});
+		this._emitterService
+			.onComplete(name.toLowerCase() + '_loaded')
+			.subscribe(() => {
+				this.linkIds[name] = reset();
+			});
 
-		this.on(name.toLowerCase() + '_changed').subscribe(() => {
-			this.linkIds[name].splice(0, this.linkIds[name].length);
+		this._emitterService
+			.on(name.toLowerCase() + '_changed')
+			.subscribe(() => {
+				this.linkIds[name].splice(0, this.linkIds[name].length);
 
-			this.linkIds[name].push(...reset());
-		});
+				this.linkIds[name].push(...reset());
+			});
 	}
 
 	// Angular Signals //
@@ -512,7 +417,10 @@ export class CoreService {
 	 * console.log(sig().name); // 'Alice'
 	 * console.log(sig().score()); // 42 — field is now a signal
 	 */
-	toSignal<Document>(document: Document, signalFields: Record<string, (doc: Document) => unknown> = {}): Signal<Document> {
+	toSignal<Document>(
+		document: Document,
+		signalFields: Record<string, (doc: Document) => unknown> = {},
+	): Signal<Document> {
 		if (Object.keys(signalFields).length) {
 			const fields: Record<string, Signal<unknown>> = {};
 
@@ -545,7 +453,10 @@ export class CoreService {
 	 *   score: (u) => u.score,
 	 * });
 	 */
-	toSignalsArray<Document>(arr: Document[], signalFields: Record<string, (doc: Document) => unknown> = {}): Signal<Document>[] {
+	toSignalsArray<Document>(
+		arr: Document[],
+		signalFields: Record<string, (doc: Document) => unknown> = {},
+	): Signal<Document>[] {
 		return arr.map((obj) => this.toSignal(obj, signalFields));
 	}
 
@@ -561,7 +472,11 @@ export class CoreService {
 	 *
 	 * @returns {void}
 	 */
-	pushSignal<Document>(signals: Signal<Document>[], item: Document, signalFields: Record<string, (doc: Document) => unknown> = {}): void {
+	pushSignal<Document>(
+		signals: Signal<Document>[],
+		item: Document,
+		signalFields: Record<string, (doc: Document) => unknown> = {},
+	): void {
 		signals.push(this.toSignal(item, signalFields));
 	}
 
@@ -589,7 +504,9 @@ export class CoreService {
 	 * @param {string} field - The object field to use for tracking (e.g., '_id').
 	 * @returns {(index: number, sig: Signal<Document>) => unknown} TrackBy function for Angular.
 	 */
-	trackBySignalField<Document extends Record<string, unknown>>(field: string) {
+	trackBySignalField<Document extends Record<string, unknown>>(
+		field: string,
+	) {
 		return (_: number, sig: Signal<Document>) => sig()[field];
 	}
 
@@ -606,7 +523,9 @@ export class CoreService {
 		value: unknown,
 		field = '_id',
 	): Signal<Document> | undefined {
-		return signals.find((sig) => sig()[field] === value) as Signal<Document>;
+		return signals.find(
+			(sig) => sig()[field] === value,
+		) as Signal<Document>;
 	}
 
 	/**
@@ -624,8 +543,14 @@ export class CoreService {
 		updater: (val: Document) => Document,
 		field: string,
 	): void {
-		const sig = this.findSignalByField<Document>(signals, value, field) as WritableSignal<Document>;
+		const sig = this.findSignalByField<Document>(
+			signals,
+			value,
+			field,
+		) as WritableSignal<Document>;
 
 		if (sig) sig.update(updater);
 	}
+
+	private _emitterService = inject(EmitterService);
 }
