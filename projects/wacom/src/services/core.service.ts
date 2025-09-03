@@ -1,3 +1,4 @@
+// Core utilities and helpers for the Wacom app
 import {
 	Injectable,
 	Signal,
@@ -5,7 +6,6 @@ import {
 	inject,
 	signal,
 } from '@angular/core';
-import { Selectitem } from '../interfaces/select.item.interface';
 import { EmitterService } from './emitter.service';
 
 // Add capitalize method to String prototype if it doesn't already exist
@@ -368,31 +368,6 @@ export class CoreService {
 	 */
 	locked(which: string): boolean {
 		return !!this._locked[which];
-	}
-
-	// Linking management
-	linkCollections: string[] = [];
-	linkRealCollectionName: Record<string, string> = {};
-	linkIds: Record<string, Selectitem[]> = {};
-
-	addLink(name: string, reset: () => Selectitem[], realName = ''): void {
-		this.linkCollections.push(name);
-
-		this.linkRealCollectionName[name] = realName || name;
-
-		this._emitterService
-			.onComplete(name.toLowerCase() + '_loaded')
-			.subscribe(() => {
-				this.linkIds[name] = reset();
-			});
-
-		this._emitterService
-			.on(name.toLowerCase() + '_changed')
-			.subscribe(() => {
-				this.linkIds[name].splice(0, this.linkIds[name].length);
-
-				this.linkIds[name].push(...reset());
-			});
 	}
 
 	// Angular Signals //

@@ -6,7 +6,7 @@ Module which has common services and components which can be used on all project
 
 [MIT](LICENSE)
 
-## Instalation
+## Installation
 
 ```bash
 $ npm i --save wacom
@@ -44,6 +44,20 @@ export const appConfig = {
 				warning: "#ffa726",
 				question: "#fff59d",
 			},
+			// other optional configs
+			store: { prefix: "waStore" },
+			meta: {
+				useTitleSuffix: false,
+				warnMissingGuard: true,
+				defaults: { links: {} },
+			},
+			alert: {},
+			loader: {},
+			modal: {},
+			network: {},
+			// enable and configure sockets if needed
+			socket: false,
+			io: undefined,
 		}),
 	],
 };
@@ -65,24 +79,83 @@ You can reference these variables in your global styles to keep the design consi
 
 ## Services
 
-| Name                                                               |                             Description                             |
-| ------------------------------------------------------------------ | :-----------------------------------------------------------------: |
-| [**`Core`**](https://www.npmjs.com/package/wacom#core-service)     |     Common supportive function which can be used in any service     |
-| [**`Base`**](https://www.npmjs.com/package/wacom#base-service)     |     Tracks timestamps and can refresh to the current time           |
-| [**`Http`**](https://www.npmjs.com/package/wacom#http-service)     |                      Http layer for HttpClient                      |
-| [**`Store`**](https://www.npmjs.com/package/wacom#store-service)   |  Service responsible for keeping information on the device          |
-| [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service)     |             Website meta tags management within router              |
-| [**`Crud`**](https://www.npmjs.com/package/wacom#crud-service)     | Provides basic CRUD operations for managing data with HTTP services |
-| [**`File`**](https://www.npmjs.com/package/wacom#file-service)     |  Handles file uploads, image processing, and file management tasks  |
-| [**`Socket`**](https://www.npmjs.com/package/wacom#socket-service) |   Manages WebSocket connections and real-time data communication    |
-| [**`Time`**](https://www.npmjs.com/package/wacom#time-service)     |  Provides utilities for date and time manipulation and formatting   |
-| [**`Dom`**](https://www.npmjs.com/package/wacom#dom-service)       |     Facilitates DOM manipulation and dynamic component loading      |
-| [**`Network`**](https://www.npmjs.com/package/wacom#network-service) | Monitors network connectivity and latency                          |
-| [**`Alert`**](https://www.npmjs.com/package/wacom#alert-service)   |   Displays configurable alert messages                              |
-| [**`Loader`**](https://www.npmjs.com/package/wacom#loader-service) |   Shows and manages loading indicators                              |
-| [**`Modal`**](https://www.npmjs.com/package/wacom#modal-service)   |   Creates and controls modal dialogs                                |
-| [**`RTC`**](https://www.npmjs.com/package/wacom#rtc-service)       |   Wraps WebRTC peer connections and local media streams             |
-| [**`Util`**](https://www.npmjs.com/package/wacom#util-service)     |   Utility methods for forms, validation, and CSS variables          |
+| Name                                                                 |                             Description                             |
+| -------------------------------------------------------------------- | :-----------------------------------------------------------------: |
+| [**`Core`**](https://www.npmjs.com/package/wacom#core-service)       |     Common supportive function which can be used in any service     |
+| [**`Base`**](https://www.npmjs.com/package/wacom#base-service)       |        Tracks timestamps and can refresh to the current time        |
+| [**`Http`**](https://www.npmjs.com/package/wacom#http-service)       |                      Http layer for HttpClient                      |
+| [**`Store`**](https://www.npmjs.com/package/wacom#store-service)     |      Service responsible for keeping information on the device      |
+| [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service)       |             Website meta tags management within router              |
+| [**`Crud`**](https://www.npmjs.com/package/wacom#crud-service)       | Provides basic CRUD operations for managing data with HTTP services |
+| [**`File`**](https://www.npmjs.com/package/wacom#file-service)       |  Handles file uploads, image processing, and file management tasks  |
+| [**`Socket`**](https://www.npmjs.com/package/wacom#socket-service)   |   Manages WebSocket connections and real-time data communication    |
+| [**`Time`**](https://www.npmjs.com/package/wacom#time-service)       |  Provides utilities for date and time manipulation and formatting   |
+| [**`Dom`**](https://www.npmjs.com/package/wacom#dom-service)         |     Facilitates DOM manipulation and dynamic component loading      |
+| [**`Network`**](https://www.npmjs.com/package/wacom#network-service) |              Monitors network connectivity and latency              |
+| [**`Alert`**](https://www.npmjs.com/package/wacom#alert-service)     |                Displays configurable alert messages                 |
+| [**`Loader`**](https://www.npmjs.com/package/wacom#loader-service)   |                Shows and manages loading indicators                 |
+| [**`Modal`**](https://www.npmjs.com/package/wacom#modal-service)     |                 Creates and controls modal dialogs                  |
+| [**`RTC`**](https://www.npmjs.com/package/wacom#rtc-service)         |        Wraps WebRTC peer connections and local media streams        |
+| [**`Util`**](https://www.npmjs.com/package/wacom#util-service)       |      Utility methods for forms, validation, and CSS variables       |
+| [**`Emitter`**](#emitter-service)                                    |            Lightweight app-wide event and task signaling            |
+
+## [Emitter Service](#emitter-service)
+
+The `EmitterService` provides a lightweight event bus and completion signaling built on Angular Signals and RxJS.
+
+### Events
+
+- `emit(id: string, data?: any): void`: Publish an event on a channel.
+- `on<T = any>(id: string): Observable<T>`: Subscribe to a channel (hot, no replay).
+- `off(id: string): void`: Close and remove a channel.
+- `offAll(): void`: Close and remove all channels.
+- `has(id: string): boolean`: Check if a channel exists.
+
+Example:
+
+```ts
+import { EmitterService } from 'wacom';
+
+constructor(private emitter: EmitterService) {}
+
+ngOnInit() {
+  this.emitter.on<string>('user:login').subscribe((uid) => {
+    console.log('Logged in:', uid);
+  });
+}
+
+login(uid: string) {
+  this.emitter.emit('user:login', uid);
+}
+```
+
+### Completion tasks
+
+Track once-off tasks and await their completion.
+
+- `complete<T = any>(task: string, value: T = true): void`: Mark task done with payload.
+- `clearCompleted(task: string): void`: Reset completion state.
+- `completed(task: string): any | undefined`: Read current payload or `undefined`.
+- `isCompleted(task: string): boolean`: Convenience check.
+- `onComplete(tasks: string | string[], opts?: { mode?: 'all' | 'any'; timeoutMs?: number; abort?: AbortSignal; }): Observable<any | any[]>`: Await task(s) completion.
+
+Example:
+
+```ts
+// Somewhere that waits for a single task
+this.emitter.onComplete("profile:loaded").subscribe(() => {
+	// safe to render UI
+});
+
+// Somewhere that fulfills it
+await api.loadProfile();
+this.emitter.complete("profile:loaded");
+
+// Wait for any of several tasks
+this.emitter
+	.onComplete(["a", "b"], { mode: "any", timeoutMs: 5000 })
+	.subscribe((which) => console.log("First done:", which));
+```
 
 ## [Core Service](#core-service)
 
@@ -369,179 +442,6 @@ Sets the date version and updates the combined version string.
 ```Typescript
 coreService.setDateVersion('2023-01-01');
 ```
-
-### Signal Management
-
-The `CoreService` provides methods for managing signals (events) to facilitate communication between different parts of the application. This allows multiple components or services to subscribe to signals and be notified when those signals are emitted.
-
-#### Methods
-
-##### `emit(signal: string, data?: any): void`
-
-Emits a signal, optionally passing data to the listeners.
-
-- **Parameters**:
-    - `signal` (string): The name of the signal to emit.
-    - `data` (any): Optional data to pass to the listeners.
-
-- **Example**:
-  coreService.emit('mySignal', { key: 'value' });
-
-##### `on(signal: string): Observable<any>`
-
-Returns an Observable that emits values when the specified signal is emitted. Multiple components or services can subscribe to this Observable to be notified of the signal.
-
-- **Parameters**:
-    - `signal` (string): The name of the signal to listen for.
-
-- **Returns**:
-    - `Observable<any>`: An Observable that emits when the signal is emitted.
-
-- **Example**:
-
-```Typescript
-const subscription = coreService.on('mySignal').subscribe(data => {
-	console.log('Signal received:', data);
-});
-// To unsubscribe from the signal
-subscription.unsubscribe();
-```
-
-##### `off(signal: string): void`
-
-Completes the Subject for a specific signal, effectively stopping any future emissions. This also unsubscribes all listeners for the signal.
-
-- **Parameters**:
-    - `signal` (string): The name of the signal to stop.
-
-- **Example**:
-
-```Typescript
-coreService.off('mySignal');
-```
-
-#### Example Usage
-
-Here's an example demonstrating how to use the signal management methods in `CoreService`:
-
-```Typescript
-import { CoreService } from 'wacom';
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
-export class AppComponent implements OnInit, OnDestroy {
-  private signalSubscription: Subscription;
-
-  constructor(private coreService: CoreService) {}
-
-  ngOnInit() {
-    this.setupSignalListeners();
-    this.coreService.emit('update', { message: 'Data updated' });
-  }
-
-  setupSignalListeners() {
-    this.signalSubscription = this.coreService.on('update').subscribe(data => {
-      this.handleUpdate(data);
-    });
-  }
-
-  handleUpdate(data: any) {
-    console.log('Update signal received:', data);
-  }
-
-  ngOnDestroy() {
-    if (this.signalSubscription) {
-      this.signalSubscription.unsubscribe();
-    }
-    this.coreService.off('update');
-  }
-}
-```
-
-In this example:
-
-1. The `on` method returns an `Observable` that emits when the `update` signal is emitted.
-2. The component subscribes to the `Observable` to handle the emitted data.
-3. The `emit` method is used to emit the `update` signal with some data.
-4. The `off` method completes the `Subject` for the `update` signal, stopping any future emissions and cleaning up the signal.
-
-### Await Management
-
-The `CoreService` provides methods for managing the completion of tasks. This is useful in scenarios where you need to wait for certain tasks to be completed before proceeding.
-
-#### Methods
-
-##### `complete(task: string): void`
-
-Marks a task as complete.
-
-- **Parameters**:
-    - `task` (string): The task to mark as complete, identified by a string.
-
-- **Example**:
-  coreService.complete('myTask');
-
-##### `onComplete(task: string): Promise<void>`
-
-Returns a Promise that resolves when the specified task is complete. This is useful for waiting until a task is completed.
-
-- **Parameters**:
-    - `task` (string): The task to watch for completion, identified by a string.
-
-- **Returns**:
-    - `Promise<void>`: A Promise that resolves when the task is complete.
-
-- **Example**:
-  coreService.onComplete('myTask').then(() => {
-  console.log('Task is now complete');
-  });
-
-##### `completed(task: string): boolean`
-
-Checks if a task is completed.
-
-- **Parameters**:
-    - `task` (string): The task to check, identified by a string.
-
-- **Returns**:
-    - `boolean`: True if the task is completed, false otherwise.
-
-- **Example**:
-  if (coreService.completed('myTask')) {
-  console.log('Task is completed');
-  } else {
-  console.log('Task is not yet completed');
-  }
-
-#### Example Usage
-
-Here's an example demonstrating how to use the await management methods in `CoreService`:
-
-```Typescript
-import { CoreService } from 'wacom';
-export class AppComponent {
-  constructor(private coreService: CoreService) {
-    this.checkTaskCompletion();
-  }
-
-  async checkTaskCompletion() {
-    console.log('Starting task...');
-
-    setTimeout(() => {
-      this.coreService.complete('task1');
-      console.log('Task completed');
-    }, 2000);
-
-    await this.coreService.onComplete('task1');
-    console.log('Task is now acknowledged as complete');
-  }
-}
-```
-
-In this example:
-
-1. The `complete` method is used to mark a task identified by `'task1'` as complete.
-2. The `onComplete` method returns a Promise that resolves when the task is marked as complete, allowing the code to wait until the task is acknowledged as complete.
-3. The `completed` method checks if a task is completed, returning a boolean value.
 
 ### Locking Management
 
@@ -1600,7 +1500,14 @@ interface CrudDocument {
 
 ```typescript
 import { Injectable } from "@angular/core";
-import { AlertService, CoreService, HttpService, StoreService, CrudService, CrudDocument } from "wacom";
+import {
+	AlertService,
+	CoreService,
+	HttpService,
+	StoreService,
+	CrudService,
+	CrudDocument,
+} from "wacom";
 
 export interface Work extends CrudDocument {
 	name: string;
@@ -1613,7 +1520,12 @@ export interface Work extends CrudDocument {
 export class WorkService extends CrudService<Work> {
 	works: Work[] = this.getDocs();
 
-	constructor(_http: HttpService, _store: StoreService, _alert: AlertService, _core: CoreService) {
+	constructor(
+		_http: HttpService,
+		_store: StoreService,
+		_alert: AlertService,
+		_core: CoreService,
+	) {
 		super(
 			{
 				name: "work",
@@ -2448,24 +2360,31 @@ The `AlertService` displays configurable alert messages such as information, suc
 ### Methods
 
 #### `show(opts: Alert | string): Alert`
+
 Displays a customizable alert. Passing a string uses it as the alert text.
 
 #### `info(opts: Alert): void`
+
 Shows an informational alert.
 
 #### `success(opts: Alert): void`
+
 Shows a success alert.
 
 #### `warning(opts: Alert): void`
+
 Shows a warning alert.
 
 #### `error(opts: Alert): void`
+
 Shows an error alert.
 
 #### `question(opts: Alert): void`
+
 Shows a question alert.
 
 #### `destroy(): void`
+
 Removes all alerts.
 
 **Example**:
@@ -2487,9 +2406,11 @@ The `LoaderService` provides global loading indicators.
 ### Methods
 
 #### `show(opts: Loader | string = 'Loading...'): Loader`
+
 Displays a loader with optional text or configuration.
 
 #### `destroy(): void`
+
 Removes all active loaders.
 
 **Example**:
@@ -2513,15 +2434,21 @@ The `ModalService` manages modal dialogs and projects components into them.
 ### Methods
 
 #### `show(opts: Modal | Type<unknown>): Modal`
+
 Opens a modal with the given configuration or component type.
 
 #### `small(opts: Modal): void`
+
 #### `mid(opts: Modal): void`
+
 #### `big(opts: Modal): void`
+
 #### `full(opts: Modal): void`
+
 Convenience helpers to open modals of different sizes.
 
 #### `destroy(): void`
+
 Closes all open modals.
 
 **Example**:
@@ -2567,4 +2494,3 @@ async connect(id: string) {
   // send offer to remote peer...
 }
 ```
-

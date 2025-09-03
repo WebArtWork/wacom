@@ -1,6 +1,3 @@
-// util.service.ts — Angular 20, zoneless-friendly
-// Modernized in the same style as EmitterService (Maps, helpers, signals).
-
 import { Injectable, WritableSignal, signal } from '@angular/core';
 
 type Dict<T = unknown> = Record<string, T>;
@@ -18,6 +15,10 @@ export class UtilService {
 	// --- Global bag for design/debug ---
 	var: Dict = {};
 
+	/**
+	 * Initialize service state: load persisted CSS variables from localStorage
+	 * and apply them to the document root. Emits the initial CSS snapshot.
+	 */
 	constructor() {
 		this._loadCss();
 		// apply on boot
@@ -48,16 +49,38 @@ export class UtilService {
 		return obj;
 	}
 
+	/**
+	 * Check whether a form signal has been created for the given id.
+	 * @param id Unique form identifier.
+	 * @returns True if a signal exists for the id.
+	 */
 	hasForm(id: string): boolean {
 		return this._forms.has(id);
 	}
 
+	/**
+	 * Remove form state associated with the given id.
+	 * @param id Unique form identifier to clear.
+	 */
 	clearForm(id: string): void {
 		this._forms.delete(id);
 	}
 
 	// ===== Validation =====
 
+	/**
+	 * Validate a value against a specific kind.
+	 * - email: RFC-light pattern check.
+	 * - text: typeof string.
+	 * - array: Array.isArray.
+	 * - object: non-null plain object.
+	 * - number: finite number.
+	 * - password: strength tiers (extra 0..4).
+	 * @param value Input to validate.
+	 * @param kind Validation kind.
+	 * @param extra Additional constraint for passwords: 0..4 increasing strength.
+	 * @returns True if value passes validation.
+	 */
 	valid(
 		value: any,
 		kind:
@@ -182,6 +205,13 @@ export class UtilService {
 
 	// ===== Generators =====
 
+	/**
+	 * Generate an array of given length filled with sequential numbers (1..n),
+	 * random text, dates from today, or a constant value.
+	 * @param len Desired array length.
+	 * @param type 'number' | 'text' | 'date' | any other constant value to repeat.
+	 * @returns Generated array.
+	 */
 	arr(len = 10, type: 'number' | 'text' | 'date' | string = 'number'): any[] {
 		const out: any[] = [];
 		for (let i = 0; i < len; i++) {
@@ -202,6 +232,11 @@ export class UtilService {
 		return out;
 	}
 
+	/**
+	 * Create a random alphanumeric string.
+	 * @param length Number of characters to generate.
+	 * @returns Random string of requested length.
+	 */
 	text(length = 10): string {
 		const chars =
 			'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -213,6 +248,7 @@ export class UtilService {
 
 	// ===== Internals =====
 
+	/** Persist current CSS variables to localStorage. */
 	private _saveCss(): void {
 		try {
 			if (typeof localStorage !== 'undefined') {
@@ -224,6 +260,7 @@ export class UtilService {
 		} catch {}
 	}
 
+	/** Load CSS variables snapshot from localStorage into memory. */
 	private _loadCss(): void {
 		try {
 			if (typeof localStorage !== 'undefined') {
@@ -235,6 +272,11 @@ export class UtilService {
 		}
 	}
 
+	/**
+	 * Apply a CSS variable to the :root element.
+	 * @param key CSS custom property name (e.g., --brand-color).
+	 * @param value CSS value to set.
+	 */
 	private _setProperty(key: string, value: string): void {
 		try {
 			if (typeof document !== 'undefined') {
