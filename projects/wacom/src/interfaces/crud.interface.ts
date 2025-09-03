@@ -1,3 +1,5 @@
+import { Observable } from 'rxjs';
+
 /**
  * Basic fields expected on a document managed by the CRUD service.
  */
@@ -50,7 +52,7 @@ export interface CrudServiceInterface<Document> {
 	/** Change the number of documents retrieved per page. */
 	setPerPage?: (count: number) => void;
 	/** Resolves when the initial data load has completed. */
-	loaded: Promise<unknown>;
+	loaded: Observable<unknown>;
 }
 
 /**

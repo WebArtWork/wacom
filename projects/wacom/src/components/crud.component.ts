@@ -124,7 +124,7 @@ export abstract class CrudComponent<
 					this.__core.toSignalsArray(this.crudService.getDocs()),
 				);
 
-				this.crudService.loaded.then(() => {
+				this.crudService.loaded.subscribe(() => {
 					resolve();
 
 					this.__cdr.markForCheck();
