@@ -1,7 +1,11 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { AlertComponent } from '../components/alert/alert/alert.component';
 import { WrapperComponent } from '../components/alert/wrapper/wrapper.component';
-import { Alert, AlertConfig, DEFAULT_ALERT_CONFIG } from '../interfaces/alert.interface';
+import {
+	Alert,
+	AlertConfig,
+	DEFAULT_ALERT_CONFIG,
+} from '../interfaces/alert.interface';
 import { Config, CONFIG_TOKEN } from '../interfaces/config.interface';
 import { DomComponent } from '../interfaces/dom.interface';
 import { DomService } from './dom.service';
@@ -40,6 +44,10 @@ export class AlertService {
 	show(opts: Alert | string): Alert {
 		opts = this._opts(opts);
 
+		if (opts.text && typeof this._translate === 'function') {
+			opts.text = this._translate(opts.text);
+		}
+
 		if (opts.unique && this._alerts.find((m) => m.unique === opts.unique)) {
 			return this._alerts.find((m) => m.unique === opts.unique) as Alert;
 		}
@@ -75,13 +83,19 @@ export class AlertService {
 			);
 		};
 
-		alertComponent = this._dom.appendById(AlertComponent, opts, opts.position);
+		alertComponent = this._dom.appendById(
+			AlertComponent,
+			opts,
+			opts.position,
+		);
 
 		if (typeof opts.component === 'function') {
 			content = this._dom.appendComponent(
 				opts.component,
 				opts as Partial<{ providedIn?: string | undefined }>,
-				this._container.nativeElement.children[0].children[this._positionNumber[opts.position] || 0] as HTMLElement,
+				this._container.nativeElement.children[0].children[
+					this._positionNumber[opts.position] || 0
+				] as HTMLElement,
 			)!;
 		}
 
@@ -168,6 +182,11 @@ export class AlertService {
 			this._alerts[i].close?.();
 		}
 	}
+
+	setTranslate(_translate: (phrase: string) => string) {
+		this._translate = _translate;
+	}
+
 	private _alerts: Alert[] = [];
 
 	/** Merged configuration applied to new alerts. */
@@ -200,4 +219,6 @@ export class AlertService {
 					...opts,
 				};
 	}
+
+	private _translate = (phrase: string) => '';
 }

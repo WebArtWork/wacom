@@ -97,7 +97,7 @@ export abstract class CrudComponent<
 	/**
 	 * Loads documents for a given page.
 	 */
-	protected setDocuments(page = this.page): Promise<void> {
+	protected setDocuments(page = this.page, query = ''): Promise<void> {
 		return new Promise((resolve) => {
 			if (this.configType === 'server') {
 				this.page = page;
@@ -106,7 +106,7 @@ export abstract class CrudComponent<
 					this,
 					() => {
 						this.crudService
-							.get({ page }, this.getOptions())
+							.get({ page, query }, this.getOptions())
 							.subscribe((docs: Document[]) => {
 								this.documents.update(() =>
 									this.__core.toSignalsArray(docs),

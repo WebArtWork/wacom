@@ -40,7 +40,10 @@ export interface CrudOptions<Document> {
  */
 export interface CrudServiceInterface<Document> {
 	/** Retrieve a page of documents from the server. */
-	get: (params: { page: number }, options: CrudOptions<Document>) => any;
+	get: (
+		params: { page: number; query?: string },
+		options: CrudOptions<Document>,
+	) => any;
 	/** Return the current in‑memory documents. */
 	getDocs: () => Document[];
 	/** Create a new document. */
