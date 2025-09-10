@@ -34,7 +34,10 @@ export class ModalComponent implements OnInit {
 	}
 
 	ngOnDestroy(): void {
-		window.removeEventListener('popstate', this.popStateListener.bind(this));
+		window.removeEventListener(
+			'popstate',
+			this.popStateListener.bind(this),
+		);
 	}
 
 	popStateListener(e: Event) {

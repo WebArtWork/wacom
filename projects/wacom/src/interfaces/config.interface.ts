@@ -49,7 +49,7 @@ export const DEFAULT_CONFIG: Config = {
 	},
 	meta: {
 		useTitleSuffix: false,
-		warnMissingGuard: true,
+		warnMissingGuard: false,
 		defaults: { links: {} },
 	},
 	socket: false,

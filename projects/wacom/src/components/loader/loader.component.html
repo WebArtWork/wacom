@@ -1,7 +1,11 @@
 <div class="wacom-loader" [ngClass]="class">
 	@if (progressPercentage) {
 		<div class="wacom-loader__progress">
-			<span class="wacom-loader__progress-bar" [style.width.%]="progressPercentage()" style="animation: none"></span>
+			<span
+				class="wacom-loader__progress-bar"
+				[style.width.%]="progressPercentage()"
+				style="animation: none"
+			></span>
 		</div>
 	} @else if (progress) {
 		<div class="wacom-loader__progress">

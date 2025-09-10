@@ -1,6 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { AlertButton, AlertPosition, AlertType } from '../../../interfaces/alert.interface';
+import {
+	AlertButton,
+	AlertPosition,
+	AlertType,
+} from '../../../interfaces/alert.interface';
 
 @Component({
 	selector: 'alert',

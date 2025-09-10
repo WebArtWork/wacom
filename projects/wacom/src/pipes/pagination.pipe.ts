@@ -28,6 +28,9 @@ export class PaginationPipe implements PipeTransform {
 			});
 		}
 
-		return arr.slice((config.page - 1) * config.perPage, config.page * config.perPage);
+		return arr.slice(
+			(config.page - 1) * config.perPage,
+			config.page * config.perPage,
+		);
 	}
 }

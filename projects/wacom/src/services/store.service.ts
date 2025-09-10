@@ -1,5 +1,9 @@
 import { Inject, Injectable, Optional } from '@angular/core';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config.interface';
+import {
+	CONFIG_TOKEN,
+	Config,
+	DEFAULT_CONFIG,
+} from '../interfaces/config.interface';
 import { StoreConfig } from '../interfaces/store.interface';
 
 @Injectable({
@@ -109,7 +113,12 @@ export class StoreService {
 		callback: () => void = () => {},
 		errCallback: (err: unknown) => void = () => {},
 	): Promise<boolean> {
-		return await this.set(key, JSON.stringify(value), callback, errCallback);
+		return await this.set(
+			key,
+			JSON.stringify(value),
+			callback,
+			errCallback,
+		);
 	}
 
 	/**
@@ -146,7 +155,11 @@ export class StoreService {
 	 * @param errCallback - The callback to execute on error.
 	 * @returns A promise that resolves to a boolean indicating success.
 	 */
-	async remove(key: string, callback: () => void = () => {}, errCallback: (err: unknown) => void = () => {}): Promise<boolean> {
+	async remove(
+		key: string,
+		callback: () => void = () => {},
+		errCallback: (err: unknown) => void = () => {},
+	): Promise<boolean> {
 		key = this._applyPrefix(key);
 
 		try {
@@ -175,7 +188,10 @@ export class StoreService {
 	 * @param errCallback - The callback to execute on error.
 	 * @returns A promise that resolves to a boolean indicating success.
 	 */
-	async clear(callback?: () => void, errCallback?: (err: unknown) => void): Promise<boolean> {
+	async clear(
+		callback?: () => void,
+		errCallback?: (err: unknown) => void,
+	): Promise<boolean> {
 		try {
 			if (this._config.clear) {
 				await this._config.clear();

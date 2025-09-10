@@ -1,12 +1,27 @@
 import { Pipe, PipeTransform, Signal, isSignal } from '@angular/core';
 
-type Query = string | string[] | Record<string, unknown> | Signal<string | string[] | Record<string, unknown> | undefined>;
+type Query =
+	| string
+	| string[]
+	| Record<string, unknown>
+	| Signal<string | string[] | Record<string, unknown> | undefined>;
 
-type Field = string | string[] | number | Signal<string | string[] | number | undefined>;
+type Field =
+	| string
+	| string[]
+	| number
+	| Signal<string | string[] | number | undefined>;
 
 @Pipe({ name: 'search', pure: true })
 export class SearchPipe implements PipeTransform {
-	transform<T>(items: T[] | Record<string, T>, query?: Query, fields?: Field, limit?: number, ignore = false, _reload?: unknown): T[] {
+	transform<T>(
+		items: T[] | Record<string, T>,
+		query?: Query,
+		fields?: Field,
+		limit?: number,
+		ignore = false,
+		_reload?: unknown,
+	): T[] {
 		/* unwrap signals */
 		const q = isSignal(query) ? query() : query;
 
@@ -24,7 +39,11 @@ export class SearchPipe implements PipeTransform {
 		if (ignore || !q) return limit ? docs.slice(0, limit) : docs;
 
 		/* normalise fields */
-		const paths: string[] = !f ? ['name'] : Array.isArray(f) ? f : f.trim().split(/\s+/);
+		const paths: string[] = !f
+			? ['name']
+			: Array.isArray(f)
+				? f
+				: f.trim().split(/\s+/);
 
 		/* normalise query */
 		const needles: string[] = Array.isArray(q)
@@ -50,7 +69,10 @@ export class SearchPipe implements PipeTransform {
 
 			const next = obj[head];
 
-			if (Array.isArray(next)) return next.some((v) => (rest.length ? walk(v, rest) : txtMatches(v)));
+			if (Array.isArray(next))
+				return next.some((v) =>
+					rest.length ? walk(v, rest) : txtMatches(v),
+				);
 
 			return rest.length ? walk(next, rest) : txtMatches(next);
 		};
@@ -73,7 +95,9 @@ export class SearchPipe implements PipeTransform {
 			}
 		};
 
-		Array.isArray(items) ? docs.forEach((d, i) => check(d, i)) : Object.entries(items).forEach(([k, v]) => check(v, k));
+		Array.isArray(items)
+			? docs.forEach((d, i) => check(d, i))
+			: Object.entries(items).forEach(([k, v]) => check(v, k));
 
 		return limit ? out.slice(0, limit) : out;
 	}

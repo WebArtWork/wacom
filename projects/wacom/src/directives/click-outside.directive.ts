@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, DestroyRef, Directive, ElementRef, inject, output } from '@angular/core';
+import {
+	ChangeDetectorRef,
+	DestroyRef,
+	Directive,
+	ElementRef,
+	inject,
+	output,
+} from '@angular/core';
 
 /**
  * Stand-alone “click outside” directive (zoneless-safe).
@@ -16,7 +23,9 @@ export class ClickOutsideDirective {
 		document.addEventListener('pointerdown', this.handler, true);
 
 		// cleanup
-		this._dref.onDestroy(() => document.removeEventListener('pointerdown', this.handler, true));
+		this._dref.onDestroy(() =>
+			document.removeEventListener('pointerdown', this.handler, true),
+		);
 	}
 
 	private _host = inject(ElementRef<HTMLElement>);

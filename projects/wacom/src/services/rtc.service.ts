@@ -38,7 +38,9 @@ export class RtcService {
 	async createPeer(id: string): Promise<RTCPeerConnection> {
 		const peer = new RTCPeerConnection();
 
-		this.localStream?.getTracks().forEach((track) => peer.addTrack(track, this.localStream!));
+		this.localStream
+			?.getTracks()
+			.forEach((track) => peer.addTrack(track, this.localStream!));
 
 		this.peers.set(id, peer);
 
@@ -70,7 +72,10 @@ export class RtcService {
 	/**
 	 * Accepts an SDP offer, creates an answer, and sets it as the local description.
 	 */
-	async createAnswer(id: string, offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit> {
+	async createAnswer(
+		id: string,
+		offer: RTCSessionDescriptionInit,
+	): Promise<RTCSessionDescriptionInit> {
 		const peer = this.peers.get(id);
 
 		if (!peer) throw new Error('Peer not found');

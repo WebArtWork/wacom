@@ -2,7 +2,11 @@ import { Inject, Injectable, Optional, Type } from '@angular/core';
 import { ModalComponent } from '../components/modal/modal.component';
 import { CONFIG_TOKEN, Config } from '../interfaces/config.interface';
 import { DomComponent } from '../interfaces/dom.interface';
-import { DEFAULT_MODAL_CONFIG, Modal, ModalConfig } from '../interfaces/modal.interface';
+import {
+	DEFAULT_MODAL_CONFIG,
+	Modal,
+	ModalConfig,
+} from '../interfaces/modal.interface';
 import { DomService } from './dom.service';
 @Injectable({
 	providedIn: 'root',
@@ -67,7 +71,8 @@ export class ModalService {
 		content = this._dom.appendComponent(
 			opts.component,
 			opts as Partial<{ providedIn?: string | undefined }>,
-			component.nativeElement.children[0].children[0].children[0] as HTMLElement,
+			component.nativeElement.children[0].children[0]
+				.children[0] as HTMLElement,
 		)!;
 
 		return opts;

@@ -5,7 +5,15 @@ import { Injectable } from '@angular/core';
 	providedIn: 'root',
 })
 export class TimeService {
-	private weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+	private weekDays = [
+		'Sunday',
+		'Monday',
+		'Tuesday',
+		'Wednesday',
+		'Thursday',
+		'Friday',
+		'Saturday',
+	];
 
 	private monthNames = [
 		'January',
@@ -33,7 +41,9 @@ export class TimeService {
 	 */
 	getDayName(date: Date, format: 'short' | 'long' = 'long'): string {
 		const dayIndex = date.getDay();
-		return format === 'short' ? this.weekDays[dayIndex].substring(0, 3) : this.weekDays[dayIndex];
+		return format === 'short'
+			? this.weekDays[dayIndex].substring(0, 3)
+			: this.weekDays[dayIndex];
 	}
 	/**
 	 * Returns the name of the month for a given index.
@@ -42,11 +52,22 @@ export class TimeService {
 	 * @param format - The format in which to return the month name. Default is 'long'.
 	 * @returns The name of the month.
 	 */
-	getMonthName(monthIndex: number, format: 'short' | 'long' = 'long'): string {
-		if (!Number.isInteger(monthIndex) || monthIndex < 0 || monthIndex > 11) {
-			throw new RangeError('monthIndex must be an integer between 0 and 11');
+	getMonthName(
+		monthIndex: number,
+		format: 'short' | 'long' = 'long',
+	): string {
+		if (
+			!Number.isInteger(monthIndex) ||
+			monthIndex < 0 ||
+			monthIndex > 11
+		) {
+			throw new RangeError(
+				'monthIndex must be an integer between 0 and 11',
+			);
 		}
-		return format === 'short' ? this.monthNames[monthIndex].substring(0, 3) : this.monthNames[monthIndex];
+		return format === 'short'
+			? this.monthNames[monthIndex].substring(0, 3)
+			: this.monthNames[monthIndex];
 	}
 
 	/**
@@ -57,7 +78,11 @@ export class TimeService {
 	 * @param timezone - The timezone to use for formatting.
 	 * @returns The formatted date string.
 	 */
-	formatDate(date: Date, format: string = 'mediumDate', timezone: string = 'UTC'): string {
+	formatDate(
+		date: Date,
+		format: string = 'mediumDate',
+		timezone: string = 'UTC',
+	): string {
 		return this.datePipe.transform(date, format, timezone) || '';
 	}
 
@@ -411,7 +436,11 @@ export class TimeService {
 	 * @returns True if the dates are on the same day, false otherwise.
 	 */
 	isSameDay(date1: Date, date2: Date): boolean {
-		return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate();
+		return (
+			date1.getFullYear() === date2.getFullYear() &&
+			date1.getMonth() === date2.getMonth() &&
+			date1.getDate() === date2.getDate()
+		);
 	}
 
 	/**
@@ -427,7 +456,9 @@ export class TimeService {
 		tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
 		const yearStart = new Date(tempDate.getFullYear(), 0, 1);
 		// Calculate full weeks to nearest Thursday
-		return Math.ceil(((tempDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+		return Math.ceil(
+			((tempDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
+		);
 	}
 
 	/**

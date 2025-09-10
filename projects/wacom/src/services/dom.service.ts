@@ -26,7 +26,11 @@ export class DomService {
 	 * @param id - The ID of the element to append the component to.
 	 * @returns An object containing the native element and the component reference.
 	 */
-	appendById<T>(component: Type<T>, options: Partial<T> = {}, id: string): DomComponent<T> {
+	appendById<T>(
+		component: Type<T>,
+		options: Partial<T> = {},
+		id: string,
+	): DomComponent<T> {
 		const componentRef = createComponent(component, {
 			environmentInjector: this._injector,
 		});
@@ -35,7 +39,8 @@ export class DomService {
 
 		this._appRef.attachView(componentRef.hostView);
 
-		const domElem = (componentRef.hostView as EmbeddedViewRef<T>).rootNodes[0] as HTMLElement;
+		const domElem = (componentRef.hostView as EmbeddedViewRef<T>)
+			.rootNodes[0] as HTMLElement;
 
 		const element = document.getElementById(id);
 
@@ -79,7 +84,8 @@ export class DomService {
 
 		this._appRef.attachView(componentRef.hostView);
 
-		const domElem = (componentRef.hostView as EmbeddedViewRef<T>).rootNodes[0] as HTMLElement;
+		const domElem = (componentRef.hostView as EmbeddedViewRef<T>)
+			.rootNodes[0] as HTMLElement;
 
 		if (element && typeof element.appendChild === 'function') {
 			element.appendChild(domElem);
@@ -88,7 +94,8 @@ export class DomService {
 		return {
 			nativeElement: domElem,
 			componentRef: componentRef,
-			remove: () => this.removeComponent(componentRef, options.providedIn),
+			remove: () =>
+				this.removeComponent(componentRef, options.providedIn),
 		};
 	}
 
@@ -99,7 +106,10 @@ export class DomService {
 	 * @param options - The options to project into the component.
 	 * @returns The component reference.
 	 */
-	getComponentRef<T>(component: Type<T>, options: Partial<T> = {}): ComponentRef<T> {
+	getComponentRef<T>(
+		component: Type<T>,
+		options: Partial<T> = {},
+	): ComponentRef<T> {
 		const componentRef = createComponent(component, {
 			environmentInjector: this._injector,
 		});
@@ -118,7 +128,10 @@ export class DomService {
 	 * @param options - The options to project into the component.
 	 * @returns The component reference with the projected inputs.
 	 */
-	private projectComponentInputs<T>(component: ComponentRef<T>, options: Partial<T>): ComponentRef<T> {
+	private projectComponentInputs<T>(
+		component: ComponentRef<T>,
+		options: Partial<T>,
+	): ComponentRef<T> {
 		if (options) {
 			const props = Object.getOwnPropertyNames(options);
 
@@ -137,7 +150,10 @@ export class DomService {
 	 * @param componentRef - Reference to the component to be removed.
 	 * @param providedIn - Optional key used to track unique instances.
 	 */
-	removeComponent<T>(componentRef: ComponentRef<T>, providedIn?: string): void {
+	removeComponent<T>(
+		componentRef: ComponentRef<T>,
+		providedIn?: string,
+	): void {
 		this._appRef.detachView(componentRef.hostView);
 
 		componentRef.destroy();
