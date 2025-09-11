@@ -337,7 +337,7 @@ export abstract class CrudComponent<
 	 * Configuration object used by the UI for rendering table and handling actions.
 	 */
 	protected getConfig(): TableConfig<Document> {
-		const config = {
+		const config: TableConfig<Document> = {
 			create: this.allowCreate()
 				? (): void => {
 						this.create();
@@ -356,43 +356,43 @@ export abstract class CrudComponent<
 					}
 				: null,
 
-			buttons: [
-				this.allowUrl() && this._module
-					? {
-							icon: 'cloud_download',
-							click: (doc: Document): void => {
-								this.mutateUrl(doc);
-							},
-						}
-					: null,
-				this.allowSort()
-					? {
-							icon: 'arrow_upward',
-							click: (doc: Document): void => {
-								this.moveUp(doc);
-							},
-						}
-					: null,
-			],
-
-			headerButtons: [
-				this.allowCreate()
-					? {
-							icon: 'playlist_add',
-							click: this.bulkManagement(),
-							class: 'playlist',
-						}
-					: null,
-				this.allowMutate()
-					? {
-							icon: 'edit_note',
-							click: this.bulkManagement(false),
-							class: 'edit',
-						}
-					: null,
-			],
+			buttons: [],
+			headerButtons: [],
 			allDocs: true,
 		};
+
+		if (this.allowUrl()) {
+			config.buttons.push({
+				icon: 'cloud_download',
+				click: (doc: Document) => {
+					this.mutateUrl(doc);
+				},
+			});
+		}
+
+		if (this.allowSort()) {
+			config.buttons.push({
+				icon: 'arrow_upward',
+				click: (doc: Document) => {
+					this.moveUp(doc);
+				},
+			});
+		}
+
+		if (this.allowCreate()) {
+			config.headerButtons.push({
+				icon: 'playlist_add',
+				click: this.bulkManagement(),
+				class: 'playlist',
+			});
+		}
+		if (this.allowMutate()) {
+			config.headerButtons.push({
+				icon: 'edit_note',
+				click: this.bulkManagement(false),
+				class: 'edit',
+			});
+		}
 
 		return this.configType === 'server'
 			? {

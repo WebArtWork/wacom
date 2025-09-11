@@ -61,6 +61,12 @@ export interface CrudServiceInterface<Document> {
 /**
  * Configuration describing how a CRUD table should behave.
  */
+export interface TableConfigButton<Document> {
+	icon?: string;
+	click?: (doc: Document) => void;
+	hrefFunc?: (doc: Document) => string;
+	class?: string;
+}
 export interface TableConfig<Document> {
 	/** Callback to paginate to a given page. */
 	paginate?: (page?: number) => void;
@@ -77,16 +83,7 @@ export interface TableConfig<Document> {
 	/** Handler invoked to delete a record. */
 	delete: ((doc: Document) => void) | null;
 	/** Row‑level action buttons. */
-	buttons: ({
-		icon?: string;
-		click?: (doc: Document) => void;
-		hrefFunc?: (doc: Document) => string;
-	} | null)[];
+	buttons: TableConfigButton<Document>[];
 	/** Buttons displayed in the table header. */
-	headerButtons: ({
-		icon?: string;
-		click?: () => void;
-		hrefFunc?: (doc: Document) => string;
-		class?: string;
-	} | null)[];
+	headerButtons: TableConfigButton<Document>[];
 }
