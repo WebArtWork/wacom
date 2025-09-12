@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { inject, WritableSignal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CrudDocument, CrudOptions } from '../interfaces/crud.interface';
 import { AlertService } from './alert.service';
@@ -79,6 +79,8 @@ export abstract class CrudService<
 
 	loaded: Observable<unknown>;
 
+	getted: Observable<unknown>;
+
 	constructor(private _config: CrudConfig<Document>) {
 		super();
 
@@ -88,6 +90,10 @@ export abstract class CrudService<
 
 		this.loaded = this.__emitterService.onComplete(
 			this._config.name + '_loaded',
+		);
+
+		this.getted = this.__emitterService.onComplete(
+			this._config.name + '_getted',
 		);
 
 		if (this._config.unauthorized) {
@@ -118,6 +124,41 @@ export abstract class CrudService<
 		});
 	}
 
+	/**
+	 * Cache of per-document signals indexed by document _id.
+	 * Prevents creating multiple signals for the same document.
+	 */
+	private _signals: Record<string, WritableSignal<Document>> = {};
+
+	/**
+	 * Returns a WritableSignal for a document by _id, creating it if absent.
+	 * Caches the signal to avoid redundant instances and initializes it
+	 * with the current snapshot of the document.
+	 * Work very carefully with this and localId, better avoid such flows
+	 * @param _id - Document identifier.
+	 */
+	getSignal(_id: string) {
+		this._signals[_id] ||= this.__coreService.toSignal(
+			this.doc(_id) || { _id },
+			this._config.signalFields,
+		);
+
+		return this._signals[_id];
+	}
+
+	/**
+	 * Clears cached document signals except those explicitly preserved.
+	 * Useful when changing routes or contexts to reduce memory.
+	 * @param exceptIds - List of ids whose signals should be kept.
+	 */
+	removeSignals(exceptIds: string[] = []) {
+		for (const _id in this._signals) {
+			if (!exceptIds.includes(_id)) {
+				delete this._signals[_id];
+			}
+		}
+	}
+
 	async restoreDocs() {
 		const docs = await this.__storeService.getJson<Document[]>(
 			'docs_' + this._config.name,
@@ -145,6 +186,11 @@ export abstract class CrudService<
 					}
 				}
 			}
+
+			this.__emitterService.complete(
+				this._config.name + '_loaded',
+				this._docs,
+			);
 		}
 	}
 
@@ -244,7 +290,11 @@ export abstract class CrudService<
 	 */
 	doc(_id: string): Document {
 		const doc =
-			this._docs.find((d) => this._id(d) === _id) ||
+			this._docs.find(
+				(d) =>
+					this._id(d) === _id ||
+					(d._localId && d._localId === Number(_id)),
+			) ||
 			this.new({
 				_id,
 			} as Document);
@@ -332,7 +382,7 @@ export abstract class CrudService<
 					this._filterDocuments();
 
 					this.__emitterService.complete(
-						this._config.name + '_loaded',
+						this._config.name + '_getted',
 						this._docs,
 					);
 				}

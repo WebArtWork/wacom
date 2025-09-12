@@ -1,12 +1,5 @@
 // Core utilities and helpers for the Wacom app
-import {
-	Injectable,
-	Signal,
-	WritableSignal,
-	inject,
-	signal,
-} from '@angular/core';
-import { EmitterService } from './emitter.service';
+import { Injectable, Signal, WritableSignal, signal } from '@angular/core';
 
 // Add capitalize method to String prototype if it doesn't already exist
 if (!String.prototype.capitalize) {
@@ -383,7 +376,7 @@ export class CoreService {
 	 *        to extract the initial value for that field. These fields will be wrapped
 	 *        as separate signals and embedded in the returned object.
 	 *
-	 * @returns {Signal<Document>} A signal-wrapped object, possibly containing
+	 * @returns {WritableSignal<Document>} A signal-wrapped object, possibly containing
 	 *          nested field signals for more granular control.
 	 *
 	 * @example
@@ -395,7 +388,7 @@ export class CoreService {
 	toSignal<Document>(
 		document: Document,
 		signalFields: Record<string, (doc: Document) => unknown> = {},
-	): Signal<Document> {
+	): WritableSignal<Document> {
 		if (Object.keys(signalFields).length) {
 			const fields: Record<string, Signal<unknown>> = {};
 
@@ -419,7 +412,7 @@ export class CoreService {
 	 *        Optional map where keys are field names and values are functions that extract the initial value
 	 *        from the object. These fields will be turned into separate signals.
 	 *
-	 * @returns {Signal<Document>[]} An array where each item is a signal-wrapped object,
+	 * @returns {WritableSignal<Document>[]} An array where each item is a signal-wrapped object,
 	 *          optionally with individual fields also wrapped in signals.
 	 *
 	 * @example
@@ -431,7 +424,7 @@ export class CoreService {
 	toSignalsArray<Document>(
 		arr: Document[],
 		signalFields: Record<string, (doc: Document) => unknown> = {},
-	): Signal<Document>[] {
+	): WritableSignal<Document>[] {
 		return arr.map((obj) => this.toSignal(obj, signalFields));
 	}
 
@@ -440,7 +433,7 @@ export class CoreService {
 	 * Optionally wraps specific fields of the object as individual signals before wrapping the whole object.
 	 *
 	 * @template Document - The type of the object being added.
-	 * @param {Signal<Document>[]} signals - The signals array to append to.
+	 * @param {WritableSignal<Document>[]} signals - The signals array to append to.
 	 * @param {Document} item - The object to wrap and push as a signal.
 	 * @param {Record<string, (doc: Document) => unknown>} [signalFields={}] -
 	 *        Optional map of fields to be wrapped as signals within the object.
@@ -448,7 +441,7 @@ export class CoreService {
 	 * @returns {void}
 	 */
 	pushSignal<Document>(
-		signals: Signal<Document>[],
+		signals: WritableSignal<Document>[],
 		item: Document,
 		signalFields: Record<string, (doc: Document) => unknown> = {},
 	): void {
@@ -494,13 +487,13 @@ export class CoreService {
 	 * @returns {Signal<Document> | undefined} The found signal or undefined if not found.
 	 */
 	findSignalByField<Document extends Record<string, unknown>>(
-		signals: Signal<Document>[],
+		signals: WritableSignal<Document>[],
 		value: unknown,
 		field = '_id',
-	): Signal<Document> | undefined {
+	): WritableSignal<Document> | undefined {
 		return signals.find(
 			(sig) => sig()[field] === value,
-		) as Signal<Document>;
+		) as WritableSignal<Document>;
 	}
 
 	/**
@@ -526,6 +519,4 @@ export class CoreService {
 
 		if (sig) sig.update(updater);
 	}
-
-	private _emitterService = inject(EmitterService);
 }
