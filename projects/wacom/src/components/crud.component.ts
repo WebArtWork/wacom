@@ -280,13 +280,11 @@ export abstract class CrudComponent<
 	/** Requests confirmation before deleting the provided document. */
 	protected delete(doc: Document) {
 		this.__alert.question({
-			text: this.translateService.translate(
-				`Common.Are you sure you want to delete this${this._module ? ' ' + this._module : ''}?`,
-			)(),
+			text: `Are you sure you want to delete this${this._module ? ' ' + this._module : ''}?`,
 			buttons: [
-				{ text: this.translateService.translate('Common.No')() },
+				{ text: 'No' },
 				{
-					text: this.translateService.translate('Common.Yes')(),
+					text: 'Yes',
 					callback: async (): Promise<void> => {
 						await firstValueFrom(this.crudService.delete(doc));
 

@@ -209,8 +209,8 @@ export abstract class CrudService<
 	 *
 	 * @returns The list of documents.
 	 */
-	getDocs(): Document[] {
-		return this._docs;
+	getDocs(filter: (doc: Document) => boolean = () => true): Document[] {
+		return this._docs.filter(filter);
 	}
 
 	/**
