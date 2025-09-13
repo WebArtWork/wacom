@@ -79,7 +79,9 @@ export abstract class CrudComponent<
 	constructor(
 		formConfig: unknown,
 		protected formService: unknown,
-		protected translateService: { translate: (key: string) => string },
+		protected translateService: {
+			translate: (key: string) => WritableSignal<string>;
+		},
 		crudService: Service,
 		module = '',
 	) {
@@ -280,11 +282,11 @@ export abstract class CrudComponent<
 		this.__alert.question({
 			text: this.translateService.translate(
 				`Common.Are you sure you want to delete this${this._module ? ' ' + this._module : ''}?`,
-			),
+			)(),
 			buttons: [
-				{ text: this.translateService.translate('Common.No') },
+				{ text: this.translateService.translate('Common.No')() },
 				{
-					text: this.translateService.translate('Common.Yes'),
+					text: this.translateService.translate('Common.Yes')(),
 					callback: async (): Promise<void> => {
 						await firstValueFrom(this.crudService.delete(doc));
 
