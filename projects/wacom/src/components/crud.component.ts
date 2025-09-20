@@ -253,6 +253,7 @@ export abstract class CrudComponent<
 			label: 'Create',
 			click: async (created: unknown, close: () => void) => {
 				close();
+
 				this.preCreate(created as Document);
 
 				await firstValueFrom(
@@ -266,15 +267,20 @@ export abstract class CrudComponent<
 
 	/** Displays a modal to edit an existing document. */
 	protected update(doc: Document) {
-		this.__form
-			.modal<Document>(this.form, [], doc)
-			.then((updated: Document) => {
-				this.__core.copy(updated, doc);
+		this.__form.modal<Document>(
+			this.form,
+			{
+				label: 'Update',
+				click: (updated: unknown) => {
+					this.__core.copy(updated, doc);
 
-				this.crudService.update(doc);
+					this.crudService.update(doc);
 
-				this.__cdr.markForCheck();
-			});
+					this.__cdr.markForCheck();
+				},
+			},
+			doc,
+		);
 	}
 
 	/** Requests confirmation before deleting the provided document. */
