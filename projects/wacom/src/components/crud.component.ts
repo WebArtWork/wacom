@@ -271,7 +271,9 @@ export abstract class CrudComponent<
 			this.form,
 			{
 				label: 'Update',
-				click: (updated: unknown) => {
+				click: (updated: unknown, close: () => void) => {
+					close();
+
 					this.__core.copy(updated, doc);
 
 					this.crudService.update(doc);
