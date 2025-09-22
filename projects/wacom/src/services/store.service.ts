@@ -132,15 +132,21 @@ export class StoreService {
 		callback?: (value: string | null) => void,
 		errCallback: (err: unknown) => void = () => {},
 	): Promise<T | null> {
-		const value = await this.get(key, callback, errCallback);
+		const value = await this.get(key);
 
 		if (value === null) {
 			return null;
 		}
 
 		try {
-			return JSON.parse(value);
+			const result = JSON.parse(value);
+
+			callback?.(result);
+
+			return result;
 		} catch (err) {
+			errCallback?.(err);
+
 			console.error(err);
 
 			return null;
