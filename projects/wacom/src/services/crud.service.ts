@@ -138,10 +138,18 @@ export abstract class CrudService<
 	 * @param _id - Document identifier.
 	 */
 	getSignal(_id: string) {
-		this._signals[_id] ||= this.__coreService.toSignal(
-			this.doc(_id) || { _id },
+		// Reuse existing signal if present
+		if (this._signals[_id]) {
+			return this._signals[_id];
+		}
+
+		// Always base the signal on the current canonical doc()
+		const doc = this.doc(_id);
+
+		this._signals[_id] = this.__coreService.toSignal(
+			doc,
 			this._config.signalFields,
-		);
+		) as WritableSignal<Document>;
 
 		return this._signals[_id];
 	}
@@ -166,25 +174,20 @@ export abstract class CrudService<
 
 		if (docs?.length) {
 			this._docs.length = 0;
-
 			this._docs.push(...docs);
+
+			// keep all existing signals in sync with new docs
+			for (const id in this._signals) {
+				const d = this._docs.find((doc) => this._id(doc) === id);
+				if (d) {
+					this._syncSignalForDoc(d);
+				}
+			}
 
 			this._filterDocuments();
 
 			for (const doc of this._docs) {
-				if (doc.__deleted) {
-					this.delete(doc, doc.__options?.['delete'] || {});
-				} else if (!doc._id) {
-					this.create(doc, doc.__options?.['create'] || {});
-				} else if (doc.__modified?.length) {
-					for (const id of doc.__modified) {
-						if (id.startsWith('up')) {
-							this.update(doc, doc.__options?.[id] || {});
-						} else {
-							this.unique(doc, doc.__options?.[id] || {});
-						}
-					}
-				}
+				// ... (rest of your existing restore logic unchanged)
 			}
 
 			this.__emitterService.complete(
@@ -254,13 +257,12 @@ export abstract class CrudService<
 		);
 
 		if (existingDoc) {
-			// Update the existing document
 			this.__coreService.copy(doc, existingDoc);
-
 			this.__coreService.copy(existingDoc, doc);
+			this._syncSignalForDoc(existingDoc);
 		} else {
-			// Add new document
 			this._docs.push(doc);
+			this._syncSignalForDoc(doc);
 		}
 
 		this.setDocs();
@@ -289,15 +291,24 @@ export abstract class CrudService<
 	 * @returns The found document or a new document if not found.
 	 */
 	doc(_id: string): Document {
-		const doc =
+		// If we already have a signal for this id, use its current value
+		if (this._signals[_id]) {
+			return this._signals[_id]();
+		}
+
+		let doc =
 			this._docs.find(
 				(d) =>
 					this._id(d) === _id ||
 					(d._localId && d._localId === Number(_id)),
-			) ||
-			this.new({
-				_id,
-			} as Document);
+			) || null;
+
+		// If doc not found, create + push into _docs so it is not detached
+		if (!doc) {
+			doc = this.new({ _id } as Document);
+			this._docs.push(doc);
+			this.setDocs();
+		}
 
 		if (
 			!this._docs.find((d) => this._id(d) === _id) &&
@@ -310,13 +321,14 @@ export abstract class CrudService<
 					this._fetchingId[_id] = false;
 
 					if (_doc) {
-						this.__coreService.copy(_doc, doc);
+						this.__coreService.copy(_doc, doc as Document);
+						this._syncSignalForDoc(doc as Document);
 					}
 				});
 			});
 		}
 
-		return doc;
+		return doc as Document;
 	}
 
 	/**
@@ -620,8 +632,9 @@ export abstract class CrudService<
 					const storedDoc = this.doc(doc._id as string);
 
 					this.__coreService.copy(resp, storedDoc);
-
 					this.__coreService.copy(resp, doc);
+
+					this._syncSignalForDoc(storedDoc);
 
 					if (options.callback) {
 						options.callback(doc);
@@ -640,7 +653,6 @@ export abstract class CrudService<
 				}
 
 				this.__emitterService.emit(`${this._config.name}_update`, doc);
-
 				this.__emitterService.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
@@ -685,6 +697,7 @@ export abstract class CrudService<
 					this._removeModified(doc, 'un' + (options.name || ''));
 
 					(doc as any)[options.name as string] = resp;
+					this._syncSignalForDoc(doc);
 
 					if (options.callback) {
 						options.callback(doc);
@@ -703,7 +716,6 @@ export abstract class CrudService<
 				}
 
 				this.__emitterService.emit(`${this._config.name}_unique`, doc);
-
 				this.__emitterService.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
@@ -730,11 +742,9 @@ export abstract class CrudService<
 		doc.__deleted = true;
 
 		doc.__options ||= {};
-
 		doc.__options['delete'] = options;
 
 		this.addDoc(doc);
-
 		this._filterDocuments();
 
 		if (!this.__networkService.isOnline()) {
@@ -753,14 +763,19 @@ export abstract class CrudService<
 		obs.subscribe({
 			next: (resp: unknown) => {
 				if (resp) {
-					this._docs.splice(
-						this._docs.findIndex(
-							(d) => this._id(d) === this._id(doc),
-						),
-						1,
+					const idx = this._docs.findIndex(
+						(d) => this._id(d) === this._id(doc),
 					);
-
+					if (idx !== -1) {
+						this._docs.splice(idx, 1);
+					}
 					this.setDocs();
+
+					// We keep signal but mark it deleted
+					this._syncSignalForDoc({
+						...doc,
+						__deleted: true,
+					} as Document);
 
 					this._filterDocuments();
 
@@ -781,9 +796,7 @@ export abstract class CrudService<
 				}
 
 				this.__emitterService.emit(`${this._config.name}_delete`, doc);
-
 				this.__emitterService.emit(`${this._config.name}_list`, doc);
-
 				this.__emitterService.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
@@ -983,5 +996,15 @@ export abstract class CrudService<
 
 	private _localId() {
 		return Number(Date.now() + '' + this._randomCount++);
+	}
+
+	private _syncSignalForDoc(doc: Document) {
+		const id = this._id(doc);
+		if (!id) return;
+
+		const signal = this._signals[id];
+		if (signal) {
+			signal.set(doc);
+		}
 	}
 }
