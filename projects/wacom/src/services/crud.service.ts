@@ -137,7 +137,11 @@ export abstract class CrudService<
 	 * Work very carefully with this and localId, better avoid such flows
 	 * @param _id - Document identifier.
 	 */
-	getSignal(_id: string) {
+	getSignal(_id: string | Document) {
+		if (typeof _id !== 'string') {
+			_id = this._id(_id);
+		}
+
 		// Reuse existing signal if present
 		if (this._signals[_id]) {
 			return this._signals[_id];

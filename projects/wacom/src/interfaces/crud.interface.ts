@@ -56,6 +56,7 @@ export interface CrudServiceInterface<Document> {
 	setPerPage?: (count: number) => void;
 	/** Resolves when the initial data load has completed. */
 	loaded: Observable<unknown>;
+	getSignal: (doc: string | Document) => any;
 }
 
 /**

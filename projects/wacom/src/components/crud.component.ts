@@ -111,7 +111,9 @@ export abstract class CrudComponent<
 							.get({ page, query }, this.getOptions())
 							.subscribe((docs: Document[]) => {
 								this.documents.update(() =>
-									this.__core.toSignalsArray(docs),
+									docs.map((doc) =>
+										this.crudService.getSignal(doc),
+									),
 								);
 
 								resolve();
@@ -123,11 +125,15 @@ export abstract class CrudComponent<
 				);
 			} else {
 				this.documents.update(() =>
-					this.__core.toSignalsArray(this.crudService.getDocs()),
+					this.crudService
+						.getDocs()
+						.map((doc) => this.crudService.getSignal(doc)),
 				);
 
-				this.crudService.loaded.subscribe(() => {
+				const sub = this.crudService.loaded.subscribe(() => {
 					resolve();
+
+					sub.unsubscribe();
 
 					this.__cdr.markForCheck();
 				});
@@ -318,7 +324,7 @@ export abstract class CrudComponent<
 			this.documents.update((documents) => {
 				documents.splice(index, 1);
 
-				documents.splice(index - 1, 0, this.__core.toSignal(doc));
+				documents.splice(index - 1, 0, this.crudService.getSignal(doc));
 
 				return documents;
 			});
