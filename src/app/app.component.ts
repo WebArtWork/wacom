@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { EmitterService } from 'projects/wacom/src/services/emitter.service';
@@ -7,7 +7,7 @@ import { AppCrudService } from './app-crud.service';
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
-	imports: [CommonModule, RouterOutlet, RouterLink],
+	imports: [RouterOutlet, RouterLink],
 })
 export class AppComponent {
 	router = inject(Router);

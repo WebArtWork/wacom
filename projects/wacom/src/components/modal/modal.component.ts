@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -6,7 +6,7 @@ import { Component, OnInit } from '@angular/core';
 	templateUrl: './modal.component.html',
 	styleUrls: ['./modal.component.scss'],
 	standalone: true,
-	imports: [CommonModule],
+	imports: [],
 })
 export class ModalComponent implements OnInit {
 	closable: boolean = true;
