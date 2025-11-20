@@ -1,13 +1,11 @@
 import { inject, WritableSignal } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CrudDocument, CrudOptions } from '../interfaces/crud.interface';
-import { AlertService } from './alert.service';
-import { BaseService } from './base.service';
-import { CoreService } from './core.service';
-import { EmitterService } from './emitter.service';
-import { HttpService } from './http.service';
-import { NetworkService } from './network.service';
-import { StoreService } from './store.service';
+import { CoreService } from '../services/core.service';
+import { EmitterService } from '../services/emitter.service';
+import { HttpService } from '../services/http.service';
+import { NetworkService } from '../services/network.service';
+import { StoreService } from '../services/store.service';
+import { CrudDocument, CrudOptions } from './crud.interface';
 
 interface CrudConfig<Document> {
 	signalFields?: Record<string, (doc: Document) => unknown>;
@@ -33,9 +31,7 @@ interface GetConfig {
  *
  * @template Document - The type of the document the service handles.
  */
-export abstract class CrudService<
-	Document extends CrudDocument<Document>,
-> extends BaseService {
+export abstract class CrudService<Document extends CrudDocument<Document>> {
 	/**
 	 * URL for the API.
 	 */
@@ -62,14 +58,11 @@ export abstract class CrudService<
 	 * @param _config - Configuration options for the CRUD service.
 	 * @param __httpService - Service to handle HTTP requests.
 	 * @param __storeService - Service to manage local storage of documents.
-	 * @param __alertService - Service to display alerts.
 	 * @param __coreService - Core service for utility functions.
 	 */
 	protected __httpService = inject(HttpService);
 
 	protected __storeService = inject(StoreService);
-
-	protected __alertService = inject(AlertService);
 
 	protected __coreService = inject(CoreService);
 
@@ -82,8 +75,6 @@ export abstract class CrudService<
 	getted: Observable<unknown>;
 
 	constructor(private _config: CrudConfig<Document>) {
-		super();
-
 		this._config.signalFields = this._config.signalFields || {};
 
 		this._url += this._config.name;
@@ -407,6 +398,11 @@ export abstract class CrudService<
 					`${this._config.name}_get`,
 					this._docs,
 				);
+
+				this.__emitterService.emit(
+					`${this._config.name}_changed`,
+					this._docs,
+				);
 			},
 			error: (err: unknown): void => {
 				if (options.errCallback) {
@@ -483,13 +479,6 @@ export abstract class CrudService<
 					if (options.callback) {
 						options.callback(doc);
 					}
-
-					if (options.alert) {
-						this.__alertService.show({
-							unique: `${this._config.name}create`,
-							text: options.alert,
-						});
-					}
 				} else {
 					doc.__creating = false;
 
@@ -546,13 +535,6 @@ export abstract class CrudService<
 					this._filterDocuments();
 
 					if (options.callback) options.callback(doc as Document);
-
-					if (options.alert) {
-						this.__alertService.show({
-							unique: `${this._config.name}create`,
-							text: options.alert,
-						});
-					}
 
 					this.__emitterService.emit(
 						`${this._config.name}_changed`,
@@ -643,13 +625,6 @@ export abstract class CrudService<
 					if (options.callback) {
 						options.callback(doc);
 					}
-
-					if (options.alert) {
-						this.__alertService.show({
-							unique: `${this._config.name}update`,
-							text: options.alert,
-						});
-					}
 				} else {
 					if (options.errCallback) {
 						options.errCallback(resp);
@@ -657,6 +632,7 @@ export abstract class CrudService<
 				}
 
 				this.__emitterService.emit(`${this._config.name}_update`, doc);
+
 				this.__emitterService.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
@@ -701,17 +677,11 @@ export abstract class CrudService<
 					this._removeModified(doc, 'un' + (options.name || ''));
 
 					(doc as any)[options.name as string] = resp;
+
 					this._syncSignalForDoc(doc);
 
 					if (options.callback) {
 						options.callback(doc);
-					}
-
-					if (options.alert) {
-						this.__alertService.show({
-							unique: `${this._config.name}unique`,
-							text: options.alert,
-						});
 					}
 				} else {
 					if (options.errCallback) {
@@ -720,6 +690,7 @@ export abstract class CrudService<
 				}
 
 				this.__emitterService.emit(`${this._config.name}_unique`, doc);
+
 				this.__emitterService.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {
@@ -786,13 +757,6 @@ export abstract class CrudService<
 					if (options.callback) {
 						options.callback(doc);
 					}
-
-					if (options.alert) {
-						this.__alertService.show({
-							unique: `${this._config.name}delete`,
-							text: options.alert,
-						});
-					}
 				} else {
 					if (options.errCallback) {
 						options.errCallback(resp);
@@ -800,7 +764,7 @@ export abstract class CrudService<
 				}
 
 				this.__emitterService.emit(`${this._config.name}_delete`, doc);
-				this.__emitterService.emit(`${this._config.name}_list`, doc);
+
 				this.__emitterService.emit(`${this._config.name}_changed`, doc);
 			},
 			error: (err: unknown) => {

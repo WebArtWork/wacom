@@ -32,26 +32,9 @@ const PIPES = [
 	PaginationPipe,
 ];
 
-/* components */
-import { AlertComponent } from './components/alert/alert/alert.component';
-import { WrapperComponent } from './components/alert/wrapper/wrapper.component';
-import { FilesComponent } from './components/files/files.component';
-import { LoaderComponent } from './components/loader/loader.component';
-import { ModalComponent } from './components/modal/modal.component';
-import { themeProvider } from './theme';
-const LOCAL_COMPONENTS = [WrapperComponent, FilesComponent];
-const COMPONENTS = [LoaderComponent, ModalComponent, AlertComponent];
-
 @NgModule({
-	imports: [
-		CommonModule,
-		FormsModule,
-		...LOCAL_COMPONENTS,
-		...PIPES,
-		...COMPONENTS,
-		...DIRECTIVES,
-	],
-	exports: [...PIPES, ...COMPONENTS, ...DIRECTIVES],
+	imports: [CommonModule, FormsModule, ...PIPES, ...DIRECTIVES],
+	exports: [...PIPES, ...DIRECTIVES],
 	providers: [
 		{ provide: CONFIG_TOKEN, useValue: DEFAULT_CONFIG },
 		provideHttpClient(withInterceptorsFromDi()),
@@ -71,7 +54,6 @@ export class WacomModule {
 					provide: CONFIG_TOKEN,
 					useValue: config,
 				},
-				themeProvider(),
 			],
 		};
 	}

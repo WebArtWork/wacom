@@ -1,6 +1,6 @@
-# Angular (ngx) common
+# waw Angular (ngx) common
 
-Module which has common services and components which can be used on all projects.
+Module which has common services, pipes, directives and interfaces which can be used on all projects.
 
 ## License
 
@@ -35,25 +35,12 @@ export const appConfig = {
 	providers: [
 		provideWacom({
 			http: { url: "https://api.example.com" },
-			theme: {
-				primary: "#1976d2",
-				secondary: "#424242",
-				info: "#29b6f6",
-				error: "#ef5350",
-				success: "#66bb6a",
-				warning: "#ffa726",
-				question: "#fff59d",
-			},
-			// other optional configs
 			store: { prefix: "waStore" },
 			meta: {
 				useTitleSuffix: false,
 				warnMissingGuard: true,
 				defaults: { links: {} },
 			},
-			alert: {},
-			loader: {},
-			modal: {},
 			network: {},
 			// enable and configure sockets if needed
 			socket: false,
@@ -62,20 +49,6 @@ export const appConfig = {
 	],
 };
 ```
-
-### Theme
-
-The `theme` section customises the colours used by Wacom components. Values are written as CSS custom properties on the document root:
-
-- `--wacom-primary`
-- `--wacom-secondary`
-- `--wacom-info`
-- `--wacom-error`
-- `--wacom-success`
-- `--wacom-warning`
-- `--wacom-question`
-
-You can reference these variables in your global styles to keep the design consistent with the library.
 
 ## Services
 
@@ -87,14 +60,10 @@ You can reference these variables in your global styles to keep the design consi
 | [**`Store`**](https://www.npmjs.com/package/wacom#store-service)     |      Service responsible for keeping information on the device      |
 | [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service)       |             Website meta tags management within router              |
 | [**`Crud`**](https://www.npmjs.com/package/wacom#crud-service)       | Provides basic CRUD operations for managing data with HTTP services |
-| [**`File`**](https://www.npmjs.com/package/wacom#file-service)       |  Handles file uploads, image processing, and file management tasks  |
 | [**`Socket`**](https://www.npmjs.com/package/wacom#socket-service)   |   Manages WebSocket connections and real-time data communication    |
 | [**`Time`**](https://www.npmjs.com/package/wacom#time-service)       |  Provides utilities for date and time manipulation and formatting   |
 | [**`Dom`**](https://www.npmjs.com/package/wacom#dom-service)         |     Facilitates DOM manipulation and dynamic component loading      |
 | [**`Network`**](https://www.npmjs.com/package/wacom#network-service) |              Monitors network connectivity and latency              |
-| [**`Alert`**](https://www.npmjs.com/package/wacom#alert-service)     |                Displays configurable alert messages                 |
-| [**`Loader`**](https://www.npmjs.com/package/wacom#loader-service)   |                Shows and manages loading indicators                 |
-| [**`Modal`**](https://www.npmjs.com/package/wacom#modal-service)     |                 Creates and controls modal dialogs                  |
 | [**`RTC`**](https://www.npmjs.com/package/wacom#rtc-service)         |        Wraps WebRTC peer connections and local media streams        |
 | [**`Util`**](https://www.npmjs.com/package/wacom#util-service)       |      Utility methods for forms, validation, and CSS variables       |
 | [**`Emitter`**](#emitter-service)                                    |            Lightweight app-wide event and task signaling            |
@@ -1541,154 +1510,6 @@ export class WorkService extends CrudService<Work> {
 }
 ```
 
-## [File Service](#file-service)
-
-The `FileService` is designed to handle file uploads, image processing, and file management tasks in an Angular application. It interacts with the `HttpService` to send files to the server and provides utilities for image resizing and validation.
-
-### Methods
-
-#### `add(opts: FileOptions | string): void | (() => void)`
-
-Adds a file input configuration.
-**Parameters**:
-
-- `opts` (FileOptions | string): The file options or a string ID.
-
-**Example**:
-
-```Typescript
-fs.add({
-  id: 'fileInput',
-  type: 'image',
-  resize: 200,
-  cb: (dataUrl, file) => {
-    console.log('File processed:', dataUrl, file);
-  },
-  save: true,
-});
-```
-
-#### `change(event: Event, info: FileOptions): void`
-
-Handles file input change event.
-**Parameters**:
-
-- `event` (Event): The input change event.
-- `info` (FileOptions): The file options.
-
-**Example**:
-
-```Typescript
-<input type="file" (change)="fs.change($event, fileOptions)">
-```
-
-#### `remove(part: string, url: string, opts: any = {}, cb: (resp: any) => void = () => {}): void | (() => void)`
-
-Removes a file.
-
-**Parameters**:
-
-- `part` (string): The part of the API.
-- `url` (string): The URL of the file.
-- `opts` (object): Additional options.
-- `cb` (function): The callback function.
-
-**Example**:
-
-```Typescript
-fs.remove('images', 'https://example.com/image.jpg', {}, (resp) => {
-  console.log('File removed:', resp);
-});
-```
-
-#### `uploadFiles(info: FileOptions, files: File[], cb: (resp: any) => void = () => {}): void`
-
-Uploads files to the server.
-**Parameters**:
-
-- `info` (FileOptions): The file options.
-- `files` (File[]): The files to upload.
-- `cb` (function): The callback function.
-
-**Example**:
-
-```Typescript
-const files = document.getElementById('fileInput').files;
-fs.uploadFiles(fileOptions, files, (resp) => {
-  console.log('Files uploaded:', resp);
-});
-```
-
-#### `image(info: FileOptions, cb: (resp: any) => void = () => {}): void | (() => void)`
-
-Uploads an image to the server.
-**Parameters**:
-
-- `info` (FileOptions): The file options.
-- `cb` (function): The callback function.
-
-**Example**:
-
-```Typescript
-fs.image({
-  api: '/api/upload',
-  part: 'images',
-  name: 'profilePic',
-}, (resp) => {
-  console.log('Image uploaded:', resp);
-});
-```
-
-### Interfaces
-
-#### `FileOptions`
-
-Represents the file options for uploading and processing files.
-**Properties**:
-
-- `id` (string): The unique ID for the file input.
-- `type` (string): The type of file ('image' or 'file').
-- `resize` (number | object): The dimensions for resizing the image.
-- `multiple` (boolean): Indicates if multiple files can be uploaded.
-- `multiple_cb` (function): Callback function for multiple files.
-- `cb` (function): Callback function for file processing.
-- `save` (boolean): Indicates if the file should be saved.
-- `complete` (function): Function to call when the file is saved.
-- `api` (string): The API endpoint for uploading the file.
-- `part` (string): The part of the API.
-- `name` (string): The name of the file.
-- `body` (function | object): Function or object to generate the request body.
-- `resp` (function): Function to handle the response.
-- `append` (function): Function to append files to FormData.
-- `multiple_files` (array): Array of multiple files.
-- `multiple_counter` (number): Counter for multiple files.
-- `url` (string): The URL for the file.
-
-**Example**:
-
-```Typescript
-const fileOptions: FileOptions = {
-  id: 'fileInput',
-  type: 'image',
-  resize: { width: 200, height: 200 },
-  multiple: true,
-  multiple_cb: (files) => {
-    console.log('Multiple files processed:', files);
-  },
-  cb: (dataUrl, file) => {
-    console.log('File processed:', dataUrl, file);
-  },
-  save: true,
-  api: '/api/upload',
-  part: 'images',
-  name: 'profilePic',
-  body: () => ({ userId: 123 }),
-  resp: (response) => {
-    console.log('Server response:', response);
-  },
-};
-```
-
 ## [Socket Service](#socket-service)
 
 The `SocketService` manages WebSocket connections using `socket.io`. It handles setting up the connection, listening for events, and emitting messages.
@@ -2351,117 +2172,6 @@ Performs an immediate connectivity check and updates all signals.
 
 ```Typescript
 await networkService.recheckNow();
-```
-
-## [Alert Service](#alert-service)
-
-The `AlertService` displays configurable alert messages such as information, success, warning, error or question prompts.
-
-### Methods
-
-#### `show(opts: Alert | string): Alert`
-
-Displays a customizable alert. Passing a string uses it as the alert text.
-
-#### `info(opts: Alert): void`
-
-Shows an informational alert.
-
-#### `success(opts: Alert): void`
-
-Shows a success alert.
-
-#### `warning(opts: Alert): void`
-
-Shows a warning alert.
-
-#### `error(opts: Alert): void`
-
-Shows an error alert.
-
-#### `question(opts: Alert): void`
-
-Shows a question alert.
-
-#### `destroy(): void`
-
-Removes all alerts.
-
-**Example**:
-
-```Typescript
-import { AlertService } from 'wacom';
-
-constructor(private alertService: AlertService) {}
-
-notify() {
-  this.alertService.success({ text: 'Saved!' });
-}
-```
-
-## [Loader Service](#loader-service)
-
-The `LoaderService` provides global loading indicators.
-
-### Methods
-
-#### `show(opts: Loader | string = 'Loading...'): Loader`
-
-Displays a loader with optional text or configuration.
-
-#### `destroy(): void`
-
-Removes all active loaders.
-
-**Example**:
-
-```Typescript
-import { LoaderService } from 'wacom';
-
-constructor(private loader: LoaderService) {}
-
-load() {
-  const l = this.loader.show();
-  // ...do work...
-  l.close?.();
-}
-```
-
-## [Modal Service](#modal-service)
-
-The `ModalService` manages modal dialogs and projects components into them.
-
-### Methods
-
-#### `show(opts: Modal | Type<unknown>): Modal`
-
-Opens a modal with the given configuration or component type.
-
-#### `small(opts: Modal): void`
-
-#### `mid(opts: Modal): void`
-
-#### `big(opts: Modal): void`
-
-#### `full(opts: Modal): void`
-
-Convenience helpers to open modals of different sizes.
-
-#### `destroy(): void`
-
-Closes all open modals.
-
-**Example**:
-
-```Typescript
-import { ModalService } from 'wacom';
-import { MyComponent } from './my.component';
-
-constructor(private modal: ModalService) {}
-
-open() {
-  this.modal.show({ component: MyComponent, size: 'mid' });
-}
 ```
 
 ## [RTC Service](#rtc-service)

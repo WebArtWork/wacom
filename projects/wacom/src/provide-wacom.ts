@@ -8,7 +8,6 @@ import {
 	Config,
 	DEFAULT_CONFIG,
 } from './interfaces/config.interface';
-import { themeProvider } from './theme';
 
 export function provideWacom(
 	config: Config = DEFAULT_CONFIG,
@@ -16,6 +15,5 @@ export function provideWacom(
 	return makeEnvironmentProviders([
 		{ provide: CONFIG_TOKEN, useValue: config },
 		provideHttpClient(withInterceptorsFromDi()),
-		themeProvider(),
 	]);
 }

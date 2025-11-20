@@ -1,9 +1,6 @@
 import { InjectionToken } from '@angular/core';
-import { AlertConfig } from './alert.interface';
 import { HttpConfig } from './http.interface';
-import { LoaderConfig } from './loader.interface';
 import { MetaConfig } from './meta.interface';
-import { ModalConfig } from './modal.interface';
 import { NetworkConfig } from './network.interface';
 import { StoreConfig } from './store.interface';
 
@@ -17,27 +14,12 @@ export interface Config {
 	store?: StoreConfig;
 	/** Defaults applied to page metadata handling. */
 	meta?: MetaConfig;
-	/** Global settings for the alert service. */
-	alert?: AlertConfig;
-	/** Default options for loader overlays. */
-	loader?: LoaderConfig;
-	/** Configuration for modal dialogs. */
-	modal?: ModalConfig;
 	/** Base HTTP settings such as API URL and headers. */
 	http?: HttpConfig;
 	/** Optional socket connection configuration. */
 	socket?: any;
 	/** Raw Socket.IO client instance, if used. */
 	io?: any;
-	theme?: {
-		primary: string;
-		secondary: string;
-		info: string;
-		error: string;
-		success: string;
-		warning: string;
-		question: string;
-	};
 	network?: NetworkConfig;
 }
 
@@ -56,14 +38,5 @@ export const DEFAULT_CONFIG: Config = {
 	http: {
 		url: '',
 		headers: {},
-	},
-	theme: {
-		primary: '#fff',
-		secondary: '#000',
-		info: '#9ddeff',
-		error: '#ffafb4',
-		success: '#a6efb8',
-		warning: '#ffcfa5',
-		question: '#fff9b2',
 	},
 };

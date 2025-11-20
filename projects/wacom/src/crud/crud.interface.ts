@@ -27,8 +27,6 @@ export interface CrudDocument<Document> {
 export interface CrudOptions<Document> {
 	/** Logical name of the collection or resource. */
 	name?: string;
-	/** Message to display when the operation completes. */
-	alert?: string;
 	/** Callback invoked with the server response. */
 	callback?: (resp: Document | Document[]) => void;
 	/** Callback invoked if the request fails. */

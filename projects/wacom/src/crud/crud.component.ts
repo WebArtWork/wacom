@@ -5,15 +5,14 @@ import {
 	signal,
 	WritableSignal,
 } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, take } from 'rxjs';
+import { CoreService } from '../services/core.service';
 import {
 	CrudDocument,
 	CrudOptions,
 	CrudServiceInterface,
 	TableConfig,
-} from '../interfaces/crud.interface';
-import { AlertService } from '../services/alert.service';
-import { CoreService } from '../services/core.service';
+} from './crud.interface';
 
 /**
  * Interface representing the shape of a form service used by the CrudComponent.
@@ -24,12 +23,6 @@ interface FormServiceInterface<FormInterface> {
 	modal: <T>(form: any, options?: any, doc?: T) => Promise<T>;
 	modalDocs: <T>(docs: T[]) => Promise<T[]>;
 	modalUnique: <T>(collection: string, key: string, doc: T) => void;
-	alert?: {
-		question: (config: {
-			text: string;
-			buttons: { text: string; callback?: () => void }[];
-		}) => void;
-	};
 }
 
 /**
@@ -58,9 +51,6 @@ export abstract class CrudComponent<
 
 	/** CoreService handles timing and copying helpers */
 	private __core = inject(CoreService);
-
-	/** AlertService handles alerts */
-	private __alert = inject(AlertService);
 
 	/** ChangeDetectorRef handles on push strategy */
 	private __cdr = inject(ChangeDetectorRef);
@@ -130,10 +120,8 @@ export abstract class CrudComponent<
 						.map((doc) => this.crudService.getSignal(doc)),
 				);
 
-				const sub = this.crudService.loaded.subscribe(() => {
+				this.crudService.loaded.pipe(take(1)).subscribe(() => {
 					resolve();
-
-					sub.unsubscribe();
 
 					this.__cdr.markForCheck();
 				});
@@ -292,20 +280,9 @@ export abstract class CrudComponent<
 	}
 
 	/** Requests confirmation before deleting the provided document. */
-	protected delete(doc: Document) {
-		this.__alert.question({
-			text: `Are you sure you want to delete this${this._module ? ' ' + this._module : ''}?`,
-			buttons: [
-				{ text: 'No' },
-				{
-					text: 'Yes',
-					callback: async (): Promise<void> => {
-						await firstValueFrom(this.crudService.delete(doc));
-
-						this.setDocuments();
-					},
-				},
-			],
+	protected async delete(doc: Document) {
+		this.crudService.delete(doc).subscribe(() => {
+			this.setDocuments();
 		});
 	}
 
