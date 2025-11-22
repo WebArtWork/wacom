@@ -20,6 +20,7 @@ export * from './src/crud/crud.component';
  *	Directives
  */
 export * from './src/directives/click-outside.directive';
+export * from './src/directives/manual-type.directive';
 /*
  *	Pipes
  */
