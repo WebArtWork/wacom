@@ -19,8 +19,7 @@ import {
  * The consuming app must provide a service that implements this structure.
  */
 interface FormServiceInterface<FormInterface> {
-	prepareForm: (form: FormInterface) => any;
-	modal: <T>(form: any, options?: any, doc?: T) => Promise<T>;
+	modal: <T>(form: FormInterface, options?: any, doc?: T) => Promise<T>;
 	modalDocs: <T>(docs: T[]) => Promise<T[]>;
 	modalUnique: <T>(collection: string, key: string, doc: T) => void;
 }
@@ -43,8 +42,8 @@ export abstract class CrudComponent<
 	/** The array of documents currently loaded and shown */
 	protected documents = signal<Signal<Document>[]>([]);
 
-	/** The reactive form instance generated from the provided config */
-	protected form: any;
+	/** Form schema/config used by the FormService modals */
+	protected form: FormInterface;
 
 	/** Current pagination page */
 	protected page = 1;
@@ -63,15 +62,11 @@ export abstract class CrudComponent<
 	 *
 	 * @param formConfig - Object describing form title and its component structure
 	 * @param formService - Any service that conforms to FormServiceInterface (usually casted)
-	 * @param translateService - An object providing a translate() method for i18n
 	 * @param crudService - CRUD service implementing get/create/update/delete
 	 */
 	constructor(
 		formConfig: unknown,
-		protected formService: unknown,
-		protected translateService: {
-			translate: (key: string) => WritableSignal<string>;
-		},
+		formService: unknown,
 		crudService: Service,
 		module = '',
 	) {
@@ -79,7 +74,7 @@ export abstract class CrudComponent<
 
 		this.__form = formService as FormServiceInterface<FormInterface>;
 
-		this.form = this.__form.prepareForm(form);
+		this.form = form;
 
 		this.crudService = crudService;
 
