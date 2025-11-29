@@ -212,6 +212,15 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	}
 
 	/**
+	 * Retrieves the document based on function.
+	 *
+	 * @returns The list of document.
+	 */
+	getDoc(find: (doc: Document) => boolean): Document | undefined {
+		return this._docs.find(find);
+	}
+
+	/**
 	 * Clears the current list of documents.
 	 *
 	 * Empties the internal documents array and saves the updated state to local storage.

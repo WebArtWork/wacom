@@ -1,7 +1,7 @@
 import { Directive, ElementRef, effect, inject, input } from '@angular/core';
 
 @Directive({
-	selector: 'input[manualType]',
+	selector: 'input[manualType], textarea[manualType]',
 })
 export class ManualTypeDirective {
 	private readonly el = inject(ElementRef) as ElementRef<HTMLInputElement>;

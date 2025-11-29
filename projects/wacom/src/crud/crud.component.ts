@@ -172,11 +172,11 @@ export abstract class CrudComponent<
 	 * In creation mode, adds new documents.
 	 * In update mode, syncs changes and deletes removed entries.
 	 */
-	protected bulkManagement(create = true): () => void {
+	protected bulkManagement(isCreateFlow = true): () => void {
 		return (): void => {
 			this.__form
 				.modalDocs<Document>(
-					create
+					isCreateFlow
 						? []
 						: this.documents().map(
 								(obj: any) =>
@@ -189,7 +189,7 @@ export abstract class CrudComponent<
 							),
 				)
 				.then(async (docs: Document[]) => {
-					if (create) {
+					if (isCreateFlow) {
 						for (const doc of docs) {
 							this.preCreate(doc);
 
