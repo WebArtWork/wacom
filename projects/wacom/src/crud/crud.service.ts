@@ -1,4 +1,4 @@
-import { inject, WritableSignal } from '@angular/core';
+import { inject, signal, WritableSignal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CoreService } from '../services/core.service';
 import { EmitterService } from '../services/emitter.service';
@@ -33,45 +33,58 @@ interface GetConfig {
  */
 export abstract class CrudService<Document extends CrudDocument<Document>> {
 	/**
-	 * URL for the API.
+	 * Base URL for the API collection associated with this service.
 	 */
 	private _url = '/api/';
 
 	/**
-	 * Array of documents managed by this service.
+	 * In-memory cache with all documents currently known by the service.
 	 */
 	private _docs: Document[] = [];
 
 	/**
-	 * Number of documents per page.
+	 * Number of documents per page for paginated `get()` calls.
 	 */
 	private _perPage = 20;
 
 	/**
-	 * Callbacks for filtering documents.
+	 * Registered callbacks that recompute filtered document views.
 	 */
 	private _filteredDocumentsCallbacks: (() => void)[] = [];
 
 	/**
-	 * Constructs a CRUD service instance.
-	 *
-	 * @param _config - Configuration options for the CRUD service.
-	 * @param __httpService - Service to handle HTTP requests.
-	 * @param __storeService - Service to manage local storage of documents.
-	 * @param __coreService - Core service for utility functions.
+	 * HTTP client wrapper used for API communication.
 	 */
 	protected __httpService = inject(HttpService);
 
+	/**
+	 * Key–value storage service used to persist documents locally.
+	 */
 	protected __storeService = inject(StoreService);
 
+	/**
+	 * Core helper service with utility methods (copy, debounce, toSignal, etc.).
+	 */
 	protected __coreService = inject(CoreService);
 
+	/**
+	 * Global event bus for cross-service communication.
+	 */
 	protected __emitterService = inject(EmitterService);
 
+	/**
+	 * Network status service used to queue work while offline.
+	 */
 	protected __networkService = inject(NetworkService);
 
+	/**
+	 * Emits once when documents are restored from local storage on startup.
+	 */
 	loaded: Observable<unknown>;
 
+	/**
+	 * Emits once when the initial `get()` (without page param) completes.
+	 */
 	getted: Observable<unknown>;
 
 	constructor(private _config: CrudConfig<Document>) {
@@ -119,14 +132,32 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * Cache of per-document signals indexed by document _id.
 	 * Prevents creating multiple signals for the same document.
 	 */
-	private _signals: Record<string, WritableSignal<Document>> = {};
+	private _signal: Record<string, WritableSignal<Document>> = {};
+
+	/**
+	 * Cache of per (field,value) lists of document signals.
+	 * Key format: `${field}_${JSON.stringify(value)}`.
+	 */
+	private _signals: Record<
+		string,
+		WritableSignal<WritableSignal<Document>[]>
+	> = {};
+
+	/**
+	 * Cache of per-field maps: fieldValue -> array of document signals.
+	 */
+	private _fieldSignals: Record<
+		string,
+		WritableSignal<Record<string, WritableSignal<Document>[]>>
+	> = {};
 
 	/**
 	 * Returns a WritableSignal for a document by _id, creating it if absent.
 	 * Caches the signal to avoid redundant instances and initializes it
 	 * with the current snapshot of the document.
-	 * Work very carefully with this and localId, better avoid such flows
-	 * @param _id - Document identifier.
+	 * Work very carefully with this and localId, better avoid such flows.
+	 *
+	 * @param _id - Document identifier or a document instance.
 	 */
 	getSignal(_id: string | Document) {
 		if (typeof _id !== 'string') {
@@ -134,34 +165,129 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		}
 
 		// Reuse existing signal if present
-		if (this._signals[_id]) {
-			return this._signals[_id];
+		if (this._signal[_id]) {
+			return this._signal[_id];
 		}
 
 		// Always base the signal on the current canonical doc()
 		const doc = this.doc(_id);
 
-		this._signals[_id] = this.__coreService.toSignal(
+		this._signal[_id] = this.__coreService.toSignal(
 			doc,
 			this._config.signalFields,
 		) as WritableSignal<Document>;
 
-		return this._signals[_id];
+		return this._signal[_id];
+	}
+
+	/**
+	 * Returns a signal with an array of document signals that match
+	 * a given field/value pair.
+	 *
+	 * Example:
+	 *   const activitiesSig = service.getSignals('userId', currentUserId);
+	 */
+	getSignals(field: string, value: unknown) {
+		const id = field + '_' + JSON.stringify(value);
+
+		if (!this._signals[id]) {
+			this._signals[id] = signal<WritableSignal<Document>[]>(
+				this._getSignals(id),
+			);
+		}
+
+		return this._signals[id];
+	}
+
+	/**
+	 * Builds the array of document signals for a given (field,value) key.
+	 * Only documents with a real _id are included.
+	 */
+	private _getSignals(id: string): WritableSignal<Document>[] {
+		const sep = id.indexOf('_');
+		if (sep === -1) {
+			return [];
+		}
+
+		const field = id.slice(0, sep) as keyof Document;
+		const valueJson = id.slice(sep + 1);
+
+		const list: WritableSignal<Document>[] = [];
+
+		for (const doc of this.getDocs()) {
+			if (JSON.stringify(doc[field] as unknown) !== valueJson) {
+				continue;
+			}
+
+			const docId = this._id(doc);
+			if (!docId) continue;
+
+			list.push(this.getSignal(docId));
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns a signal with a map: fieldValue -> array of document signals.
+	 *
+	 * Example:
+	 *   const byStatusSig = service.getFieldSignals('status');
+	 *   byStatusSig() might be { active: [sig1, sig2], draft: [sig3] }.
+	 */
+	getFieldSignals(field: string) {
+		if (!this._fieldSignals[field]) {
+			this._fieldSignals[field] = signal<
+				Record<string, WritableSignal<Document>[]>
+			>(this._getFieldSignals(field));
+		}
+
+		return this._fieldSignals[field];
+	}
+
+	/**
+	 * Builds the map for a given field.
+	 * Only documents with a real _id are included.
+	 */
+	private _getFieldSignals(
+		field: string,
+	): Record<string, WritableSignal<Document>[]> {
+		const byFields: Record<string, WritableSignal<Document>[]> = {};
+
+		for (const doc of this.getDocs()) {
+			const docId = this._id(doc);
+			if (!docId) continue;
+
+			const value = String(doc[field as keyof Document]);
+
+			if (!byFields[value]) {
+				byFields[value] = [];
+			}
+
+			byFields[value].push(this.getSignal(docId));
+		}
+
+		return byFields;
 	}
 
 	/**
 	 * Clears cached document signals except those explicitly preserved.
 	 * Useful when changing routes or contexts to reduce memory.
+	 *
 	 * @param exceptIds - List of ids whose signals should be kept.
 	 */
 	removeSignals(exceptIds: string[] = []) {
-		for (const _id in this._signals) {
+		for (const _id in this._signal) {
 			if (!exceptIds.includes(_id)) {
-				delete this._signals[_id];
+				delete this._signal[_id];
 			}
 		}
 	}
 
+	/**
+	 * Restores documents from local storage (if present) and syncs
+	 * all existing signals with the restored data.
+	 */
 	async restoreDocs() {
 		const docs = await this.__storeService.getJson<Document[]>(
 			'docs_' + this._config.name,
@@ -169,20 +295,25 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 
 		if (docs?.length) {
 			this._docs.length = 0;
-			this._docs.push(...docs);
 
-			// keep all existing signals in sync with new docs
-			for (const id in this._signals) {
-				const d = this._docs.find((doc) => this._id(doc) === id);
-				if (d) {
-					this._syncSignalForDoc(d);
-				}
-			}
+			this._docs.push(...docs);
 
 			this._filterDocuments();
 
 			for (const doc of this._docs) {
-				// ... (rest of your existing restore logic unchanged)
+				if (doc.__deleted) {
+					this.delete(doc, doc.__options?.['delete'] || {});
+				} else if (!doc._id) {
+					this.create(doc, doc.__options?.['create'] || {});
+				} else if (doc.__modified?.length) {
+					for (const id of doc.__modified) {
+						if (id.startsWith('up')) {
+							this.update(doc, doc.__options?.[id] || {});
+						} else {
+							this.unique(doc, doc.__options?.[id] || {});
+						}
+					}
+				}
 			}
 
 			this.__emitterService.complete(
@@ -212,16 +343,17 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	}
 
 	/**
-	 * Retrieves the document based on function.
+	 * Retrieves the first document that matches the given predicate.
 	 *
-	 * @returns The list of document.
+	 * @param find - Predicate used to locate a specific document.
 	 */
 	getDoc(find: (doc: Document) => boolean): Document | undefined {
 		return this._docs.find(find);
 	}
 
 	/**
-	 * Clears the current list of documents.
+	 * Clears the current list of documents, persists the empty state
+	 * and recomputes all derived signals.
 	 *
 	 * Empties the internal documents array and saves the updated state to local storage.
 	 */
@@ -229,6 +361,8 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		this._docs.splice(0, this._docs.length);
 
 		this.setDocs();
+
+		this._updateSignals();
 	}
 
 	/**
@@ -296,8 +430,8 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 */
 	doc(_id: string): Document {
 		// If we already have a signal for this id, use its current value
-		if (this._signals[_id]) {
-			return this._signals[_id]();
+		if (this._signal[_id]) {
+			return this._signal[_id]();
 		}
 
 		let doc =
@@ -755,7 +889,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 					}
 					this.setDocs();
 
-					// We keep signal but mark it deleted
+					// We keep signal but mark it deleted and recompute mappings.
 					this._syncSignalForDoc({
 						...doc,
 						__deleted: true,
@@ -786,6 +920,11 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		return obs as Observable<Document>;
 	}
 
+	/**
+	 * Registers a filtered view of documents and returns the recompute callback.
+	 *
+	 * The callback is called automatically whenever `_filterDocuments()` runs.
+	 */
 	filteredDocuments(
 		storeObjectOrArray: Record<string, Document[]> | Document[],
 		config: {
@@ -911,14 +1050,32 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		return callback;
 	}
 
+	/**
+	 * Track pending fetch-by-id requests to avoid duplicate calls.
+	 */
 	private _fetchingId: Record<string, boolean> = {};
 
+	/**
+	 * Queue of operations that must be retried when network comes back online.
+	 */
 	private _onOnline: (() => void)[] = [];
 
+	/**
+	 * Local counter used to build unique local identifiers together with Date.now().
+	 */
 	private _randomCount = 0;
 
 	/**
-	 * Generates a unique ID for a document.
+	 * Generates a unique ID for a document when using local-only identifiers.
+	 *
+	 * @returns The unique ID as a number.
+	 */
+	private _localId() {
+		return Number(Date.now() + '' + this._randomCount++);
+	}
+
+	/**
+	 * Returns the configured identity field for the given document as string.
 	 *
 	 * @param doc - The document for which to generate the ID.
 	 * @returns The unique ID as a string.
@@ -930,7 +1087,8 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	}
 
 	/**
-	 * Executes all registered filter document callbacks.
+	 * Executes all registered filter document callbacks and emits a
+	 * `<name>_filtered` event.
 	 */
 	private _filterDocuments(): void {
 		for (const callback of this._filteredDocumentsCallbacks) {
@@ -940,6 +1098,10 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		this.__emitterService.emit(`${this._config.name}_filtered`);
 	}
 
+	/**
+	 * Marks a document as modified for a given operation id and
+	 * keeps the document in the store until the operation is confirmed.
+	 */
 	private _updateModified(
 		doc: Document,
 		id: string,
@@ -958,6 +1120,10 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		}
 	}
 
+	/**
+	 * Removes a modification mark from the document once the
+	 * server operation is confirmed.
+	 */
 	private _removeModified(doc: Document, id: string) {
 		doc.__modified ||= [];
 
@@ -971,17 +1137,37 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		}
 	}
 
-	private _localId() {
-		return Number(Date.now() + '' + this._randomCount++);
-	}
-
+	/**
+	 * Syncs a single document's signal (if exists) and refreshes all
+	 * derived collections (field/value lists and field maps).
+	 */
 	private _syncSignalForDoc(doc: Document) {
 		const id = this._id(doc);
-		if (!id) return;
 
-		const signal = this._signals[id];
-		if (signal) {
-			signal.set(doc);
+		if (id && this._signal[id]) {
+			this._signal[id].set(doc);
+		}
+
+		this._updateSignals();
+	}
+
+	/**
+	 * Rebuilds all derived signal collections:
+	 *  - all per (field,value) lists of document signals
+	 *  - all per-field maps value -> [signals]
+	 *
+	 * This keeps `getSignals()` and `getFieldSignals()` in sync after
+	 * any mutation that touches `_docs`.
+	 */
+	private _updateSignals() {
+		// refresh all (field,value) collections
+		for (const key in this._signals) {
+			this._signals[key].set(this._getSignals(key));
+		}
+
+		// refresh all per-field maps
+		for (const field in this._fieldSignals) {
+			this._fieldSignals[field].set(this._getFieldSignals(field));
 		}
 	}
 }
