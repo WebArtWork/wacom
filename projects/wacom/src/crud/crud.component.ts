@@ -81,6 +81,8 @@ export abstract class CrudComponent<
 		this._module = module;
 	}
 
+	protected localDocumentsFilter: (doc: Document) => boolean = () => true;
+
 	/**
 	 * Loads documents for a given page.
 	 */
@@ -112,6 +114,7 @@ export abstract class CrudComponent<
 				this.documents.update(() =>
 					this.crudService
 						.getDocs()
+						.filter(this.localDocumentsFilter)
 						.map((doc) => this.crudService.getSignal(doc)),
 				);
 
