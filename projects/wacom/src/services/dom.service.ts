@@ -48,6 +48,8 @@ export class DomService {
 			element.appendChild(domElem);
 		}
 
+		componentRef.changeDetectorRef.detectChanges();
+
 		return {
 			nativeElement: domElem,
 			componentRef: componentRef,
@@ -91,6 +93,8 @@ export class DomService {
 			element.appendChild(domElem);
 		}
 
+		componentRef.changeDetectorRef.detectChanges();
+
 		return {
 			nativeElement: domElem,
 			componentRef: componentRef,
@@ -117,6 +121,8 @@ export class DomService {
 		this.projectComponentInputs(componentRef, options);
 
 		this._appRef.attachView(componentRef.hostView);
+
+		componentRef.changeDetectorRef.detectChanges();
 
 		return componentRef;
 	}
