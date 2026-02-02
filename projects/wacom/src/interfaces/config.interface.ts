@@ -1,6 +1,6 @@
 import { InjectionToken } from '@angular/core';
+import { MetaConfig } from '../meta/meta.interface';
 import { HttpConfig } from './http.interface';
-import { MetaConfig } from './meta.interface';
 import { NetworkConfig } from './network.interface';
 import { StoreConfig } from './store.interface';
 
@@ -31,7 +31,6 @@ export const DEFAULT_CONFIG: Config = {
 	},
 	meta: {
 		useTitleSuffix: false,
-		warnMissingGuard: false,
 		defaults: { links: {} },
 	},
 	socket: false,

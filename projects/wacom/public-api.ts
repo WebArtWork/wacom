@@ -5,13 +5,13 @@ export * from './src/crud/crud.interface';
 export * from './src/interfaces/config.interface';
 export * from './src/interfaces/dom.interface';
 export * from './src/interfaces/http.interface';
-export * from './src/interfaces/meta.interface';
 export * from './src/interfaces/network.interface';
 export * from './src/interfaces/store.interface';
+export * from './src/meta/meta.interface';
 /*
  *	Guard
  */
-export * from './src/guard/meta.guard';
+export * from './src/meta/meta.guard';
 /*
  *	Components
  */
@@ -39,11 +39,11 @@ export * from './src/pipes/split.pipe';
  *	Services
  */
 export * from './src/crud/crud.service';
+export * from './src/meta/meta.service';
 export * from './src/services/core.service';
 export * from './src/services/dom.service';
 export * from './src/services/emitter.service';
 export * from './src/services/http.service';
-export * from './src/services/meta.service';
 export * from './src/services/network.service';
 export * from './src/services/rtc.service';
 export * from './src/services/socket.service';
