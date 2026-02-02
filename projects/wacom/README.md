@@ -38,7 +38,6 @@ export const appConfig = {
 			store: { prefix: "waStore" },
 			meta: {
 				useTitleSuffix: false,
-				warnMissingGuard: true,
 				defaults: { links: {} },
 			},
 			network: {},
@@ -55,7 +54,6 @@ export const appConfig = {
 | Name                                                                 |                             Description                             |
 | -------------------------------------------------------------------- | :-----------------------------------------------------------------: |
 | [**`Core`**](https://www.npmjs.com/package/wacom#core-service)       |     Common supportive function which can be used in any service     |
-| [**`Base`**](https://www.npmjs.com/package/wacom#base-service)       |        Tracks timestamps and can refresh to the current time        |
 | [**`Http`**](https://www.npmjs.com/package/wacom#http-service)       |                      Http layer for HttpClient                      |
 | [**`Store`**](https://www.npmjs.com/package/wacom#store-service)     |      Service responsible for keeping information on the device      |
 | [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service)       |             Website meta tags management within router              |
@@ -503,32 +501,6 @@ In this example:
 3. The `onUnlock` method returns a Promise that resolves when the resource is unlocked, allowing the code to wait until the resource is available again.
 
 This ensures controlled access to the resource, preventing race conditions and ensuring data integrity.
-
-## [Base Service](#base-service)
-
-The `BaseService` provides a minimal utility for tracking the current timestamp.
-
-### Properties
-
-- `now` (`number`): Stores the current timestamp in milliseconds.
-
-### Methods
-
-#### `refreshNow(): void`
-
-Updates the `now` property to the current timestamp.
-
-**Example**:
-
-```Typescript
-import { BaseService } from 'wacom';
-
-constructor(private baseService: BaseService) {}
-
-refresh() {
-  this.baseService.refreshNow();
-}
-```
 
 ## [Http Service](#http-service)
 
@@ -1000,7 +972,7 @@ Sets the title and optional title suffix, updating the `title`, `og:title`, and 
 metaService.setTitle('My Page Title', ' | My Website');
 ```
 
-#### `setLink(links: { [key: string]: string }): MetaService`
+#### `setLink(links: { [key: string]: string }): void`
 
 Sets link tags.
 
@@ -1064,16 +1036,6 @@ Updates a meta tag.
 - `tag` (string): The meta tag name.
 - `value` (string): The meta tag value.
 - `prop` (string): The meta tag property.
-
-#### `_warnMissingGuard(): void`
-
-Warns about missing meta guards in routes.
-
-**Example**:
-
-```Typescript
-metaService._warnMissingGuard();
-```
 
 ## [Util Service](#util-service)
 
@@ -1470,7 +1432,6 @@ interface CrudDocument {
 ```typescript
 import { Injectable } from "@angular/core";
 import {
-	AlertService,
 	CoreService,
 	HttpService,
 	StoreService,
@@ -1492,7 +1453,6 @@ export class WorkService extends CrudService<Work> {
 	constructor(
 		_http: HttpService,
 		_store: StoreService,
-		_alert: AlertService,
 		_core: CoreService,
 	) {
 		super(
@@ -1501,7 +1461,6 @@ export class WorkService extends CrudService<Work> {
 			},
 			_http,
 			_store,
-			_alert,
 			_core,
 		);
 
