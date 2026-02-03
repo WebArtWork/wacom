@@ -50,6 +50,7 @@ export * from './src/services/socket.service';
 export * from './src/services/store.service';
 export * from './src/services/time.service';
 export * from './src/services/util.service';
+export * from './src/theme/theme.service';
 /*
  *	Initial
  *
