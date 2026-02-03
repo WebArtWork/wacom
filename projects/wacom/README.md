@@ -64,6 +64,7 @@ export const appConfig = {
 | [**`Network`**](https://www.npmjs.com/package/wacom#network-service) |              Monitors network connectivity and latency              |
 | [**`RTC`**](https://www.npmjs.com/package/wacom#rtc-service)         |        Wraps WebRTC peer connections and local media streams        |
 | [**`Util`**](https://www.npmjs.com/package/wacom#util-service)       |      Utility methods for forms, validation, and CSS variables       |
+| [**`Theme`**](#theme-service)                                       |     Manages UI theme mode, density, and radius preferences     |
 | [**`Emitter`**](#emitter-service)                                    |            Lightweight app-wide event and task signaling            |
 
 ## [Emitter Service](#emitter-service)
@@ -2161,5 +2162,35 @@ async connect(id: string) {
   await this.rtc.createPeer(id);
   const offer = await this.rtc.createOffer(id);
   // send offer to remote peer...
+}
+```
+
+## [Theme Service](#theme-service)
+
+The `ThemeService` manages UI theme preferences by setting data attributes on the
+document root and persisting them in `localStorage`.
+
+### Methods
+
+- `getMode(): ThemeMode | null` â€“ reads `theme.mode` from `localStorage`.
+- `setMode(mode: ThemeMode): void` â€“ sets `data-mode` and persists `theme.mode`.
+- `getDensity(): ThemeDensity | null` â€“ reads `theme.density` from `localStorage`.
+- `setDensity(density: ThemeDensity): void` â€“ sets `data-density` and persists `theme.density`.
+- `getRadius(): ThemeRadius | string | null` â€“ reads `theme.radius` from `localStorage`.
+- `setRadius(radius: ThemeRadius | string): void` â€“ sets `data-radius` and persists `theme.radius`.
+- `init(): void` â€“ loads preferences from `localStorage` (or defaults to `light`, `comfortable`, `rounded`).
+
+### Usage Example
+
+```Typescript
+import { ThemeService } from "wacom";
+
+constructor(private theme: ThemeService) {}
+
+ngOnInit() {
+	this.theme.init();
+	this.theme.setMode("dark");
+	this.theme.setDensity("compact");
+	this.theme.setRadius("square");
 }
 ```

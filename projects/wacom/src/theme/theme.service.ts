@@ -6,16 +6,25 @@ import { ThemeDensity, ThemeMode, ThemeRadius } from './theme.type';
 export class ThemeService {
 	private readonly doc = inject(DOCUMENT);
 
+	getRadius() {
+		return localStorage.getItem('theme.radius') as ThemeRadius | string;
+	}
 	setRadius(radius: ThemeRadius | string) {
 		this.doc.documentElement.dataset['radius'] = radius;
 		localStorage.setItem('theme.radius', radius);
 	}
 
+	getMode() {
+		return localStorage.getItem('theme.mode') as ThemeMode;
+	}
 	setMode(mode: ThemeMode) {
 		this.doc.documentElement.dataset['mode'] = mode;
 		localStorage.setItem('theme.mode', mode);
 	}
 
+	getDensity() {
+		return localStorage.getItem('theme.density') as ThemeDensity;
+	}
 	setDensity(density: ThemeDensity) {
 		this.doc.documentElement.dataset['density'] = density;
 		localStorage.setItem('theme.density', density);

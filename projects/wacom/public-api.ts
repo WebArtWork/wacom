@@ -8,14 +8,22 @@ export * from './src/interfaces/http.interface';
 export * from './src/interfaces/network.interface';
 export * from './src/interfaces/store.interface';
 export * from './src/meta/meta.interface';
+
+/*
+ *	Types
+ */
+export * from './src/theme/theme.type';
+
 /*
  *	Guard
  */
 export * from './src/meta/meta.guard';
+
 /*
  *	Components
  */
 export * from './src/crud/crud.component';
+
 /*
  *	Directives
  */
@@ -24,6 +32,7 @@ export * from './src/directives/manual-disabled.directive';
 export * from './src/directives/manual-name.directive';
 export * from './src/directives/manual-readonly.directive';
 export * from './src/directives/manual-type.directive';
+
 /*
  *	Pipes
  */
@@ -35,6 +44,7 @@ export * from './src/pipes/safe.pipe';
 export * from './src/pipes/search.pipe';
 export * from './src/pipes/splice.pipe';
 export * from './src/pipes/split.pipe';
+
 /*
  *	Services
  */
@@ -51,6 +61,7 @@ export * from './src/services/store.service';
 export * from './src/services/time.service';
 export * from './src/services/util.service';
 export * from './src/theme/theme.service';
+
 /*
  *	Initial
  *
