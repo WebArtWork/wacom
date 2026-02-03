@@ -1,5 +1,13 @@
 // Core utilities and helpers for the Wacom app
-import { Injectable, Signal, WritableSignal, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import {
+	Injectable,
+	PLATFORM_ID,
+	Signal,
+	WritableSignal,
+	inject,
+	signal,
+} from '@angular/core';
 
 // Add capitalize method to String prototype if it doesn't already exist
 if (!String.prototype.capitalize) {
@@ -22,16 +30,25 @@ declare global {
 	providedIn: 'root',
 })
 export class CoreService {
-	deviceID =
-		localStorage.getItem('deviceID') ||
-		(typeof crypto?.randomUUID === 'function'
-			? crypto.randomUUID()
-			: this.UUID());
+	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
+	deviceID = '';
 
 	constructor() {
-		localStorage.setItem('deviceID', this.deviceID);
+		if (this.isBrowser) {
+			const stored = localStorage.getItem('deviceID');
+			this.deviceID =
+				stored ||
+				(typeof crypto?.randomUUID === 'function'
+					? crypto.randomUUID()
+					: this.UUID());
 
-		this.detectDevice();
+			localStorage.setItem('deviceID', this.deviceID);
+
+			this.detectDevice();
+		} else {
+			this.deviceID = this.UUID();
+		}
 	}
 
 	/**
@@ -157,11 +174,11 @@ export class CoreService {
 		if (typeof cb === 'function' && typeof time === 'number') {
 			if (typeof doc === 'string') {
 				clearTimeout(this._afterWhile[doc]);
-				this._afterWhile[doc] = window.setTimeout(cb, time);
+				this._afterWhile[doc] = setTimeout(cb, time);
 			} else if (typeof doc === 'object') {
 				clearTimeout((doc as { __afterWhile: number }).__afterWhile);
 				(doc as { __afterWhile: number }).__afterWhile =
-					window.setTimeout(cb, time);
+					setTimeout(cb, time);
 			} else {
 				console.warn('badly configured after while');
 			}
@@ -205,6 +222,8 @@ export class CoreService {
 	 * Detects the device type based on the user agent.
 	 */
 	detectDevice(): void {
+		if (!this.isBrowser) return;
+
 		const userAgent =
 			navigator.userAgent || navigator.vendor || (window as any).opera;
 		if (/windows phone/i.test(userAgent)) {
@@ -238,6 +257,8 @@ export class CoreService {
 	 * @returns {boolean} - Returns true if the device is a tablet.
 	 */
 	isTablet(): boolean {
+		if (!this.isBrowser) return false;
+
 		return this.device === 'iOS' && /iPad/.test(navigator.userAgent);
 	}
 

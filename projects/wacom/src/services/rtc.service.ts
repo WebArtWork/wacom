@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 
 /**
  * RtcService handles WebRTC peer connections and local media stream setup.
@@ -7,6 +8,7 @@ import { Injectable } from '@angular/core';
  */
 @Injectable({ providedIn: 'root' })
 export class RtcService {
+	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	/**
 	 * Map of peer connections, keyed by peer ID.
 	 */
@@ -22,6 +24,10 @@ export class RtcService {
 	 * Requests permissions and stores the stream internally.
 	 */
 	async initLocalStream(): Promise<MediaStream> {
+		if (!this.isBrowser) {
+			throw new Error('RTC is not available during SSR.');
+		}
+
 		if (!this.localStream) {
 			this.localStream = await navigator.mediaDevices.getUserMedia({
 				video: true,
@@ -36,6 +42,10 @@ export class RtcService {
 	 * Creates a new RTCPeerConnection for the given ID and attaches local tracks.
 	 */
 	async createPeer(id: string): Promise<RTCPeerConnection> {
+		if (!this.isBrowser) {
+			throw new Error('RTC is not available during SSR.');
+		}
+
 		const peer = new RTCPeerConnection();
 
 		this.localStream
@@ -58,6 +68,10 @@ export class RtcService {
 	 * Creates an SDP offer for the specified peer and sets it as the local description.
 	 */
 	async createOffer(id: string): Promise<RTCSessionDescriptionInit> {
+		if (!this.isBrowser) {
+			throw new Error('RTC is not available during SSR.');
+		}
+
 		const peer = this.peers.get(id);
 
 		if (!peer) throw new Error('Peer not found');
@@ -76,6 +90,10 @@ export class RtcService {
 		id: string,
 		offer: RTCSessionDescriptionInit,
 	): Promise<RTCSessionDescriptionInit> {
+		if (!this.isBrowser) {
+			throw new Error('RTC is not available during SSR.');
+		}
+
 		const peer = this.peers.get(id);
 
 		if (!peer) throw new Error('Peer not found');
@@ -93,6 +111,10 @@ export class RtcService {
 	 * Sets the remote description with an SDP answer for the given peer.
 	 */
 	async setRemoteAnswer(id: string, answer: RTCSessionDescriptionInit) {
+		if (!this.isBrowser) {
+			throw new Error('RTC is not available during SSR.');
+		}
+
 		const peer = this.peers.get(id);
 
 		if (!peer) throw new Error('Peer not found');
@@ -104,6 +126,8 @@ export class RtcService {
 	 * Adds an ICE candidate to the specified peer connection.
 	 */
 	addIceCandidate(id: string, candidate: RTCIceCandidateInit) {
+		if (!this.isBrowser) return;
+
 		const peer = this.peers.get(id);
 
 		if (peer) peer.addIceCandidate(new RTCIceCandidate(candidate));

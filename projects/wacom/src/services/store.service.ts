@@ -1,4 +1,5 @@
-import { Inject, Injectable, Optional } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, Injectable, Optional, PLATFORM_ID, inject } from '@angular/core';
 import {
 	CONFIG_TOKEN,
 	Config,
@@ -10,6 +11,8 @@ import { StoreConfig } from '../interfaces/store.interface';
 	providedIn: 'root',
 })
 export class StoreService {
+	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
 	constructor(@Inject(CONFIG_TOKEN) @Optional() config: Config) {
 		this._config = {
 			...DEFAULT_CONFIG,
@@ -45,6 +48,11 @@ export class StoreService {
 			if (this._config.set) {
 				await this._config.set(key, value, callback, errCallback);
 			} else {
+				if (!this.isBrowser) {
+					callback();
+					return true;
+				}
+
 				localStorage.setItem(key, value);
 
 				callback();
@@ -85,6 +93,11 @@ export class StoreService {
 
 				return value ?? null;
 			} else {
+				if (!this.isBrowser) {
+					callback?.(null);
+					return null;
+				}
+
 				const value = localStorage.getItem(key);
 
 				callback?.(value ?? null);
@@ -172,6 +185,11 @@ export class StoreService {
 			if (this._config.remove) {
 				return await this._config.remove(key, callback, errCallback);
 			} else {
+				if (!this.isBrowser) {
+					callback();
+					return true;
+				}
+
 				localStorage.removeItem(key);
 
 				callback();
@@ -202,6 +220,11 @@ export class StoreService {
 			if (this._config.clear) {
 				await this._config.clear();
 			} else {
+				if (!this.isBrowser) {
+					callback?.();
+					return true;
+				}
+
 				localStorage.clear();
 			}
 

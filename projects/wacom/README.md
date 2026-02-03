@@ -2168,17 +2168,20 @@ async connect(id: string) {
 ## [Theme Service](#theme-service)
 
 The `ThemeService` manages UI theme preferences by setting data attributes on the
-document root and persisting them in `localStorage`.
+document root, persisting them in `localStorage`, and exposing Angular signals.
+
+### Properties
+
+- `mode: Signal<ThemeMode | string | undefined>` - current theme mode.
+- `density: Signal<ThemeDensity | undefined>` - current density.
+- `radius: Signal<ThemeRadius | undefined>` - current radius.
 
 ### Methods
 
-- `getMode(): ThemeMode | null` â€“ reads `theme.mode` from `localStorage`.
-- `setMode(mode: ThemeMode): void` â€“ sets `data-mode` and persists `theme.mode`.
-- `getDensity(): ThemeDensity | null` â€“ reads `theme.density` from `localStorage`.
-- `setDensity(density: ThemeDensity): void` â€“ sets `data-density` and persists `theme.density`.
-- `getRadius(): ThemeRadius | string | null` â€“ reads `theme.radius` from `localStorage`.
-- `setRadius(radius: ThemeRadius | string): void` â€“ sets `data-radius` and persists `theme.radius`.
-- `init(): void` â€“ loads preferences from `localStorage` (or defaults to `light`, `comfortable`, `rounded`).
+- `setMode(mode: ThemeMode): void` - sets `data-mode`, persists `theme.mode`, updates `mode`.
+- `setDensity(density: ThemeDensity): void` - sets `data-density`, persists `theme.density`, updates `density`.
+- `setRadius(radius: ThemeRadius): void` - sets `data-radius`, persists `theme.radius`, updates `radius`.
+- `init(): void` - loads preferences from `localStorage` (or defaults to `light`, `comfortable`, `rounded`) and updates signals.
 
 ### Usage Example
 

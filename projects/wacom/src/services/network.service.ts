@@ -1,5 +1,13 @@
 // network.service.ts — Angular 20+ (zoneless) signal-based connectivity checker
-import { inject, Inject, Injectable, Optional, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import {
+	Inject,
+	Injectable,
+	Optional,
+	PLATFORM_ID,
+	inject,
+	signal,
+} from '@angular/core';
 import { Config, CONFIG_TOKEN } from '../interfaces/config.interface';
 import {
 	DEFAULT_NETWORK_CONFIG,
@@ -10,10 +18,14 @@ import { EmitterService } from './emitter.service';
 
 @Injectable({ providedIn: 'root' })
 export class NetworkService {
+	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
 	/** Internal mutable signals. */
-	private _status = signal<NetworkStatus>(navigator.onLine ? 'poor' : 'none');
+	private _status = signal<NetworkStatus>(
+		this.isBrowser && navigator.onLine ? 'poor' : 'none',
+	);
 	private _latencyMs = signal<number | null>(null);
-	private _isOnline = signal<boolean>(navigator.onLine);
+	private _isOnline = signal<boolean>(this.isBrowser ? navigator.onLine : false);
 
 	/** Public read-only signals. */
 	readonly status = this._status.asReadonly();
@@ -33,6 +45,8 @@ export class NetworkService {
 			...(config.network || ({} as NetworkConfig)),
 		};
 
+		if (!this.isBrowser) return;
+
 		this._bindEvents();
 
 		this.recheckNow(); // fire once on start
@@ -46,6 +60,8 @@ export class NetworkService {
 	 * - Updates `isOnline`, `latencyMs`, and `status` accordingly.
 	 */
 	async recheckNow(): Promise<void> {
+		if (!this.isBrowser) return;
+
 		const res = await this._pingAny();
 
 		if (res.ok && res.latency != null) {
@@ -108,6 +124,8 @@ export class NetworkService {
 	 * - NetworkInformation 'change' (if supported)
 	 */
 	private _bindEvents(): void {
+		if (!this.isBrowser) return;
+
 		window.addEventListener('online', () => {
 			this._isOnline.set(true);
 
@@ -130,6 +148,8 @@ export class NetworkService {
 	 * Returns success with measured latency, or a failure result.
 	 */
 	private async _pingAny(): Promise<{ ok: boolean; latency: number | null }> {
+		if (!this.isBrowser) return { ok: false, latency: null };
+
 		for (const url of this._config.endpoints) {
 			const noCors = !url.includes('api.webart.work'); // treat public fallbacks as opaque checks
 

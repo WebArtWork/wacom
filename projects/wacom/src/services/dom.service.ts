@@ -4,10 +4,12 @@ import {
 	EmbeddedViewRef,
 	EnvironmentInjector,
 	Injectable,
+	PLATFORM_ID,
 	Type,
 	createComponent,
 	inject,
 } from '@angular/core';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { DomComponent } from '../interfaces/dom.interface';
 
 @Injectable({
@@ -18,6 +20,8 @@ import { DomComponent } from '../interfaces/dom.interface';
  * components within the DOM.
  */
 export class DomService {
+	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
 	/**
 	 * Appends a component to a specified element by ID.
 	 *
@@ -42,9 +46,9 @@ export class DomService {
 		const domElem = (componentRef.hostView as EmbeddedViewRef<T>)
 			.rootNodes[0] as HTMLElement;
 
-		const element = document.getElementById(id);
+		const element = this._doc.getElementById(id);
 
-		if (element && typeof element.appendChild === 'function') {
+		if (this.isBrowser && element && typeof element.appendChild === 'function') {
 			element.appendChild(domElem);
 		}
 
@@ -68,7 +72,7 @@ export class DomService {
 	appendComponent<T>(
 		component: Type<T>,
 		options: Partial<T & { providedIn?: string }> = {},
-		element: HTMLElement = document.body,
+		element?: HTMLElement,
 	): DomComponent<T> | void {
 		if (options.providedIn) {
 			if (this._providedIn[options.providedIn]) {
@@ -89,8 +93,9 @@ export class DomService {
 		const domElem = (componentRef.hostView as EmbeddedViewRef<T>)
 			.rootNodes[0] as HTMLElement;
 
-		if (element && typeof element.appendChild === 'function') {
-			element.appendChild(domElem);
+		const target = element || this._doc.body;
+		if (this.isBrowser && target && typeof target.appendChild === 'function') {
+			target.appendChild(domElem);
 		}
 
 		componentRef.changeDetectorRef.detectChanges();
@@ -174,6 +179,9 @@ export class DomService {
 
 	/** Injector utilized when creating dynamic components. */
 	private _injector = inject(EnvironmentInjector);
+
+	/** Document reference (browser or SSR shim). */
+	private _doc = inject(DOCUMENT);
 
 	/**
 	 * Flags to ensure components with a specific `providedIn` key are only

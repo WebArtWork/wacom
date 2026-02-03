@@ -1,4 +1,5 @@
-import { Inject, Injectable, Optional } from '@angular/core';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { Inject, Injectable, Optional, PLATFORM_ID, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -41,6 +42,8 @@ import { TagAttr } from './meta.type';
  */
 @Injectable({ providedIn: 'root' })
 export class MetaService {
+	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
 	/**
 	 * Effective configuration (from CONFIG_TOKEN + DEFAULT_CONFIG fallback).
 	 */
@@ -166,22 +169,23 @@ export class MetaService {
 	 * - if duplicates exist -> remove extras
 	 */
 	setLink(links: Record<string, string>): void {
+		if (!this.isBrowser) return;
 		if (!links || !Object.keys(links).length) return;
 
 		for (const rel of Object.keys(links)) {
 			const href = links[rel];
 
 			const all = Array.from(
-				document.head.querySelectorAll<HTMLLinkElement>(
+				this._doc.head.querySelectorAll<HTMLLinkElement>(
 					`link[rel="${rel}"]`,
 				),
 			);
 
 			let link = all[0];
 			if (!link) {
-				link = document.createElement('link');
+				link = this._doc.createElement('link');
 				link.setAttribute('rel', rel);
-				document.head.appendChild(link);
+				this._doc.head.appendChild(link);
 			} else if (all.length > 1) {
 				for (let i = 1; i < all.length; i++) all[i].remove();
 			}
@@ -199,9 +203,10 @@ export class MetaService {
 	 * - Call explicitly if you want to remove canonical/alternate links.
 	 */
 	resetLinks(): void {
+		if (!this.isBrowser) return;
 		for (const rel of this.managedLinkRels) {
 			const all = Array.from(
-				document.head.querySelectorAll<HTMLLinkElement>(
+				this._doc.head.querySelectorAll<HTMLLinkElement>(
 					`link[rel="${rel}"]`,
 				),
 			);
@@ -372,4 +377,6 @@ export class MetaService {
 		}
 		this.managedTagSelectors.clear();
 	}
+
+	private _doc = inject(DOCUMENT);
 }
