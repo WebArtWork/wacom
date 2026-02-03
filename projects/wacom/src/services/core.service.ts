@@ -30,12 +30,12 @@ declare global {
 	providedIn: 'root',
 })
 export class CoreService {
-	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
 	deviceID = '';
 
 	constructor() {
-		if (this.isBrowser) {
+		if (this._isBrowser) {
 			const stored = localStorage.getItem('deviceID');
 			this.deviceID =
 				stored ||
@@ -222,7 +222,7 @@ export class CoreService {
 	 * Detects the device type based on the user agent.
 	 */
 	detectDevice(): void {
-		if (!this.isBrowser) return;
+		if (!this._isBrowser) return;
 
 		const userAgent =
 			navigator.userAgent || navigator.vendor || (window as any).opera;
@@ -257,7 +257,7 @@ export class CoreService {
 	 * @returns {boolean} - Returns true if the device is a tablet.
 	 */
 	isTablet(): boolean {
-		if (!this.isBrowser) return false;
+		if (!this._isBrowser) return false;
 
 		return this.device === 'iOS' && /iPad/.test(navigator.userAgent);
 	}

@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 	providedIn: 'root',
 })
 export class TimeService {
-	private weekDays = [
+	private _weekDays = [
 		'Sunday',
 		'Monday',
 		'Tuesday',
@@ -15,7 +15,7 @@ export class TimeService {
 		'Saturday',
 	];
 
-	private monthNames = [
+	private _monthNames = [
 		'January',
 		'February',
 		'March',
@@ -30,7 +30,7 @@ export class TimeService {
 		'December',
 	];
 
-	constructor(private datePipe: DatePipe) {}
+	constructor(private _datePipe: DatePipe) {}
 
 	/**
 	 * Returns the name of the day of the week for a given date.
@@ -42,8 +42,8 @@ export class TimeService {
 	getDayName(date: Date, format: 'short' | 'long' = 'long'): string {
 		const dayIndex = date.getDay();
 		return format === 'short'
-			? this.weekDays[dayIndex].substring(0, 3)
-			: this.weekDays[dayIndex];
+			? this._weekDays[dayIndex].substring(0, 3)
+			: this._weekDays[dayIndex];
 	}
 	/**
 	 * Returns the name of the month for a given index.
@@ -66,8 +66,8 @@ export class TimeService {
 			);
 		}
 		return format === 'short'
-			? this.monthNames[monthIndex].substring(0, 3)
-			: this.monthNames[monthIndex];
+			? this._monthNames[monthIndex].substring(0, 3)
+			: this._monthNames[monthIndex];
 	}
 
 	/**
@@ -83,7 +83,7 @@ export class TimeService {
 		format: string = 'mediumDate',
 		timezone: string = 'UTC',
 	): string {
-		return this.datePipe.transform(date, format, timezone) || '';
+		return this._datePipe.transform(date, format, timezone) || '';
 	}
 
 	/**

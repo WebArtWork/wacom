@@ -42,12 +42,12 @@ import { TagAttr } from './meta.type';
  */
 @Injectable({ providedIn: 'root' })
 export class MetaService {
-	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
 	/**
 	 * Effective configuration (from CONFIG_TOKEN + DEFAULT_CONFIG fallback).
 	 */
-	private metaConfig: MetaConfig;
+	private _metaConfig: MetaConfig;
 
 	/**
 	 * Meta tags that are "owned" by this service.
@@ -58,31 +58,31 @@ export class MetaService {
 	 * - property="og:title"
 	 * - itemprop="image"
 	 */
-	private managedTagSelectors = new Set<string>();
+	private _managedTagSelectors = new Set<string>();
 
 	/**
 	 * Link rels that are managed by this service.
 	 * Used to update links without duplicates and optionally remove them via resetLinks().
 	 */
-	private managedLinkRels = new Set<string>();
+	private _managedLinkRels = new Set<string>();
 
 	constructor(
-		@Inject(CONFIG_TOKEN) @Optional() private config: Config,
-		private router: Router,
-		private activatedRoute: ActivatedRoute,
-		private meta: Meta,
-		private titleService: Title,
+		@Inject(CONFIG_TOKEN) @Optional() private _config: Config,
+		private _router: Router,
+		private _activatedRoute: ActivatedRoute,
+		private _meta: Meta,
+		private _titleService: Title,
 	) {
-		this.config = this.config || DEFAULT_CONFIG;
-		this.metaConfig = this.config.meta || {};
+		this._config = this._config || DEFAULT_CONFIG;
+		this._metaConfig = this._config.meta || {};
 
 		// Recommended default: keep meta in sync with route changes automatically.
 		const applyFromRoutes =
-			!isDefined(this.metaConfig.applyFromRoutes) ||
-			!!this.metaConfig.applyFromRoutes;
+			!isDefined(this._metaConfig.applyFromRoutes) ||
+			!!this._metaConfig.applyFromRoutes;
 
 		if (applyFromRoutes) {
-			this.router.events
+			this._router.events
 				.pipe(filter((e) => e instanceof NavigationEnd))
 				.subscribe(() => {
 					const page = this._readDeepestRouteMeta();
@@ -101,8 +101,8 @@ export class MetaService {
 	 * - reset()
 	 */
 	setDefaults(defaults: MetaDefaults): void {
-		this.metaConfig.defaults = {
-			...(this.metaConfig.defaults || {}),
+		this._metaConfig.defaults = {
+			...(this._metaConfig.defaults || {}),
 			...defaults,
 		};
 	}
@@ -127,7 +127,7 @@ export class MetaService {
 		this._removeManagedTags();
 
 		// 2) Resolve values with defaults.
-		const defaults = this.metaConfig.defaults || {};
+		const defaults = this._metaConfig.defaults || {};
 
 		const title = this._resolveTitle(page, defaults);
 		const description = this._resolveValue(
@@ -169,7 +169,7 @@ export class MetaService {
 	 * - if duplicates exist -> remove extras
 	 */
 	setLink(links: Record<string, string>): void {
-		if (!this.isBrowser) return;
+		if (!this._isBrowser) return;
 		if (!links || !Object.keys(links).length) return;
 
 		for (const rel of Object.keys(links)) {
@@ -191,7 +191,7 @@ export class MetaService {
 			}
 
 			link.setAttribute('href', href);
-			this.managedLinkRels.add(rel);
+			this._managedLinkRels.add(rel);
 		}
 	}
 
@@ -203,8 +203,8 @@ export class MetaService {
 	 * - Call explicitly if you want to remove canonical/alternate links.
 	 */
 	resetLinks(): void {
-		if (!this.isBrowser) return;
-		for (const rel of this.managedLinkRels) {
+		if (!this._isBrowser) return;
+		for (const rel of this._managedLinkRels) {
 			const all = Array.from(
 				this._doc.head.querySelectorAll<HTMLLinkElement>(
 					`link[rel="${rel}"]`,
@@ -212,7 +212,7 @@ export class MetaService {
 			);
 			all.forEach((it) => it.remove());
 		}
-		this.managedLinkRels.clear();
+		this._managedLinkRels.clear();
 	}
 
 	// ---------------------------------------------------------------------------
@@ -224,7 +224,7 @@ export class MetaService {
 	 * This matches the common Angular pattern where child routes override parent routes.
 	 */
 	private _readDeepestRouteMeta(): MetaPage | null {
-		let route: ActivatedRoute | null = this.activatedRoute;
+		let route: ActivatedRoute | null = this._activatedRoute;
 
 		while (route?.firstChild) route = route.firstChild;
 
@@ -244,7 +244,7 @@ export class MetaService {
 	private _resolveTitle(page: MetaPage, defaults: MetaDefaults): string {
 		let titleContent = this._resolveValue(page.title, defaults.title) || '';
 
-		if (this.metaConfig.useTitleSuffix) {
+		if (this._metaConfig.useTitleSuffix) {
 			const suffix = isDefined(page.titleSuffix)
 				? page.titleSuffix
 				: defaults.titleSuffix;
@@ -298,7 +298,7 @@ export class MetaService {
 	 * - twitter:title
 	 */
 	private _setTitleTriplet(title: string): void {
-		this.titleService.setTitle(title);
+		this._titleService.setTitle(title);
 
 		this._updateTag('og:title', title, 'property');
 		this._updateTag('twitter:title', title, 'name');
@@ -363,8 +363,8 @@ export class MetaService {
 				? ({ itemprop: key, content } as any)
 				: ({ [attr]: key, content } as any);
 
-		this.meta.updateTag(tagDef, selector);
-		this.managedTagSelectors.add(selector);
+		this._meta.updateTag(tagDef, selector);
+		this._managedTagSelectors.add(selector);
 	}
 
 	/**
@@ -372,10 +372,10 @@ export class MetaService {
 	 * Called on each apply/reset to prevent tags from a previous page persisting.
 	 */
 	private _removeManagedTags(): void {
-		for (const selector of this.managedTagSelectors) {
-			this.meta.removeTag(selector);
+		for (const selector of this._managedTagSelectors) {
+			this._meta.removeTag(selector);
 		}
-		this.managedTagSelectors.clear();
+		this._managedTagSelectors.clear();
 	}
 
 	private _doc = inject(DOCUMENT);

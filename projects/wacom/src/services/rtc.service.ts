@@ -8,51 +8,51 @@ import { Injectable, PLATFORM_ID, inject } from '@angular/core';
  */
 @Injectable({ providedIn: 'root' })
 export class RtcService {
-	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	/**
 	 * Map of peer connections, keyed by peer ID.
 	 */
-	private peers = new Map<string, RTCPeerConnection>();
+	private _peers = new Map<string, RTCPeerConnection>();
 
 	/**
 	 * Local media stream from user's camera and microphone.
 	 */
-	private localStream: MediaStream | null = null;
+	private _localStream: MediaStream | null = null;
 
 	/**
 	 * Initializes the local media stream (audio/video).
 	 * Requests permissions and stores the stream internally.
 	 */
 	async initLocalStream(): Promise<MediaStream> {
-		if (!this.isBrowser) {
+		if (!this._isBrowser) {
 			throw new Error('RTC is not available during SSR.');
 		}
 
-		if (!this.localStream) {
-			this.localStream = await navigator.mediaDevices.getUserMedia({
+		if (!this._localStream) {
+			this._localStream = await navigator.mediaDevices.getUserMedia({
 				video: true,
 				audio: true,
 			});
 		}
 
-		return this.localStream;
+		return this._localStream;
 	}
 
 	/**
 	 * Creates a new RTCPeerConnection for the given ID and attaches local tracks.
 	 */
 	async createPeer(id: string): Promise<RTCPeerConnection> {
-		if (!this.isBrowser) {
+		if (!this._isBrowser) {
 			throw new Error('RTC is not available during SSR.');
 		}
 
 		const peer = new RTCPeerConnection();
 
-		this.localStream
+		this._localStream
 			?.getTracks()
-			.forEach((track) => peer.addTrack(track, this.localStream!));
+			.forEach((track) => peer.addTrack(track, this._localStream!));
 
-		this.peers.set(id, peer);
+		this._peers.set(id, peer);
 
 		return peer;
 	}
@@ -61,18 +61,18 @@ export class RtcService {
 	 * Retrieves an existing peer connection by ID.
 	 */
 	getPeer(id: string): RTCPeerConnection | undefined {
-		return this.peers.get(id);
+		return this._peers.get(id);
 	}
 
 	/**
 	 * Creates an SDP offer for the specified peer and sets it as the local description.
 	 */
 	async createOffer(id: string): Promise<RTCSessionDescriptionInit> {
-		if (!this.isBrowser) {
+		if (!this._isBrowser) {
 			throw new Error('RTC is not available during SSR.');
 		}
 
-		const peer = this.peers.get(id);
+		const peer = this._peers.get(id);
 
 		if (!peer) throw new Error('Peer not found');
 
@@ -90,11 +90,11 @@ export class RtcService {
 		id: string,
 		offer: RTCSessionDescriptionInit,
 	): Promise<RTCSessionDescriptionInit> {
-		if (!this.isBrowser) {
+		if (!this._isBrowser) {
 			throw new Error('RTC is not available during SSR.');
 		}
 
-		const peer = this.peers.get(id);
+		const peer = this._peers.get(id);
 
 		if (!peer) throw new Error('Peer not found');
 
@@ -111,11 +111,11 @@ export class RtcService {
 	 * Sets the remote description with an SDP answer for the given peer.
 	 */
 	async setRemoteAnswer(id: string, answer: RTCSessionDescriptionInit) {
-		if (!this.isBrowser) {
+		if (!this._isBrowser) {
 			throw new Error('RTC is not available during SSR.');
 		}
 
-		const peer = this.peers.get(id);
+		const peer = this._peers.get(id);
 
 		if (!peer) throw new Error('Peer not found');
 
@@ -126,9 +126,9 @@ export class RtcService {
 	 * Adds an ICE candidate to the specified peer connection.
 	 */
 	addIceCandidate(id: string, candidate: RTCIceCandidateInit) {
-		if (!this.isBrowser) return;
+		if (!this._isBrowser) return;
 
-		const peer = this.peers.get(id);
+		const peer = this._peers.get(id);
 
 		if (peer) peer.addIceCandidate(new RTCIceCandidate(candidate));
 	}
@@ -137,19 +137,19 @@ export class RtcService {
 	 * Returns the initialized local media stream.
 	 */
 	getLocalStream(): MediaStream | null {
-		return this.localStream;
+		return this._localStream;
 	}
 
 	/**
 	 * Closes a specific peer connection and removes it from the map.
 	 */
 	closePeer(id: string) {
-		const peer = this.peers.get(id);
+		const peer = this._peers.get(id);
 
 		if (peer) {
 			peer.close();
 
-			this.peers.delete(id);
+			this._peers.delete(id);
 		}
 	}
 
@@ -157,12 +157,12 @@ export class RtcService {
 	 * Closes all peer connections and stops the local media stream.
 	 */
 	closeAll() {
-		this.peers.forEach((peer) => peer.close());
+		this._peers.forEach((peer) => peer.close());
 
-		this.peers.clear();
+		this._peers.clear();
 
-		this.localStream?.getTracks().forEach((track) => track.stop());
+		this._localStream?.getTracks().forEach((track) => track.stop());
 
-		this.localStream = null;
+		this._localStream = null;
 	}
 }

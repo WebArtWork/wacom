@@ -4,16 +4,16 @@ import { Directive, ElementRef, effect, inject, input } from '@angular/core';
 	selector: 'input[manualName], textarea[manualName]',
 })
 export class ManualNameDirective {
-	private readonly el = inject(ElementRef) as ElementRef<HTMLInputElement>;
+	private readonly _el = inject(ElementRef) as ElementRef<HTMLInputElement>;
 
 	// Bind as: manualName="email" or [manualName]="expr"
 	readonly manualName = input<string | null>(null, { alias: 'manualName' });
 
-	private readonly syncNameEffect = effect(() => {
+	private readonly _syncNameEffect = effect(() => {
 		const name = this.manualName();
 		if (name == null) return;
 
-		const native = this.el.nativeElement;
+		const native = this._el.nativeElement;
 		if (!native) return;
 
 		if (native.name !== name) {

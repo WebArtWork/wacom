@@ -23,12 +23,12 @@ export class ClickOutsideDirective {
 
 	constructor() {
 		if (this._isBrowser) {
-			this._doc.addEventListener('pointerdown', this.handler, true);
+			this._doc.addEventListener('pointerdown', this._handler, true);
 		}
 
 		// cleanup
 		this._dref.onDestroy(() =>
-			this._doc.removeEventListener('pointerdown', this.handler, true),
+			this._doc.removeEventListener('pointerdown', this._handler, true),
 		);
 	}
 
@@ -42,7 +42,7 @@ export class ClickOutsideDirective {
 
 	private _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-	private handler = (e: MouseEvent): void => {
+	private _handler = (e: MouseEvent): void => {
 		if (!this._host.nativeElement.contains(e.target as Node)) {
 			this.clickOutside.emit(e); // notify parent
 			this._cdr.markForCheck(); // trigger CD for OnPush comps

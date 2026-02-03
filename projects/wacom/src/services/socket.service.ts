@@ -17,7 +17,7 @@ import { EmitterService } from './emitter.service';
 	providedIn: 'root',
 })
 export class SocketService {
-	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
 	private _url = '';
 
@@ -30,7 +30,7 @@ export class SocketService {
 	constructor(@Inject(CONFIG_TOKEN) @Optional() private _config: Config) {
 		this._config = { ...DEFAULT_CONFIG, ...(this._config || {}) };
 
-		if (!this.isBrowser) {
+		if (!this._isBrowser) {
 			return;
 		}
 
@@ -70,7 +70,7 @@ export class SocketService {
 			this._config.socket = true;
 		}
 
-		if (this.isBrowser) {
+		if (this._isBrowser) {
 			this.load();
 		}
 	}
@@ -79,7 +79,7 @@ export class SocketService {
 	 * Loads and initializes the WebSocket connection.
 	 */
 	private load(): void {
-		if (!this.isBrowser) return;
+		if (!this._isBrowser) return;
 
 		if (this._config.io) {
 			const ioFunc = this._config.io.default

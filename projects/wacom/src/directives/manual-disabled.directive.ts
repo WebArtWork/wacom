@@ -4,18 +4,18 @@ import { Directive, ElementRef, effect, inject, input } from '@angular/core';
 	selector: 'input[manualDisabled], textarea[manualDisabled]',
 })
 export class ManualDisabledDirective {
-	private readonly el = inject(ElementRef) as ElementRef<HTMLInputElement>;
+	private readonly _el = inject(ElementRef) as ElementRef<HTMLInputElement>;
 
 	// Bind as: [manualDisabled]="isDisabled"
 	readonly manualDisabled = input<boolean | null>(null, {
 		alias: 'manualDisabled',
 	});
 
-	private readonly syncDisabledEffect = effect(() => {
+	private readonly _syncDisabledEffect = effect(() => {
 		const disabled = this.manualDisabled();
 		if (disabled == null) return;
 
-		const native = this.el.nativeElement;
+		const native = this._el.nativeElement;
 		if (!native) return;
 
 		native.disabled = !!disabled;

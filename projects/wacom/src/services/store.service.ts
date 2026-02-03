@@ -11,7 +11,7 @@ import { StoreConfig } from '../interfaces/store.interface';
 	providedIn: 'root',
 })
 export class StoreService {
-	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
 	constructor(@Inject(CONFIG_TOKEN) @Optional() config: Config) {
 		this._config = {
@@ -48,7 +48,7 @@ export class StoreService {
 			if (this._config.set) {
 				await this._config.set(key, value, callback, errCallback);
 			} else {
-				if (!this.isBrowser) {
+				if (!this._isBrowser) {
 					callback();
 					return true;
 				}
@@ -93,7 +93,7 @@ export class StoreService {
 
 				return value ?? null;
 			} else {
-				if (!this.isBrowser) {
+				if (!this._isBrowser) {
 					callback?.(null);
 					return null;
 				}
@@ -185,7 +185,7 @@ export class StoreService {
 			if (this._config.remove) {
 				return await this._config.remove(key, callback, errCallback);
 			} else {
-				if (!this.isBrowser) {
+				if (!this._isBrowser) {
 					callback();
 					return true;
 				}
@@ -220,7 +220,7 @@ export class StoreService {
 			if (this._config.clear) {
 				await this._config.clear();
 			} else {
-				if (!this.isBrowser) {
+				if (!this._isBrowser) {
 					callback?.();
 					return true;
 				}

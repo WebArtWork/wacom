@@ -33,7 +33,7 @@ interface GetConfig {
  * @template Document - The type of the document the service handles.
  */
 export abstract class CrudService<Document extends CrudDocument<Document>> {
-	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	/**
 	 * Base URL for the API collection associated with this service.
 	 */
@@ -104,7 +104,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 
 		if (this._config.unauthorized) {
 			this.restoreDocs();
-		} else if (this.isBrowser && localStorage.getItem('waw_user')) {
+		} else if (this._isBrowser && localStorage.getItem('waw_user')) {
 			const user = JSON.parse(localStorage.getItem('waw_user') as string);
 
 			if (
@@ -500,7 +500,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		}
 
 		if (
-			this.isBrowser &&
+			this._isBrowser &&
 			!this._config.unauthorized &&
 			localStorage.getItem('waw_user')
 		) {

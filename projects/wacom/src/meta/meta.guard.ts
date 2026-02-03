@@ -17,14 +17,14 @@ import { MetaService } from './meta.service';
  */
 @Injectable({ providedIn: 'root' })
 export class MetaGuard {
-	constructor(private metaService: MetaService) {}
+	constructor(private _metaService: MetaService) {}
 
 	canActivate(route: ActivatedRouteSnapshot): boolean {
 		const pageMeta =
 			(route.data && (route.data['meta'] as MetaPage)) || null;
 
-		if (pageMeta) this.metaService.applyMeta(pageMeta);
-		else this.metaService.reset();
+		if (pageMeta) this._metaService.applyMeta(pageMeta);
+		else this._metaService.reset();
 
 		return true;
 	}

@@ -14,7 +14,7 @@ import {
 	providedIn: 'root',
 })
 export class HttpService {
-	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
 	// An array of error handling callbacks
 	errors: ((err: HttpErrorResponse, retry?: () => void) => {})[] = [];
@@ -53,7 +53,7 @@ export class HttpService {
 			this.setUrl(this._config.url);
 		}
 
-		if (this.isBrowser) {
+		if (this._isBrowser) {
 			this.url = localStorage.getItem('wacom-http.url') || this.url;
 
 			const raw = localStorage.getItem('wacom-http.headers');
@@ -74,7 +74,7 @@ export class HttpService {
 	setUrl(url: string) {
 		this.url = url;
 
-		if (this.isBrowser) {
+		if (this._isBrowser) {
 			localStorage.setItem('wacom-http.url', url);
 		}
 	}
@@ -83,7 +83,7 @@ export class HttpService {
 	removeUrl() {
 		this.url = this._config.url || '';
 
-		if (this.isBrowser) {
+		if (this._isBrowser) {
 			localStorage.removeItem('wacom-http.url');
 		}
 	}
@@ -92,7 +92,7 @@ export class HttpService {
 	set(key: any, value: any) {
 		this._headers[key] = value;
 
-		if (this.isBrowser) {
+		if (this._isBrowser) {
 			localStorage.setItem(
 				'wacom-http.headers',
 				JSON.stringify(this._headers),
@@ -111,7 +111,7 @@ export class HttpService {
 	remove(key: any) {
 		delete this._headers[key];
 
-		if (this.isBrowser) {
+		if (this._isBrowser) {
 			localStorage.setItem(
 				'wacom-http.headers',
 				JSON.stringify(this._headers),

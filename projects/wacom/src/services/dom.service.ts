@@ -20,7 +20,7 @@ import { DomComponent } from '../interfaces/dom.interface';
  * components within the DOM.
  */
 export class DomService {
-	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
 	/**
 	 * Appends a component to a specified element by ID.
@@ -48,7 +48,7 @@ export class DomService {
 
 		const element = this._doc.getElementById(id);
 
-		if (this.isBrowser && element && typeof element.appendChild === 'function') {
+		if (this._isBrowser && element && typeof element.appendChild === 'function') {
 			element.appendChild(domElem);
 		}
 
@@ -94,7 +94,7 @@ export class DomService {
 			.rootNodes[0] as HTMLElement;
 
 		const target = element || this._doc.body;
-		if (this.isBrowser && target && typeof target.appendChild === 'function') {
+		if (this._isBrowser && target && typeof target.appendChild === 'function') {
 			target.appendChild(domElem);
 		}
 

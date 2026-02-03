@@ -18,14 +18,14 @@ import { EmitterService } from './emitter.service';
 
 @Injectable({ providedIn: 'root' })
 export class NetworkService {
-	private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
 	/** Internal mutable signals. */
 	private _status = signal<NetworkStatus>(
-		this.isBrowser && navigator.onLine ? 'poor' : 'none',
+		this._isBrowser && navigator.onLine ? 'poor' : 'none',
 	);
 	private _latencyMs = signal<number | null>(null);
-	private _isOnline = signal<boolean>(this.isBrowser ? navigator.onLine : false);
+	private _isOnline = signal<boolean>(this._isBrowser ? navigator.onLine : false);
 
 	/** Public read-only signals. */
 	readonly status = this._status.asReadonly();
@@ -33,7 +33,7 @@ export class NetworkService {
 	readonly isOnline = this._isOnline.asReadonly();
 
 	/** Failure counter to decide "none". */
-	private fails = 0;
+	private _fails = 0;
 
 	/**
 	 * Creates the network monitor, binds browser/Capacitor events,
@@ -45,7 +45,7 @@ export class NetworkService {
 			...(config.network || ({} as NetworkConfig)),
 		};
 
-		if (!this.isBrowser) return;
+		if (!this._isBrowser) return;
 
 		this._bindEvents();
 
@@ -60,18 +60,18 @@ export class NetworkService {
 	 * - Updates `isOnline`, `latencyMs`, and `status` accordingly.
 	 */
 	async recheckNow(): Promise<void> {
-		if (!this.isBrowser) return;
+		if (!this._isBrowser) return;
 
 		const res = await this._pingAny();
 
 		if (res.ok && res.latency != null) {
-			this.fails = 0;
+			this._fails = 0;
 
 			this._latencyMs.set(res.latency);
 
 			this._isOnline.set(true);
 		} else {
-			this.fails++;
+			this._fails++;
 
 			this._latencyMs.set(null);
 			// `isOnline` may still be true per OS; we let online/offline events keep it in sync.
@@ -91,7 +91,7 @@ export class NetworkService {
 	private _updateClassification(): void {
 		if (
 			!this._isOnline() ||
-			this.fails >= this._config.maxConsecutiveFails
+			this._fails >= this._config.maxConsecutiveFails
 		) {
 			if (this._status() !== 'none') {
 				this._status.set('none');
@@ -124,7 +124,7 @@ export class NetworkService {
 	 * - NetworkInformation 'change' (if supported)
 	 */
 	private _bindEvents(): void {
-		if (!this.isBrowser) return;
+		if (!this._isBrowser) return;
 
 		window.addEventListener('online', () => {
 			this._isOnline.set(true);
@@ -148,7 +148,7 @@ export class NetworkService {
 	 * Returns success with measured latency, or a failure result.
 	 */
 	private async _pingAny(): Promise<{ ok: boolean; latency: number | null }> {
-		if (!this.isBrowser) return { ok: false, latency: null };
+		if (!this._isBrowser) return { ok: false, latency: null };
 
 		for (const url of this._config.endpoints) {
 			const noCors = !url.includes('api.webart.work'); // treat public fallbacks as opaque checks
