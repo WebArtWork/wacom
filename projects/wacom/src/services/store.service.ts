@@ -1,5 +1,11 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Inject, Injectable, Optional, PLATFORM_ID, inject } from '@angular/core';
+import {
+	Inject,
+	Injectable,
+	Optional,
+	PLATFORM_ID,
+	inject,
+} from '@angular/core';
 import {
 	CONFIG_TOKEN,
 	Config,

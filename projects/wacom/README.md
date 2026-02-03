@@ -64,7 +64,7 @@ export const appConfig = {
 | [**`Network`**](https://www.npmjs.com/package/wacom#network-service) |              Monitors network connectivity and latency              |
 | [**`RTC`**](https://www.npmjs.com/package/wacom#rtc-service)         |        Wraps WebRTC peer connections and local media streams        |
 | [**`Util`**](https://www.npmjs.com/package/wacom#util-service)       |      Utility methods for forms, validation, and CSS variables       |
-| [**`Theme`**](#theme-service)                                       |     Manages UI theme mode, density, and radius preferences     |
+| [**`Theme`**](#theme-service)                                        |       Manages UI theme mode, density, and radius preferences        |
 | [**`Emitter`**](#emitter-service)                                    |            Lightweight app-wide event and task signaling            |
 
 ## [Emitter Service](#emitter-service)
@@ -1451,11 +1451,7 @@ export interface Work extends CrudDocument {
 export class WorkService extends CrudService<Work> {
 	works: Work[] = this.getDocs();
 
-	constructor(
-		_http: HttpService,
-		_store: StoreService,
-		_core: CoreService,
-	) {
+	constructor(_http: HttpService, _store: StoreService, _core: CoreService) {
 		super(
 			{
 				name: "work",

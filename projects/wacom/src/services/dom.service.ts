@@ -1,3 +1,4 @@
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import {
 	ApplicationRef,
 	ComponentRef,
@@ -9,7 +10,6 @@ import {
 	createComponent,
 	inject,
 } from '@angular/core';
-import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { DomComponent } from '../interfaces/dom.interface';
 
 @Injectable({
@@ -48,7 +48,11 @@ export class DomService {
 
 		const element = this._doc.getElementById(id);
 
-		if (this._isBrowser && element && typeof element.appendChild === 'function') {
+		if (
+			this._isBrowser &&
+			element &&
+			typeof element.appendChild === 'function'
+		) {
 			element.appendChild(domElem);
 		}
 
@@ -94,7 +98,11 @@ export class DomService {
 			.rootNodes[0] as HTMLElement;
 
 		const target = element || this._doc.body;
-		if (this._isBrowser && target && typeof target.appendChild === 'function') {
+		if (
+			this._isBrowser &&
+			target &&
+			typeof target.appendChild === 'function'
+		) {
 			target.appendChild(domElem);
 		}
 

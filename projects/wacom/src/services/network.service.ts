@@ -2,10 +2,10 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
 	Inject,
+	inject,
 	Injectable,
 	Optional,
 	PLATFORM_ID,
-	inject,
 	signal,
 } from '@angular/core';
 import { Config, CONFIG_TOKEN } from '../interfaces/config.interface';
@@ -25,7 +25,9 @@ export class NetworkService {
 		this._isBrowser && navigator.onLine ? 'poor' : 'none',
 	);
 	private _latencyMs = signal<number | null>(null);
-	private _isOnline = signal<boolean>(this._isBrowser ? navigator.onLine : false);
+	private _isOnline = signal<boolean>(
+		this._isBrowser ? navigator.onLine : false,
+	);
 
 	/** Public read-only signals. */
 	readonly status = this._status.asReadonly();

@@ -177,8 +177,10 @@ export class CoreService {
 				this._afterWhile[doc] = setTimeout(cb, time);
 			} else if (typeof doc === 'object') {
 				clearTimeout((doc as { __afterWhile: number }).__afterWhile);
-				(doc as { __afterWhile: number }).__afterWhile =
-					setTimeout(cb, time);
+				(doc as { __afterWhile: number }).__afterWhile = setTimeout(
+					cb,
+					time,
+				);
 			} else {
 				console.warn('badly configured after while');
 			}
