@@ -19,7 +19,13 @@ import {
  * The consuming app must provide a service that implements this structure.
  */
 interface FormServiceInterface<FormInterface> {
-	modal: <T>(form: FormInterface, options?: any, doc?: T) => Promise<T>;
+	modal: <T>(
+		form: FormInterface,
+		buttons?: unknown | unknown[],
+		submition?: unknown,
+		change?: (update: T) => void | Promise<(update: T) => void>,
+		modalOptions?: unknown,
+	) => Promise<T>;
 	modalDocs: <T>(docs: T[]) => Promise<T[]>;
 	modalUnique: <T>(collection: string, key: string, doc: T) => void;
 }
@@ -241,20 +247,28 @@ export abstract class CrudComponent<
 
 	/** Opens a modal to create a new document. */
 	protected create() {
-		this.__form.modal<Document>(this.form, {
-			label: 'Create',
-			click: async (created: unknown, close: () => void) => {
-				close();
+		this.__form.modal<Document>(
+			this.form,
+			{
+				label: 'Create',
+				click: async (created: unknown, close: () => void) => {
+					close();
 
-				this.preCreate(created as Document);
+					this.preCreate(created as Document);
 
-				await firstValueFrom(
-					this.crudService.create(created as Document),
-				);
+					await firstValueFrom(
+						this.crudService.create(created as Document),
+					);
 
-				this.setDocuments();
+					this.setDocuments();
+				},
 			},
-		});
+			{ data: {} },
+			() => {},
+			{
+				resetOnSubmit: true,
+			},
+		);
 	}
 
 	/** Displays a modal to edit an existing document. */
