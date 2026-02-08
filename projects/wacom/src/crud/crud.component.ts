@@ -104,7 +104,7 @@ export abstract class CrudComponent<
 							.get({ page, query }, this.getOptions())
 							.subscribe((docs: Document[]) => {
 								this.documents.update(() =>
-									docs.map((doc) =>
+									(docs || []).map((doc) =>
 										this.crudService.getSignal(doc),
 									),
 								);
