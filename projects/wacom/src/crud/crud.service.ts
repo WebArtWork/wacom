@@ -1151,7 +1151,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		const id = this._id(doc);
 
 		if (id && this._signal[id]) {
-			this._signal[id].set(doc);
+			this._signal[id].set({ ...doc });
 		}
 
 		this._updateSignals();

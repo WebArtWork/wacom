@@ -61,7 +61,7 @@ export abstract class CrudComponent<
 	private __cdr = inject(ChangeDetectorRef);
 
 	/** Internal reference to form service matching FormServiceInterface */
-	private __form: FormServiceInterface<FormInterface>;
+	private __formService: FormServiceInterface<FormInterface>;
 
 	/**
 	 * Constructor
@@ -78,7 +78,7 @@ export abstract class CrudComponent<
 	) {
 		const form = formConfig as FormInterface;
 
-		this.__form = formService as FormServiceInterface<FormInterface>;
+		this.__formService = formService as FormServiceInterface<FormInterface>;
 
 		this.form = form;
 
@@ -183,7 +183,7 @@ export abstract class CrudComponent<
 	 */
 	protected bulkManagement(isCreateFlow = true): () => void {
 		return (): void => {
-			this.__form
+			this.__formService
 				.modalDocs<Document>(
 					isCreateFlow
 						? []
@@ -247,7 +247,7 @@ export abstract class CrudComponent<
 
 	/** Opens a modal to create a new document. */
 	protected create() {
-		this.__form.modal<Document>(
+		this.__formService.modal<Document>(
 			this.form,
 			{
 				label: 'Create',
@@ -273,7 +273,7 @@ export abstract class CrudComponent<
 
 	/** Displays a modal to edit an existing document. */
 	protected update(doc: Document) {
-		this.__form.modal<Document>(
+		this.__formService.modal<Document>(
 			this.form,
 			{
 				label: 'Update',
@@ -300,7 +300,7 @@ export abstract class CrudComponent<
 
 	/** Opens a modal to edit the document's unique URL. */
 	protected mutateUrl(doc: Document) {
-		this.__form.modalUnique<Document>(this._module, 'url', doc);
+		this.__formService.modalUnique<Document>(this._module, 'url', doc);
 	}
 
 	/** Moves the given document one position up and updates ordering. */
