@@ -1,36 +1,24 @@
 // Core utilities and helpers for the Wacom app
 import { isPlatformBrowser } from '@angular/common';
 import {
+	DestroyRef,
 	Injectable,
 	PLATFORM_ID,
 	Signal,
 	WritableSignal,
+	computed,
 	inject,
 	signal,
 } from '@angular/core';
-
-// Add capitalize method to String prototype if it doesn't already exist
-if (!String.prototype.capitalize) {
-	String.prototype.capitalize = function (): string {
-		if (this.length > 0) {
-			return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
-		}
-		return '';
-	};
-}
-
-// Extend the String interface to include the new method
-declare global {
-	interface String {
-		capitalize(): string;
-	}
-}
+import { Viewport } from './core.type';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class CoreService {
-	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _platformId = inject(PLATFORM_ID);
+	private readonly _isBrowser = isPlatformBrowser(this._platformId);
+	private readonly _destroyRef = inject(DestroyRef);
 
 	deviceID = '';
 
@@ -46,6 +34,7 @@ export class CoreService {
 			localStorage.setItem('deviceID', this.deviceID);
 
 			this.detectDevice();
+			this.detectViewport();
 		} else {
 			this.deviceID = this.UUID();
 		}
@@ -286,6 +275,41 @@ export class CoreService {
 	 */
 	isIos(): boolean {
 		return this.device === 'iOS';
+	}
+
+	// Viewport management (responsive breakpoint)
+	readonly viewport = signal<Viewport>('desktop');
+
+	readonly isViewportMobile = computed(() => this.viewport() === 'mobile');
+	readonly isViewportTablet = computed(() => this.viewport() === 'tablet');
+	readonly isViewportDesktop = computed(() => this.viewport() === 'desktop');
+
+	detectViewport(): void {
+		if (!this._isBrowser) return;
+
+		const mqMobile = window.matchMedia('(max-width: 767.98px)');
+		const mqTablet = window.matchMedia(
+			'(min-width: 768px) and (max-width: 1023.98px)',
+		);
+		const mqDesktop = window.matchMedia('(min-width: 1024px)');
+
+		const update = () => {
+			if (mqMobile.matches) return this.viewport.set('mobile');
+			if (mqTablet.matches) return this.viewport.set('tablet');
+			return this.viewport.set('desktop');
+		};
+
+		update();
+
+		mqMobile.addEventListener('change', update);
+		mqTablet.addEventListener('change', update);
+		mqDesktop.addEventListener('change', update);
+
+		this._destroyRef.onDestroy(() => {
+			mqMobile.removeEventListener('change', update);
+			mqTablet.removeEventListener('change', update);
+			mqDesktop.removeEventListener('change', update);
+		});
 	}
 
 	// Version management

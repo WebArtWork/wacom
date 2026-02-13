@@ -6,7 +6,7 @@ import {
 	WritableSignal,
 } from '@angular/core';
 import { firstValueFrom, take } from 'rxjs';
-import { CoreService } from '../services/core.service';
+import { CoreService } from '../core/core.service';
 import {
 	CrudDocument,
 	CrudOptions,

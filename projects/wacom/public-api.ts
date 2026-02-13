@@ -10,8 +10,14 @@ export * from './src/interfaces/store.interface';
 export * from './src/meta/meta.interface';
 
 /*
+ *	Prototypes
+ */
+export * from './src/core/core.prototype';
+
+/*
  *	Types
  */
+export * from './src/core/core.type';
 export * from './src/theme/theme.type';
 
 /*
@@ -48,9 +54,9 @@ export * from './src/pipes/split.pipe';
 /*
  *	Services
  */
+export * from './src/core/core.service';
 export * from './src/crud/crud.service';
 export * from './src/meta/meta.service';
-export * from './src/services/core.service';
 export * from './src/services/dom.service';
 export * from './src/services/emitter.service';
 export * from './src/services/http.service';

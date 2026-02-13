@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, WritableSignal, inject, signal } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CoreService } from '../services/core.service';
+import { CoreService } from '../core/core.service';
 import { EmitterService } from '../services/emitter.service';
 import { HttpService } from '../services/http.service';
 import { NetworkService } from '../services/network.service';
