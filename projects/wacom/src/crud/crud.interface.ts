@@ -86,3 +86,18 @@ export interface TableConfig<Document> {
 	/** Buttons displayed in the table header. */
 	headerButtons: TableConfigButton<Document>[];
 }
+
+export interface CrudConfig<Document> {
+	signalFields?: Record<string, (doc: Document) => unknown>;
+	name: string;
+	_id?: string;
+	replace?: (doc: Document) => void;
+	unauthorized?: boolean;
+	appId?: string;
+}
+
+export interface GetConfig {
+	page?: number;
+	perPage?: number;
+	query?: string;
+}

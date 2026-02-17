@@ -6,22 +6,12 @@ import { EmitterService } from '../services/emitter.service';
 import { HttpService } from '../services/http.service';
 import { NetworkService } from '../services/network.service';
 import { StoreService } from '../services/store.service';
-import { CrudDocument, CrudOptions } from './crud.interface';
-
-interface CrudConfig<Document> {
-	signalFields?: Record<string, (doc: Document) => unknown>;
-	name: string;
-	_id?: string;
-	replace?: (doc: Document) => void;
-	unauthorized?: boolean;
-	appId?: string;
-}
-
-interface GetConfig {
-	page?: number;
-	perPage?: number;
-	query?: string;
-}
+import {
+	CrudConfig,
+	CrudDocument,
+	CrudOptions,
+	GetConfig,
+} from './crud.interface';
 
 /**
  * Abstract class representing a CRUD (Create, Read, Update, Delete) service.
