@@ -713,224 +713,179 @@ httpService.unlock();
 
 ## [Store Service](#store-service)
 
-The `StoreService` manages local storage in a configurable manner. It can set, get, and remove items from storage, with support for asynchronous operations and JSON serialization.
+`StoreService` provides a unified, async-first API for working with storage (localStorage by default or a custom provider via config).
+It supports raw values, safe JSON handling, key prefixing, and optional lifecycle hooks.
 
-### Properties
+---
 
-#### `_prefix: string`
+### Key features
 
-The prefix for storage keys.
+- async/await everywhere (no separate `*Async` methods)
+- optional side-effects via `options`
+- automatic JSON corruption handling
+- configurable storage backend
+- prefix support for namespacing
 
-### Methods
+---
 
-#### `setPrefix(prefix: string): void`
+### Prefixing keys
 
-Sets the prefix for storage keys.
-**Parameters**:
-
-- `prefix` (string): The prefix to set.
-
-**Example**:
-
-```Typescript
-storeService.setPrefix('app_');
+```ts
+storeService.setPrefix("app_");
 ```
 
-#### `set(key: string, value: string, callback: () => void = () => {}, errCallback: () => void = () => {}): void`
+All keys will be stored as `app_<key>` (plus global config prefix if defined).
 
-Sets a value in storage.
+---
 
-**Parameters**:
+### set
 
-- `key` (string): The storage key.
-- `value` (string): The value to store.
-- `callback` (function): The callback to execute on success.
-- `errCallback` (function): The callback to execute on error.
+Stores a raw string value.
 
-**Example**:
-
-```Typescript
-storeService.set('key', 'value', () => console.log('Success'), () => console.log('Error'));
+```ts
+await storeService.set("token", "abc123");
 ```
 
-#### `setAsync(key: string, value: string): Promise<boolean>`
+With hooks:
 
-Sets a value in storage asynchronously.
-
-**Parameters**:
-
-- `key` (string): The storage key.
-- `value` (string): The value to store.
-
-**Returns**:
-
-- `Promise<boolean>`: A promise that resolves to a boolean indicating success.
-
-**Example**:
-
-```Typescript
-await storeService.setAsync('key', 'value');
+```ts
+await storeService.set("token", "abc123", {
+	onSuccess: () => console.log("saved"),
+	onError: console.error,
+});
 ```
 
-#### `get(key: string, callback: (value: string) => void = () => {}, errCallback: () => void = () => {}): void`
+**Returns:** `Promise<boolean>`
 
-Gets a value from storage.
+---
 
-**Parameters**:
+### get
 
-- `key` (string): The storage key.
-- `callback` (function): The callback to execute with the retrieved value.
-- `errCallback` (function): The callback to execute on error.
+Retrieves a raw string value.
 
-**Example**:
-
-```Typescript
-storeService.get('key', value => console.log(value), () => console.log('Error'));
+```ts
+const token = await storeService.get("token");
 ```
 
-#### `getAsync(key: string): Promise<string | null>`
+With hooks:
 
-Gets a value from storage asynchronously.
-
-**Parameters**:
-
-- `key` (string): The storage key.
-
-**Returns**:
-
-- `Promise<string | null>`: A promise that resolves to the retrieved value or `null` if the key is missing.
-
-**Example**:
-
-```Typescript
-const value = await storeService.getAsync('key');
+```ts
+const token = await storeService.get("token", {
+	onSuccess: (v) => console.log(v),
+	onError: console.error,
+});
 ```
 
-#### `setJson(key: string, value: any, callback: () => void = () => {}, errCallback: () => void = () => {}): void`
+**Returns:** `Promise<string | null>`
 
-Sets a JSON value in storage.
+---
 
-**Parameters**:
+### setJson
 
-- `key` (string): The storage key.
-- `value` (any): The value to store.
-- `callback` (function): The callback to execute on success.
-- `errCallback` (function): The callback to execute on error.
+Stores a JSON-serializable value.
 
-**Example**:
-
-```Typescript
-storeService.setJson('key', { data: 'value' }, () => console.log('Success'), () => console.log('Error'));
+```ts
+await storeService.setJson("profile", { name: "Den", role: "dev" });
 ```
 
-#### `setJsonAsync(key: string, value: any): Promise<boolean>`
+With hooks:
 
-Sets a JSON value in storage asynchronously.
-
-**Parameters**:
-
-- `key` (string): The storage key.
-- `value` (any): The value to store.
-
-**Returns**:
-
-- `Promise<boolean>`: A promise that resolves to a boolean indicating success.
-
-**Example**:
-
-```Typescript
-await storeService.setJsonAsync('key', { data: 'value' });
+```ts
+await storeService.setJson("profile", user, {
+	onSuccess: () => console.log("saved"),
+	onError: console.error,
+});
 ```
 
-#### `getJson(key: string, callback: (value: any) => void = () => {}, errCallback: () => void = () => {}): void`
+**Returns:** `Promise<boolean>`
 
-Gets a JSON value from storage.
+---
 
-**Parameters**:
+### getJson
 
-- `key` (string): The storage key.
-- `callback` (function): The callback to execute with the retrieved value.
-- `errCallback` (function): The callback to execute on error.
+Retrieves a JSON value safely.
 
-**Example**:
+- empty or missing → `null` (or `defaultValue`)
+- corrupted JSON → auto-cleared (by default)
 
-```Typescript
-storeService.getJson('key', value => console.log(value), () => console.log('Error'));
+```ts
+const profile = await storeService.getJson<User>("profile");
 ```
 
-#### `getJsonAsync<T = any>(key: string): Promise<T | null>`
+With defaults and error handling:
 
-Gets a JSON value from storage asynchronously.
-
-**Parameters**:
-
-- `key` (string): The storage key.
-
-**Returns**:
-
-- `Promise<T | null>`: A promise that resolves to the retrieved value.
-
-**Example**:
-
-```Typescript
-const value = await storeService.getJsonAsync('key');
+```ts
+const profile = await storeService.getJson<User>("profile", {
+	defaultValue: {},
+	onError: console.warn,
+});
 ```
 
-#### `remove(key: string, callback?: () => void, errCallback?: () => void): Promise<boolean>`
+Disable auto-clean:
 
-Removes a value from storage.
-
-**Parameters**:
-
-- `key` (string): The storage key.
-- `callback` (function): The callback to execute on success.
-- `errCallback` (function): The callback to execute on error.
-
-**Returns**:
-
-- `Promise<boolean>`: A promise that resolves to a boolean indicating success.
-
-**Example**:
-
-```Typescript
-await storeService.remove('key', () => console.log('Success'), () => console.log('Error'));
+```ts
+await storeService.getJson("profile", {
+	clearOnError: false,
+});
 ```
 
-#### `clear(callback?: () => void, errCallback?: () => void): Promise<boolean>`
+**Returns:** `Promise<T | null>`
 
-Clears all values from storage.
+---
 
-**Parameters**:
+### remove
 
-- `callback` (function): The callback to execute on success.
-- `errCallback` (function): The callback to execute on error.
+Removes a single key.
 
-**Returns**:
-
-- `Promise<boolean>`: A promise that resolves to a boolean indicating success.
-
-**Example**:
-
-```Typescript
-await storeService.clear(() => console.log('Success'), () => console.log('Error'));
+```ts
+await storeService.remove("token");
 ```
 
-#### `applyPrefix(key: string): string`
+With hooks:
 
-Applies the configured prefix to a storage key.
+```ts
+await storeService.remove("token", {
+	onSuccess: () => console.log("removed"),
+	onError: console.error,
+});
+```
 
-**Parameters**:
+**Returns:** `Promise<boolean>`
 
-- `key` (string): The storage key.
+---
 
-**Returns**:
+### clear
 
-- `string`: The prefixed storage key.
+Clears all stored values.
 
-**Example**:
+```ts
+await storeService.clear();
+```
 
-```Typescript
-const prefixedKey = storeService.applyPrefix('key');
+With hooks:
+
+```ts
+await storeService.clear({
+	onSuccess: () => console.log("cleared"),
+	onError: console.error,
+});
+```
+
+**Returns:** `Promise<boolean>`
+
+---
+
+### Options object
+
+All methods accept an optional `options` parameter:
+
+```ts
+interface StoreOptions<T = unknown> {
+	onSuccess?: (value?: T | null) => void;
+	onError?: (err: unknown) => void;
+	defaultValue?: T; // getJson only
+	clearOnError?: boolean; // getJson only (default: true)
+}
 ```
 
 ## [Meta Service](#meta-service)

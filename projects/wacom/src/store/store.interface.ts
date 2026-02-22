@@ -29,3 +29,10 @@ export interface StoreConfig {
 		errCb?: (err: unknown) => void,
 	) => Promise<boolean>;
 }
+
+export interface StoreOptions<T = unknown> {
+	onSuccess?: (value?: T | null) => void;
+	onError?: (err: unknown) => void;
+	defaultValue?: T;
+	clearOnError?: boolean;
+}

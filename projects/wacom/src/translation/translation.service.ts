@@ -1,5 +1,5 @@
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
-import { StoreService } from '../services/store.service';
+import { StoreService } from '../store/store.service';
 import { Translation } from './translation.interface';
 import { Translations } from './translation.type';
 
@@ -20,10 +20,12 @@ export class TranslationService {
 		 * - Signals for keys not yet requested via `translate()` will not exist,
 		 *   so `setMany()` assumes signals are already registered (strict mode).
 		 */
-		this._storeService.getJson('translations', (translations) => {
-			if (Array.isArray(translations)) {
-				this.setMany(translations as Translation[]);
-			}
+		this._storeService.getJson('translations', {
+			onSuccess: (translations) => {
+				if (Array.isArray(translations)) {
+					this.setMany(translations as Translation[]);
+				}
+			},
 		});
 	}
 

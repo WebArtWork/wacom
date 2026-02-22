@@ -5,7 +5,7 @@ import { CoreService } from '../core/core.service';
 import { EmitterService } from '../services/emitter.service';
 import { HttpService } from '../services/http.service';
 import { NetworkService } from '../services/network.service';
-import { StoreService } from '../services/store.service';
+import { StoreService } from '../store/store.service';
 import {
 	CrudConfig,
 	CrudDocument,
