@@ -54,6 +54,7 @@ export const appConfig = {
 | Name                                                                 |                             Description                             |
 | -------------------------------------------------------------------- | :-----------------------------------------------------------------: |
 | [**`Core`**](https://www.npmjs.com/package/wacom#core-service)       |     Common supportive function which can be used in any service     |
+| [**`Emitter`**](#emitter-service)                                    |            Lightweight app-wide event and task signaling            |
 | [**`Http`**](https://www.npmjs.com/package/wacom#http-service)       |                      Http layer for HttpClient                      |
 | [**`Store`**](https://www.npmjs.com/package/wacom#store-service)     |      Service responsible for keeping information on the device      |
 | [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service)       |             Website meta tags management within router              |
@@ -65,65 +66,7 @@ export const appConfig = {
 | [**`RTC`**](https://www.npmjs.com/package/wacom#rtc-service)         |        Wraps WebRTC peer connections and local media streams        |
 | [**`Util`**](https://www.npmjs.com/package/wacom#util-service)       |      Utility methods for forms, validation, and CSS variables       |
 | [**`Theme`**](#theme-service)                                        |       Manages UI theme mode, density, and radius preferences        |
-| [**`Emitter`**](#emitter-service)                                    |            Lightweight app-wide event and task signaling            |
-
-## [Emitter Service](#emitter-service)
-
-The `EmitterService` provides a lightweight event bus and completion signaling built on Angular Signals and RxJS.
-
-### Events
-
-- `emit(id: string, data?: any): void`: Publish an event on a channel.
-- `on<T = any>(id: string): Observable<T>`: Subscribe to a channel (hot, no replay).
-- `off(id: string): void`: Close and remove a channel.
-- `offAll(): void`: Close and remove all channels.
-- `has(id: string): boolean`: Check if a channel exists.
-
-Example:
-
-```ts
-import { EmitterService } from 'wacom';
-
-constructor(private emitter: EmitterService) {}
-
-ngOnInit() {
-  this.emitter.on<string>('user:login').subscribe((uid) => {
-    console.log('Logged in:', uid);
-  });
-}
-
-login(uid: string) {
-  this.emitter.emit('user:login', uid);
-}
-```
-
-### Completion tasks
-
-Track once-off tasks and await their completion.
-
-- `complete<T = any>(task: string, value: T = true): void`: Mark task done with payload.
-- `clearCompleted(task: string): void`: Reset completion state.
-- `completed(task: string): any | undefined`: Read current payload or `undefined`.
-- `isCompleted(task: string): boolean`: Convenience check.
-- `onComplete(tasks: string | string[], opts?: { mode?: 'all' | 'any'; timeoutMs?: number; abort?: AbortSignal; }): Observable<any | any[]>`: Await task(s) completion.
-
-Example:
-
-```ts
-// Somewhere that waits for a single task
-this.emitter.onComplete("profile:loaded").subscribe(() => {
-	// safe to render UI
-});
-
-// Somewhere that fulfills it
-await api.loadProfile();
-this.emitter.complete("profile:loaded");
-
-// Wait for any of several tasks
-this.emitter
-	.onComplete(["a", "b"], { mode: "any", timeoutMs: 5000 })
-	.subscribe((which) => console.log("First done:", which));
-```
+| [**`Translation`**](#translation-service)                            |        Lightweight, signal-based runtime translation engine         |
 
 ## [Core Service](#core-service)
 
@@ -502,6 +445,64 @@ In this example:
 3. The `onUnlock` method returns a Promise that resolves when the resource is unlocked, allowing the code to wait until the resource is available again.
 
 This ensures controlled access to the resource, preventing race conditions and ensuring data integrity.
+
+## [Emitter Service](#emitter-service)
+
+The `EmitterService` provides a lightweight event bus and completion signaling built on Angular Signals and RxJS.
+
+### Events
+
+- `emit(id: string, data?: any): void`: Publish an event on a channel.
+- `on<T = any>(id: string): Observable<T>`: Subscribe to a channel (hot, no replay).
+- `off(id: string): void`: Close and remove a channel.
+- `offAll(): void`: Close and remove all channels.
+- `has(id: string): boolean`: Check if a channel exists.
+
+Example:
+
+```ts
+import { EmitterService } from 'wacom';
+
+constructor(private emitter: EmitterService) {}
+
+ngOnInit() {
+  this.emitter.on<string>('user:login').subscribe((uid) => {
+    console.log('Logged in:', uid);
+  });
+}
+
+login(uid: string) {
+  this.emitter.emit('user:login', uid);
+}
+```
+
+### Completion tasks
+
+Track once-off tasks and await their completion.
+
+- `complete<T = any>(task: string, value: T = true): void`: Mark task done with payload.
+- `clearCompleted(task: string): void`: Reset completion state.
+- `completed(task: string): any | undefined`: Read current payload or `undefined`.
+- `isCompleted(task: string): boolean`: Convenience check.
+- `onComplete(tasks: string | string[], opts?: { mode?: 'all' | 'any'; timeoutMs?: number; abort?: AbortSignal; }): Observable<any | any[]>`: Await task(s) completion.
+
+Example:
+
+```ts
+// Somewhere that waits for a single task
+this.emitter.onComplete("profile:loaded").subscribe(() => {
+	// safe to render UI
+});
+
+// Somewhere that fulfills it
+await api.loadProfile();
+this.emitter.complete("profile:loaded");
+
+// Wait for any of several tasks
+this.emitter
+	.onComplete(["a", "b"], { mode: "any", timeoutMs: 5000 })
+	.subscribe((which) => console.log("First done:", which));
+```
 
 ## [Http Service](#http-service)
 
@@ -2193,3 +2194,129 @@ ngOnInit() {
 	this.theme.setRadius("square");
 }
 ```
+
+## [Translation Service](#translation-service)
+
+Wacom includes a lightweight, signal-based runtime translation engine built for Angular Signals.
+
+It provides:
+
+- reactive translations via `WritableSignal<string>`
+- zero-config fallback (source text renders until translated)
+- persistent storage (auto-hydrates from `StoreService`)
+- directive + pipe for ergonomic template usage
+- instant language switching without reload
+
+Unlike compile-time Angular i18n, this works fully at runtime.
+
+---
+
+### Translation model
+
+```ts
+export interface Translation {
+	sourceText: string;
+	text: string;
+}
+```
+
+Each `sourceText` acts as both:
+
+- translation key
+- default visible UI text (fallback)
+
+---
+
+### Basic usage (signal API)
+
+```ts
+import { TranslationService } from "wacom";
+
+private _translationService = inject(TranslationService);
+
+title = this._translationService.translate("Create project");
+```
+
+The returned value is a `WritableSignal<string>`.
+
+If no translation exists yet, it renders:
+
+```
+Create project
+```
+
+automatically.
+
+---
+
+### Updating translations in bulk (language switch)
+
+```ts
+this._translationService.setMany([
+	{ sourceText: "Create project", text: "Створити проєкт" },
+	{ sourceText: "Save", text: "Зберегти" },
+]);
+```
+
+Behavior:
+
+- provided keys update reactively
+- missing keys reset back to original text
+- state persists in storage
+
+---
+
+### Updating a single translation
+
+```ts
+this._translationService.setOne({
+	sourceText: "Save",
+	text: "Зберегти",
+});
+```
+
+Useful for:
+
+- live editors
+- dynamic language loading
+- admin translation panels
+
+---
+
+### Translate pipe (template friendly)
+
+```html
+<h1>{{ 'Create project' | translate }}</h1>
+```
+
+Auto-reacts when translations change.
+
+---
+
+### Translate directive (zero-key mode)
+
+Automatically uses element’s original rendered text as translation key.
+
+```html
+<h1 translate>Create project</h1>
+<button translate>Save</button>
+```
+
+Optional explicit key:
+
+```html
+<h1 translate="Create project"></h1>
+```
+
+> The directive replaces `textContent` and is SSR-safe.
+
+---
+
+### Persistence
+
+Translations are automatically:
+
+- hydrated from storage on startup
+- synced after every update
+
+No extra config required.

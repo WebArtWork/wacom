@@ -14,7 +14,7 @@ import {
 
 /* directives */
 import { ClickOutsideDirective } from './directives/click-outside.directive';
-const DIRECTIVES = [ClickOutsideDirective];
+const DIRECTIVES = [ClickOutsideDirective, TranslateDirective];
 
 /* pipes */
 import { ArrPipe } from './pipes/arr.pipe';
@@ -23,6 +23,8 @@ import { PaginationPipe } from './pipes/pagination.pipe';
 import { SafePipe } from './pipes/safe.pipe';
 import { SearchPipe } from './pipes/search.pipe';
 import { SplicePipe } from './pipes/splice.pipe';
+import { TranslateDirective } from './translation/translation.directive';
+import { TranslatePipe } from './translation/translation.pipe';
 const PIPES = [
 	ArrPipe,
 	SafePipe,
@@ -30,6 +32,7 @@ const PIPES = [
 	SearchPipe,
 	MongodatePipe,
 	PaginationPipe,
+	TranslatePipe,
 ];
 
 @NgModule({

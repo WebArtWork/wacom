@@ -1,7 +1,31 @@
 /*
+ *	Core
+ */
+export * from './src/core/core.prototype';
+export * from './src/core/core.service';
+export * from './src/core/core.type';
+/*
+ *	Crud
+ */
+export * from './src/crud/crud.component';
+export * from './src/crud/crud.interface';
+export * from './src/crud/crud.service';
+/*
+ *	Theme
+ */
+export * from './src/theme/theme.service';
+export * from './src/theme/theme.type';
+/*
+ *	Translation
+ */
+export * from './src/translation/translation.directive';
+export * from './src/translation/translation.interface';
+export * from './src/translation/translation.pipe';
+export * from './src/translation/translation.service';
+export * from './src/translation/translation.type';
+/*
  *	Interfaces
  */
-export * from './src/crud/crud.interface';
 export * from './src/interfaces/config.interface';
 export * from './src/interfaces/dom.interface';
 export * from './src/interfaces/http.interface';
@@ -10,25 +34,9 @@ export * from './src/interfaces/store.interface';
 export * from './src/meta/meta.interface';
 
 /*
- *	Prototypes
- */
-export * from './src/core/core.prototype';
-
-/*
- *	Types
- */
-export * from './src/core/core.type';
-export * from './src/theme/theme.type';
-
-/*
  *	Guard
  */
 export * from './src/meta/meta.guard';
-
-/*
- *	Components
- */
-export * from './src/crud/crud.component';
 
 /*
  *	Directives
@@ -54,8 +62,6 @@ export * from './src/pipes/split.pipe';
 /*
  *	Services
  */
-export * from './src/core/core.service';
-export * from './src/crud/crud.service';
 export * from './src/meta/meta.service';
 export * from './src/services/dom.service';
 export * from './src/services/emitter.service';
@@ -66,7 +72,6 @@ export * from './src/services/socket.service';
 export * from './src/services/store.service';
 export * from './src/services/time.service';
 export * from './src/services/util.service';
-export * from './src/theme/theme.service';
 
 /*
  *	Initial

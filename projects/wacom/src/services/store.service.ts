@@ -148,7 +148,7 @@ export class StoreService {
 	 */
 	async getJson<T = any>(
 		key: string,
-		callback?: (value: string | null) => void,
+		callback?: (value: string | object | null) => void,
 		errCallback: (err: unknown) => void = () => {},
 	): Promise<T | null> {
 		const value = await this.get(key);
