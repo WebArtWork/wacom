@@ -90,9 +90,18 @@ export abstract class CrudComponent<
 	protected localDocumentsFilter: (doc: Document) => boolean = () => true;
 
 	/**
+	 * Allow set query customization
+	 */
+	protected setDocumentsQuery(query: string) {
+		return query;
+	}
+
+	/**
 	 * Loads documents for a given page.
 	 */
 	protected setDocuments(page = this.page, query = ''): Promise<void> {
+		query = this.setDocumentsQuery(query);
+
 		return new Promise((resolve) => {
 			if (this.configType === 'server') {
 				this.page = page;
