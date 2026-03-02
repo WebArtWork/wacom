@@ -7,6 +7,20 @@ import { Translations } from './translation.type';
 export class TranslationService {
 	private _storeService = inject(StoreService);
 
+	/**
+	 * Internal registry of translation signals.
+	 *
+	 * Each key (sourceText) maps to a WritableSignal<string>
+	 * that always holds the current translated value.
+	 *
+	 * Example:
+	 * {
+	 *   "Hello": signal("Hola"),
+	 *   "Save": signal("Guardar")
+	 * }
+	 */
+	private _signalTranslates: Translations = {};
+
 	constructor() {
 		/**
 		 * Hydrates translations from the internal persistent store (if present).
@@ -28,45 +42,6 @@ export class TranslationService {
 			},
 		});
 	}
-
-	/**
-	 * Persists the current in-memory translations into the internal store.
-	 *
-	 * The payload is derived from `_signalTranslates` by materializing each signal's
-	 * current value at the time of saving.
-	 *
-	 * Side effects:
-	 * - Writes to storage via `StoreService.setJson`.
-	 *
-	 * Intended usage:
-	 * - Called after `setMany()` and `setOne()` to keep storage in sync.
-	 */
-	private _updateStorageTranslations() {
-		const translations = [];
-
-		for (const sourceText in this._signalTranslates) {
-			translations.push({
-				text: this._signalTranslates[sourceText](),
-				sourceText,
-			});
-		}
-
-		this._storeService.setJson('translations', translations);
-	}
-
-	/**
-	 * Internal registry of translation signals.
-	 *
-	 * Each key (sourceText) maps to a WritableSignal<string>
-	 * that always holds the current translated value.
-	 *
-	 * Example:
-	 * {
-	 *   "Hello": signal("Hola"),
-	 *   "Save": signal("Guardar")
-	 * }
-	 */
-	private _signalTranslates: Translations = {};
 
 	/**
 	 * Returns a reactive translation signal for the given source text.
@@ -161,5 +136,30 @@ export class TranslationService {
 		}
 
 		this._signalTranslates[sourceText].set(text);
+	}
+
+	/**
+	 * Persists the current in-memory translations into the internal store.
+	 *
+	 * The payload is derived from `_signalTranslates` by materializing each signal's
+	 * current value at the time of saving.
+	 *
+	 * Side effects:
+	 * - Writes to storage via `StoreService.setJson`.
+	 *
+	 * Intended usage:
+	 * - Called after `setMany()` and `setOne()` to keep storage in sync.
+	 */
+	private _updateStorageTranslations() {
+		const translations = [];
+
+		for (const sourceText in this._signalTranslates) {
+			translations.push({
+				text: this._signalTranslates[sourceText](),
+				sourceText,
+			});
+		}
+
+		this._storeService.setJson('translations', translations);
 	}
 }

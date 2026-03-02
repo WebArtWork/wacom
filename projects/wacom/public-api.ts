@@ -34,6 +34,7 @@ export * from './src/store/store.service';
 /*
  *	Translation
  */
+export * from './src/translation/provide-translation';
 export * from './src/translation/translation.directive';
 export * from './src/translation/translation.interface';
 export * from './src/translation/translation.pipe';
