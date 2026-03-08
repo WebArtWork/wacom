@@ -8,41 +8,23 @@
 	},
 	"private": true,
 	"dependencies": {
-		"@angular/animations": "21.1.4",
-		"@angular/common": "21.1.4",
-		"@angular/compiler": "21.1.4",
-		"@angular/core": "21.1.4",
-		"@angular/forms": "21.1.4",
-		"@angular/platform-browser": "21.1.4",
-		"@angular/platform-browser-dynamic": "21.1.4",
-		"@angular/router": "21.1.4",
+		"@angular/common": "21.2.0",
+		"@angular/compiler": "21.2.0",
+		"@angular/core": "21.2.0",
+		"@angular/forms": "21.2.0",
+		"@angular/platform-browser": "21.2.0",
+		"@angular/platform-browser-dynamic": "21.2.0",
+		"@angular/router": "21.2.0",
 		"rxjs": "7.8.2",
 		"tslib": "2.6.2"
 	},
 	"devDependencies": {
-		"@angular-eslint/eslint-plugin": "20.2.0",
-		"@angular-eslint/eslint-plugin-template": "20.2.0",
-		"@angular-eslint/template-parser": "20.2.0",
-		"@angular/build": "21.1.4",
-		"@angular/cli": "21.1.4",
-		"@angular/compiler-cli": "21.1.4",
-		"@typescript-eslint/eslint-plugin": "8.40.0",
-		"@typescript-eslint/parser": "8.40.0",
-		"eslint": "9.34.0",
-		"eslint-config-prettier": "10.1.8",
-		"eslint-plugin-prettier": "5.5.4",
+		"@angular/build": "21.2.0",
+		"@angular/cli": "21.2.0",
+		"@angular/compiler-cli": "21.2.0",
 		"ng-packagr": "21.0.0",
 		"prettier": "3.6.2",
 		"typescript": "5.9.3"
 	},
-	"overrides": {
-		"@modelcontextprotocol/sdk": "1.26.0",
-		"@isaacs/brace-expansion": "5.0.1",
-		"js-yaml": "4.1.1",
-		"tar": "7.5.9",
-		"hono": "4.12.1",
-		"ajv": "8.18.0",
-		"minimatch": "10.2.2",
-		"qs": "6.15.0"
-	}
+	"overrides": {}
 }

@@ -1,4 +1,38 @@
 {
+	"quoteProps": "as-needed",
 	"trailingComma": "all",
-	"printWidth": 80
+	"bracketSpacing": true,
+	"arrowParens": "avoid",
+	"singleQuote": true,
+	"endOfLine": "auto",
+	"printWidth": 100,
+	"useTabs": true,
+	"tabWidth": 4,
+	"semi": true,
+	"overrides": [
+		{
+			"files": "*.html",
+			"options": {
+				"parser": "angular"
+			}
+		},
+		{
+			"files": "*.scss",
+			"options": {
+				"parser": "scss"
+			}
+		},
+		{
+			"files": "*.ts",
+			"options": {
+				"parser": "typescript"
+			}
+		},
+		{
+			"files": "*.json",
+			"options": {
+				"parser": "json"
+			}
+		}
+	]
 }
