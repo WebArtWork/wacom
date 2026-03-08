@@ -127,10 +127,10 @@ export class EmitterService {
 		},
 	): Observable<Any | Any[]> {
 		const list = (Array.isArray(tasks) ? tasks : [tasks]).filter(Boolean);
-		const streams = list.map((id) =>
+		const streams = list.map(id =>
 			toObservable(this._getDoneSignal(id)).pipe(
 				filter((v): v is Any => v !== undefined),
-				map((v) => v as Any),
+				map(v => v as Any),
 			),
 		);
 
@@ -150,7 +150,7 @@ export class EmitterService {
 		}
 
 		if (opts?.abort) {
-			const abort$ = new Observable<void>((sub) => {
+			const abort$ = new Observable<void>(sub => {
 				const handler = () => {
 					sub.next();
 					sub.complete();

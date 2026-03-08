@@ -1,16 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
-import {
-	Inject,
-	Injectable,
-	Optional,
-	PLATFORM_ID,
-	inject,
-} from '@angular/core';
-import {
-	CONFIG_TOKEN,
-	Config,
-	DEFAULT_CONFIG,
-} from '../interfaces/config.interface';
+import { Inject, Injectable, Optional, PLATFORM_ID, inject } from '@angular/core';
+import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config.interface';
 import { StoreConfig, StoreOptions } from './store.interface';
 
 @Injectable({
@@ -39,21 +29,12 @@ export class StoreService {
 	/**
 	 * Stores a raw string value.
 	 */
-	async set(
-		key: string,
-		value: string,
-		options?: StoreOptions,
-	): Promise<boolean> {
+	async set(key: string, value: string, options?: StoreOptions): Promise<boolean> {
 		key = this._applyPrefix(key);
 
 		try {
 			if (this._config.set) {
-				await this._config.set(
-					key,
-					value,
-					() => options?.onSuccess?.(),
-					options?.onError,
-				);
+				await this._config.set(key, value, () => options?.onSuccess?.(), options?.onError);
 			} else {
 				if (!this._isBrowser) {
 					options?.onSuccess?.();
@@ -75,10 +56,7 @@ export class StoreService {
 	/**
 	 * Retrieves a raw string value.
 	 */
-	async get(
-		key: string,
-		options?: StoreOptions<string>,
-	): Promise<string | null> {
+	async get(key: string, options?: StoreOptions<string>): Promise<string | null> {
 		key = this._applyPrefix(key);
 
 		try {
@@ -112,21 +90,14 @@ export class StoreService {
 	/**
 	 * Stores a JSON value safely.
 	 */
-	async setJson<T>(
-		key: string,
-		value: T,
-		options?: StoreOptions,
-	): Promise<boolean> {
+	async setJson<T>(key: string, value: T, options?: StoreOptions): Promise<boolean> {
 		return this.set(key, JSON.stringify(value), options);
 	}
 
 	/**
 	 * Retrieves a JSON value safely (auto-heals broken data).
 	 */
-	async getJson<T = unknown>(
-		key: string,
-		options?: StoreOptions<T>,
-	): Promise<T | null> {
+	async getJson<T = unknown>(key: string, options?: StoreOptions<T>): Promise<T | null> {
 		const clearOnError = options?.clearOnError ?? true;
 
 		const raw = await this.get(key, {

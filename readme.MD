@@ -16,9 +16,7 @@ import { AppComponent } from './app/app.component';
 import { provideWacom } from 'wacom';
 
 bootstrapApplication(AppComponent, {
-  providers: [
-    provideWacom()
-  ]
+	providers: [provideWacom()],
 });
 ```
 

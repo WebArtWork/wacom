@@ -27,9 +27,7 @@ export class CoreService {
 			const stored = localStorage.getItem('deviceID');
 			this.deviceID =
 				stored ||
-				(typeof crypto?.randomUUID === 'function'
-					? crypto.randomUUID()
-					: this.UUID());
+				(typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : this.UUID());
 
 			localStorage.setItem('deviceID', this.deviceID);
 
@@ -58,14 +56,11 @@ export class CoreService {
 	 * @returns A string containing a UUID v4.
 	 */
 	UUID(): string {
-		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-			/[xy]/g,
-			(c: string) => {
-				const r = (Math.random() * 16) | 0;
-				const v = c === 'x' ? r : (r & 0x3) | 0x8;
-				return v.toString(16);
-			},
-		);
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c: string) => {
+			const r = (Math.random() * 16) | 0;
+			const v = c === 'x' ? r : (r & 0x3) | 0x8;
+			return v.toString(16);
+		});
 	}
 
 	/**
@@ -82,9 +77,7 @@ export class CoreService {
 		for (const each in obj) {
 			if (
 				obj.hasOwnProperty(each) &&
-				(obj[each] ||
-					typeof obj[each] === 'number' ||
-					typeof obj[each] === 'boolean')
+				(obj[each] || typeof obj[each] === 'number' || typeof obj[each] === 'boolean')
 			) {
 				if (holder) {
 					arr.push(each);
@@ -104,19 +97,13 @@ export class CoreService {
 	 * @param {string} [compareField='_id'] - The field to use for comparison.
 	 * @returns {any[]} The modified `fromArray` with elements removed.
 	 */
-	splice(
-		removeArray: any[],
-		fromArray: any[],
-		compareField: string = '_id',
-	): any[] {
+	splice(removeArray: any[], fromArray: any[], compareField: string = '_id'): any[] {
 		if (!Array.isArray(removeArray) || !Array.isArray(fromArray)) {
 			return fromArray;
 		}
 
-		const removeSet = new Set(
-			removeArray.map((item) => item[compareField]),
-		);
-		return fromArray.filter((item) => !removeSet.has(item[compareField]));
+		const removeSet = new Set(removeArray.map(item => item[compareField]));
+		return fromArray.filter(item => !removeSet.has(item[compareField]));
 	}
 
 	/**
@@ -128,10 +115,7 @@ export class CoreService {
 	 */
 	ids2id(...args: string[]): string {
 		args.sort((a, b) => {
-			if (
-				Number(a.toString().substring(0, 8)) >
-				Number(b.toString().substring(0, 8))
-			) {
+			if (Number(a.toString().substring(0, 8)) > Number(b.toString().substring(0, 8))) {
 				return 1;
 			}
 			return -1;
@@ -150,11 +134,7 @@ export class CoreService {
 	 * @param {() => void} [cb] - The callback function to execute after the delay.
 	 * @param {number} [time=1000] - The delay time in milliseconds.
 	 */
-	afterWhile(
-		doc: string | object | (() => void),
-		cb?: () => void,
-		time: number = 1000,
-	): void {
+	afterWhile(doc: string | object | (() => void), cb?: () => void, time: number = 1000): void {
 		if (typeof doc === 'function') {
 			cb = doc as () => void;
 			doc = 'common';
@@ -166,10 +146,7 @@ export class CoreService {
 				this._afterWhile[doc] = setTimeout(cb, time);
 			} else if (typeof doc === 'object') {
 				clearTimeout((doc as { __afterWhile: number }).__afterWhile);
-				(doc as { __afterWhile: number }).__afterWhile = setTimeout(
-					cb,
-					time,
-				);
+				(doc as { __afterWhile: number }).__afterWhile = setTimeout(cb, time);
 			} else {
 				console.warn('badly configured after while');
 			}
@@ -215,16 +192,12 @@ export class CoreService {
 	detectDevice(): void {
 		if (!this._isBrowser) return;
 
-		const userAgent =
-			navigator.userAgent || navigator.vendor || (window as any).opera;
+		const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
 		if (/windows phone/i.test(userAgent)) {
 			this.device = 'Windows Phone';
 		} else if (/android/i.test(userAgent)) {
 			this.device = 'Android';
-		} else if (
-			/iPad|iPhone|iPod/.test(userAgent) &&
-			!(window as any).MSStream
-		) {
+		} else if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {
 			this.device = 'iOS';
 		} else {
 			this.device = 'Web';
@@ -237,9 +210,7 @@ export class CoreService {
 	 */
 	isMobile(): boolean {
 		return (
-			this.device === 'Windows Phone' ||
-			this.device === 'Android' ||
-			this.device === 'iOS'
+			this.device === 'Windows Phone' || this.device === 'Android' || this.device === 'iOS'
 		);
 	}
 
@@ -288,9 +259,7 @@ export class CoreService {
 		if (!this._isBrowser) return;
 
 		const mqMobile = window.matchMedia('(max-width: 767.98px)');
-		const mqTablet = window.matchMedia(
-			'(min-width: 768px) and (max-width: 1023.98px)',
-		);
+		const mqTablet = window.matchMedia('(min-width: 768px) and (max-width: 1023.98px)');
 		const mqDesktop = window.matchMedia('(min-width: 1024px)');
 
 		const update = () => {
@@ -376,7 +345,7 @@ export class CoreService {
 		this._locked[which] = false;
 
 		if (this._unlockResolvers[which]) {
-			this._unlockResolvers[which].forEach((resolve) => resolve());
+			this._unlockResolvers[which].forEach(resolve => resolve());
 
 			this._unlockResolvers[which] = [];
 		}
@@ -392,7 +361,7 @@ export class CoreService {
 			return Promise.resolve();
 		}
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			if (!this._unlockResolvers[which]) {
 				this._unlockResolvers[which] = [];
 			}
@@ -472,7 +441,7 @@ export class CoreService {
 		arr: Document[],
 		signalFields: Record<string, (doc: Document) => unknown> = {},
 	): WritableSignal<Document>[] {
-		return arr.map((obj) => this.toSignal(obj, signalFields));
+		return arr.map(obj => this.toSignal(obj, signalFields));
 	}
 
 	/**
@@ -508,7 +477,7 @@ export class CoreService {
 		value: unknown,
 		field: string = '_id',
 	): void {
-		const idx = signals.findIndex((sig) => sig()[field] === value);
+		const idx = signals.findIndex(sig => sig()[field] === value);
 
 		if (idx > -1) signals.splice(idx, 1);
 	}
@@ -519,9 +488,7 @@ export class CoreService {
 	 * @param {string} field - The object field to use for tracking (e.g., '_id').
 	 * @returns {(index: number, sig: Signal<Document>) => unknown} TrackBy function for Angular.
 	 */
-	trackBySignalField<Document extends Record<string, unknown>>(
-		field: string,
-	) {
+	trackBySignalField<Document extends Record<string, unknown>>(field: string) {
 		return (_: number, sig: Signal<Document>) => sig()[field];
 	}
 
@@ -538,9 +505,7 @@ export class CoreService {
 		value: unknown,
 		field = '_id',
 	): WritableSignal<Document> | undefined {
-		return signals.find(
-			(sig) => sig()[field] === value,
-		) as WritableSignal<Document>;
+		return signals.find(sig => sig()[field] === value) as WritableSignal<Document>;
 	}
 
 	/**

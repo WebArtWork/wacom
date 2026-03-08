@@ -29,9 +29,6 @@ export const DEFAULT_NETWORK_CONFIG: NetworkConfig = {
 	maxConsecutiveFails: 3,
 };
 
-export const NETWORK_CONFIG = new InjectionToken<NetworkConfig>(
-	'NETWORK_CONFIG',
-	{
-		factory: () => DEFAULT_NETWORK_CONFIG,
-	},
-);
+export const NETWORK_CONFIG = new InjectionToken<NetworkConfig>('NETWORK_CONFIG', {
+	factory: () => DEFAULT_NETWORK_CONFIG,
+});

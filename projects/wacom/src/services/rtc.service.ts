@@ -48,9 +48,7 @@ export class RtcService {
 
 		const peer = new RTCPeerConnection();
 
-		this._localStream
-			?.getTracks()
-			.forEach((track) => peer.addTrack(track, this._localStream!));
+		this._localStream?.getTracks().forEach(track => peer.addTrack(track, this._localStream!));
 
 		this._peers.set(id, peer);
 
@@ -157,11 +155,11 @@ export class RtcService {
 	 * Closes all peer connections and stops the local media stream.
 	 */
 	closeAll() {
-		this._peers.forEach((peer) => peer.close());
+		this._peers.forEach(peer => peer.close());
 
 		this._peers.clear();
 
-		this._localStream?.getTracks().forEach((track) => track.stop());
+		this._localStream?.getTracks().forEach(track => track.stop());
 
 		this._localStream = null;
 	}

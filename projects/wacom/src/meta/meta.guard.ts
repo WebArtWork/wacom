@@ -20,8 +20,7 @@ export class MetaGuard {
 	constructor(private _metaService: MetaService) {}
 
 	canActivate(route: ActivatedRouteSnapshot): boolean {
-		const pageMeta =
-			(route.data && (route.data['meta'] as MetaPage)) || null;
+		const pageMeta = (route.data && (route.data['meta'] as MetaPage)) || null;
 
 		if (pageMeta) this._metaService.applyMeta(pageMeta);
 		else this._metaService.reset();

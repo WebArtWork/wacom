@@ -22,8 +22,7 @@ export class UtilService {
 	constructor() {
 		this._loadCss();
 		// apply on boot
-		for (const k of Object.keys(this._css))
-			this._setProperty(k, this._css[k]);
+		for (const k of Object.keys(this._css)) this._setProperty(k, this._css[k]);
 		this._cssSig.set({ ...this._css });
 	}
 
@@ -83,47 +82,31 @@ export class UtilService {
 	 */
 	valid(
 		value: any,
-		kind:
-			| 'email'
-			| 'text'
-			| 'array'
-			| 'object'
-			| 'number'
-			| 'password' = 'email',
+		kind: 'email' | 'text' | 'array' | 'object' | 'number' | 'password' = 'email',
 		extra = 0,
 	): boolean {
 		switch (kind) {
 			case 'email':
-				return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,10})+$/.test(
-					value || '',
-				);
+				return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,10})+$/.test(value || '');
 			case 'text':
 				return typeof value === 'string';
 			case 'array':
 				return Array.isArray(value);
 			case 'object':
-				return (
-					typeof value === 'object' &&
-					!Array.isArray(value) &&
-					value !== null
-				);
+				return typeof value === 'object' && !Array.isArray(value) && value !== null;
 			case 'number':
 				return typeof value === 'number' && Number.isFinite(value);
 			case 'password':
 				if (!value) return false;
 				switch (extra) {
 					case 1:
-						return /^((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9]))/.test(
-							value,
-						);
+						return /^((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9]))/.test(value);
 					case 2:
 						return /^(((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,})/.test(
 							value,
 						);
 					case 3:
-						return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]))(?=.{8,})/.test(
-							value,
-						);
+						return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]))(?=.{8,})/.test(value);
 					case 4:
 						return /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%&!\-_]))(?=.{8,})/.test(
 							value,
@@ -149,10 +132,7 @@ export class UtilService {
 	// ===== CSS Variables Management =====
 
 	/** Set multiple CSS vars. opts: { local?: boolean; host?: string } */
-	setCss(
-		vars: Dict<string>,
-		opts: { local?: boolean; host?: string } | string = {},
-	): void {
+	setCss(vars: Dict<string>, opts: { local?: boolean; host?: string } | string = {}): void {
 		if (typeof opts === 'string') {
 			opts = opts === 'local' ? { local: true } : { host: opts };
 		}
@@ -160,12 +140,7 @@ export class UtilService {
 			local?: boolean;
 			host?: string;
 		};
-		if (
-			host &&
-			typeof window !== 'undefined' &&
-			window.location.host !== host
-		)
-			return;
+		if (host && typeof window !== 'undefined' && window.location.host !== host) return;
 
 		for (const k of Object.keys(vars)) {
 			const v = vars[k];
@@ -238,8 +213,7 @@ export class UtilService {
 	 * @returns Random string of requested length.
 	 */
 	text(length = 10): string {
-		const chars =
-			'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		let res = '';
 		for (let i = 0; i < length; i++)
 			res += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -252,10 +226,7 @@ export class UtilService {
 	private _saveCss(): void {
 		try {
 			if (typeof localStorage !== 'undefined') {
-				localStorage.setItem(
-					this._storageKey,
-					JSON.stringify(this._css),
-				);
+				localStorage.setItem(this._storageKey, JSON.stringify(this._css));
 			}
 		} catch {}
 	}

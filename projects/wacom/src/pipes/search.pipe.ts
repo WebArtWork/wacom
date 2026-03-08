@@ -6,11 +6,7 @@ type Query =
 	| Record<string, unknown>
 	| Signal<string | string[] | Record<string, unknown> | undefined>;
 
-type Field =
-	| string
-	| string[]
-	| number
-	| Signal<string | string[] | number | undefined>;
+type Field = string | string[] | number | Signal<string | string[] | number | undefined>;
 
 @Pipe({ name: 'search', pure: true })
 export class SearchPipe implements PipeTransform {
@@ -39,19 +35,15 @@ export class SearchPipe implements PipeTransform {
 		if (ignore || !q) return limit ? docs.slice(0, limit) : docs;
 
 		/* normalise fields */
-		const paths: string[] = !f
-			? ['name']
-			: Array.isArray(f)
-				? f
-				: f.trim().split(/\s+/);
+		const paths: string[] = !f ? ['name'] : Array.isArray(f) ? f : f.trim().split(/\s+/);
 
 		/* normalise query */
 		const needles: string[] = Array.isArray(q)
-			? q.map((s) => s.toLowerCase())
+			? q.map(s => s.toLowerCase())
 			: typeof q === 'object'
 				? Object.keys(q)
-						.filter((k) => (q as any)[k])
-						.map((k) => k.toLowerCase())
+						.filter(k => (q as any)[k])
+						.map(k => k.toLowerCase())
 				: [q.toLowerCase()];
 
 		const txtMatches = (val: any) => {
@@ -59,7 +51,7 @@ export class SearchPipe implements PipeTransform {
 
 			const hay = val.toString().toLowerCase();
 
-			return needles.some((n) => hay.includes(n) || n.includes(hay));
+			return needles.some(n => hay.includes(n) || n.includes(hay));
 		};
 
 		const walk = (obj: any, parts: string[]): boolean => {
@@ -70,9 +62,7 @@ export class SearchPipe implements PipeTransform {
 			const next = obj[head];
 
 			if (Array.isArray(next))
-				return next.some((v) =>
-					rest.length ? walk(v, rest) : txtMatches(v),
-				);
+				return next.some(v => (rest.length ? walk(v, rest) : txtMatches(v)));
 
 			return rest.length ? walk(next, rest) : txtMatches(next);
 		};

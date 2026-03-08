@@ -69,8 +69,7 @@ export class ThemeService {
 			? (localStorage.getItem('theme.mode') as ThemeMode) || 'light'
 			: 'light';
 		const density = this._isBrowser
-			? (localStorage.getItem('theme.density') as ThemeDensity) ||
-				'comfortable'
+			? (localStorage.getItem('theme.density') as ThemeDensity) || 'comfortable'
 			: 'comfortable';
 		const radius = this._isBrowser
 			? (localStorage.getItem('theme.radius') as ThemeRadius) || 'rounded'
@@ -80,11 +79,7 @@ export class ThemeService {
 		this.density.set(density);
 		this.radius.set(radius);
 
-		this.themeIndex.set(
-			this._isBrowser
-				? Number(localStorage.getItem('theme.index')) || 0
-				: 0,
-		);
+		this.themeIndex.set(this._isBrowser ? Number(localStorage.getItem('theme.index')) || 0 : 0);
 
 		if (this._isBrowser) {
 			this._doc.documentElement.dataset['mode'] = mode;

@@ -1,16 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
-import {
-	Inject,
-	inject,
-	Injectable,
-	Optional,
-	PLATFORM_ID,
-} from '@angular/core';
-import {
-	Config,
-	CONFIG_TOKEN,
-	DEFAULT_CONFIG,
-} from '../interfaces/config.interface';
+import { Inject, inject, Injectable, Optional, PLATFORM_ID } from '@angular/core';
+import { Config, CONFIG_TOKEN, DEFAULT_CONFIG } from '../interfaces/config.interface';
 import { EmitterService } from './emitter.service';
 
 @Injectable({
@@ -82,9 +72,7 @@ export class SocketService {
 		if (!this._isBrowser) return;
 
 		if (this._config.io) {
-			const ioFunc = this._config.io.default
-				? this._config.io.default
-				: this._config.io;
+			const ioFunc = this._config.io.default ? this._config.io.default : this._config.io;
 
 			this._io = ioFunc(this._url, this._opts);
 

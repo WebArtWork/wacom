@@ -2,7 +2,7 @@
 	"name": "wacom",
 	"version": "1.0.0",
 	"scripts": {
-		"start": "ng serve -o --proxy-config proxy.conf.json",
+		"start": "ng serve -o",
 		"build": "ng build wacom",
 		"watch": "ng build wacom --watch"
 	},

@@ -1,18 +1,7 @@
-import {
-	ChangeDetectorRef,
-	inject,
-	Signal,
-	signal,
-	WritableSignal,
-} from '@angular/core';
+import { ChangeDetectorRef, inject, Signal, signal, WritableSignal } from '@angular/core';
 import { firstValueFrom, take } from 'rxjs';
 import { CoreService } from '../core/core.service';
-import {
-	CrudDocument,
-	CrudOptions,
-	CrudServiceInterface,
-	TableConfig,
-} from './crud.interface';
+import { CrudDocument, CrudOptions, CrudServiceInterface, TableConfig } from './crud.interface';
 
 /**
  * Interface representing the shape of a form service used by the CrudComponent.
@@ -70,12 +59,7 @@ export abstract class CrudComponent<
 	 * @param formService - Any service that conforms to FormServiceInterface (usually casted)
 	 * @param crudService - CRUD service implementing get/create/update/delete
 	 */
-	constructor(
-		formConfig: unknown,
-		formService: unknown,
-		crudService: Service,
-		module = '',
-	) {
+	constructor(formConfig: unknown, formService: unknown, crudService: Service, module = '') {
 		const form = formConfig as FormInterface;
 
 		this.__formService = formService as FormServiceInterface<FormInterface>;
@@ -102,7 +86,7 @@ export abstract class CrudComponent<
 	protected setDocuments(page = this.page, query = ''): Promise<void> {
 		query = this.setDocumentsQuery(query);
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			if (this.configType === 'server') {
 				this.page = page;
 
@@ -113,9 +97,7 @@ export abstract class CrudComponent<
 							.get({ page, query }, this.getOptions())
 							.subscribe((docs: Document[]) => {
 								this.documents.update(() =>
-									(docs || []).map((doc) =>
-										this.crudService.getSignal(doc),
-									),
+									(docs || []).map(doc => this.crudService.getSignal(doc)),
 								);
 
 								resolve();
@@ -130,7 +112,7 @@ export abstract class CrudComponent<
 					this.crudService
 						.getDocs()
 						.filter(this.localDocumentsFilter)
-						.map((doc) => this.crudService.getSignal(doc)),
+						.map(doc => this.crudService.getSignal(doc)),
 				);
 
 				this.crudService.loaded.pipe(take(1)).subscribe(() => {
@@ -199,10 +181,7 @@ export abstract class CrudComponent<
 						: this.documents().map(
 								(obj: any) =>
 									Object.fromEntries(
-										this.updatableFields.map((key) => [
-											key,
-											obj()[key],
-										]),
+										this.updatableFields.map(key => [key, obj()[key]]),
 									) as Document,
 							),
 				)
@@ -215,36 +194,28 @@ export abstract class CrudComponent<
 						}
 					} else {
 						for (const document of this.documents()) {
-							if (!docs.find((d) => d._id === document()._id)) {
-								await firstValueFrom(
-									this.crudService.delete(document()),
-								);
+							if (!docs.find(d => d._id === document()._id)) {
+								await firstValueFrom(this.crudService.delete(document()));
 							}
 						}
 
 						for (const doc of docs) {
 							const local = this.documents().find(
-								(document) => document()._id === doc._id,
+								document => document()._id === doc._id,
 							);
 
 							if (local) {
-								(local as WritableSignal<Document>).update(
-									(document) => {
-										this.__core.copy(doc, document);
+								(local as WritableSignal<Document>).update(document => {
+									this.__core.copy(doc, document);
 
-										return document;
-									},
-								);
+									return document;
+								});
 
-								await firstValueFrom(
-									this.crudService.update(local()),
-								);
+								await firstValueFrom(this.crudService.update(local()));
 							} else {
 								this.preCreate(doc);
 
-								await firstValueFrom(
-									this.crudService.create(doc),
-								);
+								await firstValueFrom(this.crudService.create(doc));
 							}
 						}
 					}
@@ -265,9 +236,7 @@ export abstract class CrudComponent<
 
 					this.preCreate(created as Document);
 
-					await firstValueFrom(
-						this.crudService.create(created as Document),
-					);
+					await firstValueFrom(this.crudService.create(created as Document));
 
 					this.setDocuments();
 				},
@@ -314,12 +283,10 @@ export abstract class CrudComponent<
 
 	/** Moves the given document one position up and updates ordering. */
 	protected moveUp(doc: Document) {
-		const index = this.documents().findIndex(
-			(document) => document()._id === doc._id,
-		);
+		const index = this.documents().findIndex(document => document()._id === doc._id);
 
 		if (index) {
-			this.documents.update((documents) => {
+			this.documents.update(documents => {
 				documents.splice(index, 1);
 
 				documents.splice(index - 1, 0, this.crudService.getSignal(doc));
@@ -411,9 +378,7 @@ export abstract class CrudComponent<
 					...config,
 					paginate: this.setDocuments.bind(this),
 					perPage: this.perPage,
-					setPerPage: this.crudService.setPerPage?.bind(
-						this.crudService,
-					),
+					setPerPage: this.crudService.setPerPage?.bind(this.crudService),
 					allDocs: false,
 				}
 			: config;

@@ -18,16 +18,9 @@ export interface StoreConfig {
 		errCb?: (err: unknown) => void,
 	) => Promise<string>;
 	/** Remove a stored value. */
-	remove?: (
-		field: string,
-		cb?: () => void,
-		errCb?: (err: unknown) => void,
-	) => Promise<boolean>;
+	remove?: (field: string, cb?: () => void, errCb?: (err: unknown) => void) => Promise<boolean>;
 	/** Clear all stored values created by the library. */
-	clear?: (
-		cb?: () => void,
-		errCb?: (err: unknown) => void,
-	) => Promise<boolean>;
+	clear?: (cb?: () => void, errCb?: (err: unknown) => void) => Promise<boolean>;
 }
 
 export interface StoreOptions<T = unknown> {

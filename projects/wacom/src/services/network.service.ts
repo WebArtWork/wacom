@@ -1,13 +1,6 @@
 // network.service.ts — Angular 20+ (zoneless) signal-based connectivity checker
 import { isPlatformBrowser } from '@angular/common';
-import {
-	Inject,
-	inject,
-	Injectable,
-	Optional,
-	PLATFORM_ID,
-	signal,
-} from '@angular/core';
+import { Inject, inject, Injectable, Optional, PLATFORM_ID, signal } from '@angular/core';
 import { Config, CONFIG_TOKEN } from '../interfaces/config.interface';
 import {
 	DEFAULT_NETWORK_CONFIG,
@@ -21,13 +14,9 @@ export class NetworkService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
 	/** Internal mutable signals. */
-	private _status = signal<NetworkStatus>(
-		this._isBrowser && navigator.onLine ? 'poor' : 'none',
-	);
+	private _status = signal<NetworkStatus>(this._isBrowser && navigator.onLine ? 'poor' : 'none');
 	private _latencyMs = signal<number | null>(null);
-	private _isOnline = signal<boolean>(
-		this._isBrowser ? navigator.onLine : false,
-	);
+	private _isOnline = signal<boolean>(this._isBrowser ? navigator.onLine : false);
 
 	/** Public read-only signals. */
 	readonly status = this._status.asReadonly();
@@ -91,10 +80,7 @@ export class NetworkService {
 	 * - otherwise 'poor'.
 	 */
 	private _updateClassification(): void {
-		if (
-			!this._isOnline() ||
-			this._fails >= this._config.maxConsecutiveFails
-		) {
+		if (!this._isOnline() || this._fails >= this._config.maxConsecutiveFails) {
 			if (this._status() !== 'none') {
 				this._status.set('none');
 
@@ -140,9 +126,7 @@ export class NetworkService {
 			this._updateClassification();
 		});
 
-		(navigator as any).connection?.addEventListener?.('change', () =>
-			this.recheckNow(),
-		);
+		(navigator as any).connection?.addEventListener?.('change', () => this.recheckNow());
 	}
 
 	/**
@@ -155,11 +139,7 @@ export class NetworkService {
 		for (const url of this._config.endpoints) {
 			const noCors = !url.includes('api.webart.work'); // treat public fallbacks as opaque checks
 
-			const r = await this._measure(
-				url,
-				this._config.timeoutMs,
-				noCors,
-			).catch(() => null);
+			const r = await this._measure(url, this._config.timeoutMs, noCors).catch(() => null);
 
 			if (r?.ok) return r;
 		}
@@ -183,16 +163,13 @@ export class NetworkService {
 		const t0 = performance.now();
 
 		try {
-			const res = await fetch(
-				url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(),
-				{
-					method: 'GET',
-					cache: 'no-store',
-					credentials: 'omit',
-					signal: ctrl.signal,
-					mode: noCors ? 'no-cors' : 'cors',
-				},
-			);
+			const res = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), {
+				method: 'GET',
+				cache: 'no-store',
+				credentials: 'omit',
+				signal: ctrl.signal,
+				mode: noCors ? 'no-cors' : 'cors',
+			});
 
 			clearTimeout(timer);
 

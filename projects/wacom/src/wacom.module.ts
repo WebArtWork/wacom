@@ -1,16 +1,9 @@
 /* initialize */
 import { CommonModule } from '@angular/common';
-import {
-	provideHttpClient,
-	withInterceptorsFromDi,
-} from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-	Config,
-	CONFIG_TOKEN,
-	DEFAULT_CONFIG,
-} from './interfaces/config.interface';
+import { Config, CONFIG_TOKEN, DEFAULT_CONFIG } from './interfaces/config.interface';
 
 /* directives */
 import { ClickOutsideDirective } from './directives/click-outside.directive';
@@ -47,9 +40,7 @@ const PIPES = [
  * @deprecated Use provideWacom instead.
  */
 export class WacomModule {
-	static forRoot(
-		config: Config = DEFAULT_CONFIG,
-	): ModuleWithProviders<WacomModule> {
+	static forRoot(config: Config = DEFAULT_CONFIG): ModuleWithProviders<WacomModule> {
 		return {
 			ngModule: WacomModule,
 			providers: [

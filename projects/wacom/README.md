@@ -15,7 +15,7 @@ $ npm i --save wacom
 ## Usage
 
 ```typescript
-import { provideWacom } from "wacom";
+import { provideWacom } from 'wacom';
 
 export const appConfig = {
 	providers: [provideWacom()],
@@ -29,13 +29,13 @@ export const appConfig = {
 You can pass an optional configuration object to `provideWacom` to override the library defaults.
 
 ```typescript
-import { provideWacom } from "wacom";
+import { provideWacom } from 'wacom';
 
 export const appConfig = {
 	providers: [
 		provideWacom({
-			http: { url: "https://api.example.com" },
-			store: { prefix: "waStore" },
+			http: { url: 'https://api.example.com' },
+			store: { prefix: 'waStore' },
 			meta: {
 				useTitleSuffix: false,
 				defaults: { links: {} },
@@ -490,18 +490,18 @@ Example:
 
 ```ts
 // Somewhere that waits for a single task
-this.emitter.onComplete("profile:loaded").subscribe(() => {
+this.emitter.onComplete('profile:loaded').subscribe(() => {
 	// safe to render UI
 });
 
 // Somewhere that fulfills it
 await api.loadProfile();
-this.emitter.complete("profile:loaded");
+this.emitter.complete('profile:loaded');
 
 // Wait for any of several tasks
 this.emitter
-	.onComplete(["a", "b"], { mode: "any", timeoutMs: 5000 })
-	.subscribe((which) => console.log("First done:", which));
+	.onComplete(['a', 'b'], { mode: 'any', timeoutMs: 5000 })
+	.subscribe(which => console.log('First done:', which));
 ```
 
 ## [Http Service](#http-service)
@@ -731,7 +731,7 @@ It supports raw values, safe JSON handling, key prefixing, and optional lifecycl
 ### Prefixing keys
 
 ```ts
-storeService.setPrefix("app_");
+storeService.setPrefix('app_');
 ```
 
 All keys will be stored as `app_<key>` (plus global config prefix if defined).
@@ -743,14 +743,14 @@ All keys will be stored as `app_<key>` (plus global config prefix if defined).
 Stores a raw string value.
 
 ```ts
-await storeService.set("token", "abc123");
+await storeService.set('token', 'abc123');
 ```
 
 With hooks:
 
 ```ts
-await storeService.set("token", "abc123", {
-	onSuccess: () => console.log("saved"),
+await storeService.set('token', 'abc123', {
+	onSuccess: () => console.log('saved'),
 	onError: console.error,
 });
 ```
@@ -764,14 +764,14 @@ await storeService.set("token", "abc123", {
 Retrieves a raw string value.
 
 ```ts
-const token = await storeService.get("token");
+const token = await storeService.get('token');
 ```
 
 With hooks:
 
 ```ts
-const token = await storeService.get("token", {
-	onSuccess: (v) => console.log(v),
+const token = await storeService.get('token', {
+	onSuccess: v => console.log(v),
 	onError: console.error,
 });
 ```
@@ -785,14 +785,14 @@ const token = await storeService.get("token", {
 Stores a JSON-serializable value.
 
 ```ts
-await storeService.setJson("profile", { name: "Den", role: "dev" });
+await storeService.setJson('profile', { name: 'Den', role: 'dev' });
 ```
 
 With hooks:
 
 ```ts
-await storeService.setJson("profile", user, {
-	onSuccess: () => console.log("saved"),
+await storeService.setJson('profile', user, {
+	onSuccess: () => console.log('saved'),
 	onError: console.error,
 });
 ```
@@ -809,13 +809,13 @@ Retrieves a JSON value safely.
 - corrupted JSON → auto-cleared (by default)
 
 ```ts
-const profile = await storeService.getJson<User>("profile");
+const profile = await storeService.getJson<User>('profile');
 ```
 
 With defaults and error handling:
 
 ```ts
-const profile = await storeService.getJson<User>("profile", {
+const profile = await storeService.getJson<User>('profile', {
 	defaultValue: {},
 	onError: console.warn,
 });
@@ -824,7 +824,7 @@ const profile = await storeService.getJson<User>("profile", {
 Disable auto-clean:
 
 ```ts
-await storeService.getJson("profile", {
+await storeService.getJson('profile', {
 	clearOnError: false,
 });
 ```
@@ -838,14 +838,14 @@ await storeService.getJson("profile", {
 Removes a single key.
 
 ```ts
-await storeService.remove("token");
+await storeService.remove('token');
 ```
 
 With hooks:
 
 ```ts
-await storeService.remove("token", {
-	onSuccess: () => console.log("removed"),
+await storeService.remove('token', {
+	onSuccess: () => console.log('removed'),
 	onError: console.error,
 });
 ```
@@ -866,7 +866,7 @@ With hooks:
 
 ```ts
 await storeService.clear({
-	onSuccess: () => console.log("cleared"),
+	onSuccess: () => console.log('cleared'),
 	onError: console.error,
 });
 ```
@@ -1387,14 +1387,8 @@ interface CrudDocument {
 ### Code sample use
 
 ```typescript
-import { Injectable } from "@angular/core";
-import {
-	CoreService,
-	HttpService,
-	StoreService,
-	CrudService,
-	CrudDocument,
-} from "wacom";
+import { Injectable } from '@angular/core';
+import { CoreService, HttpService, StoreService, CrudService, CrudDocument } from 'wacom';
 
 export interface Work extends CrudDocument {
 	name: string;
@@ -1402,7 +1396,7 @@ export interface Work extends CrudDocument {
 }
 
 @Injectable({
-	providedIn: "root",
+	providedIn: 'root',
 })
 export class WorkService extends CrudService<Work> {
 	works: Work[] = this.getDocs();
@@ -1410,7 +1404,7 @@ export class WorkService extends CrudService<Work> {
 	constructor(_http: HttpService, _store: StoreService, _core: CoreService) {
 		super(
 			{
-				name: "work",
+				name: 'work',
 			},
 			_http,
 			_store,
@@ -1477,26 +1471,26 @@ socketService.emit('message', { text: 'Hello, World!' });
 ### Usage Example
 
 ```typescript
-import { SocketService } from "wacom";
+import { SocketService } from 'wacom';
 
 @Component({
-	selector: "app-root",
-	templateUrl: "./app.component.html",
-	styleUrls: ["./app.component.css"],
+	selector: 'app-root',
+	templateUrl: './app.component.html',
+	styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
 	constructor(private socketService: SocketService) {
-		this.socketService.setUrl("https://example.com");
-		this.socketService.on("connect", () => {
-			console.log("Connected to WebSocket");
+		this.socketService.setUrl('https://example.com');
+		this.socketService.on('connect', () => {
+			console.log('Connected to WebSocket');
 		});
-		this.socketService.on("message", (msg) => {
-			console.log("Received message:", msg);
+		this.socketService.on('message', msg => {
+			console.log('Received message:', msg);
 		});
 	}
 
 	sendMessage() {
-		this.socketService.emit("message", { text: "Hello, World!" });
+		this.socketService.emit('message', { text: 'Hello, World!' });
 	}
 }
 ```
@@ -2208,8 +2202,8 @@ automatically.
 
 ```ts
 this._translationService.setMany([
-	{ sourceText: "Create project", text: "Створити проєкт" },
-	{ sourceText: "Save", text: "Зберегти" },
+	{ sourceText: 'Create project', text: 'Створити проєкт' },
+	{ sourceText: 'Save', text: 'Зберегти' },
 ]);
 ```
 
@@ -2225,8 +2219,8 @@ Behavior:
 
 ```ts
 this._translationService.setOne({
-	sourceText: "Save",
-	text: "Зберегти",
+	sourceText: 'Save',
+	text: 'Зберегти',
 });
 ```
 

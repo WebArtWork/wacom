@@ -1,19 +1,9 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import {
-	Inject,
-	Injectable,
-	Optional,
-	PLATFORM_ID,
-	inject,
-} from '@angular/core';
+import { Inject, Injectable, Optional, PLATFORM_ID, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import {
-	CONFIG_TOKEN,
-	Config,
-	DEFAULT_CONFIG,
-} from '../interfaces/config.interface';
+import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config.interface';
 import { isDefined } from './meta.const';
 import { MetaConfig, MetaDefaults, MetaPage } from './meta.interface';
 import { TagAttr } from './meta.type';
@@ -84,17 +74,14 @@ export class MetaService {
 
 		// Recommended default: keep meta in sync with route changes automatically.
 		const applyFromRoutes =
-			!isDefined(this._metaConfig.applyFromRoutes) ||
-			!!this._metaConfig.applyFromRoutes;
+			!isDefined(this._metaConfig.applyFromRoutes) || !!this._metaConfig.applyFromRoutes;
 
 		if (applyFromRoutes) {
-			this._router.events
-				.pipe(filter((e) => e instanceof NavigationEnd))
-				.subscribe(() => {
-					const page = this._readDeepestRouteMeta();
-					if (page) this.applyMeta(page);
-					else this.reset();
-				});
+			this._router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
+				const page = this._readDeepestRouteMeta();
+				if (page) this.applyMeta(page);
+				else this.reset();
+			});
 		}
 	}
 
@@ -136,10 +123,7 @@ export class MetaService {
 		const defaults = this._metaConfig.defaults || {};
 
 		const title = this._resolveTitle(page, defaults);
-		const description = this._resolveValue(
-			page.description,
-			defaults.description,
-		);
+		const description = this._resolveValue(page.description, defaults.description);
 		const image = this._resolveValue(page.image, defaults.image);
 		const robots = this._resolveRobots(page, defaults);
 
@@ -182,9 +166,7 @@ export class MetaService {
 			const href = links[rel];
 
 			const all = Array.from(
-				this._doc.head.querySelectorAll<HTMLLinkElement>(
-					`link[rel="${rel}"]`,
-				),
+				this._doc.head.querySelectorAll<HTMLLinkElement>(`link[rel="${rel}"]`),
 			);
 
 			let link = all[0];
@@ -212,11 +194,9 @@ export class MetaService {
 		if (!this._isBrowser) return;
 		for (const rel of this._managedLinkRels) {
 			const all = Array.from(
-				this._doc.head.querySelectorAll<HTMLLinkElement>(
-					`link[rel="${rel}"]`,
-				),
+				this._doc.head.querySelectorAll<HTMLLinkElement>(`link[rel="${rel}"]`),
 			);
-			all.forEach((it) => it.remove());
+			all.forEach(it => it.remove());
 		}
 		this._managedLinkRels.clear();
 	}
@@ -251,9 +231,7 @@ export class MetaService {
 		let titleContent = this._resolveValue(page.title, defaults.title) || '';
 
 		if (this._metaConfig.useTitleSuffix) {
-			const suffix = isDefined(page.titleSuffix)
-				? page.titleSuffix
-				: defaults.titleSuffix;
+			const suffix = isDefined(page.titleSuffix) ? page.titleSuffix : defaults.titleSuffix;
 			titleContent += suffix || '';
 		}
 
@@ -268,10 +246,7 @@ export class MetaService {
 	 * - index flag (page/defaults) -> generates "index, follow" or "noindex, follow"
 	 * - undefined -> no robots tag set by this service
 	 */
-	private _resolveRobots(
-		page: MetaPage,
-		defaults: MetaDefaults,
-	): string | undefined {
+	private _resolveRobots(page: MetaPage, defaults: MetaDefaults): string | undefined {
 		if (isDefined(page.robots)) return (page.robots || '') + '';
 		if (isDefined(defaults.robots)) return (defaults.robots || '') + '';
 
@@ -361,8 +336,7 @@ export class MetaService {
 	 * - On next apply/reset we remove them to avoid stale meta across pages.
 	 */
 	private _updateTag(key: string, content: string, attr: TagAttr): void {
-		const selector =
-			attr === 'itemprop' ? `itemprop="${key}"` : `${attr}="${key}"`;
+		const selector = attr === 'itemprop' ? `itemprop="${key}"` : `${attr}="${key}"`;
 
 		const tagDef =
 			attr === 'itemprop'

@@ -52,18 +52,9 @@ export class TimeService {
 	 * @param format - The format in which to return the month name. Default is 'long'.
 	 * @returns The name of the month.
 	 */
-	getMonthName(
-		monthIndex: number,
-		format: 'short' | 'long' = 'long',
-	): string {
-		if (
-			!Number.isInteger(monthIndex) ||
-			monthIndex < 0 ||
-			monthIndex > 11
-		) {
-			throw new RangeError(
-				'monthIndex must be an integer between 0 and 11',
-			);
+	getMonthName(monthIndex: number, format: 'short' | 'long' = 'long'): string {
+		if (!Number.isInteger(monthIndex) || monthIndex < 0 || monthIndex > 11) {
+			throw new RangeError('monthIndex must be an integer between 0 and 11');
 		}
 		return format === 'short'
 			? this._monthNames[monthIndex].substring(0, 3)
@@ -78,11 +69,7 @@ export class TimeService {
 	 * @param timezone - The timezone to use for formatting.
 	 * @returns The formatted date string.
 	 */
-	formatDate(
-		date: Date,
-		format: string = 'mediumDate',
-		timezone: string = 'UTC',
-	): string {
+	formatDate(date: Date, format: string = 'mediumDate', timezone: string = 'UTC'): string {
 		return this._datePipe.transform(date, format, timezone) || '';
 	}
 
@@ -456,9 +443,7 @@ export class TimeService {
 		tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
 		const yearStart = new Date(tempDate.getFullYear(), 0, 1);
 		// Calculate full weeks to nearest Thursday
-		return Math.ceil(
-			((tempDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
-		);
+		return Math.ceil(((tempDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 	}
 
 	/**

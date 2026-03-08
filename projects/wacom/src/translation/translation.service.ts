@@ -35,7 +35,7 @@ export class TranslationService {
 		 *   so `setMany()` assumes signals are already registered (strict mode).
 		 */
 		this._storeService.getJson('translations', {
-			onSuccess: (translations) => {
+			onSuccess: translations => {
 				if (Array.isArray(translations)) {
 					this.setMany(translations as Translation[]);
 				}
@@ -82,7 +82,7 @@ export class TranslationService {
 	 * containing sourceText and translated text.
 	 */
 	setMany(translations: Translation[]) {
-		const sourceTexts = translations.map((t) => t.sourceText);
+		const sourceTexts = translations.map(t => t.sourceText);
 		const sourceSet = new Set(sourceTexts);
 
 		// Reset removed translations back to original text

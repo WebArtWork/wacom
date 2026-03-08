@@ -6,12 +6,7 @@ import { EmitterService } from '../services/emitter.service';
 import { HttpService } from '../services/http.service';
 import { NetworkService } from '../services/network.service';
 import { StoreService } from '../store/store.service';
-import {
-	CrudConfig,
-	CrudDocument,
-	CrudOptions,
-	GetConfig,
-} from './crud.interface';
+import { CrudConfig, CrudDocument, CrudOptions, GetConfig } from './crud.interface';
 
 /**
  * Abstract class representing a CRUD (Create, Read, Update, Delete) service.
@@ -84,23 +79,16 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 
 		this._url += this._config.name;
 
-		this.loaded = this.__emitterService.onComplete(
-			this._config.name + '_loaded',
-		);
+		this.loaded = this.__emitterService.onComplete(this._config.name + '_loaded');
 
-		this.getted = this.__emitterService.onComplete(
-			this._config.name + '_getted',
-		);
+		this.getted = this.__emitterService.onComplete(this._config.name + '_getted');
 
 		if (this._config.unauthorized) {
 			this.restoreDocs();
 		} else if (this._isBrowser && localStorage.getItem('waw_user')) {
 			const user = JSON.parse(localStorage.getItem('waw_user') as string);
 
-			if (
-				user._id ===
-				localStorage.getItem(this._config.name + 'waw_user_id')
-			) {
+			if (user._id === localStorage.getItem(this._config.name + 'waw_user_id')) {
 				this.restoreDocs();
 			}
 		}
@@ -130,10 +118,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * Cache of per (field,value) lists of document signals.
 	 * Key format: `${field}_${JSON.stringify(value)}`.
 	 */
-	private _signals: Record<
-		string,
-		WritableSignal<WritableSignal<Document>[]>
-	> = {};
+	private _signals: Record<string, WritableSignal<WritableSignal<Document>[]>> = {};
 
 	/**
 	 * Cache of per-field maps: fieldValue -> array of document signals.
@@ -183,9 +168,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		const id = field + '_' + JSON.stringify(value);
 
 		if (!this._signals[id]) {
-			this._signals[id] = signal<WritableSignal<Document>[]>(
-				this._getSignals(id),
-			);
+			this._signals[id] = signal<WritableSignal<Document>[]>(this._getSignals(id));
 		}
 
 		return this._signals[id];
@@ -229,9 +212,9 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 */
 	getFieldSignals(field: string) {
 		if (!this._fieldSignals[field]) {
-			this._fieldSignals[field] = signal<
-				Record<string, WritableSignal<Document>[]>
-			>(this._getFieldSignals(field));
+			this._fieldSignals[field] = signal<Record<string, WritableSignal<Document>[]>>(
+				this._getFieldSignals(field),
+			);
 		}
 
 		return this._fieldSignals[field];
@@ -241,9 +224,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * Builds the map for a given field.
 	 * Only documents with a real _id are included.
 	 */
-	private _getFieldSignals(
-		field: string,
-	): Record<string, WritableSignal<Document>[]> {
+	private _getFieldSignals(field: string): Record<string, WritableSignal<Document>[]> {
 		const byFields: Record<string, WritableSignal<Document>[]> = {};
 
 		for (const doc of this.getDocs()) {
@@ -281,9 +262,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * all existing signals with the restored data.
 	 */
 	async restoreDocs() {
-		const docs = await this.__storeService.getJson<Document[]>(
-			'docs_' + this._config.name,
-		);
+		const docs = await this.__storeService.getJson<Document[]>('docs_' + this._config.name);
 
 		if (docs?.length) {
 			this._docs.length = 0;
@@ -308,10 +287,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 				}
 			}
 
-			this.__emitterService.complete(
-				this._config.name + '_loaded',
-				this._docs,
-			);
+			this.__emitterService.complete(this._config.name + '_loaded', this._docs);
 		}
 	}
 
@@ -319,10 +295,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * Saves the current set of documents to local storage.
 	 */
 	setDocs(): void {
-		this.__storeService.setJson<Document[]>(
-			'docs_' + this._config.name,
-			this._docs,
-		);
+		this.__storeService.setJson<Document[]>('docs_' + this._config.name, this._docs);
 	}
 
 	/**
@@ -381,7 +354,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		}
 
 		const existingDoc = this._docs.find(
-			(d) =>
+			d =>
 				(this._id(doc) && this._id(d) === this._id(doc)) ||
 				(doc._localId && d._localId === doc._localId),
 		);
@@ -428,9 +401,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 
 		let doc =
 			this._docs.find(
-				(d) =>
-					this._id(d) === _id ||
-					(d._localId && d._localId === Number(_id)),
+				d => this._id(d) === _id || (d._localId && d._localId === Number(_id)),
 			) || null;
 
 		// If doc not found, create + push into _docs so it is not detached
@@ -440,10 +411,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 			this.setDocs();
 		}
 
-		if (
-			!this._docs.find((d) => this._id(d) === _id) &&
-			!this._fetchingId[_id]
-		) {
+		if (!this._docs.find(d => this._id(d) === _id) && !this._fetchingId[_id]) {
 			this._fetchingId[_id] = true;
 
 			setTimeout(() => {
@@ -526,10 +494,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		options: CrudOptions<Document>,
 	): void | Promise<void> {}
 
-	protected beforeFetch(
-		query: object,
-		options: CrudOptions<Document>,
-	): object | Promise<object> {
+	protected beforeFetch(query: object, options: CrudOptions<Document>): object | Promise<object> {
 		return query;
 	}
 
@@ -553,23 +518,16 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that resolves with the list of documents.
 	 */
-	get(
-		config: GetConfig = {},
-		options: CrudOptions<Document> = {},
-	): Observable<Document[]> {
+	get(config: GetConfig = {}, options: CrudOptions<Document> = {}): Observable<Document[]> {
 		if (!this.__networkService.isOnline()) {
-			return new Observable((observer) => {
+			return new Observable(observer => {
 				this._onOnline.push(() => {
 					this.get(config, options).subscribe(observer);
 				});
 			});
 		}
 
-		if (
-			this._isBrowser &&
-			!this._config.unauthorized &&
-			localStorage.getItem('waw_user')
-		) {
+		if (this._isBrowser && !this._config.unauthorized && localStorage.getItem('waw_user')) {
 			const user = JSON.parse(localStorage.getItem('waw_user') as string);
 
 			localStorage.setItem(this._config.name + 'waw_user_id', user._id);
@@ -594,7 +552,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 					this.clearDocs();
 				}
 
-				(resp as Document[]).forEach((doc) => this.addDoc(doc));
+				(resp as Document[]).forEach(doc => this.addDoc(doc));
 
 				if (options.callback) {
 					options.callback(resp as Document[]);
@@ -603,21 +561,12 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 				if (typeof config.page !== 'number') {
 					this._filterDocuments();
 
-					this.__emitterService.complete(
-						this._config.name + '_getted',
-						this._docs,
-					);
+					this.__emitterService.complete(this._config.name + '_getted', this._docs);
 				}
 
-				this.__emitterService.emit(
-					`${this._config.name}_get`,
-					this._docs,
-				);
+				this.__emitterService.emit(`${this._config.name}_get`, this._docs);
 
-				this.__emitterService.emit(
-					`${this._config.name}_changed`,
-					this._docs,
-				);
+				this.__emitterService.emit(`${this._config.name}_changed`, this._docs);
 			},
 			error: (err: unknown): void => {
 				if (options.errCallback) {
@@ -642,7 +591,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	): Observable<Document> {
 		return defer(() =>
 			from(this._mw(this.beforeCreate(doc, options))).pipe(
-				switchMap((mwDoc) => {
+				switchMap(mwDoc => {
 					doc = (mwDoc || doc) as Document;
 
 					if (doc._id) {
@@ -658,7 +607,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 					this._filterDocuments();
 
 					if (!this.__networkService.isOnline()) {
-						return new Observable((observer) => {
+						return new Observable(observer => {
 							this._onOnline.push(() => {
 								this.create(doc, options).subscribe(observer);
 							});
@@ -666,12 +615,8 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 					}
 
 					if (doc.__creating) {
-						return new Observable<Document>((observer) => {
-							observer.error(
-								new Error(
-									'Document is currently already creating.',
-								),
-							);
+						return new Observable<Document>(observer => {
+							observer.error(new Error('Document is currently already creating.'));
 						});
 					}
 
@@ -696,28 +641,16 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 
 								if (options.callback) options.callback(doc);
 
-								await this._mw(
-									this.afterCreate(resp, doc, options),
-								);
+								await this._mw(this.afterCreate(resp, doc, options));
 							} else {
 								doc.__creating = false;
 
-								if (options.errCallback)
-									options.errCallback(resp);
+								if (options.errCallback) options.errCallback(resp);
 							}
 
-							this.__emitterService.emit(
-								`${this._config.name}_create`,
-								doc,
-							);
-							this.__emitterService.emit(
-								`${this._config.name}_list`,
-								doc,
-							);
-							this.__emitterService.emit(
-								`${this._config.name}_changed`,
-								doc,
-							);
+							this.__emitterService.emit(`${this._config.name}_create`, doc);
+							this.__emitterService.emit(`${this._config.name}_list`, doc);
+							this.__emitterService.emit(`${this._config.name}_changed`, doc);
 						},
 						error: (err: unknown) => {
 							doc.__creating = false;
@@ -738,17 +671,14 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that resolves with the fetched document.
 	 */
-	fetch(
-		query: object = {},
-		options: CrudOptions<Document> = {},
-	): Observable<Document> {
+	fetch(query: object = {}, options: CrudOptions<Document> = {}): Observable<Document> {
 		return defer(() =>
 			from(this._mw(this.beforeFetch(query, options))).pipe(
-				switchMap((mwQuery) => {
+				switchMap(mwQuery => {
 					query = (mwQuery || query) as object;
 
 					if (!this.__networkService.isOnline()) {
-						return new Observable((observer) => {
+						return new Observable(observer => {
 							this._onOnline.push(() => {
 								this.fetch(query, options).subscribe(observer);
 							});
@@ -766,20 +696,13 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 								this.addDoc(doc as Document);
 								this._filterDocuments();
 
-								if (options.callback)
-									options.callback(doc as Document);
+								if (options.callback) options.callback(doc as Document);
 
-								await this._mw(
-									this.afterFetch(doc, query, options),
-								);
+								await this._mw(this.afterFetch(doc, query, options));
 
-								this.__emitterService.emit(
-									`${this._config.name}_changed`,
-									doc,
-								);
+								this.__emitterService.emit(`${this._config.name}_changed`, doc);
 							} else {
-								if (options.errCallback)
-									options.errCallback(doc as Document);
+								if (options.errCallback) options.errCallback(doc as Document);
 							}
 						},
 						error: (err: unknown) => {
@@ -800,17 +723,14 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that emits the updated document.
 	 */
-	updateAfterWhile(
-		doc: Document,
-		options: CrudOptions<Document> = {},
-	): Observable<Document> {
-		return new Observable<Document>((observer) => {
+	updateAfterWhile(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> {
+		return new Observable<Document>(observer => {
 			this.__coreService.afterWhile(this._id(doc), () => {
 				this.update(doc, options).subscribe({
-					next: (updatedDoc) => {
+					next: updatedDoc => {
 						observer.next(updatedDoc); // Emit the updated document
 					},
-					error: (err) => {
+					error: err => {
 						observer.error(err); // Forward the error
 					},
 					complete: () => {
@@ -828,23 +748,16 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that resolves with the updated document.
 	 */
-	update(
-		doc: Document,
-		options: CrudOptions<Document> = {},
-	): Observable<Document> {
+	update(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> {
 		return defer(() =>
 			from(this._mw(this.beforeUpdate(doc, options))).pipe(
-				switchMap((mwDoc) => {
+				switchMap(mwDoc => {
 					doc = (mwDoc || doc) as Document;
 
-					this._updateModified(
-						doc,
-						'up' + (options.name || ''),
-						options,
-					);
+					this._updateModified(doc, 'up' + (options.name || ''), options);
 
 					if (!this.__networkService.isOnline()) {
-						return new Observable((observer) => {
+						return new Observable(observer => {
 							this._onOnline.push(() => {
 								this.update(doc, options).subscribe(observer);
 							});
@@ -859,10 +772,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 					obs.subscribe({
 						next: async (resp: unknown) => {
 							if (resp) {
-								this._removeModified(
-									doc,
-									'up' + (options.name || ''),
-								);
+								this._removeModified(doc, 'up' + (options.name || ''));
 
 								const storedDoc = this.doc(doc._id as string);
 
@@ -873,22 +783,13 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 
 								if (options.callback) options.callback(doc);
 
-								await this._mw(
-									this.afterUpdate(resp, doc, options),
-								);
+								await this._mw(this.afterUpdate(resp, doc, options));
 							} else {
-								if (options.errCallback)
-									options.errCallback(resp);
+								if (options.errCallback) options.errCallback(resp);
 							}
 
-							this.__emitterService.emit(
-								`${this._config.name}_update`,
-								doc,
-							);
-							this.__emitterService.emit(
-								`${this._config.name}_changed`,
-								doc,
-							);
+							this.__emitterService.emit(`${this._config.name}_update`, doc);
+							this.__emitterService.emit(`${this._config.name}_changed`, doc);
 						},
 						error: (err: unknown) => {
 							if (options.errCallback) options.errCallback(err);
@@ -908,23 +809,16 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that resolves with the updated document.
 	 */
-	unique(
-		doc: Document,
-		options: CrudOptions<Document> = {},
-	): Observable<Document> {
+	unique(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> {
 		return defer(() =>
 			from(this._mw(this.beforeUnique(doc, options))).pipe(
-				switchMap((mwDoc) => {
+				switchMap(mwDoc => {
 					doc = (mwDoc || doc) as Document;
 
-					this._updateModified(
-						doc,
-						'un' + (options.name || ''),
-						options,
-					);
+					this._updateModified(doc, 'un' + (options.name || ''), options);
 
 					if (!this.__networkService.isOnline()) {
-						return new Observable((observer) => {
+						return new Observable(observer => {
 							this._onOnline.push(() => {
 								this.unique(doc, options).subscribe(observer);
 							});
@@ -939,10 +833,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 					obs.subscribe({
 						next: async (resp: unknown) => {
 							if (resp) {
-								this._removeModified(
-									doc,
-									'un' + (options.name || ''),
-								);
+								this._removeModified(doc, 'un' + (options.name || ''));
 
 								(doc as any)[options.name as string] = resp;
 
@@ -950,22 +841,13 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 
 								if (options.callback) options.callback(doc);
 
-								await this._mw(
-									this.afterUnique(resp, doc, options),
-								);
+								await this._mw(this.afterUnique(resp, doc, options));
 							} else {
-								if (options.errCallback)
-									options.errCallback(resp);
+								if (options.errCallback) options.errCallback(resp);
 							}
 
-							this.__emitterService.emit(
-								`${this._config.name}_unique`,
-								doc,
-							);
-							this.__emitterService.emit(
-								`${this._config.name}_changed`,
-								doc,
-							);
+							this.__emitterService.emit(`${this._config.name}_unique`, doc);
+							this.__emitterService.emit(`${this._config.name}_changed`, doc);
 						},
 						error: (err: unknown) => {
 							if (options.errCallback) options.errCallback(err);
@@ -985,13 +867,10 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * @param options - Optional callback and error handling configuration.
 	 * @returns An observable that resolves with the deleted document.
 	 */
-	delete(
-		doc: Document,
-		options: CrudOptions<Document> = {},
-	): Observable<Document> {
+	delete(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> {
 		return defer(() =>
 			from(this._mw(this.beforeDelete(doc, options))).pipe(
-				switchMap((mwDoc) => {
+				switchMap(mwDoc => {
 					doc = (mwDoc || doc) as Document;
 
 					doc.__deleted = true;
@@ -1003,7 +882,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 					this._filterDocuments();
 
 					if (!this.__networkService.isOnline()) {
-						return new Observable((observer) => {
+						return new Observable(observer => {
 							this._onOnline.push(() => {
 								this.delete(doc, options).subscribe(observer);
 							});
@@ -1019,7 +898,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 						next: async (resp: unknown) => {
 							if (resp) {
 								const idx = this._docs.findIndex(
-									(d) => this._id(d) === this._id(doc),
+									d => this._id(d) === this._id(doc),
 								);
 								if (idx !== -1) this._docs.splice(idx, 1);
 
@@ -1034,22 +913,13 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 
 								if (options.callback) options.callback(doc);
 
-								await this._mw(
-									this.afterDelete(resp, doc, options),
-								);
+								await this._mw(this.afterDelete(resp, doc, options));
 							} else {
-								if (options.errCallback)
-									options.errCallback(resp);
+								if (options.errCallback) options.errCallback(resp);
 							}
 
-							this.__emitterService.emit(
-								`${this._config.name}_delete`,
-								doc,
-							);
-							this.__emitterService.emit(
-								`${this._config.name}_changed`,
-								doc,
-							);
+							this.__emitterService.emit(`${this._config.name}_delete`, doc);
+							this.__emitterService.emit(`${this._config.name}_changed`, doc);
 						},
 						error: (err: unknown) => {
 							if (options.errCallback) options.errCallback(err);
@@ -1073,15 +943,13 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 			field?: string | ((doc: Document) => string);
 			valid?: (doc: Document) => boolean;
 			sort?: (a: Document, b: Document) => number;
-			filtered?: (
-				storeObjectOrArray: Record<string, Document[]> | Document[],
-			) => void;
+			filtered?: (storeObjectOrArray: Record<string, Document[]> | Document[]) => void;
 		} = {},
 	) {
 		const callback = (): void => {
 			if (Array.isArray(storeObjectOrArray)) {
 				let result = this._docs
-					.filter((doc) => !doc.__deleted)
+					.filter(doc => !doc.__deleted)
 					.filter(config.valid ?? (() => true));
 
 				storeObjectOrArray.length = 0;
@@ -1092,18 +960,11 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 
 				storeObjectOrArray.push(...result);
 			} else {
-				const storeObject = storeObjectOrArray as Record<
-					string,
-					Document[]
-				>;
+				const storeObject = storeObjectOrArray as Record<string, Document[]>;
 
 				/* remove docs if they were removed */
 				for (const parentId in storeObject) {
-					for (
-						let i = storeObject[parentId].length - 1;
-						i >= 0;
-						i--
-					) {
+					for (let i = storeObject[parentId].length - 1; i >= 0; i--) {
 						const _field =
 							typeof config.field === 'function'
 								? config.field(storeObject[parentId][i])
@@ -1144,9 +1005,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 					if (typeof config.field === 'function') {
 						if (
 							config.field(doc) &&
-							!storeObject[(doc as any)[_field]].find(
-								(c) => c._id === doc._id,
-							)
+							!storeObject[(doc as any)[_field]].find(c => c._id === doc._id)
 						) {
 							storeObject[(doc as any)[_field]].push(doc);
 						}
@@ -1154,23 +1013,14 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 						(doc as any)[_field].forEach((_field: string) => {
 							storeObject[_field] = storeObject[_field] || [];
 
-							if (
-								!storeObject[_field].find(
-									(c) => c._id === doc._id,
-								)
-							) {
+							if (!storeObject[_field].find(c => c._id === doc._id)) {
 								storeObject[_field].push(doc);
 							}
 						});
 					} else {
-						storeObject[(doc as any)[_field]] =
-							storeObject[(doc as any)[_field]] || [];
+						storeObject[(doc as any)[_field]] = storeObject[(doc as any)[_field]] || [];
 
-						if (
-							!storeObject[(doc as any)[_field]].find(
-								(c) => c._id === doc._id,
-							)
-						) {
+						if (!storeObject[(doc as any)[_field]].find(c => c._id === doc._id)) {
 							storeObject[(doc as any)[_field]].push(doc);
 						}
 					}
@@ -1244,18 +1094,14 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * Marks a document as modified for a given operation id and
 	 * keeps the document in the store until the operation is confirmed.
 	 */
-	private _updateModified(
-		doc: Document,
-		id: string,
-		options: CrudOptions<Document>,
-	) {
+	private _updateModified(doc: Document, id: string, options: CrudOptions<Document>) {
 		doc.__modified ||= [];
 
 		doc.__options ||= {};
 
 		doc.__options[id] = options;
 
-		if (!doc.__modified.find((m) => m === id)) {
+		if (!doc.__modified.find(m => m === id)) {
 			doc.__modified.push(id);
 
 			this.addDoc(doc);
@@ -1269,9 +1115,9 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	private _removeModified(doc: Document, id: string) {
 		doc.__modified ||= [];
 
-		if (doc.__modified.find((m) => m === id)) {
+		if (doc.__modified.find(m => m === id)) {
 			doc.__modified.splice(
-				doc.__modified.findIndex((m) => m === id),
+				doc.__modified.findIndex(m => m === id),
 				1,
 			);
 
