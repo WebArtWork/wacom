@@ -10,7 +10,7 @@ import {
 	signal,
 	WritableSignal,
 } from '@angular/core';
-import { TranslationService } from './translation.service';
+import { TranslateService } from './translate.service';
 
 @Directive({
 	selector: '[translate]',
@@ -34,7 +34,7 @@ export class TranslateDirective {
 	readonly translate = input<string>('');
 
 	private readonly _el = inject(ElementRef<HTMLElement>);
-	private readonly _translationService = inject(TranslationService);
+	private readonly _translateService = inject(TranslateService);
 
 	/**
 	 * Captures the element's original rendered text (trimmed) after the first render.
@@ -70,7 +70,7 @@ export class TranslateDirective {
 			// Only swap signal when key changes
 			if (key !== this._lastKey) {
 				this._lastKey = key;
-				this._lastSignal = this._translationService.translate(key);
+				this._lastSignal = this._translateService.translate(key);
 			}
 
 			// If no translation exists, service returns key (origin), so this keeps origin text.

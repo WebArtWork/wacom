@@ -66,7 +66,7 @@ export const appConfig = {
 | [**`RTC`**](https://www.npmjs.com/package/wacom#rtc-service)         |        Wraps WebRTC peer connections and local media streams        |
 | [**`Util`**](https://www.npmjs.com/package/wacom#util-service)       |      Utility methods for forms, validation, and CSS variables       |
 | [**`Theme`**](#theme-service)                                        |       Manages UI theme mode, density, and radius preferences        |
-| [**`Translation`**](#translation-service)                            |        Lightweight, signal-based runtime translation engine         |
+| [**`Translate`**](#translate-service)                                |        Lightweight, signal-based runtime translate engine           |
 
 ## [Core Service](#core-service)
 
@@ -2144,7 +2144,7 @@ ngOnInit() {
 }
 ```
 
-## [Translation Service](#translation-service)
+## [Translate Service](#translate-service)
 
 Wacom includes a lightweight, signal-based runtime translation engine built for Angular Signals.
 
@@ -2160,10 +2160,10 @@ Unlike compile-time Angular i18n, this works fully at runtime.
 
 ---
 
-### Translation model
+### Translate model
 
 ```ts
-export interface Translation {
+export interface Translate {
 	sourceText: string;
 	text: string;
 }
@@ -2179,11 +2179,11 @@ Each `sourceText` acts as both:
 ### Basic usage (signal API)
 
 ```ts
-import { TranslationService } from "wacom";
+import { TranslateService } from "wacom";
 
-private _translationService = inject(TranslationService);
+private _translateService = inject(TranslateService);
 
-title = this._translationService.translate("Create project");
+title = this._translateService.translate("Create project");
 ```
 
 The returned value is a `WritableSignal<string>`.
@@ -2201,7 +2201,7 @@ automatically.
 ### Updating translations in bulk (language switch)
 
 ```ts
-this._translationService.setMany([
+this._translateService.setMany([
 	{ sourceText: 'Create project', text: 'Створити проєкт' },
 	{ sourceText: 'Save', text: 'Зберегти' },
 ]);
@@ -2218,7 +2218,7 @@ Behavior:
 ### Updating a single translation
 
 ```ts
-this._translationService.setOne({
+this._translateService.setOne({
 	sourceText: 'Save',
 	text: 'Зберегти',
 });
@@ -2263,7 +2263,7 @@ Optional explicit key:
 
 ### Persistence
 
-Translations are automatically:
+Translate entries are automatically:
 
 - hydrated from storage on startup
 - synced after every update

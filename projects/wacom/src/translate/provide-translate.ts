@@ -4,17 +4,17 @@ import {
 	makeEnvironmentProviders,
 	provideEnvironmentInitializer,
 } from '@angular/core';
-import { Translation } from './translation.interface';
-import { TranslationService } from './translation.service';
+import { Translate } from './translate.interface';
+import { TranslateService } from './translate.service';
 
-export function provideTranslation(translations: Translation[] = []): EnvironmentProviders {
+export function provideTranslate(translations: Translate[] = []): EnvironmentProviders {
 	return makeEnvironmentProviders([
 		provideEnvironmentInitializer(() => {
 			if (!translations.length) {
 				return;
 			}
 
-			inject(TranslationService).setMany(translations);
+			inject(TranslateService).setMany(translations);
 		}),
 	]);
 }

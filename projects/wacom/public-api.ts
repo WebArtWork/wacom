@@ -32,14 +32,14 @@ export * from './src/store/store.interface';
 export * from './src/store/store.service';
 
 /*
- *	Translation
+ *	Translate
  */
-export * from './src/translation/provide-translation';
-export * from './src/translation/translation.directive';
-export * from './src/translation/translation.interface';
-export * from './src/translation/translation.pipe';
-export * from './src/translation/translation.service';
-export * from './src/translation/translation.type';
+export * from './src/translate/provide-translate';
+export * from './src/translate/translate.directive';
+export * from './src/translate/translate.interface';
+export * from './src/translate/translate.pipe';
+export * from './src/translate/translate.service';
+export * from './src/translate/translate.type';
 
 /*
  *	Interfaces

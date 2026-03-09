@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform, inject } from '@angular/core';
-import { TranslationService } from './translation.service';
+import { TranslateService } from './translate.service';
 
 @Pipe({ name: 'translate' })
 export class TranslatePipe implements PipeTransform {
@@ -11,12 +11,12 @@ export class TranslatePipe implements PipeTransform {
 	 * - The returned value is reactive via signals: when `setMany()` / `setOne()`
 	 *   updates the underlying signal, templates re-render automatically.
 	 *
-	 * @param text - Translation key (typically the source text).
+	 * @param text - Translate key (typically the source text).
 	 * @returns The translated string for the current in-memory/store state.
 	 */
 	transform(text: string) {
-		return this._translationService.translate(text)();
+		return this._translateService.translate(text)();
 	}
 
-	private _translationService = inject(TranslationService);
+	private _translateService = inject(TranslateService);
 }

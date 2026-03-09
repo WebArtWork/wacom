@@ -16,8 +16,8 @@ import { PaginationPipe } from './pipes/pagination.pipe';
 import { SafePipe } from './pipes/safe.pipe';
 import { SearchPipe } from './pipes/search.pipe';
 import { SplicePipe } from './pipes/splice.pipe';
-import { TranslateDirective } from './translation/translation.directive';
-import { TranslatePipe } from './translation/translation.pipe';
+import { TranslateDirective } from './translate/translate.directive';
+import { TranslatePipe } from './translate/translate.pipe';
 const PIPES = [
 	ArrPipe,
 	SafePipe,

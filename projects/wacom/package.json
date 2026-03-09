@@ -1,6 +1,6 @@
 {
 	"name": "wacom",
-	"version": "21.2.3",
+	"version": "21.2.4",
 	"license": "MIT",
 	"repository": "WebArtWork/wacom",
 	"funding": [
@@ -56,6 +56,6 @@
 		"network",
 		"theme",
 		"i18n",
-		"translation"
+		"translate"
 	]
 }

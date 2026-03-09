@@ -1,10 +1,10 @@
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { StoreService } from '../store/store.service';
-import { Translation } from './translation.interface';
-import { Translations } from './translation.type';
+import { Translate } from './translate.interface';
+import { Translates } from './translate.type';
 
 @Injectable({ providedIn: 'root' })
-export class TranslationService {
+export class TranslateService {
 	private _storeService = inject(StoreService);
 
 	/**
@@ -19,25 +19,24 @@ export class TranslationService {
 	 *   "Save": signal("Guardar")
 	 * }
 	 */
-	private _signalTranslates: Translations = {};
+	private _signalTranslates: Translates = {};
 
 	constructor() {
 		/**
 		 * Hydrates translations from the internal persistent store (if present).
 		 *
-		 * This runs once at service construction time and calls `setMany()` to:
-		 * - populate/update known translation signals
-		 * - persist the normalized set back to storage (via `setMany()` side effect)
+		 * This runs once at service construction time and merges stored values into
+		 * fallback signals only.
 		 *
 		 * Notes:
-		 * - The stored payload is expected to be an array of `Translation`.
-		 * - Signals for keys not yet requested via `translate()` will not exist,
-		 *   so `setMany()` assumes signals are already registered (strict mode).
+		 * - The stored payload is expected to be an array of `Translate`.
+		 * - Storage hydration is async, so runtime translations may already be set
+		 *   by the time this resolves. In that case, the runtime value must win.
 		 */
 		this._storeService.getJson('translations', {
 			onSuccess: translations => {
 				if (Array.isArray(translations)) {
-					this.setMany(translations as Translation[]);
+					this._hydrateTranslations(translations as Translate[]);
 				}
 			},
 		});
@@ -81,7 +80,7 @@ export class TranslationService {
 	 * @param translations - Array of translation objects
 	 * containing sourceText and translated text.
 	 */
-	setMany(translations: Translation[]) {
+	setMany(translations: Translate[]) {
 		const sourceTexts = translations.map(t => t.sourceText);
 		const sourceSet = new Set(sourceTexts);
 
@@ -110,10 +109,10 @@ export class TranslationService {
 	 * The signal must already exist (created via `translate()`),
 	 * otherwise this will throw an error.
 	 *
-	 * @param translation - Translation object containing
+	 * @param translation - Translate object containing
 	 * sourceText and translated text.
 	 */
-	setOne(translation: Translation) {
+	setOne(translation: Translate) {
 		this._setTranslation(translation.sourceText, translation.text);
 
 		this._updateStorageTranslations();
@@ -126,8 +125,21 @@ export class TranslationService {
 	 *
 	 * @returns A record mapping sourceText keys to WritableSignal<string>.
 	 */
-	get(): Translations {
+	get(): Translates {
 		return this._signalTranslates;
+	}
+
+	private _hydrateTranslations(translations: Translate[]) {
+		for (const translation of translations) {
+			const existing = this._signalTranslates[translation.sourceText];
+
+			// Do not let stale async storage overwrite an already translated runtime value.
+			if (existing && existing() !== translation.sourceText) {
+				continue;
+			}
+
+			this._setTranslation(translation.sourceText, translation.text);
+		}
 	}
 
 	private _setTranslation(sourceText: string, text: string) {

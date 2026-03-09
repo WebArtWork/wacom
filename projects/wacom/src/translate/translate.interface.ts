@@ -1,4 +1,4 @@
-export interface Translation {
+export interface Translate {
 	sourceText: string;
 	text: string;
 }
