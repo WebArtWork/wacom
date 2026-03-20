@@ -2,6 +2,8 @@
 
 Module which has common services, pipes, directives and interfaces which can be used on all projects.
 
+Wacom is SSR-safe and works with Angular Universal: browser-only APIs are guarded, and features that require a browser runtime activate only on the client.
+
 ## License
 
 [MIT](LICENSE)
@@ -66,7 +68,7 @@ export const appConfig = {
 | [**`RTC`**](https://www.npmjs.com/package/wacom#rtc-service)         |        Wraps WebRTC peer connections and local media streams        |
 | [**`Util`**](https://www.npmjs.com/package/wacom#util-service)       |      Utility methods for forms, validation, and CSS variables       |
 | [**`Theme`**](#theme-service)                                        |       Manages UI theme mode, density, and radius preferences        |
-| [**`Translate`**](#translate-service)                                |        Lightweight, signal-based runtime translate engine           |
+| [**`Translate`**](#translate-service)                                |         Lightweight, signal-based runtime translate engine          |
 
 ## [Core Service](#core-service)
 
@@ -2269,3 +2271,11 @@ Translate entries are automatically:
 - synced after every update
 
 No extra config required.
+
+## AGENTS.md
+
+Copy this into `AGENTS.md`.
+
+```md
+Wacom is an Angular utility library that provides shared services, directives, pipes, interfaces, and configuration for apps. It is SSR-safe by design: the library guards browser-only APIs so Angular Universal / SSR can render normally, while browser-specific features degrade gracefully on the server or activate only in the browser runtime. Bootstrap via `provideWacom()` (or legacy `WacomModule`), configure `http`, `store`, `meta`, `network`, and optional `socket/io`; core capabilities include `CoreService` helpers (device detection, ids, debounce, signals), `HttpService` with headers and CRUD-style callbacks/observables, `StoreService` storage helpers, `MetaService` with route-driven and manual SEO tags plus link management and optional `MetaGuard`, `CrudService` for offline-aware data syncing with signals, `EmitterService` for app-wide events and completion tasks, `DomService` for dynamic component rendering, `NetworkService` for connectivity monitoring, `SocketService` for realtime messaging, `RtcService` for browser WebRTC flows, `TimeService` for date utilities, `UtilService` for assorted helpers, `ThemeService` and `TranslateService`, and common directives/pipes like click-outside, manual-\* attributes, and array/search/safe/pagination helpers.
+```
