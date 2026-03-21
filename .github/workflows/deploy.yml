@@ -24,9 +24,6 @@ jobs:
             - name: Rebuild lightningcss
               run: npm rebuild lightningcss
 
-            - name: Build NGX Wacom library
-              run: npm run build
-
             - name: Build App
               run: npm run build:app
 
