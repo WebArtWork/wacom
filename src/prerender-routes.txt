@@ -1,0 +1,10 @@
+/
+/services/core-service
+/services/http-service
+/services/store-service
+/services/meta-service
+/services/crud-service
+/services/emitter-service
+/services/network-service
+/services/theme-service
+/services/translate-service
