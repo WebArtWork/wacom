@@ -2,8 +2,10 @@
 	"name": "wacom",
 	"version": "1.0.0",
 	"scripts": {
-		"start": "ng serve -o",
-		"build": "ng build wacom",
+		"build": "ng build wacom && node scripts/copy-readme.mjs",
+		"build:app": "ng build app",
+		"publish": "node scripts/publish.mjs",
+		"start": "ng serve app",
 		"watch": "ng build wacom --watch"
 	},
 	"private": true,

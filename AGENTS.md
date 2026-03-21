@@ -1,1 +1,15 @@
-Wacom is an Angular utility library that provides shared services, directives, pipes, interfaces, and configuration for apps: bootstrap via `provideWacom()` (or legacy `WacomModule`), configure `http`, `store`, `meta`, `network`, and optional `socket/io`; core capabilities include `CoreService` helpers (device detection, ids, debounce, signals), `HttpService` with headers and CRUD-style callbacks/observables, `StoreService` local storage helpers, `MetaService` with route-driven and manual SEO tags plus link management and optional `MetaGuard`, `CrudService` for offline-aware data syncing with signals, `EmitterService` for app-wide events and completion tasks, `DomService` for dynamic component rendering, `NetworkService` for connectivity monitoring, `SocketService` for realtime messaging, `RtcService` for WebRTC flows, `TimeService` for date utilities, `UtilService` for assorted helpers, and common directives/pipes like click-outside, manual-\* attributes, and array/search/safe/pagination helpers.
+- This project uses `wacom`, an Angular utility library for shared services, directives, pipes, and app-level configuration.
+- Prefer bootstrapping with `provideWacom({...})` in application providers. Use `WacomModule` / `WacomModule.forRoot()` only for legacy NgModule-based apps.
+- Put library-wide configuration in `provideWacom()` instead of scattering it across components. Available config areas include `http`, `store`, `meta`, `network`, and optional `socket` / `io`.
+- Prefer the library services before adding duplicate app utilities:
+  - `HttpService` for API calls and shared headers/base URL handling.
+  - `StoreService` for persisted local storage values.
+  - `MetaService` for title, description, robots, image, and link tags.
+  - `CrudService` for data flows that need offline-aware syncing behavior.
+  - `EmitterService`, `NetworkService`, `SocketService`, `RtcService`, `TimeService`, and `UtilService` when their built-in behavior matches the need.
+- Prefer importing the specific Wacom directives, pipes, and translation helpers you need instead of wrapping the whole library again in another shared abstraction.
+- For metadata, prefer configuring defaults in `provideWacom({ meta: ... })` and using `MetaService` or route metadata. If route-driven updates are expected, prefer `meta.applyFromRoutes = true`; use `MetaGuard` only when that flow specifically needs a guard.
+- For translations, register app translations with `provideTranslate(...)` and use the exported translation pipe/directive rather than creating another parallel translation bootstrap path.
+- Keep SSR-safe behavior intact. Do not add unguarded direct access to browser-only globals such as `window`, `document`, storage, media devices, or WebRTC APIs when Wacom already provides a guarded service for that area.
+- When changing app behavior, prefer configuring or composing Wacom services first before modifying the library source.
+- Common reusable building blocks exported by the library include `clickOutside`, manual form-related directives, translation helpers, and array/search/safe/pagination-style pipes.

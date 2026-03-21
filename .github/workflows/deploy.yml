@@ -1,0 +1,61 @@
+name: Deploy to GitHub Pages
+
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Install Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '20'
+
+            - name: Install dependencies
+              run: npm install --legacy-peer-deps
+
+            - name: Build NGX Wacom library
+              run: npm run build
+
+            - name: Build App
+              run: npm run build:app
+
+            - name: Copy CNAME file
+              run: cp CNAME dist/app/browser/
+
+            - name: Copy CNAME file
+              run: cp README.md dist/app/browser/
+
+            - name: Set up SSH
+              env:
+                  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+              run: |
+                  mkdir -p ~/.ssh
+                  echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+                  chmod 600 ~/.ssh/id_rsa
+                  ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+            - name: Commit and push to gh-pages using SSH
+              env:
+                  GIT_SSH_COMMAND: 'ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no'
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                  cd dist/app/browser
+                  git init  # Initialize a new git repository
+                  git add --all .  # Add all changes
+                  git commit -m "Deploy to GitHub Pages"
+                  git checkout -B gh-pages  # Switch to gh-pages branch
+                  git push git@github.com:${{ github.repository }} gh-pages --force
+
+            - name: Clean up SSH
+              run: |
+                  rm -f ~/.ssh/id_rsa
+                  rm -f ~/.ssh/known_hosts

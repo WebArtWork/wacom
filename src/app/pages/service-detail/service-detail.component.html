@@ -1,0 +1,99 @@
+@if (doc(); as currentDoc) {
+	<section class="service-shell">
+		<header class="service-hero">
+			<h1>{{ currentDoc.name }}</h1>
+			<p class="summary">{{ currentDoc.summary }}</p>
+		</header>
+
+		<div class="service-layout">
+			<aside class="menu-card">
+				<p class="label">Available Items</p>
+				<nav class="service-menu" aria-label="Service item navigation">
+					@for (group of groups(); track group.name) {
+						<section class="menu-group">
+							<h2 class="menu-group-title">{{ group.name }}</h2>
+							<div class="menu-group-links">
+								@for (item of group.items; track item.id) {
+									<button
+										type="button"
+										class="menu-link"
+										(click)="scrollToItem(item.id)"
+									>
+										<span class="menu-link-group">{{ item.group }}</span>
+										<span class="menu-link-name">{{ item.name }}</span>
+									</button>
+								}
+							</div>
+						</section>
+					}
+				</nav>
+			</aside>
+
+			<div class="content-column">
+				<section class="service-intro">
+					<p class="label">Overview</p>
+					<h2>{{ currentDoc.description }}</h2>
+					<p>{{ currentDoc.summary }}</p>
+				</section>
+
+				@for (item of items(); track item.id) {
+					<article class="reference-row" [attr.id]="item.id">
+						<section class="info-card">
+							<p class="label">Documentation</p>
+							<div class="item-heading">
+								<div>
+									<p class="item-group">{{ item.category }}</p>
+									<h2>{{ item.name }}</h2>
+								</div>
+								<code>{{ item.signature }}</code>
+							</div>
+
+							<p class="item-description">{{ item.description }}</p>
+
+							@if (item.details.length) {
+								<section class="doc-group">
+									<h3>Details</h3>
+									<ul>
+										@for (detail of item.details; track detail) {
+											<li>{{ detail }}</li>
+										}
+									</ul>
+								</section>
+							}
+						</section>
+
+						<section class="code-card">
+							<div class="code-card-head">
+								<div>
+									<p class="label">Example</p>
+									<h2>{{ item.name }} in use</h2>
+								</div>
+								<button
+									type="button"
+									class="copy-button"
+									(click)="copyExample(item.example)"
+									[attr.aria-label]="copied() ? 'Copied' : 'Copy example'"
+								>
+									<svg viewBox="0 0 24 24" aria-hidden="true">
+										<path
+											d="M9 9h10v10H9zM5 5h10v2H7v8H5z"
+											fill="currentColor"
+										/>
+									</svg>
+									<span>{{ copied() ? 'Copied' : 'Copy' }}</span>
+								</button>
+							</div>
+							<pre><code>{{ item.example }}</code></pre>
+						</section>
+					</article>
+				}
+			</div>
+		</div>
+	</section>
+} @else {
+	<section class="service-shell">
+		<h1>Service not found</h1>
+		<p>The requested documentation page does not exist.</p>
+		<a class="back-link" routerLink="/">Back to landing</a>
+	</section>
+}

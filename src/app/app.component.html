@@ -1,0 +1,23 @@
+<div class="app-shell">
+	<header class="topbar">
+		<a class="brand" routerLink="/" aria-label="Go to home page">
+			<img src="logo.png" alt="Wacom" />
+		</a>
+
+		<nav class="topbar-nav" aria-label="Service navigation">
+			@for (service of services; track service.slug) {
+				<a
+					class="topbar-link"
+					[routerLink]="['/services', service.slug]"
+					routerLinkActive="topbar-link-active"
+				>
+					{{ service.name }}
+				</a>
+			}
+		</nav>
+	</header>
+
+	<main class="page-content">
+		<router-outlet />
+	</main>
+</div>

@@ -1,0 +1,167 @@
+<section class="landing-shell">
+	<div class="landing-hero">
+		<p class="eyebrow">Angular Utility Library</p>
+		<h1>Wacom</h1>
+		<p class="summary">
+			Shared services, directives, pipes, and app-level configuration for Angular apps.
+		</p>
+		<p class="subsummary">
+			SSR-safe defaults, standalone-first bootstrapping, and a single place to configure http,
+			store, meta, network, socket, and translation behavior.
+		</p>
+	</div>
+
+	<article class="readme-card">
+		<header class="readme-header">
+			<div>
+				<p class="kicker">landing.ts</p>
+				<h2>Project Overview</h2>
+			</div>
+			<div class="window-actions" aria-hidden="true">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+		</header>
+
+		<div class="panel-content">
+			<section class="section-grid">
+				<div>
+					<p class="label">Package</p>
+					<h3>wacom</h3>
+					<p>
+						Common Angular building blocks for shared app behavior, with browser-only
+						APIs guarded so SSR stays intact.
+					</p>
+				</div>
+				<div>
+					<p class="label">License</p>
+					<h3>MIT</h3>
+					<p>
+						Published as a public package and designed for reuse across multiple apps.
+					</p>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Installation</p>
+					<h3>Install the package</h3>
+				</div>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('install', installCommand)"
+						[attr.aria-label]="
+							copiedKey() === 'install' ? 'Copied' : 'Copy installation command'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'install' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-prompt">$</span> {{ installCommand }}</code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Usage</p>
+					<h3>Bootstrap with <code>provideWacom()</code></h3>
+				</div>
+				<p>
+					Use standalone providers by default. <code>WacomModule</code> remains available
+					for older NgModule apps, but the intended entry point is
+					<code>provideWacom</code>.
+				</p>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('usage', usageCopy)"
+						[attr.aria-label]="
+							copiedKey() === 'usage' ? 'Copied' : 'Copy usage example'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'usage' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideWacom</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'wacom'</span><span class="code-punctuation">;</span>
+
+<span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
+  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-function">provideWacom</span><span class="code-punctuation">()</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+<span class="code-punctuation">&#125;;</span></code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Configuration</p>
+					<h3>Centralize app-level defaults</h3>
+				</div>
+				<p>
+					Configure library-wide behavior once instead of scattering base URLs, storage
+					prefixes, or route metadata policy across components.
+				</p>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('config', configCopy)"
+						[attr.aria-label]="
+							copiedKey() === 'config' ? 'Copied' : 'Copy configuration example'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'config' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideWacom</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'wacom'</span><span class="code-punctuation">;</span>
+
+<span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
+  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span>
+    <span class="code-function">provideWacom</span><span class="code-punctuation">(</span><span class="code-punctuation">&#123;</span>
+      <span class="code-property">http</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span> <span class="code-property">url</span><span class="code-punctuation">:</span> <span class="code-string">'https://api.example.com'</span> <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
+      <span class="code-property">store</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span> <span class="code-property">prefix</span><span class="code-punctuation">:</span> <span class="code-string">'waStore'</span> <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
+      <span class="code-property">meta</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span>
+        <span class="code-property">useTitleSuffix</span><span class="code-punctuation">:</span> <span class="code-boolean">false</span><span class="code-punctuation">,</span>
+        <span class="code-property">applyFromRoutes</span><span class="code-punctuation">:</span> <span class="code-boolean">true</span><span class="code-punctuation">,</span>
+        <span class="code-property">defaults</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span> <span class="code-property">links</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;&#125;</span> <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
+      <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
+      <span class="code-property">network</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;&#125;</span><span class="code-punctuation">,</span>
+      <span class="code-property">socket</span><span class="code-punctuation">:</span> <span class="code-boolean">false</span><span class="code-punctuation">,</span>
+      <span class="code-property">io</span><span class="code-punctuation">:</span> <span class="code-keyword">undefined</span><span class="code-punctuation">,</span>
+    <span class="code-punctuation">&#125;</span><span class="code-punctuation">)</span><span class="code-punctuation">,</span>
+  <span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+<span class="code-punctuation">&#125;;</span></code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Services</p>
+					<h3>Core building blocks</h3>
+				</div>
+				<div class="service-list">
+					@for (service of services; track service.name) {
+						<a class="service-item" [routerLink]="['/services', service.slug]">
+							<h4>{{ service.name }}</h4>
+							<p>{{ service.description }}</p>
+						</a>
+					}
+				</div>
+			</section>
+		</div>
+	</article>
+</section>
