@@ -13,4 +13,8 @@ import { serviceDocs } from './services/service-docs';
 export class AppComponent {
 	private readonly _metaService = inject(MetaService);
 	protected readonly services = serviceDocs;
+
+	protected topbarLabel(name: string): string {
+		return name.replace(/Service$/, '');
+	}
 }

@@ -3,9 +3,9 @@
 }
 
 .service-shell {
-	width: calc(100vw - 32px);
+	width: 100%;
 	margin: 0 auto;
-	padding: 40px 0 72px;
+	padding: 40px 20px 72px;
 }
 
 .back-link {
@@ -27,6 +27,21 @@
 	font-weight: 700;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
+}
+
+.empty-example {
+	display: grid;
+	gap: 8px;
+	padding: 18px;
+	border: 1px dashed var(--panel-border);
+	border-radius: var(--radius-md);
+	background: var(--panel-subtle);
+	color: var(--text-muted);
+	line-height: 1.7;
+}
+
+.empty-example p {
+	margin: 0;
 }
 
 h1,
@@ -254,10 +269,6 @@ h2,
 }
 
 @media (max-width: 720px) {
-	.service-shell {
-		width: calc(100vw - 20px);
-	}
-
 	.service-layout {
 		grid-template-columns: 1fr;
 	}

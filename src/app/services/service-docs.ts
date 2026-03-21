@@ -5,6 +5,7 @@ export interface ServiceMethodDoc {
 	details?: string[];
 	example?: string;
 	category?: string;
+	docType?: 'Service' | 'Component' | 'Interface';
 }
 
 export interface ServiceSectionDoc {
@@ -575,11 +576,75 @@ async saveSettings() {
 				name: 'loaded',
 				signature: 'Observable<unknown>',
 				description: 'Completes when cached documents are restored from storage.',
+				category: 'Lifecycle',
+				docType: 'Service',
 			},
 			{
 				name: 'getted',
 				signature: 'Observable<unknown>',
 				description: 'Completes after the first full get() without page pagination.',
+				category: 'Lifecycle',
+				docType: 'Service',
+			},
+			{
+				name: 'documents',
+				signature: 'protected documents = signal<Signal<Document>[]>([])',
+				description:
+					'CrudComponent stores the currently displayed document signals here for table and list rendering.',
+				category: 'Component state',
+				docType: 'Component',
+			},
+			{
+				name: 'page / perPage / configType',
+				signature: "pagination and mode fields",
+				description:
+					'CrudComponent tracks pagination state and whether it loads from the server or local memory.',
+				category: 'Component state',
+				docType: 'Component',
+			},
+			{
+				name: 'CrudDocument',
+				signature: 'interface CrudDocument<Document>',
+				description:
+					'Base document contract with identity, ordering, and offline mutation metadata used by CrudService.',
+				details: [
+					'Includes _id, _localId, appId, order, __modified, __deleted, and __options.',
+					'Use it as the base generic constraint for your app document model.',
+				],
+				category: 'Interfaces',
+				docType: 'Interface',
+			},
+			{
+				name: 'CrudOptions',
+				signature: 'interface CrudOptions<Document>',
+				description: 'Options passed into CRUD operations for callbacks and request naming.',
+				details: ['Supports name, callback, and errCallback.'],
+				category: 'Interfaces',
+				docType: 'Interface',
+			},
+			{
+				name: 'CrudServiceInterface',
+				signature: 'interface CrudServiceInterface<Document>',
+				description:
+					'Contract that CrudComponent expects from a CRUD-backed data service.',
+				category: 'Interfaces',
+				docType: 'Interface',
+			},
+			{
+				name: 'TableConfig / TableConfigButton',
+				signature: 'table configuration interfaces',
+				description:
+					'Describe row actions, header buttons, pagination handlers, and CRUD callbacks used by CrudComponent UIs.',
+				category: 'Interfaces',
+				docType: 'Interface',
+			},
+			{
+				name: 'CrudConfig / GetConfig',
+				signature: 'configuration interfaces',
+				description:
+					'Define the CrudService constructor config and read-query options for collection requests.',
+				category: 'Interfaces',
+				docType: 'Interface',
 			},
 		],
 		methods: [
@@ -588,32 +653,44 @@ async saveSettings() {
 				signature: 'restoreDocs(): Promise<void>',
 				description:
 					'Loads cached docs, hydrates memory, and replays pending create/update/unique/delete work.',
+				category: 'Lifecycle',
+				docType: 'Service',
 			},
 			{
 				name: 'setDocs / getDocs / getDoc / clearDocs',
 				signature: 'cache management helpers',
 				description: 'Persist, retrieve, or reset the local in-memory document cache.',
+				category: 'Cache',
+				docType: 'Service',
 			},
 			{
 				name: 'addDoc / addDocs',
 				signature: 'addDoc(doc: Document): void / addDocs(docs: Document[]): void',
 				description: 'Insert or merge documents into the cache and keep signals in sync.',
+				category: 'Cache',
+				docType: 'Service',
 			},
 			{
 				name: 'new',
 				signature: 'new(doc?: Document): Document',
 				description: 'Creates a local-first document with _localId and mutation flags.',
+				category: 'Documents',
+				docType: 'Service',
 			},
 			{
 				name: 'doc',
 				signature: 'doc(_id: string): Document',
 				description:
 					'Returns a cached document, creates a placeholder if missing, and fetches the server copy in the background.',
+				category: 'Documents',
+				docType: 'Service',
 			},
 			{
 				name: 'setPerPage',
 				signature: 'setPerPage(_perPage: number): void',
 				description: 'Controls skip/limit generation for paginated get() calls.',
+				category: 'Pagination',
+				docType: 'Service',
 			},
 			{
 				name: 'get',
@@ -621,6 +698,8 @@ async saveSettings() {
 					'get(config?: GetConfig, options?: CrudOptions<Document>): Observable<Document[]>',
 				description:
 					'Fetches collection documents, fills the cache, emits collection events, and supports pagination.',
+				category: 'Requests',
+				docType: 'Service',
 			},
 			{
 				name: 'create',
@@ -628,12 +707,16 @@ async saveSettings() {
 					'create(doc: Document, options?: CrudOptions<Document>): Observable<Document>',
 				description:
 					'Creates a document, stores local intent first, and retries automatically when offline.',
+				category: 'Requests',
+				docType: 'Service',
 			},
 			{
 				name: 'fetch',
 				signature:
 					'fetch(query?: object, options?: CrudOptions<Document>): Observable<Document>',
 				description: 'Fetches one document by query and merges it into the cache.',
+				category: 'Requests',
+				docType: 'Service',
 			},
 			{
 				name: 'updateAfterWhile',
@@ -641,6 +724,8 @@ async saveSettings() {
 					'updateAfterWhile(doc: Document, options?: CrudOptions<Document>): Observable<Document>',
 				description:
 					'Debounces update() through CoreService.afterWhile() for typing-heavy flows.',
+				category: 'Requests',
+				docType: 'Service',
 			},
 			{
 				name: 'update',
@@ -648,6 +733,8 @@ async saveSettings() {
 					'update(doc: Document, options?: CrudOptions<Document>): Observable<Document>',
 				description:
 					'Marks the document modified, posts to /update, clears the modification mark on success, and syncs signals.',
+				category: 'Requests',
+				docType: 'Service',
 			},
 			{
 				name: 'unique',
@@ -655,6 +742,8 @@ async saveSettings() {
 					'unique(doc: Document, options?: CrudOptions<Document>): Observable<Document>',
 				description:
 					'Runs a unique-field style update through /unique and stores the returned field value on the document.',
+				category: 'Requests',
+				docType: 'Service',
 			},
 			{
 				name: 'delete',
@@ -662,12 +751,16 @@ async saveSettings() {
 					'delete(doc: Document, options?: CrudOptions<Document>): Observable<Document>',
 				description:
 					'Marks the document deleted, queues offline if needed, and removes it from the cache on success.',
+				category: 'Requests',
+				docType: 'Service',
 			},
 			{
 				name: 'getSignal / getSignals / getFieldSignals / removeSignals',
 				signature: 'signal helpers',
 				description:
 					'Expose per-document signals, field/value grouped signals, and cache cleanup for signal instances.',
+				category: 'Signals',
+				docType: 'Service',
 			},
 			{
 				name: 'filteredDocuments',
@@ -679,6 +772,8 @@ async saveSettings() {
 					'Supports valid(), sort(), and filtered() callbacks.',
 					'Triggered whenever _filterDocuments() runs after cache mutations.',
 				],
+				category: 'Signals',
+				docType: 'Service',
 			},
 			{
 				name: 'before*/after* hooks',
@@ -686,6 +781,56 @@ async saveSettings() {
 					'beforeCreate, afterCreate, beforeUpdate, afterUpdate, beforeUnique, afterUnique, beforeDelete, afterDelete, beforeFetch, afterFetch',
 				description:
 					'Override these in child services to normalize input, inject context, or react after server success.',
+				category: 'Extensibility',
+				docType: 'Service',
+			},
+			{
+				name: 'setDocuments',
+				signature: "setDocuments(page = this.page, query = ''): Promise<void>",
+				description:
+					'CrudComponent loads rows for the current page and updates its internal documents signal.',
+				category: 'Loading and pagination',
+				docType: 'Component',
+			},
+			{
+				name: 'setDocumentsQuery / localDocumentsFilter / getOptions',
+				signature: 'customization hooks',
+				description:
+					'CrudComponent lets feature components customize list queries, local filtering, and CRUD request options.',
+				category: 'Customization hooks',
+				docType: 'Component',
+			},
+			{
+				name: 'create / update / delete / mutateUrl',
+				signature: 'modal and mutation handlers',
+				description:
+					'CrudComponent wires modal workflows to create, update, delete, and unique-url actions.',
+				category: 'Mutations',
+				docType: 'Component',
+			},
+			{
+				name: 'bulkManagement',
+				signature: 'bulkManagement(isCreateFlow = true): () => void',
+				description:
+					'Handles batch create and batch update flows through modalDocs() and the CRUD service.',
+				category: 'Mutations',
+				docType: 'Component',
+			},
+			{
+				name: 'moveUp / allowSort',
+				signature: 'sorting helpers',
+				description:
+					'Provide optional manual ordering controls for list views backed by an `order` field.',
+				category: 'List controls',
+				docType: 'Component',
+			},
+			{
+				name: 'getConfig',
+				signature: 'getConfig(): TableConfig<Document>',
+				description:
+					'Builds the action and pagination configuration consumed by CRUD table UIs.',
+				category: 'List controls',
+				docType: 'Component',
 			},
 		],
 		sections: [

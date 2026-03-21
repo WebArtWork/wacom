@@ -19,10 +19,11 @@ interface ServiceReferenceItem {
 	name: string;
 	group: string;
 	category: string;
+	docType: string;
 	signature: string;
 	description: string;
 	details: string[];
-	example: string;
+	example: string | null;
 }
 
 interface ServiceReferenceGroup {
@@ -48,6 +49,7 @@ export class ServiceDetailComponent {
 		{ initialValue: this._route.snapshot.paramMap.get('slug') || '' },
 	);
 	protected readonly doc = computed(() => serviceDocMap.get(this._slug()) || null);
+	protected readonly pageTitle = computed(() => this.doc()?.name.replace(/Service$/, '') || '');
 	protected readonly items = computed(() => this._buildItems(this.doc()));
 	protected readonly groups = computed(() => this._buildGroups(this.items()));
 
@@ -70,7 +72,7 @@ export class ServiceDetailComponent {
 		});
 	}
 
-	protected copyExample(example: string): void {
+	protected copyExample(example: string | null): void {
 		if (!example || !isPlatformBrowser(this._platformId) || !navigator?.clipboard) {
 			return;
 		}
@@ -116,10 +118,15 @@ export class ServiceDetailComponent {
 			name: item.name,
 			group,
 			category: item.category || group,
+			docType: item.docType || 'Service',
 			signature: item.signature,
 			description: item.description,
 			details: item.details || [],
-			example: this.formatExample(item.example || fallbackExample),
+			example: item.example
+				? this.formatExample(item.example)
+				: (item.docType || 'Service') === 'Service'
+					? this.formatExample(fallbackExample)
+					: null,
 		};
 	}
 
@@ -127,9 +134,10 @@ export class ServiceDetailComponent {
 		const groups = new Map<string, ServiceReferenceItem[]>();
 
 		for (const item of items) {
-			const bucket = groups.get(item.category) || [];
+			const key = `${item.docType}: ${item.category}`;
+			const bucket = groups.get(key) || [];
 			bucket.push(item);
-			groups.set(item.category, bucket);
+			groups.set(key, bucket);
 		}
 
 		return Array.from(groups.entries()).map(([name, groupedItems]) => ({

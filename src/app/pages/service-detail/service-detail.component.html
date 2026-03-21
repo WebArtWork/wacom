@@ -1,7 +1,8 @@
 @if (doc(); as currentDoc) {
 	<section class="service-shell">
 		<header class="service-hero">
-			<h1>{{ currentDoc.name }}</h1>
+			<p class="eyebrow">Reference</p>
+			<h1>{{ pageTitle() }}</h1>
 			<p class="summary">{{ currentDoc.summary }}</p>
 		</header>
 
@@ -42,7 +43,7 @@
 							<p class="label">Documentation</p>
 							<div class="item-heading">
 								<div>
-									<p class="item-group">{{ item.category }}</p>
+									<p class="item-group">{{ item.docType }} / {{ item.category }}</p>
 									<h2>{{ item.name }}</h2>
 								</div>
 								<code>{{ item.signature }}</code>
@@ -68,22 +69,31 @@
 									<p class="label">Example</p>
 									<h2>{{ item.name }} in use</h2>
 								</div>
-								<button
-									type="button"
-									class="copy-button"
-									(click)="copyExample(item.example)"
-									[attr.aria-label]="copied() ? 'Copied' : 'Copy example'"
-								>
-									<svg viewBox="0 0 24 24" aria-hidden="true">
-										<path
-											d="M9 9h10v10H9zM5 5h10v2H7v8H5z"
-											fill="currentColor"
-										/>
-									</svg>
-									<span>{{ copied() ? 'Copied' : 'Copy' }}</span>
-								</button>
+								@if (item.example) {
+									<button
+										type="button"
+										class="copy-button"
+										(click)="copyExample(item.example)"
+										[attr.aria-label]="copied() ? 'Copied' : 'Copy example'"
+									>
+										<svg viewBox="0 0 24 24" aria-hidden="true">
+											<path
+												d="M9 9h10v10H9zM5 5h10v2H7v8H5z"
+												fill="currentColor"
+											/>
+										</svg>
+										<span>{{ copied() ? 'Copied' : 'Copy' }}</span>
+									</button>
+								}
 							</div>
-							<pre><code>{{ item.example }}</code></pre>
+							@if (item.example) {
+								<pre><code>{{ item.example }}</code></pre>
+							} @else {
+								<div class="empty-example">
+									<p>No dedicated example for this API surface.</p>
+									<p>Examples are shown only for service entries.</p>
+								</div>
+							}
 						</section>
 					</article>
 				}
