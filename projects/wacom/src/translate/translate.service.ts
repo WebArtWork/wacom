@@ -1,11 +1,26 @@
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { StoreService } from '../store/store.service';
-import { Translate } from './translate.interface';
+import { ProvideTranslateConfig, Translate } from './translate.interface';
 import { Translates } from './translate.type';
 
 @Injectable({ providedIn: 'root' })
 export class TranslateService {
+	private static readonly _LANGUAGE_STORE_KEY = 'translate.language';
+	private static readonly _DEFAULT_FOLDER = '/i18n/';
+
+	private _http = inject(HttpClient);
 	private _storeService = inject(StoreService);
+	private _language = signal('');
+	private _defaultLanguage = signal('');
+	private _config: Required<Pick<ProvideTranslateConfig, 'folder' | 'persistLanguage'>> &
+		Omit<ProvideTranslateConfig, 'folder' | 'persistLanguage'> = {
+		folder: TranslateService._DEFAULT_FOLDER,
+		persistLanguage: true,
+	};
+	private _translationsByLanguage = new Map<string, Translate[]>();
+	private _loadingByLanguage = new Map<string, Promise<Translate[]>>();
 
 	/**
 	 * Internal registry of translation signals.
@@ -21,25 +36,84 @@ export class TranslateService {
 	 */
 	private _signalTranslates: Translates = {};
 
-	constructor() {
-		/**
-		 * Hydrates translations from the internal persistent store (if present).
-		 *
-		 * This runs once at service construction time and merges stored values into
-		 * fallback signals only.
-		 *
-		 * Notes:
-		 * - The stored payload is expected to be an array of `Translate`.
-		 * - Storage hydration is async, so runtime translations may already be set
-		 *   by the time this resolves. In that case, the runtime value must win.
-		 */
-		this._storeService.getJson('translations', {
-			onSuccess: translations => {
-				if (Array.isArray(translations)) {
-					this._hydrateTranslations(translations as Translate[]);
-				}
-			},
+	constructor() {}
+
+	async init(config: ProvideTranslateConfig = {}): Promise<void> {
+		this._config = {
+			...this._config,
+			...config,
+			folder: this._normalizeFolder(config.folder ?? this._config.folder),
+			persistLanguage: config.persistLanguage ?? this._config.persistLanguage,
+		};
+
+		if (this._config.defaultLanguage) {
+			this._defaultLanguage.set(this._config.defaultLanguage);
+		}
+
+		const storedLanguage = this._config.persistLanguage
+			? await this._storeService.get(TranslateService._LANGUAGE_STORE_KEY)
+			: null;
+
+		const initialLanguage =
+			this._config.language || storedLanguage || this._config.defaultLanguage || '';
+
+		if (initialLanguage) {
+			await this.setLanguage(initialLanguage);
+		}
+	}
+
+	language() {
+		return this._language();
+	}
+
+	defaultLanguage() {
+		return this._defaultLanguage();
+	}
+
+	async setLanguage(language: string): Promise<void> {
+		const nextLanguage = (language || '').trim();
+
+		if (!nextLanguage) {
+			return;
+		}
+
+		this._language.set(nextLanguage);
+
+		if (this._config.persistLanguage) {
+			void this._storeService.set(TranslateService._LANGUAGE_STORE_KEY, nextLanguage);
+		}
+
+		const translations = await this.loadTranslations(nextLanguage);
+
+		this._applyTranslations(translations);
+	}
+
+	async loadTranslations(language: string): Promise<Translate[]> {
+		const normalizedLanguage = (language || '').trim();
+
+		if (!normalizedLanguage) {
+			return [];
+		}
+
+		const cached = this._translationsByLanguage.get(normalizedLanguage);
+
+		if (cached) {
+			return [...cached];
+		}
+
+		const existingLoad = this._loadingByLanguage.get(normalizedLanguage);
+
+		if (existingLoad) {
+			return existingLoad;
+		}
+
+		const loadPromise = this._loadLanguageInternal(normalizedLanguage).finally(() => {
+			this._loadingByLanguage.delete(normalizedLanguage);
 		});
+
+		this._loadingByLanguage.set(normalizedLanguage, loadPromise);
+
+		return loadPromise;
 	}
 
 	/**
@@ -81,22 +155,16 @@ export class TranslateService {
 	 * containing sourceText and translated text.
 	 */
 	setMany(translations: Translate[]) {
-		const sourceTexts = translations.map(t => t.sourceText);
-		const sourceSet = new Set(sourceTexts);
+		this._applyTranslations(translations);
 
-		// Reset removed translations back to original text
-		for (const sourceText in this._signalTranslates) {
-			if (!sourceSet.has(sourceText)) {
-				this._signalTranslates[sourceText].set(sourceText);
-			}
+		const language = this._language();
+
+		if (language) {
+			this._translationsByLanguage.set(
+				language,
+				translations.map(translation => ({ ...translation })),
+			);
 		}
-
-		// Update provided translations
-		for (const translation of translations) {
-			this._setTranslation(translation.sourceText, translation.text);
-		}
-
-		this._updateStorageTranslations();
 	}
 
 	/**
@@ -115,7 +183,24 @@ export class TranslateService {
 	setOne(translation: Translate) {
 		this._setTranslation(translation.sourceText, translation.text);
 
-		this._updateStorageTranslations();
+		const language = this._language();
+
+		if (!language) {
+			return;
+		}
+
+		const currentTranslations = this._translationsByLanguage.get(language) || [];
+		const existingIndex = currentTranslations.findIndex(
+			item => item.sourceText === translation.sourceText,
+		);
+
+		if (existingIndex >= 0) {
+			currentTranslations[existingIndex] = { ...translation };
+		} else {
+			currentTranslations.push({ ...translation });
+		}
+
+		this._translationsByLanguage.set(language, currentTranslations);
 	}
 
 	/**
@@ -129,17 +214,79 @@ export class TranslateService {
 		return this._signalTranslates;
 	}
 
-	private _hydrateTranslations(translations: Translate[]) {
-		for (const translation of translations) {
-			const existing = this._signalTranslates[translation.sourceText];
+	private _applyTranslations(translations: Translate[]) {
+		const sourceSet = new Set(translations.map(translation => translation.sourceText));
 
-			// Do not let stale async storage overwrite an already translated runtime value.
-			if (existing && existing() !== translation.sourceText) {
-				continue;
+		for (const sourceText in this._signalTranslates) {
+			if (!sourceSet.has(sourceText)) {
+				this._signalTranslates[sourceText].set(sourceText);
 			}
+		}
 
+		for (const translation of translations) {
 			this._setTranslation(translation.sourceText, translation.text);
 		}
+	}
+
+	private async _loadLanguageInternal(language: string): Promise<Translate[]> {
+		const inlineTranslations = this._config.translations?.[language];
+
+		if (Array.isArray(inlineTranslations)) {
+			const normalizedInline = inlineTranslations.map(translation => ({ ...translation }));
+			this._translationsByLanguage.set(language, normalizedInline);
+			return [...normalizedInline];
+		}
+
+		if (!this._config.folder) {
+			this._translationsByLanguage.set(language, []);
+			return [];
+		}
+
+		const url = this._createLanguageUrl(language);
+
+		try {
+			const payload =
+				(await firstValueFrom(this._http.get<Record<string, string>>(url))) || {};
+			const translations = this._mapJsonToTranslations(payload);
+
+			this._translationsByLanguage.set(language, translations);
+
+			return [...translations];
+		} catch (error) {
+			console.warn(
+				`[wacom:translate] Failed to load translations for "${language}" from "${url}".`,
+				error,
+			);
+			this._translationsByLanguage.set(language, []);
+			return [];
+		}
+	}
+
+	private _createLanguageUrl(language: string): string {
+		return `${this._normalizeFolder(this._config.folder)}${language}.json`;
+	}
+
+	private _mapJsonToTranslations(payload: Record<string, string>): Translate[] {
+		const translations: Translate[] = [];
+
+		for (const sourceText in payload) {
+			translations.push({
+				sourceText,
+				text: payload[sourceText],
+			});
+		}
+
+		return translations;
+	}
+
+	private _normalizeFolder(folder: string): string {
+		const normalized = (folder || '').trim();
+
+		if (!normalized) {
+			return TranslateService._DEFAULT_FOLDER;
+		}
+
+		return normalized.endsWith('/') ? normalized : `${normalized}/`;
 	}
 
 	private _setTranslation(sourceText: string, text: string) {
@@ -148,30 +295,5 @@ export class TranslateService {
 		}
 
 		this._signalTranslates[sourceText].set(text);
-	}
-
-	/**
-	 * Persists the current in-memory translations into the internal store.
-	 *
-	 * The payload is derived from `_signalTranslates` by materializing each signal's
-	 * current value at the time of saving.
-	 *
-	 * Side effects:
-	 * - Writes to storage via `StoreService.setJson`.
-	 *
-	 * Intended usage:
-	 * - Called after `setMany()` and `setOne()` to keep storage in sync.
-	 */
-	private _updateStorageTranslations() {
-		const translations = [];
-
-		for (const sourceText in this._signalTranslates) {
-			translations.push({
-				text: this._signalTranslates[sourceText](),
-				sourceText,
-			});
-		}
-
-		this._storeService.setJson('translations', translations);
 	}
 }
