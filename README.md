@@ -1,0 +1,2403 @@
+# waw Angular (ngx) common
+
+Module which has common services, pipes, directives and interfaces which can be used on all projects.
+
+Wacom is SSR-safe and works with Angular Universal: browser-only APIs are guarded, and features that require a browser runtime activate only on the client.
+
+## License
+
+[MIT](LICENSE)
+
+## Installation
+
+```bash
+$ npm i --save wacom
+```
+
+## Usage
+
+```typescript
+import { provideWacom } from 'wacom';
+
+export const appConfig = {
+	providers: [provideWacom()],
+};
+```
+
+`WacomModule` is still available for older applications but will be deprecated in future versions. Use `provideWacom` to configure the library when working with standalone APIs.
+
+## Configuration
+
+You can pass an optional configuration object to `provideWacom` to override the library defaults.
+
+```typescript
+import { provideWacom } from 'wacom';
+
+export const appConfig = {
+	providers: [
+		provideWacom({
+			http: { url: 'https://api.example.com' },
+			store: { prefix: 'waStore' },
+			meta: {
+				useTitleSuffix: false,
+				defaults: { links: {} },
+			},
+			network: {},
+			// enable and configure sockets if needed
+			socket: false,
+			io: undefined,
+		}),
+	],
+};
+```
+
+## Services
+
+| Name                                                                 |                             Description                             |
+| -------------------------------------------------------------------- | :-----------------------------------------------------------------: |
+| [**`Core`**](https://www.npmjs.com/package/wacom#core-service)       |     Common supportive function which can be used in any service     |
+| [**`Emitter`**](#emitter-service)                                    |            Lightweight app-wide event and task signaling            |
+| [**`Http`**](https://www.npmjs.com/package/wacom#http-service)       |                      Http layer for HttpClient                      |
+| [**`Store`**](https://www.npmjs.com/package/wacom#store-service)     |      Service responsible for keeping information on the device      |
+| [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service)       |             Website meta tags management within router              |
+| [**`Crud`**](https://www.npmjs.com/package/wacom#crud-service)       | Provides basic CRUD operations for managing data with HTTP services |
+| [**`Socket`**](https://www.npmjs.com/package/wacom#socket-service)   |   Manages WebSocket connections and real-time data communication    |
+| [**`Time`**](https://www.npmjs.com/package/wacom#time-service)       |  Provides utilities for date and time manipulation and formatting   |
+| [**`Dom`**](https://www.npmjs.com/package/wacom#dom-service)         |     Facilitates DOM manipulation and dynamic component loading      |
+| [**`Network`**](https://www.npmjs.com/package/wacom#network-service) |              Monitors network connectivity and latency              |
+| [**`RTC`**](https://www.npmjs.com/package/wacom#rtc-service)         |        Wraps WebRTC peer connections and local media streams        |
+| [**`Util`**](https://www.npmjs.com/package/wacom#util-service)       |      Utility methods for forms, validation, and CSS variables       |
+| [**`Theme`**](#theme-service)                                        |       Manages UI theme mode, density, and radius preferences        |
+| [**`Translate`**](#translate-service)                                |         Lightweight, signal-based runtime translate engine          |
+
+## [Core Service](#core-service)
+
+### SSR and Platform Services Initialization
+
+The `CoreService` manages the initialization of various platform-specific services depending on whether the application is running on the server or the client.
+
+#### Properties
+
+- `ssr` (boolean): Indicates whether the application is running on the server side.
+- `localStorage` (any): Local storage object. Uses a mock object on the server side.
+- `navigator` (any): Navigator object. Uses a mock object on the server side.
+- `document` (any): Document object. Uses a mock object on the server side.
+- `window` (any): Window object. Uses a mock object on the server side.
+
+### String Prototype Extension
+
+The `CoreService` extends the `String` prototype with a `capitalize` method, allowing you to capitalize the first letter of any string instance.
+
+#### `capitalize(): string`
+
+Capitalizes the first letter of the string and makes the rest of the string lowercase.
+
+- **Example**:
+  const exampleString = "hellO";
+  console.log(exampleString.capitalize()); // Output: "Hello"
+
+### Object to Array Function
+
+The `CoreService` provides an `ota` method to convert an object to an array. Optionally, it can hold keys instead of values.
+
+#### `ota(obj: any, holder?: boolean): any[]`
+
+Converts an object to an array. Optionally holds keys instead of values.
+
+- **Parameters**:
+    - `obj` (any): The object to be converted.
+    - `holder` (boolean): If true, the keys will be held in the array; otherwise, the values will be held. Default is `false`.
+
+- **Returns**:
+    - `any[]`: The resulting array.
+
+- **Example**:
+
+```Typescript
+const exampleObj = { a: 1, b: 2, c: 3 };
+const resultValues = coreService.ota(exampleObj);
+console.log(resultValues); // Output: [1, 2, 3]
+const resultKeys = coreService.ota(exampleObj, true);
+console.log(resultKeys); // Output: ['a', 'b', 'c']
+```
+
+### Array Splice Function
+
+The `CoreService` provides a `splice` method to remove elements from one array that are present in another array based on a comparison field.
+
+#### `splice(removeArray: any[], fromArray: any[], compareField: string = '_id'): any[]`
+
+Removes elements from `fromArray` that are present in `removeArray` based on a comparison field.
+
+- **Parameters**:
+    - `removeArray` (any[]): The array of elements to remove.
+    - `fromArray` (any[]): The array from which to remove elements.
+    - `compareField` (string): The field to use for comparison. Default is `_id`.
+
+- **Returns**:
+    - `any[]`: The modified `fromArray` with elements removed.
+
+- **Example**:
+
+```
+const removeArray = [{ _id: '1' }, { _id: '3' }];
+const fromArray = [{ _id: '1' }, { _id: '2' }, { _id: '3' }, { _id: '4' }];
+
+const result = coreService.splice(removeArray, fromArray);
+console.log(result); // Output: [{ _id: '2' }, { _id: '4' }]
+```
+
+### ID Unification Function
+
+The `CoreService` provides an `ids2id` method to unite multiple \_id values into a single unique \_id. The resulting \_id is unique regardless of the order of the input \_id values.
+
+#### `ids2id(...args: string[]): string`
+
+Unites multiple \_id values into a single unique \_id. The resulting \_id is unique regardless of the order of the input \_id values.
+
+- **Parameters**:
+    - `...args` (string[]): The \_id values to be united.
+
+- **Returns**:
+    - `string`: The unique combined \_id.
+
+- **Example**:
+
+```Typescript
+const id1 = "20230101abc";
+const id2 = "20230102xyz";
+const id3 = "20230101def";
+
+const result = coreService.ids2id(id1, id2, id3);
+console.log(result); // Output will be the ids sorted by the first 8 characters and joined
+```
+
+### Delayed Execution Function
+
+The `CoreService` provides an `afterWhile` method to delay the execution of a callback function for a specified amount of time. If called again within that time, the timer resets.
+
+#### `afterWhile(doc: string | object | (() => void), cb?: () => void, time: number = 1000): void`
+
+Delays the execution of a callback function for a specified amount of time. If called again within that time, the timer resets.
+
+- **Parameters**:
+    - `doc` (string | object | (() => void)): A unique identifier for the timer, an object to host the timer, or the callback function.
+    - `cb` (() => void): The callback function to execute after the delay.
+    - `time` (number): The delay time in milliseconds. Default is 1000.
+
+- **Example**:
+
+```Typescript
+coreService.afterWhile('example', () => {
+	console.log('This message is delayed by 1 second');
+}, 1000);
+
+const obj = {};
+coreService.afterWhile(obj, () => {
+	console.log('This message is delayed by 1 second and stored in obj.__afterWhile');
+}, 1000);
+
+coreService.afterWhile(() => {
+	console.log('This message is delayed by 1 second using the default doc "common"');
+}, 1000);
+```
+
+### Copy Function
+
+The `CoreService` provides a `copy` method to recursively copy properties from one object to another.
+
+#### `copy<T>(from: T, to: T): void`
+
+Recursively copies properties from one object to another.
+
+- **Parameters**:
+    - `from`: The source object from which properties are copied.
+    - `to`: The target object to which properties are copied.
+
+- **Example**:
+
+```Typescript
+const source = { a: 1, b: { c: 2 } };
+const target = {};
+coreService.copy(source, target);
+console.log(target); // Output: { a: 1, b: { c: 2 } }
+```
+
+### Device Detection
+
+The `CoreService` provides methods to detect the client's device type (mobile, tablet, or web).
+
+#### Properties
+
+- `device` (string): The detected device type.
+
+#### Methods
+
+##### `detectDevice(): void`
+
+Detects the device type based on the user agent.
+
+- **Example**:
+
+```Typescript
+coreService.detectDevice();
+```
+
+##### `isMobile(): boolean`
+
+Checks if the device is a mobile device.
+
+- **Returns**:
+    - `boolean`: Returns true if the device is a mobile device.
+
+- **Example**:
+
+```Typescript
+console.log(coreService.isMobile()); // Output: true or false
+```
+
+##### `isTablet(): boolean`
+
+Checks if the device is a tablet.
+
+- **Returns**:
+    - `boolean`: Returns true if the device is a tablet.
+
+- **Example**:
+
+```Typescript
+console.log(coreService.isTablet()); // Output: true or false
+```
+
+##### `isWeb(): boolean`
+
+Checks if the device is a web browser.
+
+- **Returns**:
+    - `boolean`: Returns true if the device is a web browser.
+
+- **Example**:
+
+```Typescript
+console.log(coreService.isWeb()); // Output: true or false
+```
+
+##### `isAndroid(): boolean`
+
+Checks if the device is an Android device.
+
+- **Returns**:
+    - `boolean`: Returns true if the device is an Android device.
+
+- **Example**:
+
+```Typescript
+console.log(coreService.isAndroid()); // Output: true or false
+```
+
+##### `isIos(): boolean`
+
+Checks if the device is an iOS device.
+
+- **Returns**:
+    - `boolean`: Returns true if the device is an iOS device.
+
+- **Example**:
+
+```Typescript
+console.log(coreService.isIos()); // Output: true or false
+```
+
+### Version Management
+
+The `CoreService` provides methods for managing the application's version. The version is dynamically constructed from the app version and the date version.
+
+#### Properties
+
+- `version` (string): The combined version string of the application.
+- `appVersion` (string): The application version.
+- `dateVersion` (string): The date version.
+
+#### Methods
+
+##### `setVersion(): void`
+
+Sets the combined version string based on `appVersion` and `dateVersion`.
+
+- **Example**:
+
+```Typescript
+coreService.setVersion();
+```
+
+##### `setAppVersion(appVersion: string): void`
+
+Sets the app version and updates the combined version string.
+
+- **Parameters**:
+    - `appVersion` (string): The application version to set.
+
+- **Example**:
+
+```Typescript
+coreService.setAppVersion('1.2.3');
+```
+
+##### `setDateVersion(dateVersion: string): void`
+
+Sets the date version and updates the combined version string.
+
+- **Parameters**:
+    - `dateVersion` (string): The date version to set.
+
+- **Example**:
+
+```Typescript
+coreService.setDateVersion('2023-01-01');
+```
+
+### Locking Management
+
+The `CoreService` provides methods for managing locks on resources to prevent concurrent access. This is useful in scenarios where you need to ensure that only one part of your application is accessing or modifying a resource at any given time.
+
+### Methods
+
+#### `lock(which: string): void`
+
+Locks a resource to prevent concurrent access.
+
+- **Parameters**:
+    - `which` (string): The resource to lock, identified by a string.
+
+- **Example**:
+  coreService.lock('myResource');
+
+#### `unlock(which: string): void`
+
+Unlocks a resource, allowing other processes or threads to access it.
+
+- **Parameters**:
+    - `which` (string): The resource to unlock, identified by a string.
+
+- **Example**:
+  coreService.unlock('myResource');
+
+#### `onUnlock(which: string): Promise<void>`
+
+Returns a Promise that resolves when the specified resource is unlocked. This is useful for waiting until a resource becomes available.
+
+- **Parameters**:
+    - `which` (string): The resource to watch for unlocking, identified by a string.
+
+- **Returns**:
+    - `Promise<void>`: A Promise that resolves when the resource is unlocked.
+
+- **Example**:
+  coreService.onUnlock('myResource').then(() => {
+  console.log('Resource is now unlocked');
+  });
+
+#### `locked(which: string): boolean`
+
+Checks if a resource is currently locked.
+
+- **Parameters**:
+    - `which` (string): The resource to check, identified by a string.
+
+- **Returns**:
+    - `boolean`: True if the resource is locked, false otherwise.
+
+- **Example**:
+  if (coreService.locked('myResource')) {
+  console.log('Resource is currently locked');
+  } else {
+  console.log('Resource is available');
+  }
+
+### Example Usage
+
+Here's an example demonstrating how to use the locking management methods in `CoreService`:
+
+```Typescript
+import { CoreService } from 'wacom';
+export class AppComponent {
+  constructor(private coreService: CoreService) {
+    this.manageResource();
+  }
+
+  async manageResource() {
+    this.coreService.lock('resource1');
+    console.log('Resource locked');
+
+    setTimeout(() => {
+      this.coreService.unlock('resource1');
+      console.log('Resource unlocked');
+    }, 2000);
+
+    await this.coreService.onUnlock('resource1');
+    console.log('Resource is now available for use');
+  }
+}
+```
+
+In this example:
+
+1. The `lock` method is used to lock a resource identified by `'resource1'`.
+2. The `unlock` method is called after a timeout to unlock the resource.
+3. The `onUnlock` method returns a Promise that resolves when the resource is unlocked, allowing the code to wait until the resource is available again.
+
+This ensures controlled access to the resource, preventing race conditions and ensuring data integrity.
+
+## [Emitter Service](#emitter-service)
+
+The `EmitterService` provides a lightweight event bus and completion signaling built on Angular Signals and RxJS.
+
+### Events
+
+- `emit(id: string, data?: any): void`: Publish an event on a channel.
+- `on<T = any>(id: string): Observable<T>`: Subscribe to a channel (hot, no replay).
+- `off(id: string): void`: Close and remove a channel.
+- `offAll(): void`: Close and remove all channels.
+- `has(id: string): boolean`: Check if a channel exists.
+
+Example:
+
+```ts
+import { EmitterService } from 'wacom';
+
+constructor(private emitter: EmitterService) {}
+
+ngOnInit() {
+  this.emitter.on<string>('user:login').subscribe((uid) => {
+    console.log('Logged in:', uid);
+  });
+}
+
+login(uid: string) {
+  this.emitter.emit('user:login', uid);
+}
+```
+
+### Completion tasks
+
+Track once-off tasks and await their completion.
+
+- `complete<T = any>(task: string, value: T = true): void`: Mark task done with payload.
+- `clearCompleted(task: string): void`: Reset completion state.
+- `completed(task: string): any | undefined`: Read current payload or `undefined`.
+- `isCompleted(task: string): boolean`: Convenience check.
+- `onComplete(tasks: string | string[], opts?: { mode?: 'all' | 'any'; timeoutMs?: number; abort?: AbortSignal; }): Observable<any | any[]>`: Await task(s) completion.
+
+Example:
+
+```ts
+// Somewhere that waits for a single task
+this.emitter.onComplete('profile:loaded').subscribe(() => {
+	// safe to render UI
+});
+
+// Somewhere that fulfills it
+await api.loadProfile();
+this.emitter.complete('profile:loaded');
+
+// Wait for any of several tasks
+this.emitter
+	.onComplete(['a', 'b'], { mode: 'any', timeoutMs: 5000 })
+	.subscribe(which => console.log('First done:', which));
+```
+
+## [Http Service](#http-service)
+
+The `HttpService` provides an HTTP layer for `HttpClient` in Angular, supporting both callbacks and observables for various HTTP operations.
+
+### Methods
+
+#### `setUrl(url: string)`
+
+Sets the base URL for HTTP requests.
+**Parameters**:
+
+- `url` (string): The base URL.
+
+**Example**:
+
+```Typescript
+httpService.setUrl('https://api.example.com');
+```
+
+#### `removeUrl()`
+
+Removes the base URL for HTTP requests.
+**Example**:
+
+```Typescript
+httpService.removeUrl();
+```
+
+#### `set(key: string, value: string)`
+
+Sets a header for HTTP requests.
+**Parameters**:
+
+- `key` (string): The header key.
+- `value` (string): The header value.
+
+**Example**:
+
+```Typescript
+httpService.set('Authorization', 'Bearer token');
+```
+
+#### `header(key: string): string`
+
+Gets the value of a specified header.
+**Parameters**:
+
+- `key` (string): The header key.
+
+**Returns**:
+
+- The header value.
+
+**Example**:
+
+```Typescript
+const authHeader = httpService.header('Authorization');
+```
+
+#### `remove(key: string)`
+
+Removes a specified header.
+**Parameters**:
+
+- `key` (string): The header key.
+
+**Example**:
+
+```Typescript
+httpService.remove('Authorization');
+```
+
+#### `post(url: string, doc: any, callback = (resp: any) => {}, opts: any = {}): Observable<any>`
+
+Performs a POST request.
+**Parameters**:
+
+- `url` (string): The URL for the request.
+- `doc` (any): The request body.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
+
+**Returns**:
+
+- An observable for the request.
+
+**Example**:
+
+```Typescript
+httpService.post('/endpoint', data, (resp) => {
+  console.log(resp);
+}).subscribe();
+```
+
+#### `put(url: string, doc: any, callback = (resp: any) => {}, opts: any = {}): Observable<any>`
+
+Performs a PUT request.
+**Parameters**:
+
+- `url` (string): The URL for the request.
+- `doc` (any): The request body.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
+
+**Returns**:
+
+- An observable for the request.
+
+**Example**:
+
+```Typescript
+httpService.put('/endpoint', data, (resp) => {
+  console.log(resp);
+}).subscribe();
+```
+
+#### `patch(url: string, doc: any, callback = (resp: any) => {}, opts: any = {}): Observable<any>`
+
+Performs a PATCH request.
+**Parameters**:
+
+- `url` (string): The URL for the request.
+- `doc` (any): The request body.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
+
+**Returns**:
+
+- An observable for the request.
+
+**Example**:
+
+```Typescript
+httpService.patch('/endpoint', data, (resp) => {
+  console.log(resp);
+}).subscribe();
+```
+
+#### `delete(url: string, callback = (resp: any) => {}, opts: any = {}): Observable<any>`
+
+Performs a DELETE request.
+**Parameters**:
+
+- `url` (string): The URL for the request.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
+
+**Returns**:
+
+- An observable for the request.
+
+**Example**:
+
+```Typescript
+httpService.delete('/endpoint', (resp) => {
+  console.log(resp);
+}).subscribe();
+```
+
+#### `get(url: string, callback = (resp: any) => {}, opts: any = {}): Observable<any>`
+
+Performs a GET request.
+**Parameters**:
+
+- `url` (string): The URL for the request.
+- `callback` (function): The callback function.
+- `opts` (any): Additional options.
+
+**Returns**:
+
+- An observable for the request.
+
+**Example**:
+
+```Typescript
+httpService.get('/endpoint', (resp) => {
+  console.log(resp);
+}).subscribe();
+```
+
+#### `clearLocked()`
+
+Clears all locked requests.
+**Example**:
+
+```Typescript
+httpService.clearLocked();
+```
+
+#### `lock()`
+
+Locks the service to prevent further requests.
+**Example**:
+
+```Typescript
+httpService.lock();
+```
+
+#### `unlock()`
+
+Unlocks the service to allow requests.
+**Example**:
+
+```Typescript
+httpService.unlock();
+```
+
+## [Store Service](#store-service)
+
+`StoreService` provides a unified, async-first API for working with storage (localStorage by default or a custom provider via config).
+It supports raw values, safe JSON handling, key prefixing, and optional lifecycle hooks.
+
+---
+
+### Key features
+
+- async/await everywhere (no separate `*Async` methods)
+- optional side-effects via `options`
+- automatic JSON corruption handling
+- configurable storage backend
+- prefix support for namespacing
+
+---
+
+### Prefixing keys
+
+```ts
+storeService.setPrefix('app_');
+```
+
+All keys will be stored as `app_<key>` (plus global config prefix if defined).
+
+---
+
+### set
+
+Stores a raw string value.
+
+```ts
+await storeService.set('token', 'abc123');
+```
+
+With hooks:
+
+```ts
+await storeService.set('token', 'abc123', {
+	onSuccess: () => console.log('saved'),
+	onError: console.error,
+});
+```
+
+**Returns:** `Promise<boolean>`
+
+---
+
+### get
+
+Retrieves a raw string value.
+
+```ts
+const token = await storeService.get('token');
+```
+
+With hooks:
+
+```ts
+const token = await storeService.get('token', {
+	onSuccess: v => console.log(v),
+	onError: console.error,
+});
+```
+
+**Returns:** `Promise<string | null>`
+
+---
+
+### setJson
+
+Stores a JSON-serializable value.
+
+```ts
+await storeService.setJson('profile', { name: 'Den', role: 'dev' });
+```
+
+With hooks:
+
+```ts
+await storeService.setJson('profile', user, {
+	onSuccess: () => console.log('saved'),
+	onError: console.error,
+});
+```
+
+**Returns:** `Promise<boolean>`
+
+---
+
+### getJson
+
+Retrieves a JSON value safely.
+
+- empty or missing → `null` (or `defaultValue`)
+- corrupted JSON → auto-cleared (by default)
+
+```ts
+const profile = await storeService.getJson<User>('profile');
+```
+
+With defaults and error handling:
+
+```ts
+const profile = await storeService.getJson<User>('profile', {
+	defaultValue: {},
+	onError: console.warn,
+});
+```
+
+Disable auto-clean:
+
+```ts
+await storeService.getJson('profile', {
+	clearOnError: false,
+});
+```
+
+**Returns:** `Promise<T | null>`
+
+---
+
+### remove
+
+Removes a single key.
+
+```ts
+await storeService.remove('token');
+```
+
+With hooks:
+
+```ts
+await storeService.remove('token', {
+	onSuccess: () => console.log('removed'),
+	onError: console.error,
+});
+```
+
+**Returns:** `Promise<boolean>`
+
+---
+
+### clear
+
+Clears all stored values.
+
+```ts
+await storeService.clear();
+```
+
+With hooks:
+
+```ts
+await storeService.clear({
+	onSuccess: () => console.log('cleared'),
+	onError: console.error,
+});
+```
+
+**Returns:** `Promise<boolean>`
+
+---
+
+### Options object
+
+All methods accept an optional `options` parameter:
+
+```ts
+interface StoreOptions<T = unknown> {
+	onSuccess?: (value?: T | null) => void;
+	onError?: (err: unknown) => void;
+	defaultValue?: T; // getJson only
+	clearOnError?: boolean; // getJson only (default: true)
+}
+```
+
+## [Meta Service](#meta-service)
+
+The `MetaService` manages meta tags and titles in an Angular application. It allows setting defaults, updating meta tags, and configuring titles dynamically.
+
+### Methods
+
+#### `setDefaults(defaults: MetaDefaults): void`
+
+Sets the default meta tags, merging the provided values with any existing defaults.
+
+**Parameters**:
+
+- `defaults` (object): The default meta tags including optional `links`.
+
+**Example**:
+
+```Typescript
+metaService.setDefaults({ title: 'Default Title', description: 'Default Description' });
+// Later calls merge with previous defaults instead of replacing them
+metaService.setDefaults({ description: 'Updated Description' });
+```
+
+#### `setTitle(title?: string, titleSuffix?: string): MetaService`
+
+Sets the title and optional title suffix, updating the `title`, `og:title`, and `twitter:title` meta tags.
+
+**Parameters**:
+
+- `title` (string): The title to set.
+- `titleSuffix` (string): The title suffix to append.
+
+**Returns**:
+
+- `MetaService`: The MetaService instance.
+
+**Example**:
+
+```Typescript
+metaService.setTitle('My Page Title', ' | My Website');
+```
+
+#### `setLink(links: { [key: string]: string }): void`
+
+Sets link tags.
+
+**Parameters**:
+
+- `links` (object): The links to set.
+
+**Returns**:
+
+- `MetaService`: The MetaService instance.
+
+**Example**:
+
+```Typescript
+metaService.setLink({ canonical: 'https://example.com', stylesheet: 'https://example.com/style.css' });
+```
+
+#### `setTag(tag: string, value: string, prop?: string): MetaService`
+
+Sets a meta tag.
+
+**Parameters**:
+
+- `tag` (string): The meta tag name.
+- `value` (string): The meta tag value.
+- `prop` (string): The meta tag property.
+
+**Returns**:
+
+- `MetaService`: The MetaService instance.
+
+**Example**:
+
+```Typescript
+metaService.setTag('description', 'This is a description', 'name');
+```
+
+#### `removeTag(tag: string, prop?: string): void`
+
+Removes a meta tag.
+
+**Parameters**:
+
+- `tag` (string): The meta tag name.
+- `prop` (string): The meta tag property.
+
+**Example**:
+
+```Typescript
+metaService.removeTag('description', 'name');
+```
+
+### Private Methods
+
+#### `_updateMetaTag(tag: string, value: string, prop?: string): void`
+
+Updates a meta tag.
+
+**Parameters**:
+
+- `tag` (string): The meta tag name.
+- `value` (string): The meta tag value.
+- `prop` (string): The meta tag property.
+
+## [Util Service](#util-service)
+
+The `UtilService` manages various UI-related tasks in an Angular application, including CSS management, form validation, and generating sample data for UI components.
+
+### Methods
+
+#### `form(id: string): any`
+
+Manages form states.
+
+**Parameters**:
+
+- `id` (string): The form identifier.
+
+**Returns**:
+
+- `any`: The form state object.
+
+**Example**:
+
+```Typescript
+const formState = utilService.form('contactForm');
+```
+
+#### `valid(value: any, kind = 'email', extra = 0): boolean`
+
+Validates input values based on the specified type.
+
+**Parameters**:
+
+- `value` (any): The value to validate.
+- `kind` (string): The type of validation.
+- `extra` (number): Additional validation criteria.
+
+**Returns**:
+
+- `boolean`: True if the value is valid, false otherwise.
+
+**Example**:
+
+```Typescript
+const isValidEmail = utilService.valid('test@example.com', 'email');
+```
+
+#### `level(value = ''): number`
+
+Determines the strength of a password.
+
+**Parameters**:
+
+- `value` (string): The password to evaluate.
+
+**Returns**:
+
+- `number`: The strength level of the password.
+
+**Example**:
+
+```Typescript
+const passwordLevel = utilService.level('Password123!');
+```
+
+#### `set(variables: { [key: string]: string }, opts: any = {}): void`
+
+Sets multiple CSS variables.
+
+**Parameters**:
+
+- `variables` (object): The CSS variables to set.
+- `opts` (any): Options for setting the variables.
+
+**Example**:
+
+```Typescript
+utilService.set({ '--primary-color': '#ff0000' }, 'local');
+```
+
+#### `get(): { [key: string]: string }`
+
+Retrieves the stored CSS variables.
+
+**Returns**:
+
+- `object`: The stored CSS variables.
+
+**Example**:
+
+```Typescript
+const cssVariables = utilService.get();
+```
+
+#### `remove(keys: string | string[]): void`
+
+Removes specified CSS variables.
+
+**Parameters**:
+
+- `keys` (string | array): The keys of the CSS variables to remove.
+
+**Example**:
+
+```Typescript
+utilService.remove('primary-color secondary-color');
+```
+
+#### `arr(arrLen = 10, type: string = 'number'): any[]`
+
+Generates an array of sample data.
+
+**Parameters**:
+
+- `arrLen` (number): The length of the array.
+- `type` (string): The type of data to generate.
+
+**Returns**:
+
+- `array`: An array of sample data.
+
+**Example**:
+
+```Typescript
+const sampleArray = utilService.arr(5, 'text');
+```
+
+#### `text(length = 10): string`
+
+Generates a random text string.
+
+**Parameters**:
+
+- `length` (number): The length of the text string.
+
+**Returns**:
+
+- `string`: A random text string.
+
+**Example**:
+
+```Typescript
+const randomText = utilService.text(15);
+```
+
+## [Crud Service](#crud-service)
+
+The `CrudService` is designed to manage CRUD (Create, Read, Update, Delete) operations in an Angular application. It interacts with an API, stores documents locally, and provides methods for handling various CRUD operations. It should be extended by specific services that manage different document types.
+
+### Methods
+
+---
+
+#### `new(doc: Document = {}): Document`
+
+Creates a new document with a temporary ID and status flags.
+
+**Parameters**:
+
+- `doc` (Document, optional): A base document to initialize.
+
+**Returns**:
+
+- `Document`: A new document instance with default properties.
+
+**Example**:
+const newDoc = workService.new();
+
+---
+
+#### `doc(_id: string): Document`
+
+Retrieves a document by its ID. If the document doesn't exist, a new one is created.
+
+**Parameters**:
+
+- `_id` (string): The document ID.
+
+**Returns**:
+
+- `Document`: The document instance.
+
+**Example**:
+const doc = workService.doc('12345');
+
+---
+
+#### `addDoc(doc: Document): void`
+
+Adds a new document or updates an existing document in the local store. It will attempt to update the document if it already exists in the collection.
+
+**Parameters**:
+
+- `doc` (Document): The document to add or update.
+
+**Example**:
+workService.addDoc(doc);
+
+---
+
+#### `addDocs(docs: Document[]): void`
+
+Adds multiple documents to the service. Each document will either be added or updated depending on whether it already exists.
+
+**Parameters**:
+
+- `docs` (Document[]): The array of documents to add.
+
+**Example**:
+workService.addDocs(docs);
+
+---
+
+#### `setDocs(): void`
+
+Saves the current state of documents to local storage.
+
+**Example**:
+workService.setDocs();
+
+---
+
+#### `getDocs(): Document[]`
+
+Retrieves the current list of documents stored locally.
+
+**Returns**:
+
+- `Document[]`: The list of documents.
+
+**Example**:
+const docs = workService.getDocs();
+
+---
+
+#### `setPerPage(_perPage: number): void`
+
+Sets the number of documents to display per page for pagination.
+
+**Parameters**:
+
+- `_perPage` (number): The number of documents per page.
+
+**Example**:
+workService.setPerPage(10);
+
+---
+
+#### `get(config: GetConfig = {}, options: CrudOptions<Document> = {}): Observable<Document[]>`
+
+Fetches a list of documents from the API with optional pagination and other settings.
+
+**Parameters**:
+
+- `config` (object, optional): The configuration for pagination (`page` and `perPage`).
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
+
+**Returns**:
+
+- `Observable<Document[]>`: An observable of the retrieved documents.
+
+**Example**:
+workService.get({ page: 1 }, { callback: (docs) => console.log(docs) });
+
+---
+
+#### `create(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> | void`
+
+Creates a new document in the API and adds it to the local store. The document is only created once.
+
+**Parameters**:
+
+- `doc` (Document): The document to create.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
+
+**Returns**:
+
+- `Observable<Document> | void`: An observable of the created document or void if the document was already created.
+
+**Example**:
+workService.create(newDoc, { callback: (doc) => console.log(doc) });
+
+---
+
+#### `fetch(query: object = {}, options: CrudOptions<Document> = {}): Observable<Document>`
+
+Fetches a document from the API based on a query object and adds it to the local store.
+
+**Parameters**:
+
+- `query` (object, optional): The query object to filter the documents.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
+
+**Returns**:
+
+- `Observable<Document>`: An observable of the fetched document.
+
+**Example**:
+workService.fetch({ name: 'example' }, { callback: (doc) => console.log(doc) });
+
+---
+
+#### `updateAfterWhile(doc: Document, options: CrudOptions<Document> = {}): void`
+
+Updates a document after a specified delay using a core service function to handle the delay.
+
+**Parameters**:
+
+- `doc` (Document): The document to update.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
+
+**Example**:
+workService.updateAfterWhile(doc, { callback: (doc) => console.log(doc) });
+
+---
+
+#### `update(doc: Document, options: CrudOptions<Document> = {}): Observable<Document>`
+
+Updates a document in the API and reflects the changes locally.
+
+**Parameters**:
+
+- `doc` (Document): The document to update.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
+
+**Returns**:
+
+- `Observable<Document>`: An observable of the updated document.
+
+**Example**:
+workService.update(doc, { callback: (doc) => console.log(doc) });
+
+---
+
+#### `unique(doc: Document, options: CrudOptions<Document> = {}): Observable<Document>`
+
+Unique update a document field in the API.
+
+**Parameters**:
+
+- `doc` (Document): The document to update.
+- `options` (CrudOptions<Document>, optional): Optional callback and error handling configuration.
+
+**Returns**:
+
+- `Observable<Document>`: An observable that resolves with the updated document.
+
+**Example**:
+workService.unique(doc, { callback: (doc) => console.log('Document updated', doc) });
+
+---
+
+#### `delete(doc: Document, options: CrudOptions<Document> = {}): Observable<Document>`
+
+Deletes a document from the API and updates the local store.
+
+**Parameters**:
+
+- `doc` (Document): The document to delete.
+- `options` (CrudOptions<Document>, optional): Options for callbacks and error handling.
+
+**Returns**:
+
+- `Observable<Document>`: An observable of the deleted document.
+
+**Example**:
+workService.delete(doc, { callback: (doc) => console.log(doc) });
+
+---
+
+### Interfaces
+
+---
+
+#### `CrudDocument`
+
+Represents a CRUD document.
+
+**Properties**:
+
+- `_id` (string): The document ID.
+- `__created` (boolean): Indicates if the document is created.
+- `__modified` (boolean): Indicates if the document is modified.
+
+**Example**:
+interface CrudDocument {
+\_id: string;
+**created: boolean;
+**modified: boolean;
+}
+
+---
+
+### Code sample use
+
+```typescript
+import { Injectable } from '@angular/core';
+import { CoreService, HttpService, StoreService, CrudService, CrudDocument } from 'wacom';
+
+export interface Work extends CrudDocument {
+	name: string;
+	description: string;
+}
+
+@Injectable({
+	providedIn: 'root',
+})
+export class WorkService extends CrudService<Work> {
+	works: Work[] = this.getDocs();
+
+	constructor(_http: HttpService, _store: StoreService, _core: CoreService) {
+		super(
+			{
+				name: 'work',
+			},
+			_http,
+			_store,
+			_core,
+		);
+
+		this.get();
+	}
+}
+```
+
+## [Socket Service](#socket-service)
+
+The `SocketService` manages WebSocket connections using `socket.io`. It handles setting up the connection, listening for events, and emitting messages.
+
+### Methods
+
+#### `setUrl(url: string): void`
+
+Sets the URL for the WebSocket connection and reloads the socket.
+**Parameters**:
+
+- `url` (string): The URL of the WebSocket server.
+
+**Example**:
+
+```Typescript
+socketService.setUrl('https://example.com');
+```
+
+#### `on(to: string, cb: (message: any) => void = () => {}): void`
+
+Subscribes to a WebSocket event.
+
+**Parameters**:
+
+- `to` (string): The event to subscribe to.
+- `cb` (function): The callback function to execute when the event is received.
+
+**Example**:
+
+```Typescript
+socketService.on('message', (msg) => {
+  console.log('Received message:', msg);
+});
+```
+
+#### `emit(to: string, message: any, room: any = false): void`
+
+Emits a message to a WebSocket event.
+
+**Parameters**:
+
+- `to` (string): The event to emit the message to.
+- `message` (any): The message to emit.
+- `room` (any): Optional room to emit the message to.
+
+**Example**:
+
+```Typescript
+socketService.emit('message', { text: 'Hello, World!' });
+```
+
+### Usage Example
+
+```typescript
+import { SocketService } from 'wacom';
+
+@Component({
+	selector: 'app-root',
+	templateUrl: './app.component.html',
+	styleUrls: ['./app.component.css'],
+})
+export class AppComponent {
+	constructor(private socketService: SocketService) {
+		this.socketService.setUrl('https://example.com');
+		this.socketService.on('connect', () => {
+			console.log('Connected to WebSocket');
+		});
+		this.socketService.on('message', msg => {
+			console.log('Received message:', msg);
+		});
+	}
+
+	sendMessage() {
+		this.socketService.emit('message', { text: 'Hello, World!' });
+	}
+}
+```
+
+## [Time Service](#time-service)
+
+The `TimeService` provides comprehensive date and time management, including timezone handling, formatting dates, and utility functions for calendar operations.
+
+### Methods
+
+#### `getDayName(date: Date, format: 'short' | 'long' = 'long'): string`
+
+Returns the name of the day of the week for a given date.
+
+**Parameters**:
+
+- `date` (Date): The date for which to get the day of the week.
+- `format` ('short' | 'long'): The format in which to return the day name. Default is 'long'.
+
+**Returns**:
+
+- The name of the day of the week.
+
+**Example**:
+
+```Typescript
+const dayName = timeService.getDayName(new Date(), 'short');
+console.log(dayName); // Output: 'Mon'
+```
+
+#### `getMonthName(monthIndex: number, format: 'short' | 'long' = 'long'): string`
+
+Returns the name of the month for a given index.
+
+**Parameters**:
+
+- `monthIndex` (number): The month index (0-11).
+- `format` ('short' | 'long'): The format in which to return the month name. Default is 'long'.
+
+**Returns**:
+
+- The name of the month.
+
+**Example**:
+
+```Typescript
+const monthName = timeService.getMonthName(0, 'short');
+console.log(monthName); // Output: 'Jan'
+```
+
+#### `formatDate(date: Date, format: string = 'mediumDate', timezone: string = 'UTC'): string`
+
+Formats a date according to the specified format and timezone.
+
+**Parameters**:
+
+- `date` (Date): The date to format.
+- `format` (string): The format string (see Angular DatePipe documentation for format options).
+- `timezone` (string): The timezone to use for formatting.
+
+**Returns**:
+
+- The formatted date string.
+
+**Example**:
+
+```Typescript
+const formattedDate = timeService.formatDate(new Date(), 'fullDate', 'America/New_York');
+console.log(formattedDate); // Output: 'Monday, January 1, 2023'
+```
+
+#### `convertToTimezone(date: Date, timezone: string): Date`
+
+Converts a date to a different timezone.
+**Parameters**:
+
+- `date` (Date): The date to convert.
+- `timezone` (string): The timezone to convert to.
+
+**Returns**:
+
+- The date in the new timezone.
+
+**Example**:
+
+```Typescript
+const dateInTimezone = timeService.convertToTimezone(new Date(), 'Asia/Tokyo');
+console.log(dateInTimezone);
+```
+
+#### `startOfDay(date: Date): Date`
+
+Returns the start of the day for a given date.
+**Parameters**:
+
+- `date` (Date): The date for which to get the start of the day.
+
+**Returns**:
+
+- The start of the day (midnight) for the given date.
+
+**Example**:
+
+```Typescript
+const startOfDay = timeService.startOfDay(new Date());
+console.log(startOfDay); // Output: '2023-01-01T00:00:00.000Z'
+```
+
+#### `endOfDay(date: Date): Date`
+
+Returns the end of the day for a given date.
+**Parameters**:
+
+- `date` (Date): The date for which to get the end of the day.
+
+**Returns**:
+
+- The end of the day (one millisecond before midnight) for the given date.
+
+**Example**:
+
+```Typescript
+const endOfDay = timeService.endOfDay(new Date());
+console.log(endOfDay); // Output: '2023-01-01T23:59:59.999Z'
+```
+
+#### `getDaysInMonth(month: number, year: number): number`
+
+Returns the number of days in a given month and year.
+**Parameters**:
+
+- `month` (number): The month (0-11).
+- `year` (number): The year.
+
+**Returns**:
+
+- The number of days in the month.
+
+**Example**:
+
+```Typescript
+const daysInMonth = timeService.getDaysInMonth(1, 2023);
+console.log(daysInMonth); // Output: 28
+```
+
+#### `isLeapYear(year: number): boolean`
+
+Checks if a given year is a leap year.
+**Parameters**:
+
+- `year` (number): The year to check.
+
+**Returns**:
+
+- True if the year is a leap year, false otherwise.
+
+**Example**:
+
+```Typescript
+const isLeap = timeService.isLeapYear(2024);
+console.log(isLeap); // Output: true
+```
+
+#### `addDays(date: Date, days: number): Date`
+
+Adds a specified number of days to a date.
+**Parameters**:
+
+- `date` (Date): The date to which to add days.
+- `days` (number): The number of days to add.
+
+**Returns**:
+
+- The new date with the added days.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.addDays(new Date(), 10);
+console.log(newDate);
+```
+
+#### `addMonths(date: Date, months: number): Date`
+
+Adds a specified number of months to a date.
+**Parameters**:
+
+- `date` (Date): The date to which to add months.
+- `months` (number): The number of months to add.
+
+**Returns**:
+
+- The new date with the added months.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.addMonths(new Date(), 2);
+console.log(newDate);
+```
+
+#### `addYears(date: Date, years: number): Date`
+
+Adds a specified number of years to a date.
+**Parameters**:
+
+- `date` (Date): The date to which to add years.
+- `years` (number): The number of years to add.
+
+**Returns**:
+
+- The new date with the added years.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.addYears(new Date(), 5);
+console.log(newDate);
+```
+
+#### `addHours(date: Date, hours: number): Date`
+
+Adds a specified number of hours to a date.
+
+**Parameters**:
+
+- `date` (Date): The date to which to add hours.
+- `hours` (number): The number of hours to add.
+
+**Returns**:
+
+- The new date with the added hours.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.addHours(new Date(), 3);
+console.log(newDate);
+```
+
+#### `addMinutes(date: Date, minutes: number): Date`
+
+Adds a specified number of minutes to a date.
+
+**Parameters**:
+
+- `date` (Date): The date to which to add minutes.
+- `minutes` (number): The number of minutes to add.
+
+**Returns**:
+
+- The new date with the added minutes.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.addMinutes(new Date(), 30);
+console.log(newDate);
+```
+
+#### `addSeconds(date: Date, seconds: number): Date`
+
+Adds a specified number of seconds to a date.
+
+**Parameters**:
+
+- `date` (Date): The date to which to add seconds.
+- `seconds` (number): The number of seconds to add.
+
+**Returns**:
+
+- The new date with the added seconds.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.addSeconds(new Date(), 45);
+console.log(newDate);
+```
+
+#### `subtractDays(date: Date, days: number): Date`
+
+Subtracts a specified number of days from a date.
+**Parameters**:
+
+- `date` (Date): The date from which to subtract days.
+- `days` (number): The number of days to subtract.
+
+**Returns**:
+
+- The new date with the subtracted days.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.subtractDays(new Date(), 5);
+console.log(newDate);
+```
+
+#### `subtractMonths(date: Date, months: number): Date`
+
+Subtracts a specified number of months from a date.
+**Parameters**:
+
+- `date` (Date): The date from which to subtract months.
+- `months` (number): The number of months to subtract.
+
+**Returns**:
+
+- The new date with the subtracted months.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.subtractMonths(new Date(), 3);
+console.log(newDate);
+```
+
+#### `subtractYears(date: Date, years: number): Date`
+
+Subtracts a specified number of years from a date.
+**Parameters**:
+
+- `date` (Date): The date from which to subtract years.
+- `years` (number): The number of years to subtract.
+
+**Returns**:
+
+- The new date with the subtracted years.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.subtractYears(new Date(), 2);
+console.log(newDate);
+```
+
+#### `subtractHours(date: Date, hours: number): Date`
+
+Subtracts a specified number of hours from a date.
+
+**Parameters**:
+
+- `date` (Date): The date from which to subtract hours.
+- `hours` (number): The number of hours to subtract.
+
+**Returns**:
+
+- The new date with the subtracted hours.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.subtractHours(new Date(), 4);
+console.log(newDate);
+```
+
+#### `subtractMinutes(date: Date, minutes: number): Date`
+
+Subtracts a specified number of minutes from a date.
+
+**Parameters**:
+
+- `date` (Date): The date from which to subtract minutes.
+- `minutes` (number): The number of minutes to subtract.
+
+**Returns**:
+
+- The new date with the subtracted minutes.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.subtractMinutes(new Date(), 15);
+console.log(newDate);
+```
+
+#### `subtractSeconds(date: Date, seconds: number): Date`
+
+Subtracts a specified number of seconds from a date.
+
+**Parameters**:
+
+- `date` (Date): The date from which to subtract seconds.
+- `seconds` (number): The number of seconds to subtract.
+
+**Returns**:
+
+- The new date with the subtracted seconds.
+
+**Example**:
+
+```Typescript
+const newDate = timeService.subtractSeconds(new Date(), 20);
+console.log(newDate);
+```
+
+#### `isSameDay(date1: Date, date2: Date): boolean`
+
+Checks if two dates are on the same day.
+**Parameters**:
+
+- `date1` (Date): The first date.
+- `date2` (Date): The second date.
+
+**Returns**:
+
+- True if the dates are on the same day, false otherwise.
+
+**Example**:
+
+```Typescript
+const sameDay = timeService.isSameDay(new Date(), new Date());
+console.log(sameDay); // Output: true
+```
+
+#### `getWeekNumber(date: Date): number`
+
+Returns the ISO week number for a given date.
+
+**Parameters**:
+
+- `date` (Date): The date for which to get the week number.
+
+**Returns**:
+
+- The ISO week number (1-53).
+
+**Example**:
+
+```Typescript
+const weekNumber = timeService.getWeekNumber(new Date());
+console.log(weekNumber); // Output: 35 (example)
+```
+
+#### `getWeeksInMonth(month: number, year: number): number`
+
+Returns the number of weeks in a month for a given month and year.
+
+**Parameters**:
+
+- `month` (number): The month (0-11).
+- `year` (number): The year.
+
+**Returns**:
+
+- The number of weeks in the month.
+
+**Example**:
+
+```Typescript
+const weeksInMonth = timeService.getWeeksInMonth(2, 2025);
+console.log(weeksInMonth); // Output: 6 (example for March 2025)
+```
+
+## [Dom Service](#dom-service)
+
+The `DomService` facilitates DOM manipulation and dynamic component loading in Angular applications.
+
+### Methods
+
+#### `appendById(component: any, options: any = {}, id: string): { nativeElement: HTMLElement, componentRef: ComponentRef<any> }`
+
+Appends a component to a specified element by ID.
+
+**Parameters**:
+
+- `component` (`Type<T>`): The component to append.
+- `options` (`Partial<T>`): The options to project into the component.
+- `id` (`string`): The ID of the element to append the component to.
+
+**Returns**:
+
+- An object containing the native element and the component reference (`ComponentRef<T>`).
+
+**Example**:
+
+```Typescript
+const result = domService.appendById(MyComponent, { inputProp: 'value' }, 'elementId');
+console.log(result.nativeElement); // Output: The native DOM element
+console.log(result.componentRef); // Output: The component reference
+```
+
+#### `appendComponent<T>(component: Type<T>, options: Partial<T> = {}, element: HTMLElement = this.core.document.body): { nativeElement: HTMLElement, componentRef: ComponentRef<T> }`
+
+Appends a component to a specified element or to the body.
+**Parameters**:
+
+- `component` (`Type<T>`): The component to append.
+- `options` (`Partial<T>`): The options to project into the component.
+- `element` (`HTMLElement`): The element to append the component to. Defaults to body.
+
+**Returns**:
+
+- An object containing the native element and the component reference (`ComponentRef<T>`).
+
+**Example**:
+
+```Typescript
+const result = domService.appendComponent(MyComponent, { inputProp: 'value' });
+console.log(result.nativeElement); // Output: The native DOM element
+console.log(result.componentRef); // Output: The component reference
+```
+
+#### `getComponentRef<T>(component: Type<T>, options: Partial<T> = {}): ComponentRef<T>`
+
+Gets a reference to a dynamically created component.
+**Parameters**:
+
+- `component` (`Type<T>`): The component to create.
+- `options` (`Partial<T>`): The options to project into the component.
+
+**Returns**:
+
+- The component reference (`ComponentRef<T>`).
+
+**Example**:
+
+```Typescript
+const componentRef = domService.getComponentRef(MyComponent, { inputProp: 'value' });
+console.log(componentRef); // Output: The component reference
+```
+
+#### `projectComponentInputs<T>(component: ComponentRef<T>, options: Partial<T>): ComponentRef<T>`
+
+Projects the inputs onto the component.
+**Parameters**:
+
+- `component` (ComponentRef<any>): The component reference.
+- `options` (any): The options to project into the component.
+
+**Returns**:
+
+- The component reference with the projected inputs.
+
+**Example**:
+
+```Typescript
+const componentRef = domService.getComponentRef(MyComponent);
+domService.projectComponentInputs(componentRef, { inputProp: 'value' });
+console.log(componentRef.instance.inputProp); // Output: 'value'
+```
+
+### Usage Example
+
+```Typescript
+import { DomService } from './dom.service';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  constructor(private domService: DomService) {}
+
+  addComponent() {
+    const result = this.domService.appendById(MyComponent, { inputProp: 'value' }, 'elementId');
+    console.log(result.nativeElement); // Output: The native DOM element
+    console.log(result.componentRef); // Output: The component reference
+    result.remove(); // Cleanup when done
+  }
+}
+```
+
+## [Network Service](#network-service)
+
+The `NetworkService` monitors network connectivity and latency using Angular signals.
+It periodically probes configurable endpoints and emits `wacom_online` or `wacom_offline`
+events through the `CoreService` when status changes.
+
+### Properties
+
+- `status` (`Signal<NetworkStatus>`): Current connectivity classification (`good`, `poor`, or `none`).
+- `latencyMs` (`Signal<number | null>`): Measured latency to the nearest reachable endpoint.
+- `isOnline` (`Signal<boolean>`): Indicates whether the browser reports an online state.
+
+### Methods
+
+#### `recheckNow(): Promise<void>`
+
+Performs an immediate connectivity check and updates all signals.
+
+**Example**:
+
+```Typescript
+await networkService.recheckNow();
+```
+
+## [RTC Service](#rtc-service)
+
+The `RtcService` wraps WebRTC peer connections and local media streams.
+
+### Methods
+
+- `initLocalStream(): Promise<MediaStream>` – initializes and returns the local media stream.
+- `createPeer(id: string): Promise<RTCPeerConnection>` – creates a peer connection and attaches local tracks.
+- `createOffer(id: string): Promise<RTCSessionDescriptionInit>` – creates an SDP offer.
+- `createAnswer(id: string, offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit>` – responds to an offer.
+- `setRemoteAnswer(id: string, answer: RTCSessionDescriptionInit): Promise<void>` – applies a remote answer.
+- `addIceCandidate(id: string, candidate: RTCIceCandidateInit): void` – adds an ICE candidate.
+- `getLocalStream(): MediaStream | null` – returns the initialized local stream.
+- `closePeer(id: string): void` – closes a peer connection.
+- `closeAll(): void` – closes all peers and stops the local stream.
+
+**Example**:
+
+```Typescript
+import { RtcService } from 'wacom';
+
+constructor(private rtc: RtcService) {}
+
+async connect(id: string) {
+  await this.rtc.initLocalStream();
+  await this.rtc.createPeer(id);
+  const offer = await this.rtc.createOffer(id);
+  // send offer to remote peer...
+}
+```
+
+## [Theme Service](#theme-service)
+
+The `ThemeService` manages UI theme preferences by setting data attributes on the
+document root, persisting them in `localStorage`, and exposing Angular signals.
+
+### Properties
+
+- `mode: Signal<ThemeMode | string | undefined>` - current theme mode.
+- `density: Signal<ThemeDensity | undefined>` - current density.
+- `radius: Signal<ThemeRadius | undefined>` - current radius.
+
+### Methods
+
+- `setMode(mode: ThemeMode): void` - sets `data-mode`, persists `theme.mode`, updates `mode`.
+- `setDensity(density: ThemeDensity): void` - sets `data-density`, persists `theme.density`, updates `density`.
+- `setRadius(radius: ThemeRadius): void` - sets `data-radius`, persists `theme.radius`, updates `radius`.
+- `init(): void` - loads preferences from `localStorage` (or defaults to `light`, `comfortable`, `rounded`) and updates signals.
+
+### Usage Example
+
+```Typescript
+import { ThemeService } from "wacom";
+
+constructor(private theme: ThemeService) {}
+
+ngOnInit() {
+	this.theme.init();
+	this.theme.setMode("dark");
+	this.theme.setDensity("compact");
+	this.theme.setRadius("square");
+}
+```
+
+## [Translate Service](#translate-service)
+
+Wacom includes a lightweight, signal-based runtime translation engine built for Angular Signals.
+
+It provides:
+
+- reactive translations via `WritableSignal<string>`
+- zero-config fallback (source text renders until translated)
+- config-based bootstrap via `provideTranslate(...)`
+- inline dictionaries or lazy JSON loading per language
+- optional language persistence (stored separately)
+- directive + pipe for ergonomic template usage
+- instant language switching without reload
+
+Unlike compile-time Angular i18n, this works fully at runtime.
+
+---
+
+### Translate model
+
+```ts
+export interface Translate {
+	sourceText: string;
+	text: string;
+}
+```
+
+Each `sourceText` acts as both:
+
+- translation key
+- default visible UI text (fallback)
+
+---
+
+### Bootstrap with provideTranslate
+
+```ts
+import { provideTranslate } from 'wacom';
+
+providers: [
+	provideTranslate({
+		defaultLanguage: 'en',
+		language: 'en',
+	}),
+];
+```
+
+`language ?? defaultLanguage` is used for initial startup language.
+
+---
+
+### Inline translations mode
+
+```ts
+import { provideTranslate } from 'wacom';
+
+providers: [
+	provideTranslate({
+		defaultLanguage: 'en',
+		language: 'en',
+		translations: {
+			en: [
+				{ sourceText: 'Hello', text: 'Hello' },
+				{ sourceText: 'Save', text: 'Save' },
+			],
+			de: [
+				{ sourceText: 'Hello', text: 'Hallo' },
+				{ sourceText: 'Save', text: 'Speichern' },
+			],
+		},
+	}),
+];
+```
+
+---
+
+### File loader mode
+
+```ts
+import { provideTranslate } from 'wacom';
+
+providers: [
+	provideTranslate({
+		defaultLanguage: 'en',
+		language: 'en',
+		folder: '/i18n/',
+	}),
+];
+```
+
+With `folder: '/i18n/'` and `language: 'en'`, runtime URL is:
+
+`/i18n/en.json`
+
+File format:
+
+```json
+{
+	"Hello": "Hallo",
+	"Save": "Speichern"
+}
+```
+
+---
+
+### Basic usage (signal API)
+
+```ts
+import { TranslateService } from "wacom";
+
+private _translateService = inject(TranslateService);
+
+title = this._translateService.translate("Create project");
+```
+
+The returned value is a `WritableSignal<string>`.
+
+If no translation exists yet, it renders:
+
+```
+Create project
+```
+
+automatically.
+
+---
+
+### Updating translations in bulk (language switch)
+
+```ts
+this._translateService.setMany([
+	{ sourceText: 'Create project', text: 'Створити проєкт' },
+	{ sourceText: 'Save', text: 'Зберегти' },
+]);
+```
+
+Behavior:
+
+- provided keys update reactively
+- missing keys reset back to original text
+- current language state remains isolated (no stale language mixing)
+
+Programmatic language switch:
+
+```ts
+await this._translateService.setLanguage('de');
+```
+
+---
+
+### Updating a single translation
+
+```ts
+this._translateService.setOne({
+	sourceText: 'Save',
+	text: 'Зберегти',
+});
+```
+
+Useful for:
+
+- live editors
+- dynamic language loading
+- admin translation panels
+
+---
+
+### Translate pipe (template friendly)
+
+```html
+<h1>{{ 'Create project' | translate }}</h1>
+```
+
+Auto-reacts when translations change.
+
+---
+
+### Translate directive (zero-key mode)
+
+Automatically uses element’s original rendered text as translation key.
+
+```html
+<h1 translate>Create project</h1>
+<button translate>Save</button>
+```
+
+Optional explicit key:
+
+```html
+<h1 translate="Create project"></h1>
+```
+
+> The directive replaces `textContent` and is SSR-safe.
+
+---
+
+### Persistence
+
+Current language can be persisted independently by config:
+
+```ts
+provideTranslate({
+	persistLanguage: true,
+});
+```
+
+Translation payloads are cached per language in-memory.
+
+---
+
+### Migration from old provideTranslate API
+
+Old:
+
+```ts
+provideTranslate([{ sourceText: 'Save', text: 'Speichern' }]);
+```
+
+New:
+
+```ts
+provideTranslate({
+	language: 'de',
+	translations: {
+		de: [{ sourceText: 'Save', text: 'Speichern' }],
+	},
+});
+```
+
+Directive and pipe usage stays the same:
+
+- `[translate]`
+- `| translate`
+
+## AGENTS.md
+
+Copy below code into AGENTS.md file of your project while you are using our plugin.
+
+```md
+- This project uses `wacom`, an Angular utility library for shared services, directives, pipes, and app-level configuration.
+- Prefer bootstrapping with `provideWacom({...})` in application providers. Use `WacomModule` / `WacomModule.forRoot()` only for legacy NgModule-based apps.
+- Put library-wide configuration in `provideWacom()` instead of scattering it across components. Available config areas include `http`, `store`, `meta`, `network`, and optional `socket` / `io`.
+- Prefer the library services before adding duplicate app utilities:
+    - `HttpService` for API calls and shared headers/base URL handling.
+    - `StoreService` for persisted local storage values.
+    - `MetaService` for title, description, robots, image, and link tags.
+    - `CrudService` for data flows that need offline-aware syncing behavior.
+    - `EmitterService`, `NetworkService`, `SocketService`, `RtcService`, `TimeService`, and `UtilService` when their built-in behavior matches the need.
+- Prefer importing the specific Wacom directives, pipes, and translation helpers you need instead of wrapping the whole library again in another shared abstraction.
+- For metadata, prefer configuring defaults in `provideWacom({ meta: ... })` and using `MetaService` or route metadata. If route-driven updates are expected, prefer `meta.applyFromRoutes = true`; use `MetaGuard` only when that flow specifically needs a guard.
+- For translations, register app translations with `provideTranslate(...)` and use the exported translation pipe/directive rather than creating another parallel translation bootstrap path.
+- Keep SSR-safe behavior intact. Do not add unguarded direct access to browser-only globals such as `window`, `document`, storage, media devices, or WebRTC APIs when Wacom already provides a guarded service for that area.
+- When changing app behavior, prefer configuring or composing Wacom services first before modifying the library source.
+- Common reusable building blocks exported by the library include `clickOutside`, manual form-related directives, translation helpers, and array/search/safe/pagination-style pipes.
+```
