@@ -596,7 +596,7 @@ async saveSettings() {
 			},
 			{
 				name: 'page / perPage / configType',
-				signature: "pagination and mode fields",
+				signature: 'pagination and mode fields',
 				description:
 					'CrudComponent tracks pagination state and whether it loads from the server or local memory.',
 				category: 'Component state',
@@ -617,7 +617,8 @@ async saveSettings() {
 			{
 				name: 'CrudOptions',
 				signature: 'interface CrudOptions<Document>',
-				description: 'Options passed into CRUD operations for callbacks and request naming.',
+				description:
+					'Options passed into CRUD operations for callbacks and request naming.',
 				details: ['Supports name, callback, and errCallback.'],
 				category: 'Interfaces',
 				docType: 'Interface',
@@ -625,8 +626,7 @@ async saveSettings() {
 			{
 				name: 'CrudServiceInterface',
 				signature: 'interface CrudServiceInterface<Document>',
-				description:
-					'Contract that CrudComponent expects from a CRUD-backed data service.',
+				description: 'Contract that CrudComponent expects from a CRUD-backed data service.',
 				category: 'Interfaces',
 				docType: 'Interface',
 			},
@@ -1081,17 +1081,19 @@ toggleTheme() {
 	{
 		slug: 'translate-service',
 		name: 'TranslateService',
-		description: 'Runtime translation registry backed by signals and StoreService persistence.',
+		description:
+			'Runtime translation registry backed by signals with config-based language bootstrapping.',
 		summary:
-			'TranslateService is the library’s runtime i18n layer. It exposes a signal per source text, hydrates persisted translations from storage, updates the UI reactively, and keeps storage in sync after changes.',
+			'TranslateService is the library’s runtime i18n layer. It exposes a signal per source text, supports per-language loading (inline or file-based), updates the UI reactively, and optionally persists the selected language.',
 		highlights: [
 			'translate(text) lazily creates a signal that falls back to the source text.',
 			'setMany() resets missing translations back to source text and updates the provided ones.',
-			'setOne() and setMany() persist the current translation set automatically.',
+			'setLanguage() lazy-loads and applies a language without stale cross-language state.',
 		],
 		config: [
-			'Register initial app translations with provideTranslate(...).',
-			'Persistence uses StoreService under the translations key.',
+			'Register translation bootstrap with provideTranslate({ language, defaultLanguage, translations?, folder? }).',
+			'With folder mode, language files are loaded as /i18n/{lang}.json by default.',
+			'Language persistence uses StoreService under the translate.language key when enabled.',
 			'This service manages runtime translation state; the translate pipe and directive build on top of it.',
 		],
 		methods: [
@@ -1100,6 +1102,18 @@ toggleTheme() {
 				signature: 'translate(text: string): WritableSignal<string>',
 				description:
 					'Returns the translation signal for a source text, creating it lazily if needed.',
+			},
+			{
+				name: 'setLanguage',
+				signature: 'setLanguage(language: string): Promise<void>',
+				description:
+					'Switches current language, lazy-loads the translation payload, and applies it reactively.',
+			},
+			{
+				name: 'loadTranslations',
+				signature: 'loadTranslations(language: string): Promise<Translate[]>',
+				description:
+					'Loads translation payload for a language from inline config or JSON file loader and caches it per language.',
 			},
 			{
 				name: 'setMany',
@@ -1123,10 +1137,11 @@ toggleTheme() {
 		],
 		sections: [
 			{
-				title: 'Hydration behavior',
+				title: 'Bootstrap behavior',
 				items: [
-					'The constructor loads persisted translations asynchronously from StoreService.',
-					'Stored values do not overwrite a translation that has already been changed at runtime.',
+					'Initial language resolves from language ?? stored language (optional) ?? defaultLanguage.',
+					'If inline translations exist for a language they are used directly; otherwise the file loader is used.',
+					'Missing language files fail safely and translations fall back to source text.',
 					'Signals are created lazily; there is no need to pre-register every possible text.',
 				],
 			},
@@ -1138,7 +1153,7 @@ private readonly t = inject(TranslateService);
 title = this.t.translate('Create project');
 
 switchLanguage() {
-\tthis.t.setMany([{ sourceText: 'Create project', text: 'Crear proyecto' }]);
+	void this.t.setLanguage('es');
 }`,
 	},
 ];

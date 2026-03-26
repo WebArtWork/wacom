@@ -2154,7 +2154,9 @@ It provides:
 
 - reactive translations via `WritableSignal<string>`
 - zero-config fallback (source text renders until translated)
-- persistent storage (auto-hydrates from `StoreService`)
+- config-based bootstrap via `provideTranslate(...)`
+- inline dictionaries or lazy JSON loading per language
+- optional language persistence (stored separately)
 - directive + pipe for ergonomic template usage
 - instant language switching without reload
 
@@ -2175,6 +2177,77 @@ Each `sourceText` acts as both:
 
 - translation key
 - default visible UI text (fallback)
+
+---
+
+### Bootstrap with provideTranslate
+
+```ts
+import { provideTranslate } from 'wacom';
+
+providers: [
+	provideTranslate({
+		defaultLanguage: 'en',
+		language: 'en',
+	}),
+];
+```
+
+`language ?? defaultLanguage` is used for initial startup language.
+
+---
+
+### Inline translations mode
+
+```ts
+import { provideTranslate } from 'wacom';
+
+providers: [
+	provideTranslate({
+		defaultLanguage: 'en',
+		language: 'en',
+		translations: {
+			en: [
+				{ sourceText: 'Hello', text: 'Hello' },
+				{ sourceText: 'Save', text: 'Save' },
+			],
+			de: [
+				{ sourceText: 'Hello', text: 'Hallo' },
+				{ sourceText: 'Save', text: 'Speichern' },
+			],
+		},
+	}),
+];
+```
+
+---
+
+### File loader mode
+
+```ts
+import { provideTranslate } from 'wacom';
+
+providers: [
+	provideTranslate({
+		defaultLanguage: 'en',
+		language: 'en',
+		folder: '/i18n/',
+	}),
+];
+```
+
+With `folder: '/i18n/'` and `language: 'en'`, runtime URL is:
+
+`/i18n/en.json`
+
+File format:
+
+```json
+{
+	"Hello": "Hallo",
+	"Save": "Speichern"
+}
+```
 
 ---
 
@@ -2213,7 +2286,13 @@ Behavior:
 
 - provided keys update reactively
 - missing keys reset back to original text
-- state persists in storage
+- current language state remains isolated (no stale language mixing)
+
+Programmatic language switch:
+
+```ts
+await this._translateService.setLanguage('de');
+```
 
 ---
 
@@ -2265,12 +2344,41 @@ Optional explicit key:
 
 ### Persistence
 
-Translate entries are automatically:
+Current language can be persisted independently by config:
 
-- hydrated from storage on startup
-- synced after every update
+```ts
+provideTranslate({
+	persistLanguage: true,
+});
+```
 
-No extra config required.
+Translation payloads are cached per language in-memory.
+
+---
+
+### Migration from old provideTranslate API
+
+Old:
+
+```ts
+provideTranslate([{ sourceText: 'Save', text: 'Speichern' }]);
+```
+
+New:
+
+```ts
+provideTranslate({
+	language: 'de',
+	translations: {
+		de: [{ sourceText: 'Save', text: 'Speichern' }],
+	},
+});
+```
+
+Directive and pipe usage stays the same:
+
+- `[translate]`
+- `| translate`
 
 ## AGENTS.md
 
@@ -2281,11 +2389,11 @@ Copy below code into AGENTS.md file of your project while you are using our plug
 - Prefer bootstrapping with `provideWacom({...})` in application providers. Use `WacomModule` / `WacomModule.forRoot()` only for legacy NgModule-based apps.
 - Put library-wide configuration in `provideWacom()` instead of scattering it across components. Available config areas include `http`, `store`, `meta`, `network`, and optional `socket` / `io`.
 - Prefer the library services before adding duplicate app utilities:
-  - `HttpService` for API calls and shared headers/base URL handling.
-  - `StoreService` for persisted local storage values.
-  - `MetaService` for title, description, robots, image, and link tags.
-  - `CrudService` for data flows that need offline-aware syncing behavior.
-  - `EmitterService`, `NetworkService`, `SocketService`, `RtcService`, `TimeService`, and `UtilService` when their built-in behavior matches the need.
+    - `HttpService` for API calls and shared headers/base URL handling.
+    - `StoreService` for persisted local storage values.
+    - `MetaService` for title, description, robots, image, and link tags.
+    - `CrudService` for data flows that need offline-aware syncing behavior.
+    - `EmitterService`, `NetworkService`, `SocketService`, `RtcService`, `TimeService`, and `UtilService` when their built-in behavior matches the need.
 - Prefer importing the specific Wacom directives, pipes, and translation helpers you need instead of wrapping the whole library again in another shared abstraction.
 - For metadata, prefer configuring defaults in `provideWacom({ meta: ... })` and using `MetaService` or route metadata. If route-driven updates are expected, prefer `meta.applyFromRoutes = true`; use `MetaGuard` only when that flow specifically needs a guard.
 - For translations, register app translations with `provideTranslate(...)` and use the exported translation pipe/directive rather than creating another parallel translation bootstrap path.
