@@ -66,8 +66,8 @@ export class ThemeService {
 
 	init() {
 		const mode = this._isBrowser
-			? (localStorage.getItem('theme.mode') as ThemeMode) || 'light'
-			: 'light';
+			? (localStorage.getItem('theme.mode') as ThemeMode) || 'dark'
+			: 'dark';
 		const density = this._isBrowser
 			? (localStorage.getItem('theme.density') as ThemeDensity) || 'comfortable'
 			: 'comfortable';

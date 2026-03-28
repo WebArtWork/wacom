@@ -1,7 +1,9 @@
 import { Pipe, PipeTransform, inject } from '@angular/core';
 import { TranslateService } from './translate.service';
 
-@Pipe({ name: 'translate' })
+@Pipe({
+	name: 'translate',
+})
 export class TranslatePipe implements PipeTransform {
 	/**
 	 * Transforms a translation key into the currently resolved translated string.

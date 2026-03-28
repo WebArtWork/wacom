@@ -1,10 +1,10 @@
 <div class="app-shell">
 	<header class="topbar">
-		<a class="brand" routerLink="/" aria-label="Go to home page">
+		<a class="brand" routerLink="/" [attr.aria-label]="'Go to home page' | translate">
 			<img src="logo.png" alt="Wacom" />
 		</a>
 
-		<nav class="topbar-nav" aria-label="Service navigation">
+		<nav class="topbar-nav" [attr.aria-label]="'Service navigation' | translate">
 			@for (service of services; track service.slug) {
 				<a
 					class="topbar-link"
@@ -15,6 +15,69 @@
 				</a>
 			}
 		</nav>
+
+		<div class="topbar-actions">
+			<div
+				class="language-switcher"
+				[attr.aria-label]="'Language switcher' | translate"
+				role="group"
+			>
+				<span class="language-label" translate>Language</span>
+
+				<button
+					type="button"
+					class="language-button"
+					[class.language-button-active]="isLanguage('en')"
+					(click)="setLanguage('en')"
+					[attr.aria-label]="'Switch language to English' | translate"
+					[attr.title]="'English' | translate"
+				>
+					<img
+						class="language-flag"
+						src="/flags/united-kingdom.svg"
+						[attr.alt]="'English' | translate"
+					/>
+					<span class="language-code">EN</span>
+				</button>
+
+				<button
+					type="button"
+					class="language-button"
+					[class.language-button-active]="isLanguage('ua')"
+					(click)="setLanguage('ua')"
+					[attr.aria-label]="'Switch language to Ukrainian' | translate"
+					[attr.title]="'Ukrainian' | translate"
+				>
+					<img
+						class="language-flag"
+						src="/flags/ukraine.svg"
+						[attr.alt]="'Ukrainian' | translate"
+					/>
+					<span class="language-code">UA</span>
+				</button>
+			</div>
+
+			<button
+				class="theme-toggle"
+				(click)="toggleTheme()"
+				[attr.aria-label]="
+					('Switch to' | translate) +
+					' ' +
+					(themeService.mode() === 'light'
+						? ('dark' | translate)
+						: ('light' | translate)) +
+					' ' +
+					('mode' | translate)
+				"
+				[attr.title]="'Toggle dark/light mode' | translate"
+			>
+				@if (themeService.mode() === 'light') {
+					<span class="theme-icon">🌙</span>
+				} @else {
+					<span class="theme-icon">☀️</span>
+				}
+			</button>
+		</div>
 	</header>
 
 	<main class="page-content">

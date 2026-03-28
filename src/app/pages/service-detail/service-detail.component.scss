@@ -159,7 +159,7 @@ h1 {
 	padding: 24px;
 	border: 1px solid var(--panel-border);
 	border-radius: var(--radius-lg);
-	background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(247, 250, 252, 0.92));
+	background: linear-gradient(135deg, var(--surface-intro-start), var(--surface-intro-end));
 	box-shadow: var(--shadow);
 }
 
@@ -243,10 +243,10 @@ h2,
 	align-items: center;
 	gap: 8px;
 	padding: 8px 10px;
-	border: 1px solid rgba(148, 163, 184, 0.22);
+	border: 1px solid color-mix(in srgb, var(--panel-border) 65%, transparent);
 	border-radius: 999px;
-	background: rgba(15, 23, 42, 0.92);
-	color: #dbe7f3;
+	background: var(--surface-overlay-strong);
+	color: var(--text-inverse);
 	font: 600 0.76rem/1 var(--font-base);
 	cursor: pointer;
 }

@@ -54,6 +54,17 @@
 			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
 			rel="stylesheet"
 		/>
+
+		<script>
+			(() => {
+				try {
+					const mode = localStorage.getItem('theme.mode') || 'dark';
+					document.documentElement.dataset.mode = mode;
+				} catch {
+					document.documentElement.dataset.mode = 'dark';
+				}
+			})();
+		</script>
 	</head>
 	<body>
 		<app-root></app-root>

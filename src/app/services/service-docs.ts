@@ -1008,38 +1008,88 @@ markReady() {
 	{
 		slug: 'theme-service',
 		name: 'ThemeService',
-		description: 'Appearance preference manager for mode, density, radius, and theme cycling.',
+		description:
+			'SSR-safe theme state for mode, density, and radius with provider-based initialization.',
 		summary:
-			'ThemeService stores UI appearance choices on the document root and in localStorage, while exposing the current values as Angular signals for reactive UI controls.',
+			'ThemeService applies appearance state to the html dataset and persists it in localStorage. In modern setup, initialize it through provideTheme() so apps do not call init() manually in components.',
 		highlights: [
-			'Supports light/dark mode, comfortable/compact density, and rounded/square radius.',
-			'Persists all values on the client and restores them through init().',
-			'Provides nextTheme() to cycle all combinations from one action.',
+			'Recommended bootstrap path: provideTheme() in app providers.',
+			"Mode switching in UI should call ThemeService.setMode('light' | 'dark').",
+			'Fallback mode is dark when no saved theme.mode exists.',
+			'Docs app prevents initial flash with an early index.html script that sets data-mode before Angular bootstraps.',
+		],
+		config: [
+			'Use provideTheme() once in application providers to run ThemeService.init() via environment initializer.',
+			"Styles should be driven by CSS variables under html[data-mode='light'] and html[data-mode='dark'].",
+			'Density and radius are still managed by ThemeService for UIs that need those controls.',
 		],
 		properties: [
 			{
 				name: 'mode / density / radius',
 				signature: 'Writable signals',
-				description: 'Current appearance selections.',
+				description:
+					'Current appearance selections mirrored to html[data-mode|density|radius] and persisted on the client.',
 			},
 			{
 				name: 'modes / densities / radiuses',
 				signature: 'Writable signals of option arrays',
-				description: 'Available values used by setters and nextTheme().',
+				description:
+					'Available values used by setMode(), setDensity(), setRadius(), and nextTheme().',
 			},
 			{
 				name: 'themeIndex',
 				signature: 'signal<number>',
 				description:
-					'Linear index representing the current combination of mode, density, and radius.',
+					'Linear index for the current mode/density/radius combination used by nextTheme().',
 			},
 		],
 		methods: [
+			{
+				name: 'provideTheme',
+				signature: 'provideTheme(): EnvironmentProviders',
+				description:
+					'Recommended setup API. Registers an environment initializer that injects ThemeService and runs init() at app startup.',
+				details: [
+					'Use this in app config providers instead of calling theme.init() from components.',
+					'Keeps initialization centralized, minimal, and consistent with standalone bootstrap patterns.',
+				],
+				example: `import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideTheme, provideWacom } from 'wacom';
+
+export const appConfig: ApplicationConfig = {
+	providers: [
+		provideZonelessChangeDetection(),
+		provideRouter([]),
+		provideTheme(),
+		provideWacom(),
+	],
+};`,
+			},
 			{
 				name: 'setMode',
 				signature: "setMode(mode: 'light' | 'dark'): void",
 				description:
 					'Updates the mode signal, data-mode attribute, and localStorage value.',
+				details: [
+					'In docs UI, light/dark toggle should switch by calling setMode() directly.',
+				],
+				example: `import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ThemeService } from 'wacom';
+
+@Component({
+	selector: 'app-theme-toggle',
+	template: '<button type="button" (click)="toggleTheme()">Toggle theme</button>',
+	changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class ThemeToggleComponent {
+	readonly theme = inject(ThemeService);
+
+	toggleTheme() {
+		const nextMode = this.theme.mode() === 'light' ? 'dark' : 'light';
+		this.theme.setMode(nextMode);
+	}
+}`,
 			},
 			{
 				name: 'setDensity',
@@ -1063,19 +1113,60 @@ markReady() {
 				name: 'init',
 				signature: 'init(): void',
 				description:
-					'Loads persisted values or defaults and applies them to the document root.',
+					'Loads persisted values (theme.mode/theme.density/theme.radius) and applies them to the document root.',
+				details: [
+					'Default mode fallback is dark when theme.mode is missing.',
+					'In app code, prefer provideTheme() so init() runs automatically at bootstrap.',
+				],
 			},
-		],
-		code: `import { ThemeService } from 'wacom';
-
-constructor(private theme: ThemeService) {}
-
-ngOnInit() {
-\tthis.theme.init();
+			{
+				name: 'Early mode script (index.html)',
+				signature: 'small head script before Angular bootstraps',
+				description:
+					'Prevents initial theme blink by applying data-mode from localStorage (fallback dark) before app render.',
+				example: `<script>
+	(() => {
+		try {
+			const mode = localStorage.getItem('theme.mode') || 'dark';
+			document.documentElement.dataset.mode = mode;
+		} catch {
+			document.documentElement.dataset.mode = 'dark';
+		}
+	})();
+</script>`,
+			},
+			{
+				name: 'CSS variable theming',
+				signature: "html[data-mode='light' | 'dark']",
+				description:
+					'Define mode-specific CSS variables at app level and consume them in component styles.',
+				example: `html[data-mode='light'] {
+	--page-bg: #f5f7fb;
+	--text-main: #172033;
 }
 
+html[data-mode='dark'] {
+	--page-bg: #0f172a;
+	--text-main: #e5edf7;
+}
+
+.panel {
+	background: var(--page-bg);
+	color: var(--text-main);
+}`,
+			},
+		],
+		code: `import { ThemeService, provideTheme } from 'wacom';
+
+// app.config.ts
+providers: [provideTheme()]
+
+// component
+readonly theme = inject(ThemeService);
+
 toggleTheme() {
-\tthis.theme.nextTheme();
+	const nextMode = this.theme.mode() === 'light' ? 'dark' : 'light';
+	this.theme.setMode(nextMode);
 }`,
 	},
 	{

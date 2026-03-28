@@ -1,6 +1,6 @@
 import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
-import { provideWacom } from 'wacom';
+import { provideTheme, provideTranslation, provideWacom } from 'wacom';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -12,6 +12,11 @@ export const appConfig: ApplicationConfig = {
 				scrollPositionRestoration: 'top',
 			}),
 		),
+		provideTheme(),
+		provideTranslation({
+			defaultLanguage: 'en',
+			folder: '/assets/i18n/',
+		}),
 		provideWacom({
 			meta: {
 				applyFromRoutes: true,

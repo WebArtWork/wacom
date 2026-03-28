@@ -1,4 +1,5 @@
-:root {
+:root,
+html[data-mode='light'] {
 	color-scheme: light;
 	--page-bg: #f5f7fb;
 	--page-bg-strong: #edf2f8;
@@ -14,7 +15,66 @@
 	--code-bg: #0f172a;
 	--code-border: rgba(51, 65, 85, 0.4);
 	--code-text: #e5edf7;
+	--code-token-keyword: #c792ea;
+	--code-token-symbol: #82aaff;
+	--code-token-property: #f78c6c;
+	--code-token-string: #c3e88d;
+	--code-token-operator: #ffcb6b;
+	--code-token-punctuation: #89a1b8;
+	--text-inverse: #dbe7f3;
+	--surface-raised: rgba(255, 255, 255, 0.9);
+	--surface-raised-soft: rgba(255, 255, 255, 0.7);
+	--surface-overlay: rgba(255, 255, 255, 0.5);
+	--surface-overlay-strong: rgba(15, 23, 42, 0.92);
+	--surface-overlay-hover: rgba(30, 41, 59, 0.98);
+	--surface-header-start: #ffffff;
+	--surface-header-end: #f7fafc;
+	--surface-intro-start: rgba(255, 255, 255, 0.94);
+	--surface-intro-end: rgba(247, 250, 252, 0.92);
 	--shadow: 0 24px 80px rgba(15, 23, 42, 0.1);
+	--shadow-soft: 0 12px 32px rgba(15, 23, 42, 0.08);
+	--shadow-lift: 0 16px 40px rgba(15, 23, 42, 0.08);
+	--radius-lg: 28px;
+	--radius-md: 18px;
+	--font-base: 'Space Grotesk', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+	--font-code: 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+}
+
+html[data-mode='dark'] {
+	color-scheme: dark;
+	--page-bg: #0f172a;
+	--page-bg-strong: #050d1a;
+	--panel-bg: rgba(15, 23, 42, 0.6);
+	--panel-subtle: #1a2a3f;
+	--panel-border: rgba(255, 255, 255, 0.1);
+	--text-main: #e5edf7;
+	--text-muted: #a4acb8;
+	--text-soft: #8b96a8;
+	--accent: #1f7a5a;
+	--accent-strong: #2ea878;
+	--accent-soft: rgba(46, 168, 120, 0.16);
+	--code-bg: #172033;
+	--code-border: rgba(255, 255, 255, 0.1);
+	--code-text: #c5d0e0;
+	--code-token-keyword: #c792ea;
+	--code-token-symbol: #82aaff;
+	--code-token-property: #f78c6c;
+	--code-token-string: #c3e88d;
+	--code-token-operator: #ffcb6b;
+	--code-token-punctuation: #89a1b8;
+	--text-inverse: #dbe7f3;
+	--surface-raised: rgba(15, 23, 42, 0.78);
+	--surface-raised-soft: rgba(15, 23, 42, 0.62);
+	--surface-overlay: rgba(15, 23, 42, 0.5);
+	--surface-overlay-strong: rgba(4, 10, 22, 0.92);
+	--surface-overlay-hover: rgba(16, 25, 42, 0.98);
+	--surface-header-start: rgba(15, 23, 42, 0.72);
+	--surface-header-end: rgba(26, 42, 63, 0.7);
+	--surface-intro-start: rgba(15, 23, 42, 0.72);
+	--surface-intro-end: rgba(26, 42, 63, 0.68);
+	--shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+	--shadow-soft: 0 12px 32px rgba(0, 0, 0, 0.3);
+	--shadow-lift: 0 16px 40px rgba(0, 0, 0, 0.28);
 	--radius-lg: 28px;
 	--radius-md: 18px;
 	--font-base: 'Space Grotesk', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;

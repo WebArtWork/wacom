@@ -1,5 +1,6 @@
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal, WritableSignal } from '@angular/core';
+import { inject, Injectable, PLATFORM_ID, signal, WritableSignal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { StoreService } from '../store/store.service';
 import { ProvideTranslateConfig, Translate } from './translate.interface';
@@ -11,6 +12,7 @@ export class TranslateService {
 	private static readonly _DEFAULT_FOLDER = '/i18n/';
 
 	private _http = inject(HttpClient);
+	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	private _storeService = inject(StoreService);
 	private _language = signal('');
 	private _defaultLanguage = signal('');
@@ -238,6 +240,11 @@ export class TranslateService {
 		}
 
 		if (!this._config.folder) {
+			this._translationsByLanguage.set(language, []);
+			return [];
+		}
+
+		if (!this._isBrowser) {
 			this._translationsByLanguage.set(language, []);
 			return [];
 		}

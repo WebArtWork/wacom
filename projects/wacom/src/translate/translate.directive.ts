@@ -14,7 +14,6 @@ import { TranslateService } from './translate.service';
 
 @Directive({
 	selector: '[translate]',
-	standalone: true,
 })
 export class TranslateDirective {
 	private readonly _platformId = inject(PLATFORM_ID);
@@ -75,6 +74,7 @@ export class TranslateDirective {
 
 			// If no translation exists, service returns key (origin), so this keeps origin text.
 			this._el.nativeElement.textContent = this._lastSignal();
+			console.log(this._el.nativeElement.textContent);
 		});
 	}
 }
