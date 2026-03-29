@@ -6,7 +6,7 @@
 	"version": 1,
 	"newProjectRoot": "projects",
 	"projects": {
-		"app": {
+		"ngx-core-app": {
 			"projectType": "application",
 			"root": "projects/ngx-core-app",
 			"sourceRoot": "projects/ngx-core-app/src",
@@ -59,10 +59,10 @@
 					"builder": "@angular/build:dev-server",
 					"configurations": {
 						"production": {
-							"buildTarget": "app:build:production"
+							"buildTarget": "ngx-core-app:build:production"
 						},
 						"development": {
-							"buildTarget": "app:build:development"
+							"buildTarget": "ngx-core-app:build:development"
 						}
 					},
 					"defaultConfiguration": "development"

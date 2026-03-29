@@ -41,17 +41,17 @@
 				</button>
 
 				<button
-					type="button"
-					class="language-button"
-					[class.language-button-active]="isLanguage('ua')"
-					(click)="setLanguage('ua')"
 					[attr.aria-label]="'Switch language to Ukrainian' | translate"
+					[class.language-button-active]="isLanguage('ua')"
 					[attr.title]="'Ukrainian' | translate"
+					(click)="setLanguage('ua')"
+					class="language-button"
+					type="button"
 				>
 					<img
-						class="language-flag"
-						src="/flags/ukraine.svg"
 						[attr.alt]="'Ukrainian' | translate"
+						src="/flags/ukraine.svg"
+						class="language-flag"
 					/>
 					<span class="language-code">UA</span>
 				</button>

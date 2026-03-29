@@ -74,6 +74,7 @@ export class TranslateDirective {
 
 			// If no translation exists, service returns key (origin), so this keeps origin text.
 			this._el.nativeElement.textContent = this._lastSignal();
+			// TODO currently on website we have UA language enabled, but here we get english translation
 			console.log(this._el.nativeElement.textContent);
 		});
 	}
