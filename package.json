@@ -1,5 +1,5 @@
 {
-	"name": "@wawjs/ngx-core",
+	"name": "wawjs.wiki",
 	"version": "1.0.0",
 	"scripts": {
 		"start": "ng serve app",

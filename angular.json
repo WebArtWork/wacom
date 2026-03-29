@@ -8,28 +8,28 @@
 	"projects": {
 		"app": {
 			"projectType": "application",
-			"root": "",
-			"sourceRoot": "src",
+			"root": "projects/ngx-core-app",
+			"sourceRoot": "projects/ngx-core-app/src",
 			"prefix": "app",
 			"architect": {
 				"build": {
 					"builder": "@angular/build:application",
 					"options": {
-						"browser": "src/main.ts",
-						"server": "src/main.server.ts",
-						"index": "src/index.html",
-						"tsConfig": "tsconfig.app.json",
+						"browser": "projects/ngx-core-app/src/main.ts",
+						"server": "projects/ngx-core-app/src/main.server.ts",
+						"index": "projects/ngx-core-app/src/index.html",
+						"tsConfig": "projects/ngx-core-app/tsconfig.app.json",
 						"prerender": {
 							"discoverRoutes": true,
-							"routesFile": "src/prerender-routes.txt"
+							"routesFile": "projects/ngx-core-app/src/prerender-routes.txt"
 						},
 						"assets": [
 							{
 								"glob": "**/*",
-								"input": "src/assets"
+								"input": "projects/ngx-core-app/src/assets"
 							}
 						],
-						"styles": ["src/styles.scss"]
+						"styles": ["projects/ngx-core-app/src/styles.scss"]
 					},
 					"configurations": {
 						"production": {

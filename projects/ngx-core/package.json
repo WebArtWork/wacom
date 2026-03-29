@@ -1,5 +1,5 @@
 {
-	"name": "ngx-core",
+	"name": "@wawjs/ngx-core",
 	"version": "21.2.7",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-core",
