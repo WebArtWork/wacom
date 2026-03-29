@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
-const libraryDir = path.join(rootDir, 'projects', 'wacom');
-const distDir = path.join(rootDir, 'dist', 'wacom');
+const libraryDir = path.join(rootDir, 'projects', 'ngx-core');
+const distDir = path.join(rootDir, 'dist', 'ngx-core');
 const packageJsonPath = path.join(libraryDir, 'package.json');
 const bump = process.argv[2] || 'patch';
 
@@ -46,7 +46,7 @@ console.log(`Bumping version with: ${bump}`);
 run(['version', bump, '--no-git-tag-version'], libraryDir);
 
 const nextVersion = getVersion();
-console.log(`Building wacom ${nextVersion}`);
+console.log(`Building ngx-core ${nextVersion}`);
 run(['run', 'build'], rootDir);
 
 if (!existsSync(distDir)) {

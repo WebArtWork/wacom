@@ -51,7 +51,7 @@ export const serviceDocs: ServiceDoc[] = [
 				description:
 					'Stable per-device identifier persisted to localStorage when available.',
 				category: 'Device and viewport',
-				example: `import { CoreService } from 'wacom';
+				example: `import { CoreService } from 'ngx-core';
 
 constructor(private core: CoreService) {}
 
@@ -64,7 +64,7 @@ ngOnInit() {
 				signature: "device: '' | 'Windows Phone' | 'Android' | 'iOS' | 'Web'",
 				description: 'Detected platform classification after detectDevice().',
 				category: 'Device and viewport',
-				example: `import { CoreService } from 'wacom';
+				example: `import { CoreService } from 'ngx-core';
 
 constructor(private core: CoreService) {}
 
@@ -78,7 +78,7 @@ ngOnInit() {
 				signature: "viewport: Signal<'mobile' | 'tablet' | 'desktop'>",
 				description: 'Responsive breakpoint signal driven by matchMedia listeners.',
 				category: 'Device and viewport',
-				example: `import { CoreService } from 'wacom';
+				example: `import { CoreService } from 'ngx-core';
 
 readonly core = inject(CoreService);
 
@@ -95,7 +95,7 @@ viewportLabel() {
 				signature: 'computed signals',
 				description: 'Convenience computed signals derived from viewport().',
 				category: 'Device and viewport',
-				example: `import { CoreService } from 'wacom';
+				example: `import { CoreService } from 'ngx-core';
 
 readonly core = inject(CoreService);
 
@@ -108,7 +108,7 @@ isCompactLayout() {
 				signature: 'string fields',
 				description: 'Simple version state for combining app and date versions.',
 				category: 'Versioning',
-				example: `import { CoreService } from 'wacom';
+				example: `import { CoreService } from 'ngx-core';
 
 constructor(private core: CoreService) {}
 
@@ -128,7 +128,7 @@ setBuildInfo() {
 					'Good for local ids and general runtime identifiers, not for cryptographic use.',
 				],
 				category: 'Data helpers',
-				example: `import { CoreService } from 'wacom';
+				example: `import { CoreService } from 'ngx-core';
 
 constructor(private core: CoreService) {}
 
@@ -169,7 +169,7 @@ createDraft() {
 					'Can key the timer by string, store it on an object, or default to a shared "common" key.',
 				],
 				category: 'Flow control',
-				example: `import { CoreService } from 'wacom';
+				example: `import { CoreService } from 'ngx-core';
 
 constructor(private core: CoreService) {}
 
@@ -191,7 +191,7 @@ queueSave(doc: { _id: string }) {
 				signature: 'detectDevice(): void',
 				description: 'Updates device based on the current user agent.',
 				category: 'Device and viewport',
-				example: `import { CoreService } from 'wacom';
+				example: `import { CoreService } from 'ngx-core';
 
 constructor(private core: CoreService) {}
 
@@ -215,7 +215,7 @@ ngOnInit() {
 				description:
 					'Starts responsive breakpoint tracking with automatic cleanup on service destroy.',
 				category: 'Device and viewport',
-				example: `import { CoreService } from 'wacom';
+				example: `import { CoreService } from 'ngx-core';
 
 readonly core = inject(CoreService);
 
@@ -243,7 +243,7 @@ ngOnInit() {
 				description:
 					'Wrap plain objects or arrays into Angular signals, optionally making selected fields signals too.',
 				category: 'Signals',
-				example: `import { CoreService } from 'wacom';
+				example: `import { CoreService } from 'ngx-core';
 
 constructor(private core: CoreService) {}
 
@@ -264,7 +264,7 @@ updateStatus() {
 				category: 'Signals',
 			},
 		],
-		code: `import { CoreService } from 'wacom';
+		code: `import { CoreService } from 'ngx-core';
 
 constructor(private core: CoreService) {}
 
@@ -288,7 +288,7 @@ queueSave(doc: { _id: string }) {
 		],
 		config: [
 			'Configure defaults with provideWacom({ http: { url, headers } }).',
-			'Client-side overrides persist in localStorage under wacom-http.url and wacom-http.headers.',
+			'Client-side overrides persist in localStorage under ngx-core-http.url and ngx-core-http.headers.',
 			'errors is a global array of callbacks invoked for every request failure.',
 		],
 		properties: [
@@ -377,7 +377,7 @@ queueSave(doc: { _id: string }) {
 				],
 			},
 		],
-		code: `import { HttpService } from 'wacom';
+		code: `import { HttpService } from 'ngx-core';
 
 constructor(private http: HttpService) {}
 
@@ -463,7 +463,7 @@ loadProjects() {
 				],
 			},
 		],
-		code: `import { StoreService } from 'wacom';
+		code: `import { StoreService } from 'ngx-core';
 
 constructor(private store: StoreService) {}
 
@@ -547,7 +547,7 @@ async saveSettings() {
 \t\tapplyFromRoutes: true,
 \t\tuseTitleSuffix: true,
 \t\tdefaults: {
-\t\t\ttitle: 'Wacom',
+\t\t\ttitle: 'ngx-core',
 \t\t\ttitleSuffix: ' | Web Art Work',
 \t\t\tdescription: 'Angular utility library',
 \t\t},
@@ -853,7 +853,7 @@ async saveSettings() {
 				],
 			},
 		],
-		code: `import { CrudService, type CrudDocument } from 'wacom';
+		code: `import { CrudService, type CrudDocument } from 'ngx-core';
 
 interface Project extends CrudDocument<Project> {
 \t_id?: string;
@@ -923,7 +923,7 @@ export class ProjectService extends CrudService<Project> {
 				],
 			},
 		],
-		code: `import { EmitterService } from 'wacom';
+		code: `import { EmitterService } from 'ngx-core';
 
 constructor(private emitter: EmitterService) {}
 
@@ -1055,7 +1055,7 @@ markReady() {
 				],
 				example: `import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideTheme, provideWacom } from 'wacom';
+import { provideTheme, provideWacom } from 'ngx-core';
 
 export const appConfig: ApplicationConfig = {
 	providers: [
@@ -1075,7 +1075,7 @@ export const appConfig: ApplicationConfig = {
 					'In docs UI, light/dark toggle should switch by calling setMode() directly.',
 				],
 				example: `import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { ThemeService } from 'wacom';
+import { ThemeService } from 'ngx-core';
 
 @Component({
 	selector: 'app-theme-toggle',
@@ -1156,7 +1156,7 @@ html[data-mode='dark'] {
 }`,
 			},
 		],
-		code: `import { ThemeService, provideTheme } from 'wacom';
+		code: `import { ThemeService, provideTheme } from 'ngx-core';
 
 // app.config.ts
 providers: [provideTheme()]
@@ -1237,7 +1237,7 @@ toggleTheme() {
 				],
 			},
 		],
-		code: `import { TranslateService } from 'wacom';
+		code: `import { TranslateService } from 'ngx-core';
 
 private readonly t = inject(TranslateService);
 
@@ -1250,3 +1250,4 @@ switchLanguage() {
 ];
 
 export const serviceDocMap = new Map(serviceDocs.map(doc => [doc.slug, doc]));
+

@@ -1,6 +1,6 @@
 import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
-import { provideTheme, provideTranslation, provideWacom } from 'wacom';
+import { provideTheme, provideTranslation, provideWacom } from 'ngx-core';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -21,7 +21,7 @@ export const appConfig: ApplicationConfig = {
 			meta: {
 				applyFromRoutes: true,
 				defaults: {
-					title: 'Wacom',
+					title: 'ngx-core',
 					titleSuffix: ' | Web Art Work',
 					description:
 						'Angular utility library from Web Art Work for shared services, directives, pipes, and app-level configuration.',
@@ -35,3 +35,4 @@ export const appConfig: ApplicationConfig = {
 		}),
 	],
 };
+

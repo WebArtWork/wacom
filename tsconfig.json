@@ -20,7 +20,7 @@
 		"module": "ES2022",
 		"useDefineForClassFields": false,
 		"paths": {
-			"wacom": ["projects/wacom/public-api.ts"]
+			"ngx-core": ["projects/ngx-core/public-api.ts"]
 		}
 	},
 	"angularCompilerOptions": {

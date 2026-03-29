@@ -11,6 +11,10 @@ import { DEFAULT_HTTP_CONFIG, HttpConfig, HttpHeaderType } from '../interfaces/h
 })
 export class HttpService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _urlStorageKey = 'ngx-core-http.url';
+	private readonly _legacyUrlStorageKey = 'wacom-http.url';
+	private readonly _headersStorageKey = 'ngx-core-http.headers';
+	private readonly _legacyHeadersStorageKey = 'wacom-http.headers';
 
 	// An array of error handling callbacks
 	errors: ((err: HttpErrorResponse, retry?: () => void) => {})[] = [];
@@ -50,9 +54,14 @@ export class HttpService {
 		}
 
 		if (this._isBrowser) {
-			this.url = localStorage.getItem('wacom-http.url') || this.url;
+			this.url =
+				localStorage.getItem(this._urlStorageKey) ||
+				localStorage.getItem(this._legacyUrlStorageKey) ||
+				this.url;
 
-			const raw = localStorage.getItem('wacom-http.headers');
+			const raw =
+				localStorage.getItem(this._headersStorageKey) ||
+				localStorage.getItem(this._legacyHeadersStorageKey);
 			this._headers = raw ? JSON.parse(raw) : this._headers;
 			this._http_headers = new HttpHeaders(this._headers);
 		}
@@ -71,7 +80,7 @@ export class HttpService {
 		this.url = url;
 
 		if (this._isBrowser) {
-			localStorage.setItem('wacom-http.url', url);
+			localStorage.setItem(this._urlStorageKey, url);
 		}
 	}
 
@@ -80,7 +89,8 @@ export class HttpService {
 		this.url = this._config.url || '';
 
 		if (this._isBrowser) {
-			localStorage.removeItem('wacom-http.url');
+			localStorage.removeItem(this._urlStorageKey);
+			localStorage.removeItem(this._legacyUrlStorageKey);
 		}
 	}
 
@@ -89,7 +99,7 @@ export class HttpService {
 		this._headers[key] = value;
 
 		if (this._isBrowser) {
-			localStorage.setItem('wacom-http.headers', JSON.stringify(this._headers));
+			localStorage.setItem(this._headersStorageKey, JSON.stringify(this._headers));
 		}
 
 		this._http_headers = new HttpHeaders(this._headers);
@@ -105,7 +115,7 @@ export class HttpService {
 		delete this._headers[key];
 
 		if (this._isBrowser) {
-			localStorage.setItem('wacom-http.headers', JSON.stringify(this._headers));
+			localStorage.setItem(this._headersStorageKey, JSON.stringify(this._headers));
 		}
 
 		this._http_headers = new HttpHeaders(this._headers);

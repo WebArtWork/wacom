@@ -1,6 +1,6 @@
 {
 	"$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
-	"dest": "../../dist/wacom",
+	"dest": "../../dist/ngx-core",
 	"lib": {
 		"entryFile": "public-api.ts"
 	}

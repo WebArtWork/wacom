@@ -69,23 +69,23 @@
 				}
 			}
 		},
-		"wacom": {
+		"ngx-core": {
 			"projectType": "library",
-			"root": "projects/wacom",
-			"sourceRoot": "projects/wacom/src",
+			"root": "projects/ngx-core",
+			"sourceRoot": "projects/ngx-core/src",
 			"prefix": "lib",
 			"architect": {
 				"build": {
 					"builder": "@angular/build:ng-packagr",
 					"options": {
-						"project": "projects/wacom/ng-package.json"
+						"project": "projects/ngx-core/ng-package.json"
 					},
 					"configurations": {
 						"production": {
-							"tsConfig": "projects/wacom/tsconfig.lib.prod.json"
+							"tsConfig": "projects/ngx-core/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/wacom/tsconfig.lib.json"
+							"tsConfig": "projects/ngx-core/tsconfig.lib.json"
 						}
 					},
 					"defaultConfiguration": "production"

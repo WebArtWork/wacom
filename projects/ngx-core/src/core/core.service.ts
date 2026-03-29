@@ -1,4 +1,4 @@
-// Core utilities and helpers for the Wacom app
+// Core utilities and helpers for the ngx-core app
 import { isPlatformBrowser } from '@angular/common';
 import {
 	DestroyRef,

@@ -2,7 +2,7 @@
 
 Module which has common services, pipes, directives and interfaces which can be used on all projects.
 
-Wacom is SSR-safe and works with Angular Universal: browser-only APIs are guarded, and features that require a browser runtime activate only on the client.
+ngx-core is SSR-safe and works with Angular Universal: browser-only APIs are guarded, and features that require a browser runtime activate only on the client.
 
 ## License
 
@@ -11,13 +11,13 @@ Wacom is SSR-safe and works with Angular Universal: browser-only APIs are guarde
 ## Installation
 
 ```bash
-$ npm i --save wacom
+$ npm i --save ngx-core
 ```
 
 ## Usage
 
 ```typescript
-import { provideWacom } from 'wacom';
+import { provideWacom } from 'ngx-core';
 
 export const appConfig = {
 	providers: [provideWacom()],
@@ -31,7 +31,7 @@ export const appConfig = {
 You can pass an optional configuration object to `provideWacom` to override the library defaults.
 
 ```typescript
-import { provideWacom } from 'wacom';
+import { provideWacom } from 'ngx-core';
 
 export const appConfig = {
 	providers: [
@@ -55,18 +55,18 @@ export const appConfig = {
 
 | Name                                                                 |                             Description                             |
 | -------------------------------------------------------------------- | :-----------------------------------------------------------------: |
-| [**`Core`**](https://www.npmjs.com/package/wacom#core-service)       |     Common supportive function which can be used in any service     |
+| [**`Core`**](https://www.npmjs.com/package/ngx-core#core-service)       |     Common supportive function which can be used in any service     |
 | [**`Emitter`**](#emitter-service)                                    |            Lightweight app-wide event and task signaling            |
-| [**`Http`**](https://www.npmjs.com/package/wacom#http-service)       |                      Http layer for HttpClient                      |
-| [**`Store`**](https://www.npmjs.com/package/wacom#store-service)     |      Service responsible for keeping information on the device      |
-| [**`Meta`**](https://www.npmjs.com/package/wacom#meta-service)       |             Website meta tags management within router              |
-| [**`Crud`**](https://www.npmjs.com/package/wacom#crud-service)       | Provides basic CRUD operations for managing data with HTTP services |
-| [**`Socket`**](https://www.npmjs.com/package/wacom#socket-service)   |   Manages WebSocket connections and real-time data communication    |
-| [**`Time`**](https://www.npmjs.com/package/wacom#time-service)       |  Provides utilities for date and time manipulation and formatting   |
-| [**`Dom`**](https://www.npmjs.com/package/wacom#dom-service)         |     Facilitates DOM manipulation and dynamic component loading      |
-| [**`Network`**](https://www.npmjs.com/package/wacom#network-service) |              Monitors network connectivity and latency              |
-| [**`RTC`**](https://www.npmjs.com/package/wacom#rtc-service)         |        Wraps WebRTC peer connections and local media streams        |
-| [**`Util`**](https://www.npmjs.com/package/wacom#util-service)       |      Utility methods for forms, validation, and CSS variables       |
+| [**`Http`**](https://www.npmjs.com/package/ngx-core#http-service)       |                      Http layer for HttpClient                      |
+| [**`Store`**](https://www.npmjs.com/package/ngx-core#store-service)     |      Service responsible for keeping information on the device      |
+| [**`Meta`**](https://www.npmjs.com/package/ngx-core#meta-service)       |             Website meta tags management within router              |
+| [**`Crud`**](https://www.npmjs.com/package/ngx-core#crud-service)       | Provides basic CRUD operations for managing data with HTTP services |
+| [**`Socket`**](https://www.npmjs.com/package/ngx-core#socket-service)   |   Manages WebSocket connections and real-time data communication    |
+| [**`Time`**](https://www.npmjs.com/package/ngx-core#time-service)       |  Provides utilities for date and time manipulation and formatting   |
+| [**`Dom`**](https://www.npmjs.com/package/ngx-core#dom-service)         |     Facilitates DOM manipulation and dynamic component loading      |
+| [**`Network`**](https://www.npmjs.com/package/ngx-core#network-service) |              Monitors network connectivity and latency              |
+| [**`RTC`**](https://www.npmjs.com/package/ngx-core#rtc-service)         |        Wraps WebRTC peer connections and local media streams        |
+| [**`Util`**](https://www.npmjs.com/package/ngx-core#util-service)       |      Utility methods for forms, validation, and CSS variables       |
 | [**`Theme`**](#theme-service)                                        |       Manages UI theme mode, density, and radius preferences        |
 | [**`Translate`**](#translate-service)                                |         Lightweight, signal-based runtime translate engine          |
 
@@ -419,7 +419,7 @@ Checks if a resource is currently locked.
 Here's an example demonstrating how to use the locking management methods in `CoreService`:
 
 ```Typescript
-import { CoreService } from 'wacom';
+import { CoreService } from 'ngx-core';
 export class AppComponent {
   constructor(private coreService: CoreService) {
     this.manageResource();
@@ -463,7 +463,7 @@ The `EmitterService` provides a lightweight event bus and completion signaling b
 Example:
 
 ```ts
-import { EmitterService } from 'wacom';
+import { EmitterService } from 'ngx-core';
 
 constructor(private emitter: EmitterService) {}
 
@@ -1390,7 +1390,7 @@ interface CrudDocument {
 
 ```typescript
 import { Injectable } from '@angular/core';
-import { CoreService, HttpService, StoreService, CrudService, CrudDocument } from 'wacom';
+import { CoreService, HttpService, StoreService, CrudService, CrudDocument } from 'ngx-core';
 
 export interface Work extends CrudDocument {
 	name: string;
@@ -1473,7 +1473,7 @@ socketService.emit('message', { text: 'Hello, World!' });
 ### Usage Example
 
 ```typescript
-import { SocketService } from 'wacom';
+import { SocketService } from 'ngx-core';
 
 @Component({
 	selector: 'app-root',
@@ -2101,7 +2101,7 @@ The `RtcService` wraps WebRTC peer connections and local media streams.
 **Example**:
 
 ```Typescript
-import { RtcService } from 'wacom';
+import { RtcService } from 'ngx-core';
 
 constructor(private rtc: RtcService) {}
 
@@ -2134,7 +2134,7 @@ document root, persisting them in `localStorage`, and exposing Angular signals.
 ### Usage Example
 
 ```Typescript
-import { ThemeService } from "wacom";
+import { ThemeService } from "ngx-core";
 
 constructor(private theme: ThemeService) {}
 
@@ -2148,7 +2148,7 @@ ngOnInit() {
 
 ## [Translate Service](#translate-service)
 
-Wacom includes a lightweight, signal-based runtime translation engine built for Angular Signals.
+ngx-core includes a lightweight, signal-based runtime translation engine built for Angular Signals.
 
 It provides:
 
@@ -2183,7 +2183,7 @@ Each `sourceText` acts as both:
 ### Bootstrap with provideTranslate
 
 ```ts
-import { provideTranslate } from 'wacom';
+import { provideTranslate } from 'ngx-core';
 
 providers: [
 	provideTranslate({
@@ -2200,7 +2200,7 @@ providers: [
 ### Inline translations mode
 
 ```ts
-import { provideTranslate } from 'wacom';
+import { provideTranslate } from 'ngx-core';
 
 providers: [
 	provideTranslate({
@@ -2225,7 +2225,7 @@ providers: [
 ### File loader mode
 
 ```ts
-import { provideTranslate } from 'wacom';
+import { provideTranslate } from 'ngx-core';
 
 providers: [
 	provideTranslate({
@@ -2254,7 +2254,7 @@ File format:
 ### Basic usage (signal API)
 
 ```ts
-import { TranslateService } from "wacom";
+import { TranslateService } from "ngx-core";
 
 private _translateService = inject(TranslateService);
 
@@ -2385,7 +2385,7 @@ Directive and pipe usage stays the same:
 Copy below code into AGENTS.md file of your project while you are using our plugin.
 
 ```md
-- This project uses `wacom`, an Angular utility library for shared services, directives, pipes, and app-level configuration.
+- This project uses `ngx-core`, an Angular utility library for shared services, directives, pipes, and app-level configuration.
 - Prefer bootstrapping with `provideWacom({...})` in application providers. Use `WacomModule` / `WacomModule.forRoot()` only for legacy NgModule-based apps.
 - Put library-wide configuration in `provideWacom()` instead of scattering it across components. Available config areas include `http`, `store`, `meta`, `network`, and optional `socket` / `io`.
 - Prefer the library services before adding duplicate app utilities:
@@ -2394,10 +2394,11 @@ Copy below code into AGENTS.md file of your project while you are using our plug
     - `MetaService` for title, description, robots, image, and link tags.
     - `CrudService` for data flows that need offline-aware syncing behavior.
     - `EmitterService`, `NetworkService`, `SocketService`, `RtcService`, `TimeService`, and `UtilService` when their built-in behavior matches the need.
-- Prefer importing the specific Wacom directives, pipes, and translation helpers you need instead of wrapping the whole library again in another shared abstraction.
+- Prefer importing the specific ngx-core directives, pipes, and translation helpers you need instead of wrapping the whole library again in another shared abstraction.
 - For metadata, prefer configuring defaults in `provideWacom({ meta: ... })` and using `MetaService` or route metadata. If route-driven updates are expected, prefer `meta.applyFromRoutes = true`; use `MetaGuard` only when that flow specifically needs a guard.
 - For translations, register app translations with `provideTranslate(...)` and use the exported translation pipe/directive rather than creating another parallel translation bootstrap path.
-- Keep SSR-safe behavior intact. Do not add unguarded direct access to browser-only globals such as `window`, `document`, storage, media devices, or WebRTC APIs when Wacom already provides a guarded service for that area.
-- When changing app behavior, prefer configuring or composing Wacom services first before modifying the library source.
+- Keep SSR-safe behavior intact. Do not add unguarded direct access to browser-only globals such as `window`, `document`, storage, media devices, or WebRTC APIs when ngx-core already provides a guarded service for that area.
+- When changing app behavior, prefer configuring or composing ngx-core services first before modifying the library source.
 - Common reusable building blocks exported by the library include `clickOutside`, manual form-related directives, translation helpers, and array/search/safe/pagination-style pipes.
 ```
+

@@ -7,7 +7,7 @@ export const routes: Routes = [
 			import('./pages/landing/landing.component').then(m => m.LandingComponent),
 		data: {
 			meta: {
-				title: 'Wacom',
+				title: 'ngx-core',
 				description:
 					'Angular utility library from Web Art Work for shared services, directives, pipes, and app-level configuration.',
 			},
@@ -25,3 +25,4 @@ export const routes: Routes = [
 		redirectTo: '',
 	},
 ];
+

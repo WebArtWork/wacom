@@ -13,7 +13,7 @@ export class LandingComponent {
 	private readonly _platformId = inject(PLATFORM_ID);
 
 	protected readonly copiedKey = signal('');
-	protected readonly installCommand = 'npm i --save wacom';
+	protected readonly installCommand = 'npm i --save ngx-core';
 
 	protected readonly services = serviceDocs;
 
@@ -32,13 +32,13 @@ export class LandingComponent {
 		});
 	}
 
-	protected readonly usageCopy = `import { provideWacom } from 'wacom';
+	protected readonly usageCopy = `import { provideWacom } from 'ngx-core';
 
 export const appConfig = {
 \tproviders: [provideWacom()],
 };`;
 
-	protected readonly configCopy = `import { provideWacom } from 'wacom';
+	protected readonly configCopy = `import { provideWacom } from 'ngx-core';
 
 export const appConfig = {
 \tproviders: [
@@ -57,3 +57,4 @@ export const appConfig = {
 \t],
 };`;
 }
+

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ThemeService, TranslateDirective, TranslatePipe, TranslateService } from 'wacom';
+import { ThemeService, TranslateDirective, TranslatePipe, TranslateService } from 'ngx-core';
 import { serviceDocs } from './services/service-docs';
 
 @Component({
@@ -34,3 +34,4 @@ export class AppComponent {
 		this.themeService.setMode(nextMode);
 	}
 }
+

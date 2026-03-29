@@ -1,10 +1,10 @@
 {
-	"name": "wacom",
+	"name": "@wawjs/ngx-core",
 	"version": "1.0.0",
 	"scripts": {
 		"start": "ng serve app",
-		"watch": "ng build wacom --watch",
-		"build": "ng build wacom && node scripts/copy-readme.mjs",
+		"watch": "ng build ngx-core --watch",
+		"build": "ng build ngx-core && node scripts/copy-readme.mjs",
 		"build:app": "node scripts/generate-prerender-routes.mjs && ng build app",
 		"publish": "node scripts/publish.mjs"
 	},

@@ -261,7 +261,7 @@ export class TranslateService {
 			return [...translations];
 		} catch (error) {
 			console.warn(
-				`[wacom:translate] Failed to load translations for "${language}" from "${url}".`,
+				`[ngx-core:translate] Failed to load translations for "${language}" from "${url}".`,
 				error,
 			);
 			this._translationsByLanguage.set(language, []);

@@ -1,4 +1,4 @@
-- This project uses `wacom`, an Angular utility library for shared services, directives, pipes, and app-level configuration.
+- This project uses `ngx-core`, an Angular utility library for shared services, directives, pipes, and app-level configuration.
 - Prefer bootstrapping with `provideWacom({...})` in application providers. Use `WacomModule` / `WacomModule.forRoot()` only for legacy NgModule-based apps.
 - Put library-wide configuration in `provideWacom()` instead of scattering it across components. Available config areas include `http`, `store`, `meta`, `network`, and optional `socket` / `io`.
 - Prefer the library services before adding duplicate app utilities:
@@ -7,9 +7,10 @@
   - `MetaService` for title, description, robots, image, and link tags.
   - `CrudService` for data flows that need offline-aware syncing behavior.
   - `EmitterService`, `NetworkService`, `SocketService`, `RtcService`, `TimeService`, and `UtilService` when their built-in behavior matches the need.
-- Prefer importing the specific Wacom directives, pipes, and translation helpers you need instead of wrapping the whole library again in another shared abstraction.
+- Prefer importing the specific ngx-core directives, pipes, and translation helpers you need instead of wrapping the whole library again in another shared abstraction.
 - For metadata, prefer configuring defaults in `provideWacom({ meta: ... })` and using `MetaService` or route metadata. If route-driven updates are expected, prefer `meta.applyFromRoutes = true`; use `MetaGuard` only when that flow specifically needs a guard.
 - For translations, register app translations with `provideTranslate(...)` and use the exported translation pipe/directive rather than creating another parallel translation bootstrap path.
-- Keep SSR-safe behavior intact. Do not add unguarded direct access to browser-only globals such as `window`, `document`, storage, media devices, or WebRTC APIs when Wacom already provides a guarded service for that area.
-- When changing app behavior, prefer configuring or composing Wacom services first before modifying the library source.
+- Keep SSR-safe behavior intact. Do not add unguarded direct access to browser-only globals such as `window`, `document`, storage, media devices, or WebRTC APIs when ngx-core already provides a guarded service for that area.
+- When changing app behavior, prefer configuring or composing ngx-core services first before modifying the library source.
 - Common reusable building blocks exported by the library include `clickOutside`, manual form-related directives, translation helpers, and array/search/safe/pagination-style pipes.
+

@@ -11,7 +11,7 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
-import { MetaService } from 'wacom';
+import { MetaService } from 'ngx-core';
 import { serviceDocMap, type ServiceDoc, type ServiceMethodDoc } from '../../services/service-docs';
 
 interface ServiceReferenceItem {
@@ -157,3 +157,4 @@ export class ServiceDetailComponent {
 		return example.replace(/\t/g, '  ');
 	}
 }
+
